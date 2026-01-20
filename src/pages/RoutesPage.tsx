@@ -706,55 +706,71 @@ export function RoutesPage() {
                     <button
                       key={route.id}
                       onClick={() => handleRouteSelect(route)}
-                      className="w-full text-left p-4 rounded-xl bg-card/50 border border-border/50 hover:border-primary/50 hover:bg-card/80 transition-all group"
+                      className="w-full text-left rounded-xl bg-card/50 border border-border/50 hover:border-primary/50 hover:bg-card/80 transition-all group overflow-hidden"
                     >
-                      {/* Header with title and loop badge */}
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <h3 className="font-sans font-bold text-foreground text-lg group-hover:text-primary transition-colors">
-                          {t(route.title)}
-                        </h3>
+                      {/* Cover image thumbnail */}
+                      <div 
+                        className="w-full h-32 bg-cover bg-center relative"
+                        style={{ 
+                          backgroundImage: route.coverImage 
+                            ? `url(${route.coverImage})` 
+                            : 'linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted-foreground)/0.2) 100%)'
+                        }}
+                      >
+                        {/* Loop badge on image */}
                         {route.isLoop && (
-                          <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-primary/15 text-primary text-[10px] font-bold uppercase tracking-wide whitespace-nowrap border border-primary/30">
+                          <span className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-full bg-white/90 backdrop-blur-sm text-primary text-[10px] font-bold uppercase tracking-wide border border-primary/30">
                             <RotateCw className="w-3 h-3" />
                             {t(texts.loopRoute)}
                           </span>
                         )}
+                        
+                        {/* Bottom gradient for smooth transition */}
+                        <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/30 to-transparent" />
                       </div>
 
-                      {/* Description */}
-                      {route.shortDescription && (
-                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                          {t(route.shortDescription)}
-                        </p>
-                      )}
+                      {/* Content */}
+                      <div className="p-4">
+                        {/* Title */}
+                        <h3 className="font-sans font-bold text-foreground text-lg group-hover:text-primary transition-colors mb-2">
+                          {t(route.title)}
+                        </h3>
 
-                      {/* Footer with metadata */}
-                      <div className="flex flex-wrap items-center gap-2">
-                        {/* Category chips */}
-                        {route.categoryIds.slice(0, 2).map(catId => {
-                          const cat = getCategoryById(catId);
-                          return cat ? (
-                            <span key={catId} className="category-chip text-[10px]">
-                              {t(cat.label)}
-                            </span>
-                          ) : null;
-                        })}
-                        
-                        {/* Stops count */}
-                        <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
-                          <MapPin className="w-3 h-3" />
-                          {route.poiOrder.length} {t(texts.stops)}
-                        </span>
-
-                        {/* AR badge if has AR POIs */}
-                        {arCount > 0 && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-warm/15 text-warm text-[10px] font-bold border border-warm/30">
-                            <Smartphone className="w-3 h-3" />
-                            {arCount} AR
-                          </span>
+                        {/* Description */}
+                        {route.shortDescription && (
+                          <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                            {t(route.shortDescription)}
+                          </p>
                         )}
 
-                        <ChevronRight className="w-4 h-4 text-muted-foreground ml-auto group-hover:text-primary transition-colors" />
+                        {/* Footer with metadata */}
+                        <div className="flex flex-wrap items-center gap-2">
+                          {/* Category chips */}
+                          {route.categoryIds.slice(0, 2).map(catId => {
+                            const cat = getCategoryById(catId);
+                            return cat ? (
+                              <span key={catId} className="category-chip text-[10px]">
+                                {t(cat.label)}
+                              </span>
+                            ) : null;
+                          })}
+                          
+                          {/* Stops count */}
+                          <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
+                            <MapPin className="w-3 h-3" />
+                            {route.poiOrder.length} {t(texts.stops)}
+                          </span>
+
+                          {/* AR badge if has AR POIs */}
+                          {arCount > 0 && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-warm/15 text-warm text-[10px] font-bold border border-warm/30">
+                              <Smartphone className="w-3 h-3" />
+                              {arCount} AR
+                            </span>
+                          )}
+
+                          <ChevronRight className="w-4 h-4 text-muted-foreground ml-auto group-hover:text-primary transition-colors" />
+                        </div>
                       </div>
                     </button>
                   );
