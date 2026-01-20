@@ -918,9 +918,10 @@ export function RoutesPage() {
                             </div>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <p className="font-medium text-foreground truncate">{t(poi.title)}</p>
-                            </div>
+                            <p className="font-medium text-foreground truncate">{t(poi.title)}</p>
+                            {poi.access?.address && (
+                              <p className="text-xs text-muted-foreground truncate mt-0.5">{poi.access.address}</p>
+                            )}
                             <div className="flex items-center gap-2 mt-1">
                               <TypeBadge type={poi.experienceType} size="sm" />
                               {poi.categoryIds.slice(0, 1).map(catId => {
@@ -968,13 +969,16 @@ export function RoutesPage() {
                           </div>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2 mb-1">
+                          <div className="flex items-start justify-between gap-2">
                             <h3 className="font-sans font-bold text-foreground truncate group-hover:text-primary transition-colors">
                               {t(poi.title)}
                             </h3>
                             <TypeBadge type={poi.experienceType} size="sm" />
                           </div>
-                          <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                          {poi.access?.address && (
+                            <p className="text-xs text-muted-foreground truncate mt-0.5">{poi.access.address}</p>
+                          )}
+                          <p className="text-sm text-muted-foreground line-clamp-2 mt-1 mb-2">
                             {t(poi.shortDescription)}
                           </p>
                           <div className="flex flex-wrap gap-1">
