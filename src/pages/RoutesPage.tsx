@@ -384,11 +384,11 @@ export function RoutesPage() {
         }
       }
 
-      // Colores de ruta: Azul institucional para rutas, verde para lazos
+      // Color neutro para la ruta (gris oscuro) - no implica tipo de experiencia
       polylineRef.current = L.polyline(positions, {
-        color: selectedRoute.isLoop ? 'hsl(79, 100%, 36%)' : 'hsl(203, 100%, 32%)',
+        color: 'hsl(0, 0%, 25%)',
         weight: 5,
-        opacity: 0.95,
+        opacity: 0.9,
         dashArray: selectedRoute.isLoop ? undefined : '12, 8',
         lineCap: 'round',
         lineJoin: 'round'
