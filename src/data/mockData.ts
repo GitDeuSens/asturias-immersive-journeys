@@ -6,6 +6,7 @@ import caresImg from '@/assets/cares.jpg';
 import horreoImg from '@/assets/horreo.jpg';
 import picosImg from '@/assets/picos.jpg';
 import preromanicoImg from '@/assets/preromanico.jpg';
+import rutaSidraImg from '@/assets/ruta-sidra-cover.jpg';
 
 // ============ TIPOS BASE ============
 
@@ -687,6 +688,225 @@ export const pois: POI[] = [
       ],
       allowFullscreen: true
     }
+  },
+  // ============ POIs RUTA DE LA SIDRA ============
+  {
+    id: 'museo-sidra',
+    title: { es: 'Museo de la Sidra', en: 'Cider Museum', fr: 'Musée du Cidre' },
+    categoryIds: ['gastronomy', 'culture'],
+    tags: ['sidra', 'museo', 'nava', 'tradición'],
+    experienceType: 'INFO',
+    shortDescription: {
+      es: 'El templo de la cultura sidrera asturiana',
+      en: 'The temple of Asturian cider culture',
+      fr: 'Le temple de la culture du cidre asturien'
+    },
+    richText: {
+      blocks: [
+        {
+          type: 'paragraph',
+          text: {
+            es: 'El Museo de la Sidra de Asturias, ubicado en Nava, es el centro de referencia para conocer la cultura sidrera declarada Patrimonio Cultural Inmaterial de la Humanidad por la UNESCO.',
+            en: 'The Asturias Cider Museum, located in Nava, is the reference center for learning about cider culture, declared Intangible Cultural Heritage of Humanity by UNESCO.',
+            fr: 'Le Musée du Cidre des Asturies, situé à Nava, est le centre de référence pour connaître la culture du cidre déclarée Patrimoine Culturel Immatériel de l\'Humanité par l\'UNESCO.'
+          }
+        },
+        {
+          type: 'highlight',
+          title: { es: 'El arte del escanciado', en: 'The art of pouring', fr: 'L\'art de servir' },
+          text: {
+            es: 'Aprende la técnica tradicional de escanciar la sidra y descubre los secretos de su elaboración artesanal.',
+            en: 'Learn the traditional technique of pouring cider and discover the secrets of its artisanal production.',
+            fr: 'Apprenez la technique traditionnelle de servir le cidre et découvrez les secrets de sa production artisanale.'
+          }
+        }
+      ]
+    },
+    audioGuides: {},
+    access: {
+      address: 'Plaza Príncipe de Asturias, Nava, Asturias',
+      lat: 43.3544,
+      lng: -5.5067
+    },
+    media: {
+      images: [{ url: rutaSidraImg }]
+    },
+    practical: {
+      openingHours: { es: 'Martes a Domingo: 11:00 - 14:00 y 16:00 - 19:00', en: 'Tuesday to Sunday: 11:00 - 14:00 and 16:00 - 19:00', fr: 'Mardi à Dimanche: 11:00 - 14:00 et 16:00 - 19:00' },
+      recommendedDuration: { es: '1-2 horas', en: '1-2 hours', fr: '1-2 heures' }
+    },
+    contact: { website: 'https://www.museodelasidra.com' },
+    links: [],
+    share: { shareUrl: 'https://turismoasturias.es/museo-sidra' }
+  },
+  {
+    id: 'valdedios',
+    title: { es: 'Conjunto Monumental de Valdediós', en: 'Valdediós Monumental Complex', fr: 'Ensemble Monumental de Valdediós' },
+    categoryIds: ['heritage', 'culture'],
+    tags: ['prerrománico', 'monasterio', 'villaviciosa'],
+    experienceType: '360',
+    shortDescription: {
+      es: 'Joya prerrománica en un valle de ensueño',
+      en: 'Pre-Romanesque jewel in a dream valley',
+      fr: 'Joyau préroman dans une vallée de rêve'
+    },
+    richText: {
+      blocks: [
+        {
+          type: 'paragraph',
+          text: {
+            es: 'El Conjunto Monumental de Valdediós alberga la iglesia de San Salvador (conocida como "El Conventín"), del siglo IX, y el Monasterio de Santa María, en un entorno natural de extraordinaria belleza.',
+            en: 'The Valdediós Monumental Complex houses the 9th-century church of San Salvador (known as "El Conventín") and the Monastery of Santa María, in a natural setting of extraordinary beauty.',
+            fr: 'L\'Ensemble Monumental de Valdediós abrite l\'église de San Salvador (connue comme "El Conventín"), du IXe siècle, et le Monastère de Santa María, dans un cadre naturel d\'une beauté extraordinaire.'
+          }
+        }
+      ]
+    },
+    audioGuides: {},
+    access: {
+      address: 'Valdediós, Villaviciosa, Asturias',
+      lat: 43.4389,
+      lng: -5.5147
+    },
+    media: {
+      images: [{ url: preromanicoImg }]
+    },
+    practical: {
+      recommendedDuration: { es: '1-2 horas', en: '1-2 hours', fr: '1-2 heures' }
+    },
+    contact: {},
+    links: [],
+    share: { shareUrl: 'https://turismoasturias.es/valdedios' },
+    tour360: {
+      iframe360Url: 'https://kuula.co/share/collection/7YHTQ',
+      allowFullscreen: true
+    }
+  },
+  {
+    id: 'muja',
+    title: { es: 'Museo del Jurásico de Asturias', en: 'Jurassic Museum of Asturias', fr: 'Musée du Jurassique des Asturies' },
+    categoryIds: ['culture'],
+    tags: ['dinosaurios', 'museo', 'colunga', 'paleontología'],
+    experienceType: 'AR',
+    shortDescription: {
+      es: 'Viaje al pasado prehistórico asturiano',
+      en: 'Journey to the Asturian prehistoric past',
+      fr: 'Voyage dans le passé préhistorique asturien'
+    },
+    richText: {
+      blocks: [
+        {
+          type: 'paragraph',
+          text: {
+            es: 'El MUJA es una visita esencial para los amantes de la paleontología, con una colección destacada de dinosaurios y fósiles. Su edificio con forma de huella de dinosaurio alberga réplicas a tamaño real.',
+            en: 'MUJA is an essential visit for paleontology lovers, with an outstanding collection of dinosaurs and fossils. Its dinosaur footprint-shaped building houses life-size replicas.',
+            fr: 'Le MUJA est une visite incontournable pour les amateurs de paléontologie, avec une collection remarquable de dinosaures et de fossiles. Son bâtiment en forme d\'empreinte de dinosaure abrite des répliques grandeur nature.'
+          }
+        }
+      ]
+    },
+    audioGuides: {},
+    access: {
+      address: 'Rasa de San Telmo, Colunga, Asturias',
+      lat: 43.4897,
+      lng: -5.2706
+    },
+    media: {
+      images: [{ url: rutaSidraImg }]
+    },
+    practical: {
+      recommendedDuration: { es: '2-3 horas', en: '2-3 hours', fr: '2-3 heures' }
+    },
+    contact: { website: 'https://www.museojurasicoasturias.com' },
+    links: [],
+    share: { shareUrl: 'https://turismoasturias.es/muja' },
+    ar: {
+      launchUrl: 'https://muja.ar-experience.com',
+      qrValue: 'https://muja.ar-experience.com',
+      iframe3dUrl: 'https://sketchfab.com/models/dinosaur/embed'
+    }
+  },
+  {
+    id: 'laboral',
+    title: { es: 'Laboral Ciudad de la Cultura', en: 'Laboral City of Culture', fr: 'Laboral Cité de la Culture' },
+    categoryIds: ['culture', 'heritage'],
+    tags: ['arquitectura', 'cultura', 'gijón'],
+    experienceType: '360',
+    shortDescription: {
+      es: 'Imponente complejo arquitectónico y cultural',
+      en: 'Impressive architectural and cultural complex',
+      fr: 'Impressionnant complexe architectural et culturel'
+    },
+    richText: {
+      blocks: [
+        {
+          type: 'paragraph',
+          text: {
+            es: 'Laboral Ciudad de la Cultura es uno de los edificios civiles más grandes de España. Este imponente complejo arquitectónico alberga una vibrante oferta cultural y artística, con teatros, salas de exposiciones y espacios creativos.',
+            en: 'Laboral City of Culture is one of the largest civil buildings in Spain. This impressive architectural complex houses a vibrant cultural and artistic offering, with theaters, exhibition halls, and creative spaces.',
+            fr: 'Laboral Cité de la Culture est l\'un des plus grands bâtiments civils d\'Espagne. Ce complexe architectural impressionnant abrite une offre culturelle et artistique vibrante, avec des théâtres, des salles d\'exposition et des espaces créatifs.'
+          }
+        }
+      ]
+    },
+    audioGuides: {},
+    access: {
+      address: 'Luis Moya Blanco 261, Gijón, Asturias',
+      lat: 43.5253,
+      lng: -5.6186
+    },
+    media: {
+      images: [{ url: rutaSidraImg }]
+    },
+    practical: {
+      recommendedDuration: { es: '2-3 horas', en: '2-3 hours', fr: '2-3 heures' }
+    },
+    contact: { website: 'https://www.laboralciudaddelacultura.com' },
+    links: [],
+    share: { shareUrl: 'https://turismoasturias.es/laboral' },
+    tour360: {
+      iframe360Url: 'https://kuula.co/share/collection/laboral',
+      allowFullscreen: true
+    }
+  },
+  {
+    id: 'cimavilla',
+    title: { es: 'Barrio de Cimavilla', en: 'Cimavilla Neighborhood', fr: 'Quartier de Cimavilla' },
+    categoryIds: ['gastronomy', 'culture'],
+    tags: ['sidrerías', 'gijón', 'marinero', 'tapas'],
+    experienceType: 'INFO',
+    shortDescription: {
+      es: 'Laberinto marinero con las mejores sidrerías',
+      en: 'Maritime labyrinth with the best cider houses',
+      fr: 'Labyrinthe maritime avec les meilleures cidreries'
+    },
+    richText: {
+      blocks: [
+        {
+          type: 'paragraph',
+          text: {
+            es: 'Un pintoresco laberinto de calles estrechas, lleno de historia marinera y encanto, donde se mezclan el ambiente bohemio y las vistas al puerto. Sus tradicionales sidrerías son el lugar perfecto para disfrutar de un culín.',
+            en: 'A picturesque labyrinth of narrow streets, full of maritime history and charm, where bohemian atmosphere and harbor views blend. Its traditional cider houses are the perfect place to enjoy a culín.',
+            fr: 'Un pittoresque labyrinthe de ruelles étroites, plein d\'histoire maritime et de charme, où se mêlent l\'ambiance bohème et les vues sur le port. Ses cidreries traditionnelles sont l\'endroit idéal pour déguster un culín.'
+          }
+        }
+      ]
+    },
+    audioGuides: {},
+    access: {
+      address: 'Cimavilla, Gijón, Asturias',
+      lat: 43.5456,
+      lng: -5.6633
+    },
+    media: {
+      images: [{ url: rutaSidraImg }]
+    },
+    practical: {
+      recommendedDuration: { es: '2-4 horas', en: '2-4 hours', fr: '2-4 heures' }
+    },
+    contact: {},
+    links: [],
+    share: { shareUrl: 'https://turismoasturias.es/cimavilla' }
   }
 ];
 
@@ -822,6 +1042,48 @@ export const routes: Route[] = [
       { lat: 43.2194, lng: -4.8119 },
       { lat: 43.2477, lng: -4.8433 },
       { lat: 43.3833, lng: -5.8667 },
+    ],
+  },
+  {
+    id: 'route-sidra',
+    title: { es: 'Ruta de la Sidra', en: 'Cider Route', fr: 'Route du Cidre' },
+    categoryIds: ['gastronomy', 'culture', 'heritage'],
+    isLoop: false,
+    poiOrder: ['museo-sidra', 'valdedios', 'muja', 'laboral', 'cimavilla'],
+    coverImage: rutaSidraImg,
+    shortDescription: {
+      es: 'Cultura sidrera declarada Patrimonio UNESCO',
+      en: 'Cider culture declared UNESCO Heritage',
+      fr: 'Culture du cidre déclarée Patrimoine UNESCO'
+    },
+    itineraryDays: [
+      { 
+        day: 1, 
+        title: { es: 'Día 1: Comarca de la Sidra', en: 'Day 1: Cider Region', fr: 'Jour 1: Région du Cidre' }, 
+        poiIds: ['museo-sidra'] 
+      },
+      { 
+        day: 2, 
+        title: { es: 'Día 2: Villaviciosa', en: 'Day 2: Villaviciosa', fr: 'Jour 2: Villaviciosa' }, 
+        poiIds: ['valdedios'] 
+      },
+      { 
+        day: 3, 
+        title: { es: 'Día 3: Costa Jurásica', en: 'Day 3: Jurassic Coast', fr: 'Jour 3: Côte Jurassique' }, 
+        poiIds: ['muja'] 
+      },
+      { 
+        day: 4, 
+        title: { es: 'Día 4: Gijón', en: 'Day 4: Gijón', fr: 'Jour 4: Gijón' }, 
+        poiIds: ['laboral', 'cimavilla'] 
+      },
+    ],
+    polyline: [
+      { lat: 43.3544, lng: -5.5067 }, // Nava - Museo Sidra
+      { lat: 43.4389, lng: -5.5147 }, // Valdediós
+      { lat: 43.4897, lng: -5.2706 }, // MUJA Colunga
+      { lat: 43.5253, lng: -5.6186 }, // Laboral
+      { lat: 43.5456, lng: -5.6633 }, // Cimavilla
     ],
   },
 ];
