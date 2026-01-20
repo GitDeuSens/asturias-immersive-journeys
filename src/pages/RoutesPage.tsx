@@ -121,32 +121,73 @@ const createMarkerIcon = (number: number, type: ExperienceType, imageUrl?: strin
   });
 };
 
-const createPOIMarkerIcon = (type: ExperienceType) => {
+const createPOIMarkerIcon = (type: ExperienceType, imageUrl?: string) => {
   const typeColors = {
-    'AR': { bg: 'hsl(48, 100%, 50%)', icon: '📱' },      // Amarillo Asturias
-    '360': { bg: 'hsl(79, 100%, 36%)', icon: '🔄' },     // Verde Asturias
-    'INFO': { bg: 'hsl(203, 100%, 32%)', icon: 'ℹ️' }    // Azul institucional
+    'AR': { bg: 'hsl(48, 100%, 50%)', textColor: '#1a1a1a' },
+    '360': { bg: 'hsl(79, 100%, 36%)', textColor: 'white' },
+    'INFO': { bg: 'hsl(203, 100%, 32%)', textColor: 'white' }
   };
   const config = typeColors[type];
+  
+  // SVG icons for each type
+  const icons = {
+    'AR': `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${config.textColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>`,
+    '360': `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${config.textColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>`,
+    'INFO': `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${config.textColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`
+  };
   
   return L.divIcon({
     className: 'custom-marker',
     html: `
       <div style="
-        width: 38px;
-        height: 38px;
-        background: ${config.bg};
-        border: 3px solid white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-      ">${config.icon}</div>
+        position: relative;
+        width: 48px;
+        height: 48px;
+      ">
+        <div style="
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          border: 4px solid ${config.bg};
+          overflow: hidden;
+          background: white;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        ">
+          ${imageUrl ? `
+            <img src="${imageUrl}" style="
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            " alt=""/>
+          ` : `
+            <div style="
+              width: 100%;
+              height: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background: ${config.bg};
+            ">${icons[type]}</div>
+          `}
+        </div>
+        <div style="
+          position: absolute;
+          top: -4px;
+          right: -4px;
+          width: 20px;
+          height: 20px;
+          background: ${config.bg};
+          border: 2px solid white;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        ">${icons[type]}</div>
+      </div>
     `,
-    iconSize: [38, 38],
-    iconAnchor: [19, 38],
+    iconSize: [48, 48],
+    iconAnchor: [24, 48],
   });
 };
 
@@ -236,24 +277,25 @@ const TypeBadge = ({ type, size = 'sm' }: { type: ExperienceType; size?: 'sm' | 
   const config = {
     'AR': { 
       className: 'bg-[hsl(48,100%,50%)]/20 border-[hsl(48,100%,50%)] text-[hsl(48,100%,35%)]', 
-      icon: '📱' 
+      Icon: Smartphone 
     },
     '360': { 
       className: 'bg-primary/20 border-primary text-primary', 
-      icon: '🔄' 
+      Icon: Camera 
     },
     'INFO': { 
       className: 'bg-[hsl(203,100%,32%)]/20 border-[hsl(203,100%,32%)] text-[hsl(203,100%,32%)]', 
-      icon: 'ℹ️' 
+      Icon: Info 
     }
   };
   const style = config[type];
   const sizeClasses = size === 'sm' ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs';
+  const iconSize = size === 'sm' ? 10 : 12;
   
   return (
     <span className={`inline-flex items-center gap-1 rounded-md border font-bold ${style.className} ${sizeClasses}`}>
-      <span>{style.icon}</span>
-      <span>{type}</span>
+      <style.Icon className="flex-shrink-0" style={{ width: iconSize, height: iconSize }} />
+      <span>{type === '360' ? '360°' : type}</span>
     </span>
   );
 };
@@ -440,10 +482,11 @@ export function RoutesPage() {
       // Fit bounds to route
       fitToRoute();
     } else if (viewMode === 'pois') {
-      // Add all filtered POIs as markers
+      // Add all filtered POIs as markers with thumbnails
       filteredPOIs.forEach(poi => {
+        const imageUrl = poi.media.images[0];
         const marker = L.marker([poi.access.lat, poi.access.lng], {
-          icon: createPOIMarkerIcon(poi.experienceType)
+          icon: createPOIMarkerIcon(poi.experienceType, imageUrl)
         })
           .addTo(mapRef.current!)
           .on('click', () => handlePOIClick(poi));
@@ -637,14 +680,16 @@ export function RoutesPage() {
                         ? 'bg-[hsl(203,100%,32%)]/20 border-[hsl(203,100%,32%)] text-[hsl(203,100%,32%)]'
                         : 'bg-muted/30 border-border/50 text-foreground/60 hover:bg-muted/50'
                     };
+                    const TypeIcon = type === 'AR' ? Smartphone : type === '360' ? Camera : Info;
                     
                     return (
                       <button
                         key={type}
                         onClick={() => toggleType(type)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${colorClasses[type]}`}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${colorClasses[type]}`}
                       >
-                        {type === 'AR' ? '📱 AR' : type === '360' ? '🔄 360°' : 'ℹ️ INFO'}
+                        <TypeIcon className="w-3.5 h-3.5" />
+                        {type === '360' ? '360°' : type}
                       </button>
                     );
                   })}
@@ -703,8 +748,9 @@ export function RoutesPage() {
 
                         {/* AR badge if has AR POIs */}
                         {arCount > 0 && (
-                          <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-warm/15 text-warm text-[10px] font-bold border border-warm/30">
-                            📱 {arCount} AR
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-warm/15 text-warm text-[10px] font-bold border border-warm/30">
+                            <Smartphone className="w-3 h-3" />
+                            {arCount} AR
                           </span>
                         )}
 
@@ -752,8 +798,9 @@ export function RoutesPage() {
                       {selectedRoute.poiOrder.length} {t(texts.stops)}
                     </span>
                     {getARPOICount(selectedRoute) > 0 && (
-                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-warm/15 text-warm text-xs font-bold border border-warm/30">
-                        📱 {getARPOICount(selectedRoute)} {t(texts.arExperiences)}
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-warm/15 text-warm text-xs font-bold border border-warm/30">
+                        <Smartphone className="w-3 h-3" />
+                        {getARPOICount(selectedRoute)} {t(texts.arExperiences)}
                       </span>
                     )}
                   </div>
@@ -882,41 +929,53 @@ export function RoutesPage() {
             {/* POIs list */}
             {viewMode === 'pois' && !selectedRoute && (
               <div className="space-y-3">
-                {filteredPOIs.map(poi => (
-                  <button
-                    key={poi.id}
-                    onClick={() => handlePOIClick(poi)}
-                    className="w-full text-left p-4 rounded-xl bg-card/50 border border-border/50 hover:border-primary/50 transition-all group"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div 
-                        className="w-16 h-16 rounded-lg bg-cover bg-center flex-shrink-0"
-                        style={{ backgroundImage: `url(${poi.media.images[0]})` }}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <h3 className="font-sans font-bold text-foreground truncate group-hover:text-primary transition-colors">
-                            {t(poi.title)}
-                          </h3>
-                          <TypeBadge type={poi.experienceType} size="sm" />
+                {filteredPOIs.map(poi => {
+                  const typeColor = poi.experienceType === 'AR' ? 'bg-warm' : poi.experienceType === '360' ? 'bg-primary' : 'bg-accent';
+                  const TypeIcon = poi.experienceType === 'AR' ? Smartphone : poi.experienceType === '360' ? Camera : Info;
+                  return (
+                    <button
+                      key={poi.id}
+                      onClick={() => handlePOIClick(poi)}
+                      className="w-full text-left p-4 rounded-xl bg-card/50 border border-border/50 hover:border-primary/50 transition-all group"
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Thumbnail with type badge */}
+                        <div className="relative flex-shrink-0">
+                          <div 
+                            className={`w-16 h-16 rounded-lg bg-cover bg-center border-2 ${
+                              poi.experienceType === 'AR' ? 'border-warm' : poi.experienceType === '360' ? 'border-primary' : 'border-accent'
+                            }`}
+                            style={{ backgroundImage: `url(${poi.media.images[0]})` }}
+                          />
+                          <div className={`absolute -top-2 -right-2 w-6 h-6 ${typeColor} rounded-full flex items-center justify-center border-2 border-white shadow-sm`}>
+                            <TypeIcon className={`w-3 h-3 ${poi.experienceType === 'AR' ? 'text-foreground' : 'text-white'}`} />
+                          </div>
                         </div>
-                        <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                          {t(poi.shortDescription)}
-                        </p>
-                        <div className="flex flex-wrap gap-1">
-                          {poi.categoryIds.slice(0, 2).map(catId => {
-                            const cat = getCategoryById(catId);
-                            return cat ? (
-                              <span key={catId} className="category-chip text-[10px]">
-                                {t(cat.label)}
-                              </span>
-                            ) : null;
-                          })}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2 mb-1">
+                            <h3 className="font-sans font-bold text-foreground truncate group-hover:text-primary transition-colors">
+                              {t(poi.title)}
+                            </h3>
+                            <TypeBadge type={poi.experienceType} size="sm" />
+                          </div>
+                          <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                            {t(poi.shortDescription)}
+                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            {poi.categoryIds.slice(0, 2).map(catId => {
+                              const cat = getCategoryById(catId);
+                              return cat ? (
+                                <span key={catId} className="category-chip text-[10px]">
+                                  {t(cat.label)}
+                                </span>
+                              ) : null;
+                            })}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
