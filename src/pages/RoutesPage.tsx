@@ -1,6 +1,5 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Route as RouteIcon, MapPin, Search, ChevronUp, ChevronDown, RotateCw, Camera, Info, Smartphone, X } from 'lucide-react';
 import { AppHeader } from '@/components/AppHeader';
@@ -95,17 +94,13 @@ const createPOIMarkerIcon = (type: ExperienceType) => {
   });
 };
 
-// Map center controller
-function MapController({ center, zoom }: { center: [number, number]; zoom: number }) {
-  const map = useMap();
-  useEffect(() => {
-    map.flyTo(center, zoom, { duration: 0.5 });
-  }, [center, zoom, map]);
-  return null;
-}
-
 export function RoutesPage() {
   const { t } = useLanguage();
+  const mapRef = useRef<L.Map | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const markersRef = useRef<L.Marker[]>([]);
+  const polylineRef = useRef<L.Polyline | null>(null);
+  
   const [viewMode, setViewMode] = useState<'routes' | 'pois'>('routes');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<ExperienceType[]>([]);
@@ -114,8 +109,82 @@ export function RoutesPage() {
   const [selectedPOI, setSelectedPOI] = useState<POI | null>(null);
   const [showDetailSheet, setShowDetailSheet] = useState(false);
   const [panelExpanded, setPanelExpanded] = useState(true);
-  const [mapCenter, setMapCenter] = useState<[number, number]>([43.28, -5.2]);
-  const [mapZoom, setMapZoom] = useState(9);
+
+  // Initialize map
+  useEffect(() => {
+    if (!mapContainerRef.current || mapRef.current) return;
+    
+    mapRef.current = L.map(mapContainerRef.current, {
+      center: [43.28, -5.2],
+      zoom: 9,
+      zoomControl: false,
+    });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
+    }).addTo(mapRef.current);
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, []);
+
+  // Update markers and polyline when selection changes
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    // Clear existing markers
+    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current = [];
+
+    // Clear existing polyline
+    if (polylineRef.current) {
+      polylineRef.current.remove();
+      polylineRef.current = null;
+    }
+
+    if (selectedRoute) {
+      // Draw route polyline
+      const positions = selectedRoute.polyline.map(p => [p.lat, p.lng] as [number, number]);
+      polylineRef.current = L.polyline(positions, {
+        color: '#059669',
+        weight: 4,
+        opacity: 0.8,
+        dashArray: selectedRoute.isLoop ? undefined : '10, 10'
+      }).addTo(mapRef.current);
+
+      // Add route POI markers
+      selectedRoute.poiOrder.forEach((poiId, index) => {
+        const poi = getPOIById(poiId);
+        if (poi) {
+          const marker = L.marker([poi.access.lat, poi.access.lng], {
+            icon: createMarkerIcon(index + 1, poi.experienceType)
+          })
+            .addTo(mapRef.current!)
+            .on('click', () => handlePOIClick(poi));
+          markersRef.current.push(marker);
+        }
+      });
+
+      // Fit bounds to route
+      if (positions.length > 0) {
+        mapRef.current.fitBounds(positions, { padding: [50, 50] });
+      }
+    } else if (viewMode === 'pois') {
+      // Add all filtered POIs as markers
+      filteredPOIs.forEach(poi => {
+        const marker = L.marker([poi.access.lat, poi.access.lng], {
+          icon: createPOIMarkerIcon(poi.experienceType)
+        })
+          .addTo(mapRef.current!)
+          .on('click', () => handlePOIClick(poi));
+        markersRef.current.push(marker);
+      });
+    }
+  }, [selectedRoute, viewMode, selectedCategories, selectedTypes, searchQuery]);
 
   const toggleCategory = (catId: string) => {
     setSelectedCategories(prev => 
@@ -137,7 +206,7 @@ export function RoutesPage() {
         route.categoryIds.some(id => selectedCategories.includes(id));
       return matchesSearch && matchesCategory;
     });
-  }, [routes, searchQuery, selectedCategories, t]);
+  }, [searchQuery, selectedCategories, t]);
 
   const filteredPOIs = useMemo(() => {
     return pois.filter(poi => {
@@ -149,23 +218,17 @@ export function RoutesPage() {
         selectedTypes.includes(poi.experienceType);
       return matchesSearch && matchesCategory && matchesType;
     });
-  }, [pois, searchQuery, selectedCategories, selectedTypes, t]);
+  }, [searchQuery, selectedCategories, selectedTypes, t]);
 
   const handleRouteSelect = (route: Route) => {
     setSelectedRoute(route);
-    // Center map on route
-    if (route.polyline.length > 0) {
-      const avgLat = route.polyline.reduce((sum, p) => sum + p.lat, 0) / route.polyline.length;
-      const avgLng = route.polyline.reduce((sum, p) => sum + p.lng, 0) / route.polyline.length;
-      setMapCenter([avgLat, avgLng]);
-      setMapZoom(10);
-    }
   };
 
   const handlePOIClick = (poi: POI) => {
     setSelectedPOI(poi);
-    setMapCenter([poi.access.lat, poi.access.lng]);
-    setMapZoom(12);
+    if (mapRef.current) {
+      mapRef.current.flyTo([poi.access.lat, poi.access.lng], 12, { duration: 0.5 });
+    }
   };
 
   const getCTAForPOI = (poi: POI) => {
@@ -182,71 +245,7 @@ export function RoutesPage() {
       
       {/* Map container */}
       <div className="flex-1 relative pt-14">
-        <MapContainer
-          center={mapCenter}
-          zoom={mapZoom}
-          className="h-full w-full z-0"
-          zoomControl={false}
-        >
-          <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-            attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-          />
-          <MapController center={mapCenter} zoom={mapZoom} />
-
-          {/* Route polyline */}
-          {selectedRoute && (
-            <Polyline
-              positions={selectedRoute.polyline.map(p => [p.lat, p.lng] as [number, number])}
-              pathOptions={{
-                color: '#059669',
-                weight: 4,
-                opacity: 0.8,
-                dashArray: selectedRoute.isLoop ? undefined : '10, 10'
-              }}
-            />
-          )}
-
-          {/* Route POI markers */}
-          {selectedRoute && selectedRoute.poiOrder.map((poiId, index) => {
-            const poi = getPOIById(poiId);
-            if (!poi) return null;
-            return (
-              <Marker
-                key={poi.id}
-                position={[poi.access.lat, poi.access.lng]}
-                icon={createMarkerIcon(index + 1, poi.experienceType)}
-                eventHandlers={{
-                  click: () => handlePOIClick(poi)
-                }}
-              >
-                <Popup>
-                  <div className="text-center">
-                    <strong>{t(poi.title)}</strong>
-                  </div>
-                </Popup>
-              </Marker>
-            );
-          })}
-
-          {/* All POIs mode */}
-          {viewMode === 'pois' && !selectedRoute && filteredPOIs.map(poi => (
-            <Marker
-              key={poi.id}
-              position={[poi.access.lat, poi.access.lng]}
-              icon={createPOIMarkerIcon(poi.experienceType)}
-              eventHandlers={{
-                click: () => handlePOIClick(poi)
-              }}
-            >
-              <Popup>
-                <div className="text-center">
-                  <strong>{t(poi.title)}</strong>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
+        <div ref={mapContainerRef} className="h-full w-full z-0" />
 
         {/* Side Panel (desktop) / Bottom Sheet (mobile) */}
         <motion.div
@@ -401,7 +400,7 @@ export function RoutesPage() {
                       <h4 className="text-sm font-semibold text-primary">
                         {t(texts.day)} {day.day}: {t(day.title)}
                       </h4>
-                      {day.poiIds.map((poiId, idx) => {
+                      {day.poiIds.map((poiId) => {
                         const poi = getPOIById(poiId);
                         if (!poi) return null;
                         const globalIndex = selectedRoute.poiOrder.indexOf(poiId);
@@ -456,38 +455,35 @@ export function RoutesPage() {
             {/* POIs list */}
             {viewMode === 'pois' && (
               <div className="space-y-3">
-                {filteredPOIs.map(poi => {
-                  const cta = getCTAForPOI(poi);
-                  return (
-                    <button
-                      key={poi.id}
-                      onClick={() => handlePOIClick(poi)}
-                      className="w-full text-left p-4 rounded-xl bg-card/50 border border-border/50 hover:border-primary/50 transition-all"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div 
-                          className="w-16 h-16 rounded-lg bg-cover bg-center flex-shrink-0"
-                          style={{ backgroundImage: `url(${poi.media.images[0]})` }}
-                        />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-serif font-bold text-foreground truncate">{t(poi.title)}</h3>
-                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                              poi.experienceType === 'AR' ? 'badge-ar'
-                              : poi.experienceType === '360' ? 'badge-360'
-                              : 'badge-info'
-                            }`}>
-                              {poi.experienceType}
-                            </span>
-                          </div>
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {t(poi.shortDescription)}
-                          </p>
+                {filteredPOIs.map(poi => (
+                  <button
+                    key={poi.id}
+                    onClick={() => handlePOIClick(poi)}
+                    className="w-full text-left p-4 rounded-xl bg-card/50 border border-border/50 hover:border-primary/50 transition-all"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div 
+                        className="w-16 h-16 rounded-lg bg-cover bg-center flex-shrink-0"
+                        style={{ backgroundImage: `url(${poi.media.images[0]})` }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-serif font-bold text-foreground truncate">{t(poi.title)}</h3>
+                          <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                            poi.experienceType === 'AR' ? 'badge-ar'
+                            : poi.experienceType === '360' ? 'badge-360'
+                            : 'badge-info'
+                          }`}>
+                            {poi.experienceType}
+                          </span>
                         </div>
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {t(poi.shortDescription)}
+                        </p>
                       </div>
-                    </button>
-                  );
-                })}
+                    </div>
+                  </button>
+                ))}
               </div>
             )}
           </div>
