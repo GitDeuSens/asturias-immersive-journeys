@@ -12,6 +12,12 @@ import valdediosImg from '@/assets/valdedios.jpg';
 import mujaImg from '@/assets/muja.jpg';
 import laboralImg from '@/assets/laboral.jpg';
 import cimavillaImg from '@/assets/cimavilla.jpg';
+// Nuevos POIs Ruta de la Sidra
+import torazuImg from '@/assets/torazu.jpg';
+import narzanaImg from '@/assets/narzana.jpg';
+import playaGriegaImg from '@/assets/playa-griega.jpg';
+import llastresImg from '@/assets/llastres.jpg';
+import jardinBotanicoImg from '@/assets/jardin-botanico.jpg';
 
 // ============ TIPOS BASE ============
 
@@ -917,6 +923,261 @@ export const pois: POI[] = [
     contact: {},
     links: [],
     share: { shareUrl: 'https://turismoasturias.es/cimavilla' }
+  },
+  // ============ NUEVOS POIs RUTA DE LA SIDRA ============
+  {
+    id: 'torazu',
+    title: { es: 'Torazu', en: 'Torazu Village', fr: 'Village de Torazu' },
+    categoryIds: ['heritage', 'culture'],
+    tags: ['pueblo', 'hórreos', 'arquitectura', 'tradición', 'cabranes'],
+    experienceType: 'INFO',
+    shortDescription: {
+      es: 'Pueblo tradicional con casonas e hórreos centenarios',
+      en: 'Traditional village with historic manor houses and granaries',
+      fr: 'Village traditionnel avec maisons de maître et greniers centenaires'
+    },
+    richText: {
+      blocks: [
+        {
+          type: 'paragraph',
+          text: {
+            es: 'Torazu es uno de los pueblos más pintorescos de la comarca de Cabranes, famoso por sus impresionantes casonas de piedra y sus hórreos tradicionales asturianos elevados sobre pilares de piedra.',
+            en: 'Torazu is one of the most picturesque villages in the Cabranes region, famous for its impressive stone manor houses and traditional Asturian granaries elevated on stone pillars.',
+            fr: 'Torazu est l\'un des villages les plus pittoresques de la région de Cabranes, célèbre pour ses impressionnantes maisons de maître en pierre et ses greniers traditionnels asturiens élevés sur des piliers de pierre.'
+          }
+        },
+        {
+          type: 'highlight',
+          title: { es: 'Los hórreos asturianos', en: 'Asturian granaries', fr: 'Les greniers asturiens' },
+          text: {
+            es: 'Los hórreos son construcciones elevadas sobre pilares (pegollos) que servían para almacenar el grano protegiéndolo de la humedad y los roedores. Son símbolo de la arquitectura popular asturiana.',
+            en: 'Hórreos are raised constructions on pillars (pegollos) that were used to store grain, protecting it from humidity and rodents. They are a symbol of Asturian popular architecture.',
+            fr: 'Les hórreos sont des constructions surélevées sur des piliers (pegollos) qui servaient à stocker le grain en le protégeant de l\'humidité et des rongeurs. Ils sont un symbole de l\'architecture populaire asturienne.'
+          }
+        }
+      ]
+    },
+    audioGuides: {},
+    access: {
+      address: 'Torazu, Cabranes, Asturias',
+      lat: 43.3894,
+      lng: -5.4189
+    },
+    media: {
+      heroImageUrl: torazuImg,
+      images: [{ url: torazuImg, caption: { es: 'Pueblo de Torazu con hórreos', en: 'Torazu village with granaries', fr: 'Village de Torazu avec greniers' } }]
+    },
+    practical: {
+      recommendedDuration: { es: '1 hora', en: '1 hour', fr: '1 heure' }
+    },
+    contact: {},
+    links: [],
+    share: { shareUrl: 'https://turismoasturias.es/torazu' }
+  },
+  {
+    id: 'narzana',
+    title: { es: 'Iglesia de Santa María de Narzana', en: 'Santa María de Narzana Church', fr: 'Église Santa María de Narzana' },
+    categoryIds: ['heritage', 'culture'],
+    tags: ['románico', 'iglesia', 'camino de santiago', 'sariego', 'medieval'],
+    experienceType: 'INFO',
+    shortDescription: {
+      es: 'Arte románico en el Camino de Santiago',
+      en: 'Romanesque art on the Way of Saint James',
+      fr: 'Art roman sur le Chemin de Saint-Jacques'
+    },
+    richText: {
+      blocks: [
+        {
+          type: 'paragraph',
+          text: {
+            es: 'La Iglesia de Santa María de Narzana, del siglo XII, es una joya del románico asturiano situada en el concejo de Sariego, en pleno Camino de Santiago interior.',
+            en: 'The 12th-century Church of Santa María de Narzana is a jewel of Asturian Romanesque architecture located in the municipality of Sariego, on the interior Way of Saint James.',
+            fr: 'L\'église Santa María de Narzana, du XIIe siècle, est un joyau de l\'art roman asturien située dans la commune de Sariego, sur le Chemin de Saint-Jacques intérieur.'
+          }
+        },
+        {
+          type: 'highlight',
+          title: { es: 'Patrimonio románico', en: 'Romanesque heritage', fr: 'Patrimoine roman' },
+          text: {
+            es: 'Destaca por su portada occidental con arquivoltas decoradas y capiteles historiados que narran escenas bíblicas.',
+            en: 'Notable for its western portal with decorated archivolts and historiated capitals depicting biblical scenes.',
+            fr: 'Remarquable pour son portail occidental avec des archivoltes décorées et des chapiteaux historiés représentant des scènes bibliques.'
+          }
+        }
+      ]
+    },
+    audioGuides: {},
+    access: {
+      address: 'Narzana, Sariego, Asturias',
+      lat: 43.3917,
+      lng: -5.4833
+    },
+    media: {
+      heroImageUrl: narzanaImg,
+      images: [{ url: narzanaImg, caption: { es: 'Iglesia románica de Narzana', en: 'Romanesque church of Narzana', fr: 'Église romane de Narzana' } }]
+    },
+    practical: {
+      recommendedDuration: { es: '30 minutos', en: '30 minutes', fr: '30 minutes' }
+    },
+    contact: {},
+    links: [],
+    share: { shareUrl: 'https://turismoasturias.es/narzana' }
+  },
+  {
+    id: 'playa-griega',
+    title: { es: 'Playa de La Griega - Huellas de Dinosaurio', en: 'La Griega Beach - Dinosaur Footprints', fr: 'Plage de La Griega - Empreintes de Dinosaures' },
+    categoryIds: ['nature', 'culture'],
+    tags: ['dinosaurios', 'playa', 'fósiles', 'colunga', 'jurásico', 'paleontología'],
+    experienceType: 'AR',
+    shortDescription: {
+      es: 'Huellas fósiles de dinosaurios del Jurásico',
+      en: 'Jurassic dinosaur fossil footprints',
+      fr: 'Empreintes fossiles de dinosaures du Jurassique'
+    },
+    richText: {
+      blocks: [
+        {
+          type: 'paragraph',
+          text: {
+            es: 'La Playa de La Griega alberga uno de los yacimientos de icnitas (huellas fósiles) más importantes de Europa. Aquí puedes observar huellas tridáctilas de dinosaurios saurópodos que caminaron por esta costa hace 150 millones de años.',
+            en: 'La Griega Beach houses one of the most important ichnite (fossil footprint) sites in Europe. Here you can observe tridactyl footprints of sauropod dinosaurs that walked along this coast 150 million years ago.',
+            fr: 'La plage de La Griega abrite l\'un des plus importants sites d\'ichnites (empreintes fossiles) d\'Europe. Ici, vous pouvez observer des empreintes tridactyles de dinosaures sauropodes qui ont marché le long de cette côte il y a 150 millions d\'années.'
+          }
+        },
+        {
+          type: 'highlight',
+          title: { es: 'Costa Jurásica', en: 'Jurassic Coast', fr: 'Côte Jurassique' },
+          text: {
+            es: 'Las huellas más grandes miden hasta 1,30 metros, siendo las mayores icnitas de dinosaurio conocidas en el mundo.',
+            en: 'The largest footprints measure up to 1.30 meters, being the largest known dinosaur ichnites in the world.',
+            fr: 'Les plus grandes empreintes mesurent jusqu\'à 1,30 mètre, étant les plus grandes ichnites de dinosaures connues au monde.'
+          }
+        }
+      ]
+    },
+    audioGuides: {},
+    access: {
+      address: 'Playa de La Griega, Colunga, Asturias',
+      lat: 43.4989,
+      lng: -5.2644,
+      accessibility: { es: 'Acceso a pie desde el parking', en: 'Walking access from parking', fr: 'Accès à pied depuis le parking' }
+    },
+    media: {
+      heroImageUrl: playaGriegaImg,
+      images: [{ url: playaGriegaImg, caption: { es: 'Huellas de dinosaurio en La Griega', en: 'Dinosaur footprints at La Griega', fr: 'Empreintes de dinosaures à La Griega' } }]
+    },
+    practical: {
+      recommendedDuration: { es: '1-2 horas (visitar con marea baja)', en: '1-2 hours (visit at low tide)', fr: '1-2 heures (visiter à marée basse)' }
+    },
+    contact: {},
+    links: [],
+    share: { shareUrl: 'https://turismoasturias.es/playa-griega' },
+    ar: {
+      launchUrl: 'https://example.com/ar/playa-griega',
+      qrValue: 'asturias-inmersivo://ar/playa-griega',
+      iframe3dUrl: 'https://example.com/3d/dinosaur-footprint',
+      instructions: { es: 'Escanea para ver las huellas en AR', en: 'Scan to see footprints in AR', fr: 'Scannez pour voir les empreintes en RA' }
+    }
+  },
+  {
+    id: 'llastres',
+    title: { es: 'Llastres', en: 'Llastres', fr: 'Llastres' },
+    categoryIds: ['heritage', 'gastronomy'],
+    tags: ['pueblo', 'marinero', 'pescadores', 'mirador', 'colunga'],
+    experienceType: 'INFO',
+    shortDescription: {
+      es: 'Encantador pueblo marinero con calles empedradas',
+      en: 'Charming fishing village with cobbled streets',
+      fr: 'Charmant village de pêcheurs aux rues pavées'
+    },
+    richText: {
+      blocks: [
+        {
+          type: 'paragraph',
+          text: {
+            es: 'Llastres es uno de los pueblos marineros más bonitos de Asturias. Sus empinadas calles empedradas descienden hasta el puerto pesquero, ofreciendo vistas espectaculares al mar Cantábrico.',
+            en: 'Llastres is one of the most beautiful fishing villages in Asturias. Its steep cobbled streets descend to the fishing port, offering spectacular views of the Cantabrian Sea.',
+            fr: 'Llastres est l\'un des plus beaux villages de pêcheurs des Asturies. Ses rues pavées escarpées descendent vers le port de pêche, offrant des vues spectaculaires sur la mer Cantabrique.'
+          }
+        },
+        {
+          type: 'highlight',
+          title: { es: 'Mirador de San Roque', en: 'San Roque Viewpoint', fr: 'Belvédère de San Roque' },
+          text: {
+            es: 'No te pierdas las vistas desde el mirador junto a la ermita de San Roque, con panorámicas de la costa y los Picos de Europa al fondo.',
+            en: 'Don\'t miss the views from the viewpoint next to the San Roque chapel, with panoramic views of the coast and the Picos de Europa in the background.',
+            fr: 'Ne manquez pas les vues depuis le belvédère à côté de l\'ermitage de San Roque, avec des panoramas de la côte et des Picos de Europa en arrière-plan.'
+          }
+        }
+      ]
+    },
+    audioGuides: {},
+    access: {
+      address: 'Llastres, Colunga, Asturias',
+      lat: 43.5156,
+      lng: -5.2689
+    },
+    media: {
+      heroImageUrl: llastresImg,
+      images: [{ url: llastresImg, caption: { es: 'Puerto de Llastres', en: 'Llastres Harbor', fr: 'Port de Llastres' } }]
+    },
+    practical: {
+      recommendedDuration: { es: '1-2 horas', en: '1-2 hours', fr: '1-2 heures' }
+    },
+    contact: {},
+    links: [],
+    share: { shareUrl: 'https://turismoasturias.es/llastres' }
+  },
+  {
+    id: 'jardin-botanico',
+    title: { es: 'Jardín Botánico Atlántico', en: 'Atlantic Botanical Garden', fr: 'Jardin Botanique Atlantique' },
+    categoryIds: ['nature', 'culture'],
+    tags: ['jardín', 'botánico', 'naturaleza', 'gijón', 'flora'],
+    experienceType: 'INFO',
+    shortDescription: {
+      es: 'Oasis verde con colecciones de flora atlántica',
+      en: 'Green oasis with Atlantic flora collections',
+      fr: 'Oasis vert avec des collections de flore atlantique'
+    },
+    richText: {
+      blocks: [
+        {
+          type: 'paragraph',
+          text: {
+            es: 'El Jardín Botánico Atlántico de Gijón es un espacio de 25 hectáreas dedicado a la conservación y exhibición de la flora de la cornisa cantábrica y otras regiones de clima atlántico del mundo.',
+            en: 'The Atlantic Botanical Garden of Gijón is a 25-hectare space dedicated to the conservation and exhibition of flora from the Cantabrian coast and other Atlantic climate regions of the world.',
+            fr: 'Le Jardin Botanique Atlantique de Gijón est un espace de 25 hectares dédié à la conservation et à l\'exposition de la flore de la côte cantabrique et d\'autres régions du monde au climat atlantique.'
+          }
+        },
+        {
+          type: 'highlight',
+          title: { es: 'Itinerario Atlántico', en: 'Atlantic Itinerary', fr: 'Itinéraire Atlantique' },
+          text: {
+            es: 'Recorre sus diferentes ambientes: el Jardín de la Isla, el Bosque Autóctono, el Invernadero y la zona de Cantábrico, cada uno con especies únicas.',
+            en: 'Explore its different environments: the Island Garden, the Native Forest, the Greenhouse and the Cantabrian zone, each with unique species.',
+            fr: 'Parcourez ses différents environnements : le Jardin de l\'Île, la Forêt Autochtone, la Serre et la zone Cantabrique, chacun avec des espèces uniques.'
+          }
+        }
+      ]
+    },
+    audioGuides: {},
+    access: {
+      address: 'Avenida del Jardín Botánico, 2230, Gijón, Asturias',
+      lat: 43.5297,
+      lng: -5.6081,
+      accessibility: { es: 'Acceso adaptado para personas con movilidad reducida', en: 'Adapted access for people with reduced mobility', fr: 'Accès adapté aux personnes à mobilité réduite' }
+    },
+    media: {
+      heroImageUrl: jardinBotanicoImg,
+      images: [{ url: jardinBotanicoImg, caption: { es: 'Jardín Botánico Atlántico', en: 'Atlantic Botanical Garden', fr: 'Jardin Botanique Atlantique' } }]
+    },
+    practical: {
+      openingHours: { es: 'Verano: 10:00-21:00 | Invierno: 10:00-18:00', en: 'Summer: 10:00-21:00 | Winter: 10:00-18:00', fr: 'Été: 10:00-21:00 | Hiver: 10:00-18:00' },
+      recommendedDuration: { es: '2-3 horas', en: '2-3 hours', fr: '2-3 heures' }
+    },
+    contact: { website: 'https://botanico.gijon.es' },
+    links: [],
+    share: { shareUrl: 'https://turismoasturias.es/jardin-botanico' }
   }
 ];
 
@@ -1059,40 +1320,45 @@ export const routes: Route[] = [
     title: { es: 'Ruta de la Sidra', en: 'Cider Route', fr: 'Route du Cidre' },
     categoryIds: ['gastronomy', 'culture', 'heritage'],
     isLoop: false,
-    poiOrder: ['museo-sidra', 'valdedios', 'muja', 'laboral', 'cimavilla'],
+    poiOrder: ['torazu', 'museo-sidra', 'narzana', 'valdedios', 'muja', 'playa-griega', 'llastres', 'laboral', 'jardin-botanico', 'cimavilla'],
     coverImage: rutaSidraImg,
     shortDescription: {
-      es: 'Cultura sidrera declarada Patrimonio UNESCO',
-      en: 'Cider culture declared UNESCO Heritage',
-      fr: 'Culture du cidre déclarée Patrimoine UNESCO'
+      es: 'Descubre la cultura sidrera asturiana declarada Patrimonio UNESCO. Un recorrido de 4 días por la Comarca de la Sidra, pueblos tradicionales, patrimonio románico, la Costa Jurásica y Gijón. Incluye visitas a pumaradas y llagares (reserva guiada recomendada).',
+      en: 'Discover the Asturian cider culture declared UNESCO Heritage. A 4-day journey through the Cider Region, traditional villages, Romanesque heritage, the Jurassic Coast and Gijón. Includes visits to apple orchards and cider mills (guided tour recommended).',
+      fr: 'Découvrez la culture du cidre asturienne déclarée Patrimoine UNESCO. Un parcours de 4 jours à travers la Région du Cidre, villages traditionnels, patrimoine roman, la Côte Jurassique et Gijón. Comprend des visites de vergers et pressoirs (visite guidée recommandée).'
     },
     itineraryDays: [
       { 
         day: 1, 
-        title: { es: 'Día 1: Comarca de la Sidra', en: 'Day 1: Cider Region', fr: 'Jour 1: Région du Cidre' }, 
-        poiIds: ['museo-sidra'] 
+        title: { es: 'Día 1: Cabranes - Nava - Comarca de la Sidra', en: 'Day 1: Cabranes - Nava - Cider Region', fr: 'Jour 1: Cabranes - Nava - Région du Cidre' }, 
+        poiIds: ['torazu', 'museo-sidra'] 
       },
       { 
         day: 2, 
-        title: { es: 'Día 2: Villaviciosa', en: 'Day 2: Villaviciosa', fr: 'Jour 2: Villaviciosa' }, 
-        poiIds: ['valdedios'] 
+        title: { es: 'Día 2: Sariego - Villaviciosa', en: 'Day 2: Sariego - Villaviciosa', fr: 'Jour 2: Sariego - Villaviciosa' }, 
+        poiIds: ['narzana', 'valdedios'] 
       },
       { 
         day: 3, 
-        title: { es: 'Día 3: Costa Jurásica', en: 'Day 3: Jurassic Coast', fr: 'Jour 3: Côte Jurassique' }, 
-        poiIds: ['muja'] 
+        title: { es: 'Día 3: Colunga - Llastres - Costa Jurásica', en: 'Day 3: Colunga - Llastres - Jurassic Coast', fr: 'Jour 3: Colunga - Llastres - Côte Jurassique' }, 
+        poiIds: ['muja', 'playa-griega', 'llastres'] 
       },
       { 
         day: 4, 
-        title: { es: 'Día 4: Gijón', en: 'Day 4: Gijón', fr: 'Jour 4: Gijón' }, 
-        poiIds: ['laboral', 'cimavilla'] 
+        title: { es: 'Día 4: Gijón/Xixón', en: 'Day 4: Gijón/Xixón', fr: 'Jour 4: Gijón/Xixón' }, 
+        poiIds: ['laboral', 'jardin-botanico', 'cimavilla'] 
       },
     ],
     polyline: [
+      { lat: 43.3894, lng: -5.4189 }, // Torazu
       { lat: 43.3544, lng: -5.5067 }, // Nava - Museo Sidra
+      { lat: 43.3917, lng: -5.4833 }, // Narzana
       { lat: 43.4389, lng: -5.5147 }, // Valdediós
       { lat: 43.4897, lng: -5.2706 }, // MUJA Colunga
+      { lat: 43.4989, lng: -5.2644 }, // Playa La Griega
+      { lat: 43.5156, lng: -5.2689 }, // Llastres
       { lat: 43.5253, lng: -5.6186 }, // Laboral
+      { lat: 43.5297, lng: -5.6081 }, // Jardín Botánico
       { lat: 43.5456, lng: -5.6633 }, // Cimavilla
     ],
   },
