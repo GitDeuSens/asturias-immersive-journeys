@@ -2,11 +2,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, MapPin, Clock, Euro, Phone, Mail, Globe, Share2, 
   Play, Pause, Camera, Smartphone, ExternalLink, Navigation,
-  ChevronDown, Info, Image, Link2, Headphones
+  Info, Image, Link2, Headphones, Maximize2, QrCode
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { POI, categories } from '@/data/mockData';
 import { useLanguage, Language } from '@/hooks/useLanguage';
+import { QRCodeSVG } from 'qrcode.react';
+import RichTextRenderer from '@/components/poi/RichTextRenderer';
+import FullscreenModal from '@/components/poi/FullscreenModal';
 import {
   Accordion,
   AccordionContent,
@@ -25,9 +28,10 @@ const texts = {
   accessibility: { es: 'Accesibilidad', en: 'Accessibility', fr: 'Accessibilité' },
   parking: { es: 'Parking disponible', en: 'Parking available', fr: 'Parking disponible' },
   audioGuide: { es: 'Audioguía', en: 'Audio guide', fr: 'Audioguide' },
-  hoursAndPrices: { es: 'Horarios y precios', en: 'Hours & prices', fr: 'Horaires et prix' },
+  practicalInfo: { es: 'Información práctica', en: 'Practical info', fr: 'Infos pratiques' },
   hours: { es: 'Horarios', en: 'Hours', fr: 'Horaires' },
   prices: { es: 'Precios', en: 'Prices', fr: 'Prix' },
+  duration: { es: 'Duración recomendada', en: 'Recommended duration', fr: 'Durée recommandée' },
   contact: { es: 'Contacto', en: 'Contact', fr: 'Contact' },
   links: { es: 'Enlaces', en: 'Links', fr: 'Liens' },
   gallery: { es: 'Galería', en: 'Gallery', fr: 'Galerie' },
@@ -39,65 +43,43 @@ const texts = {
   notAvailable: { es: 'No disponible', en: 'Not available', fr: 'Non disponible' },
   playAudio: { es: 'Reproducir', en: 'Play', fr: 'Jouer' },
   pauseAudio: { es: 'Pausar', en: 'Pause', fr: 'Pause' },
+  experienceAR: { es: 'Experiencia AR', en: 'AR Experience', fr: 'Expérience AR' },
+  tour360: { es: 'Tour Virtual 360°', en: '360° Virtual Tour', fr: 'Visite Virtuelle 360°' },
+  scanQR: { es: 'Escanea para abrir en tu móvil', en: 'Scan to open on your phone', fr: 'Scannez pour ouvrir sur mobile' },
+  openExperience: { es: 'Abrir experiencia', en: 'Open experience', fr: 'Ouvrir l\'expérience' },
+  maximize: { es: 'Maximizar', en: 'Maximize', fr: 'Maximiser' },
+  scenes: { es: 'Escenas', en: 'Scenes', fr: 'Scènes' },
+  didYouKnow: { es: '¿Sabías que...?', en: 'Did you know...?', fr: 'Le saviez-vous...?' },
 };
 
 export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
   const { t, language } = useLanguage();
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedAudioLang, setSelectedAudioLang] = useState<Language>(language);
+  const [show360Modal, setShow360Modal] = useState(false);
+  const experienceSectionRef = useRef<HTMLDivElement>(null);
 
   if (!poi) return null;
 
-  // Get CTA based on experience type
   const getCTA = () => {
     switch (poi.experienceType) {
       case 'AR':
-        return { 
-          label: t(texts.launchAR), 
-          icon: Smartphone, 
-          className: 'bg-[hsl(48,100%,50%)] text-[hsl(210,11%,15%)] hover:bg-[hsl(48,100%,45%)]' 
-        };
+        return { label: t(texts.launchAR), icon: Smartphone, className: 'bg-[hsl(48,100%,50%)] text-[hsl(210,11%,15%)] hover:bg-[hsl(48,100%,45%)]' };
       case '360':
-        return { 
-          label: t(texts.open360), 
-          icon: Camera, 
-          className: 'bg-primary text-primary-foreground hover:bg-primary/90' 
-        };
-      case 'INFO':
+        return { label: t(texts.open360), icon: Camera, className: 'bg-primary text-primary-foreground hover:bg-primary/90' };
       default:
-        return { 
-          label: t(texts.getDirections), 
-          icon: Navigation, 
-          className: 'bg-[hsl(203,100%,32%)] text-white hover:bg-[hsl(203,100%,28%)]' 
-        };
+        return { label: t(texts.getDirections), icon: Navigation, className: 'bg-[hsl(203,100%,32%)] text-white hover:bg-[hsl(203,100%,28%)]' };
     }
   };
 
   const cta = getCTA();
   const CTAIcon = cta.icon;
 
-  // Type badge config
   const getTypeBadge = () => {
     switch (poi.experienceType) {
-      case 'AR':
-        return { 
-          className: 'bg-[hsl(48,100%,50%)] text-[hsl(210,11%,15%)]', 
-          icon: Smartphone,
-          label: 'AR'
-        };
-      case '360':
-        return { 
-          className: 'bg-primary text-primary-foreground', 
-          icon: Camera,
-          label: '360°'
-        };
-      case 'INFO':
-      default:
-        return { 
-          className: 'bg-[hsl(203,100%,32%)] text-white', 
-          icon: Info,
-          label: 'INFO'
-        };
+      case 'AR': return { className: 'bg-[hsl(48,100%,50%)] text-[hsl(210,11%,15%)]', icon: Smartphone, label: 'AR' };
+      case '360': return { className: 'bg-primary text-primary-foreground', icon: Camera, label: '360°' };
+      default: return { className: 'bg-[hsl(203,100%,32%)] text-white', icon: Info, label: 'INFO' };
     }
   };
 
@@ -107,33 +89,24 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
   const handleShare = async () => {
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: t(poi.title),
-          text: t(poi.shortDescription),
-          url: window.location.href,
-        });
-      } catch (e) {
-        // User cancelled
-      }
+        await navigator.share({ title: t(poi.title), text: t(poi.shortDescription), url: poi.share.shareUrl });
+      } catch (e) {}
     }
   };
 
   const handleCTAClick = () => {
-    if (poi.experienceType === 'INFO') {
-      window.open(
-        `https://www.google.com/maps/dir/?api=1&destination=${poi.access.lat},${poi.access.lng}`,
-        '_blank'
-      );
+    if (poi.experienceType === 'AR') {
+      experienceSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+    } else if (poi.experienceType === '360' && poi.tour360) {
+      setShow360Modal(true);
+    } else {
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${poi.access.lat},${poi.access.lng}`, '_blank');
     }
-    // AR and 360 would trigger their respective experiences
   };
 
-  // Check if audio is available for selected language
   const audioAvailable = poi.audioGuides?.[selectedAudioLang];
-
-  // Determine which accordion items should be open by default
-  const defaultOpenItems = ['description'];
-  if (poi.audioGuides) defaultOpenItems.push('audioguide');
+  const audioDuration = audioAvailable?.durationSec ? `${Math.floor(audioAvailable.durationSec / 60)}:${String(audioAvailable.durationSec % 60).padStart(2, '0')}` : null;
+  const heroImage = poi.media.heroImageUrl || poi.media.images[0]?.url;
 
   return (
     <AnimatePresence>
@@ -153,138 +126,130 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
             className="absolute inset-x-0 bottom-0 top-14 bg-white rounded-t-3xl overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* ===== HERO SECTION ===== */}
+            {/* HERO */}
             <div className="relative h-52 md:h-64 flex-shrink-0">
-              <div 
-                className="absolute inset-0 bg-cover bg-center"
-                style={{ 
-                  backgroundImage: poi.media.images[0] 
-                    ? `url(${poi.media.images[0]})` 
-                    : 'linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted-foreground)/0.2) 100%)'
-                }}
-              />
+              <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: heroImage ? `url(${heroImage})` : undefined }} />
               <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent" />
-              
-              {/* Close button */}
-              <button
-                onClick={onClose}
-                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-muted transition-colors"
-                aria-label="Cerrar"
-              >
+              <button onClick={onClose} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-muted transition-colors">
                 <X className="w-5 h-5 text-foreground" />
               </button>
-
-              {/* Type Badge - Very Visible */}
               <div className="absolute top-4 left-4">
                 <span className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg ${badge.className}`}>
-                  <BadgeIcon className="w-4 h-4" />
-                  {badge.label}
+                  <BadgeIcon className="w-4 h-4" />{badge.label}
                 </span>
               </div>
-
-              {/* Title & Chips overlaid at bottom */}
               <div className="absolute bottom-0 left-0 right-0 p-5">
-                <h1 className="font-sans text-2xl md:text-3xl font-bold text-foreground mb-2 drop-shadow-sm">
-                  {t(poi.title)}
-                </h1>
+                <h1 className="font-sans text-2xl md:text-3xl font-bold text-foreground mb-2 drop-shadow-sm">{t(poi.title)}</h1>
                 <div className="flex flex-wrap gap-2">
                   {poi.categoryIds.map(catId => {
                     const cat = categories.find(c => c.id === catId);
-                    return cat ? (
-                      <span 
-                        key={catId} 
-                        className="px-3 py-1 rounded-full text-xs font-medium bg-white/90 text-foreground shadow-sm"
-                      >
-                        {t(cat.label)}
-                      </span>
-                    ) : null;
+                    return cat ? <span key={catId} className="px-3 py-1 rounded-full text-xs font-medium bg-white/90 text-foreground shadow-sm">{t(cat.label)}</span> : null;
                   })}
                 </div>
               </div>
             </div>
 
-            {/* ===== SCROLLABLE CONTENT ===== */}
+            {/* CONTENT */}
             <div className="flex-1 overflow-y-auto pb-24">
-              <Accordion 
-                type="multiple" 
-                defaultValue={defaultOpenItems}
-                className="px-5 py-4"
-              >
-                {/* Description Section */}
+              <Accordion type="multiple" defaultValue={['description', 'experience']} className="px-5 py-4">
+                {/* Description */}
                 <AccordionItem value="description" className="border-b border-border/50">
                   <AccordionTrigger className="hover:no-underline py-4">
-                    <span className="flex items-center gap-2 font-semibold text-foreground">
-                      <Info className="w-5 h-5 text-primary" />
-                      {t(texts.description)}
-                    </span>
+                    <span className="flex items-center gap-2 font-semibold text-foreground"><Info className="w-5 h-5 text-primary" />{t(texts.description)}</span>
                   </AccordionTrigger>
                   <AccordionContent className="pb-4">
-                    <p className="text-foreground/80 leading-relaxed">
-                      {t(poi.shortDescription)}
-                    </p>
-                    {poi.richText && (
-                      <p className="text-foreground/70 mt-3 leading-relaxed">
-                        {t(poi.richText)}
-                      </p>
-                    )}
-                    {poi.experienceType === 'AR' && poi.arExperience && (
-                      <div className="mt-4 p-4 rounded-xl bg-[hsl(48,100%,50%)]/10 border border-[hsl(48,100%,50%)]/30">
-                        <p className="text-sm text-foreground/70 flex items-start gap-2">
-                          <Smartphone className="w-4 h-4 mt-0.5 text-[hsl(48,100%,40%)]" />
-                          {t(poi.arExperience.instructions)}
-                        </p>
+                    <p className="text-foreground/80 leading-relaxed mb-4">{t(poi.shortDescription)}</p>
+                    {poi.richText?.blocks && <RichTextRenderer blocks={poi.richText.blocks} lang={language} />}
+                    {poi.info?.didYouKnow && (
+                      <div className="mt-4 p-4 rounded-xl bg-accent/50 border border-accent">
+                        <p className="text-sm font-semibold text-primary mb-1">{t(texts.didYouKnow)}</p>
+                        <p className="text-foreground/80 text-sm">{t(poi.info.didYouKnow)}</p>
                       </div>
                     )}
                   </AccordionContent>
                 </AccordionItem>
 
-                {/* Audio Guide Section */}
-                {poi.audioGuides && (
-                  <AccordionItem value="audioguide" className="border-b border-border/50">
+                {/* Experience Section (AR/360) */}
+                {(poi.experienceType === 'AR' || poi.experienceType === '360') && (
+                  <AccordionItem value="experience" className="border-b border-border/50" ref={experienceSectionRef}>
                     <AccordionTrigger className="hover:no-underline py-4">
                       <span className="flex items-center gap-2 font-semibold text-foreground">
-                        <Headphones className="w-5 h-5 text-primary" />
-                        {t(texts.audioGuide)}
+                        {poi.experienceType === 'AR' ? <Smartphone className="w-5 h-5 text-[hsl(48,100%,40%)]" /> : <Camera className="w-5 h-5 text-primary" />}
+                        {poi.experienceType === 'AR' ? t(texts.experienceAR) : t(texts.tour360)}
                       </span>
                     </AccordionTrigger>
                     <AccordionContent className="pb-4">
-                      {/* Language selector */}
+                      {poi.experienceType === 'AR' && poi.ar && (
+                        <div className="space-y-4">
+                          <div className="flex flex-col items-center p-4 bg-muted/50 rounded-xl">
+                            <QRCodeSVG value={poi.ar.qrValue} size={150} className="mb-3" />
+                            <p className="text-sm text-muted-foreground text-center">{t(texts.scanQR)}</p>
+                          </div>
+                          <a href={poi.ar.launchUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[hsl(48,100%,50%)] text-[hsl(210,11%,15%)] font-bold hover:bg-[hsl(48,100%,45%)] transition-colors">
+                            <Smartphone className="w-5 h-5" />{t(texts.openExperience)}
+                          </a>
+                          <div className="aspect-video rounded-xl overflow-hidden bg-muted">
+                            <iframe src={poi.ar.iframe3dUrl} className="w-full h-full" allowFullScreen title="3D Model" />
+                          </div>
+                          {poi.ar.instructions && (
+                            <div className="p-3 bg-[hsl(48,100%,50%)]/10 rounded-lg text-sm text-foreground/80 whitespace-pre-line">{t(poi.ar.instructions)}</div>
+                          )}
+                          {poi.ar.compatibilityNote && <p className="text-xs text-muted-foreground text-center">{t(poi.ar.compatibilityNote)}</p>}
+                        </div>
+                      )}
+                      {poi.experienceType === '360' && poi.tour360 && (
+                        <div className="space-y-4">
+                          <div className="aspect-video rounded-xl overflow-hidden bg-muted">
+                            <iframe src={poi.tour360.iframe360Url} className="w-full h-full" allowFullScreen allow="xr-spatial-tracking; gyroscope; accelerometer" title="360 Tour" />
+                          </div>
+                          {poi.tour360.allowFullscreen && (
+                            <button onClick={() => setShow360Modal(true)} className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 transition-colors">
+                              <Maximize2 className="w-5 h-5" />{t(texts.maximize)}
+                            </button>
+                          )}
+                          {poi.tour360.scenes && poi.tour360.scenes.length > 0 && (
+                            <div>
+                              <p className="text-sm font-semibold text-foreground mb-2">{t(texts.scenes)}</p>
+                              <div className="flex flex-wrap gap-2">
+                                {poi.tour360.scenes.map(scene => (
+                                  <span key={scene.id} className="px-3 py-1.5 rounded-full text-xs bg-muted text-foreground">{t(scene.title)}</span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
+
+                {/* Audio Guide */}
+                {poi.audioGuides && Object.keys(poi.audioGuides).length > 0 && (
+                  <AccordionItem value="audioguide" className="border-b border-border/50">
+                    <AccordionTrigger className="hover:no-underline py-4">
+                      <span className="flex items-center gap-2 font-semibold text-foreground"><Headphones className="w-5 h-5 text-primary" />{t(texts.audioGuide)}</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-4">
                       <div className="flex gap-2 mb-4">
                         {(['es', 'en', 'fr'] as const).map(lang => {
                           const hasAudio = !!poi.audioGuides?.[lang];
                           return (
-                            <button
-                              key={lang}
-                              onClick={() => setSelectedAudioLang(lang)}
-                              disabled={!hasAudio}
-                              className={`px-4 py-2 rounded-lg text-xs font-bold uppercase transition-all ${
-                                selectedAudioLang === lang && hasAudio
-                                  ? 'bg-primary text-white' 
-                                  : hasAudio 
-                                    ? 'bg-muted border border-border hover:border-primary text-foreground'
-                                    : 'bg-muted/50 text-muted-foreground cursor-not-allowed opacity-50'
-                              }`}
-                            >
+                            <button key={lang} onClick={() => setSelectedAudioLang(lang)} disabled={!hasAudio}
+                              className={`px-4 py-2 rounded-lg text-xs font-bold uppercase transition-all ${selectedAudioLang === lang && hasAudio ? 'bg-primary text-white' : hasAudio ? 'bg-muted border border-border hover:border-primary text-foreground' : 'bg-muted/50 text-muted-foreground cursor-not-allowed opacity-50'}`}>
                               {lang}
                             </button>
                           );
                         })}
                       </div>
-                      
-                      {/* Player */}
                       {audioAvailable ? (
-                        <button
-                          onClick={() => setIsPlaying(!isPlaying)}
-                          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors text-primary font-bold"
-                        >
-                          {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                          {isPlaying ? t(texts.pauseAudio) : t(texts.playAudio)}
-                        </button>
-                      ) : (
-                        <p className="text-sm text-muted-foreground italic py-2">
-                          {t(texts.notAvailable)}
-                        </p>
-                      )}
+                        <div className="space-y-2">
+                          <button onClick={() => setIsPlaying(!isPlaying)} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors text-primary font-bold">
+                            {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                            {isPlaying ? t(texts.pauseAudio) : t(texts.playAudio)}
+                          </button>
+                          {audioDuration && <p className="text-xs text-center text-muted-foreground">{audioDuration}</p>}
+                        </div>
+                      ) : <p className="text-sm text-muted-foreground italic py-2">{t(texts.notAvailable)}</p>}
                     </AccordionContent>
                   </AccordionItem>
                 )}
@@ -292,71 +257,45 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
                 {/* How to get there */}
                 <AccordionItem value="access" className="border-b border-border/50">
                   <AccordionTrigger className="hover:no-underline py-4">
-                    <span className="flex items-center gap-2 font-semibold text-foreground">
-                      <MapPin className="w-5 h-5 text-primary" />
-                      {t(texts.howToGet)}
-                    </span>
+                    <span className="flex items-center gap-2 font-semibold text-foreground"><MapPin className="w-5 h-5 text-primary" />{t(texts.howToGet)}</span>
                   </AccordionTrigger>
                   <AccordionContent className="pb-4 space-y-3">
                     <p className="text-foreground/80">{poi.access.address}</p>
-                    
-                    {poi.access.notes && (
-                      <p className="text-sm text-muted-foreground">{poi.access.notes}</p>
-                    )}
-                    
-                    {/* Accessibility & Parking pills */}
+                    {poi.access.howToGet && <p className="text-sm text-muted-foreground">{t(poi.access.howToGet)}</p>}
                     <div className="flex flex-wrap gap-2">
-                      {poi.access.accessibility && (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-muted text-foreground/70">
-                          ♿ {poi.access.accessibility}
-                        </span>
-                      )}
-                      {poi.access.parking && (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-muted text-foreground/70">
-                          🅿️ {t(texts.parking)}
-                        </span>
-                      )}
+                      {poi.access.accessibility && <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-muted text-foreground/70">♿ {t(poi.access.accessibility)}</span>}
+                      {poi.access.parking && <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-muted text-foreground/70">🅿️ {t(poi.access.parking)}</span>}
                     </div>
-                    
-                    <a
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${poi.access.lat},${poi.access.lng}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary/90 transition-colors"
-                    >
-                      <Navigation className="w-4 h-4" />
-                      {t(texts.openMaps)}
+                    <a href={`https://www.google.com/maps/dir/?api=1&destination=${poi.access.lat},${poi.access.lng}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary/90 transition-colors">
+                      <Navigation className="w-4 h-4" />{t(texts.openMaps)}
                     </a>
                   </AccordionContent>
                 </AccordionItem>
 
-                {/* Hours and prices */}
-                {(poi.hours || poi.prices) && (
-                  <AccordionItem value="hours-prices" className="border-b border-border/50">
+                {/* Practical Info */}
+                {(poi.practical?.openingHours || poi.practical?.prices || poi.practical?.recommendedDuration) && (
+                  <AccordionItem value="practical" className="border-b border-border/50">
                     <AccordionTrigger className="hover:no-underline py-4">
-                      <span className="flex items-center gap-2 font-semibold text-foreground">
-                        <Clock className="w-5 h-5 text-primary" />
-                        {t(texts.hoursAndPrices)}
-                      </span>
+                      <span className="flex items-center gap-2 font-semibold text-foreground"><Clock className="w-5 h-5 text-primary" />{t(texts.practicalInfo)}</span>
                     </AccordionTrigger>
                     <AccordionContent className="pb-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {poi.hours && (
-                          <div className="p-4 rounded-xl bg-muted/50">
-                            <h4 className="font-semibold text-foreground text-sm mb-1 flex items-center gap-2">
-                              <Clock className="w-4 h-4 text-primary" />
-                              {t(texts.hours)}
-                            </h4>
-                            <p className="text-sm text-muted-foreground">{poi.hours}</p>
+                      <div className="grid grid-cols-1 gap-3">
+                        {poi.practical.openingHours && (
+                          <div className="p-3 rounded-xl bg-muted/50">
+                            <h4 className="font-semibold text-foreground text-sm mb-1 flex items-center gap-2"><Clock className="w-4 h-4 text-primary" />{t(texts.hours)}</h4>
+                            <p className="text-sm text-muted-foreground">{t(poi.practical.openingHours)}</p>
                           </div>
                         )}
-                        {poi.prices && (
-                          <div className="p-4 rounded-xl bg-muted/50">
-                            <h4 className="font-semibold text-foreground text-sm mb-1 flex items-center gap-2">
-                              <Euro className="w-4 h-4 text-primary" />
-                              {t(texts.prices)}
-                            </h4>
-                            <p className="text-sm text-muted-foreground">{poi.prices}</p>
+                        {poi.practical.prices && (
+                          <div className="p-3 rounded-xl bg-muted/50">
+                            <h4 className="font-semibold text-foreground text-sm mb-1 flex items-center gap-2"><Euro className="w-4 h-4 text-primary" />{t(texts.prices)}</h4>
+                            <p className="text-sm text-muted-foreground">{t(poi.practical.prices)}</p>
+                          </div>
+                        )}
+                        {poi.practical.recommendedDuration && (
+                          <div className="p-3 rounded-xl bg-muted/50">
+                            <h4 className="font-semibold text-foreground text-sm mb-1">{t(texts.duration)}</h4>
+                            <p className="text-sm text-muted-foreground">{t(poi.practical.recommendedDuration)}</p>
                           </div>
                         )}
                       </div>
@@ -365,45 +304,16 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
                 )}
 
                 {/* Contact */}
-                {poi.contact && (
+                {poi.contact && (poi.contact.phone || poi.contact.email || poi.contact.website) && (
                   <AccordionItem value="contact" className="border-b border-border/50">
                     <AccordionTrigger className="hover:no-underline py-4">
-                      <span className="flex items-center gap-2 font-semibold text-foreground">
-                        <Phone className="w-5 h-5 text-primary" />
-                        {t(texts.contact)}
-                      </span>
+                      <span className="flex items-center gap-2 font-semibold text-foreground"><Phone className="w-5 h-5 text-primary" />{t(texts.contact)}</span>
                     </AccordionTrigger>
                     <AccordionContent className="pb-4">
                       <div className="flex flex-wrap gap-3">
-                        {poi.contact.phone && (
-                          <a 
-                            href={`tel:${poi.contact.phone}`} 
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors text-sm text-foreground"
-                          >
-                            <Phone className="w-4 h-4 text-primary" />
-                            {poi.contact.phone}
-                          </a>
-                        )}
-                        {poi.contact.email && (
-                          <a 
-                            href={`mailto:${poi.contact.email}`} 
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors text-sm text-foreground"
-                          >
-                            <Mail className="w-4 h-4 text-primary" />
-                            {poi.contact.email}
-                          </a>
-                        )}
-                        {poi.contact.website && (
-                          <a 
-                            href={poi.contact.website} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors text-sm text-foreground"
-                          >
-                            <Globe className="w-4 h-4 text-primary" />
-                            Web
-                          </a>
-                        )}
+                        {poi.contact.phone && <a href={`tel:${poi.contact.phone}`} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors text-sm text-foreground"><Phone className="w-4 h-4 text-primary" />{poi.contact.phone}</a>}
+                        {poi.contact.email && <a href={`mailto:${poi.contact.email}`} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors text-sm text-foreground"><Mail className="w-4 h-4 text-primary" />{poi.contact.email}</a>}
+                        {poi.contact.website && <a href={poi.contact.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors text-sm text-foreground"><Globe className="w-4 h-4 text-primary" />{poi.contact.website.replace(/^https?:\/\//, '')}</a>}
                       </div>
                     </AccordionContent>
                   </AccordionItem>
@@ -413,46 +323,32 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
                 {poi.media.images.length > 1 && (
                   <AccordionItem value="gallery" className="border-b border-border/50">
                     <AccordionTrigger className="hover:no-underline py-4">
-                      <span className="flex items-center gap-2 font-semibold text-foreground">
-                        <Image className="w-5 h-5 text-primary" />
-                        {t(texts.gallery)}
-                      </span>
+                      <span className="flex items-center gap-2 font-semibold text-foreground"><Image className="w-5 h-5 text-primary" />{t(texts.gallery)}</span>
                     </AccordionTrigger>
                     <AccordionContent className="pb-4">
-                      <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
-                        {poi.media.images.map((img, idx) => (
-                          <div
-                            key={idx}
-                            className="flex-shrink-0 w-36 h-28 rounded-xl bg-cover bg-center shadow-sm border border-border/30"
-                            style={{ backgroundImage: `url(${img})` }}
-                          />
+                      <div className="grid grid-cols-2 gap-2">
+                        {poi.media.images.map((img, i) => (
+                          <div key={i} className="aspect-video rounded-lg overflow-hidden bg-muted">
+                            <img src={img.url} alt={img.caption ? t(img.caption) : ''} className="w-full h-full object-cover" />
+                          </div>
                         ))}
                       </div>
                     </AccordionContent>
                   </AccordionItem>
                 )}
 
-                {/* External links */}
-                {poi.links && poi.links.length > 0 && (
-                  <AccordionItem value="links" className="border-b-0">
+                {/* Links */}
+                {poi.links.length > 0 && (
+                  <AccordionItem value="links" className="border-b border-border/50">
                     <AccordionTrigger className="hover:no-underline py-4">
-                      <span className="flex items-center gap-2 font-semibold text-foreground">
-                        <Link2 className="w-5 h-5 text-primary" />
-                        {t(texts.links)}
-                      </span>
+                      <span className="flex items-center gap-2 font-semibold text-foreground"><Link2 className="w-5 h-5 text-primary" />{t(texts.links)}</span>
                     </AccordionTrigger>
                     <AccordionContent className="pb-4">
-                      <div className="flex flex-wrap gap-2">
-                        {poi.links.map((link, idx) => (
-                          <a
-                            key={idx}
-                            href={link.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-border hover:border-primary hover:text-primary text-sm font-medium transition-colors"
-                          >
-                            <ExternalLink className="w-3.5 h-3.5" />
-                            {link.label}
+                      <div className="space-y-2">
+                        {poi.links.map((link, i) => (
+                          <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors">
+                            <span className="text-sm font-medium text-foreground">{t(link.label)}</span>
+                            <ExternalLink className="w-4 h-4 text-muted-foreground" />
                           </a>
                         ))}
                       </div>
@@ -462,27 +358,23 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
               </Accordion>
             </div>
 
-            {/* ===== STICKY CTA BAR ===== */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-border/50 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+            {/* STICKY CTA */}
+            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent pt-8">
               <div className="flex gap-3">
-                <button
-                  onClick={handleCTAClick}
-                  className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-base uppercase tracking-wide transition-all shadow-md ${cta.className}`}
-                >
-                  <CTAIcon className="w-5 h-5" />
-                  {cta.label}
+                <button onClick={handleCTAClick} className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-base shadow-lg transition-all ${cta.className}`}>
+                  <CTAIcon className="w-5 h-5" />{cta.label}
                 </button>
-                
-                <button
-                  onClick={handleShare}
-                  className="p-4 rounded-xl border border-border bg-muted/50 hover:bg-muted transition-colors"
-                  aria-label={t(texts.share)}
-                >
-                  <Share2 className="w-5 h-5 text-muted-foreground" />
+                <button onClick={handleShare} className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors shadow-lg">
+                  <Share2 className="w-5 h-5 text-foreground" />
                 </button>
               </div>
             </div>
           </motion.div>
+
+          {/* 360 Fullscreen Modal */}
+          {poi.tour360 && (
+            <FullscreenModal isOpen={show360Modal} onClose={() => setShow360Modal(false)} iframeUrl={poi.tour360.iframe360Url} title={t(poi.title)} />
+          )}
         </motion.div>
       )}
     </AnimatePresence>
