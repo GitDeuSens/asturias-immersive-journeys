@@ -50,12 +50,12 @@ const getARPOICount = (route: Route): number => {
   }, 0);
 };
 
-// Custom marker icons with improved type badge - Colores oficiales Asturias
-const createMarkerIcon = (number: number, type: ExperienceType) => {
+// Custom marker icons with POI thumbnail and position number
+const createMarkerIcon = (number: number, type: ExperienceType, imageUrl?: string) => {
   const typeColors = {
-    'AR': { bg: 'hsl(48, 100%, 50%)', badge: '📱', label: 'AR', text: '#1a1a1a' },      // Amarillo Asturias
-    '360': { bg: 'hsl(79, 100%, 36%)', badge: '🔄', label: '360°', text: '#ffffff' },   // Verde Asturias
-    'INFO': { bg: 'hsl(203, 100%, 32%)', badge: 'ℹ️', label: 'INFO', text: '#ffffff' }  // Azul institucional
+    'AR': { border: 'hsl(48, 100%, 50%)' },      // Amarillo Asturias
+    '360': { border: 'hsl(79, 100%, 36%)' },     // Verde Asturias
+    'INFO': { border: 'hsl(203, 100%, 32%)' }    // Azul institucional
   };
   const config = typeColors[type];
   
@@ -64,45 +64,60 @@ const createMarkerIcon = (number: number, type: ExperienceType) => {
     html: `
       <div style="
         position: relative;
-        width: 44px;
-        height: 44px;
+        width: 48px;
+        height: 48px;
       ">
         <div style="
-          width: 44px;
-          height: 44px;
-          background: ${config.bg};
-          border: 3px solid white;
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          border: 4px solid ${config.border};
+          overflow: hidden;
+          background: white;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        ">
+          ${imageUrl ? `
+            <img src="${imageUrl}" style="
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            " alt=""/>
+          ` : `
+            <div style="
+              width: 100%;
+              height: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-weight: 800;
+              font-size: 18px;
+              color: ${config.border};
+              font-family: 'Montserrat', sans-serif;
+            ">${number}</div>
+          `}
+        </div>
+        <div style="
+          position: absolute;
+          top: -6px;
+          right: -6px;
+          width: 22px;
+          height: 22px;
+          background: ${config.border};
+          border: 2px solid white;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
+          font-size: 11px;
           font-weight: 800;
-          color: ${config.text};
-          font-size: 16px;
-          font-family: 'Montserrat', sans-serif;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-        ">
-          ${number}
-        </div>
-        <div style="
-          position: absolute;
-          top: -8px;
-          right: -8px;
-          background: white;
-          border-radius: 6px;
-          padding: 2px 5px;
-          font-size: 9px;
-          font-weight: 700;
-          color: ${config.bg};
+          color: ${type === 'AR' ? '#1a1a1a' : 'white'};
           box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-          border: 1.5px solid ${config.bg};
           font-family: 'Montserrat', sans-serif;
-          letter-spacing: 0.5px;
-        ">${config.label}</div>
+        ">${number}</div>
       </div>
     `,
-    iconSize: [44, 44],
-    iconAnchor: [22, 44],
+    iconSize: [48, 48],
+    iconAnchor: [24, 48],
   });
 };
 
@@ -364,12 +379,13 @@ export function RoutesPage() {
         lineJoin: 'round'
       }).addTo(mapRef.current);
 
-      // Add route POI markers
+      // Add route POI markers with thumbnails
       selectedRoute.poiOrder.forEach((poiId, index) => {
         const poi = getPOIById(poiId);
         if (poi) {
+          const imageUrl = poi.media.images[0];
           const marker = L.marker([poi.access.lat, poi.access.lng], {
-            icon: createMarkerIcon(index + 1, poi.experienceType)
+            icon: createMarkerIcon(index + 1, poi.experienceType, imageUrl)
           })
             .addTo(mapRef.current!)
             .on('click', () => handlePOIClick(poi));
@@ -696,6 +712,7 @@ export function RoutesPage() {
                             if (!poi) return null;
                             const globalIndex = selectedRoute.poiOrder.indexOf(poiId);
                             const isSelected = selectedPOI?.id === poi.id;
+                            const typeColor = poi.experienceType === 'AR' ? 'bg-warm' : poi.experienceType === '360' ? 'bg-primary' : 'bg-accent';
                             return (
                               <button
                                 key={poiId}
@@ -706,13 +723,22 @@ export function RoutesPage() {
                                     : 'bg-muted/30 hover:bg-muted/50 border border-transparent'
                                 }`}
                               >
-                                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0 ${
-                                  poi.experienceType === 'AR' ? 'bg-warm' : poi.experienceType === '360' ? 'bg-primary' : 'bg-accent'
-                                }`}>
-                                  {globalIndex + 1}
+                                {/* Thumbnail with position number */}
+                                <div className="relative flex-shrink-0">
+                                  <div 
+                                    className={`w-12 h-12 rounded-lg bg-cover bg-center border-2 ${
+                                      poi.experienceType === 'AR' ? 'border-warm' : poi.experienceType === '360' ? 'border-primary' : 'border-accent'
+                                    }`}
+                                    style={{ backgroundImage: `url(${poi.media.images[0]})` }}
+                                  />
+                                  <div className={`absolute -top-2 -right-2 w-6 h-6 ${typeColor} rounded-full flex items-center justify-center text-xs font-bold text-white border-2 border-white shadow-sm`}>
+                                    {globalIndex + 1}
+                                  </div>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="font-medium text-foreground truncate">{t(poi.title)}</p>
+                                  <div className="flex items-center gap-2">
+                                    <p className="font-medium text-foreground truncate">{t(poi.title)}</p>
+                                  </div>
                                   <div className="flex items-center gap-2 mt-1">
                                     <TypeBadge type={poi.experienceType} size="sm" />
                                   </div>
@@ -734,6 +760,7 @@ export function RoutesPage() {
                       const poi = getPOIById(poiId);
                       if (!poi) return null;
                       const isSelected = selectedPOI?.id === poi.id;
+                      const typeColor = poi.experienceType === 'AR' ? 'bg-warm' : poi.experienceType === '360' ? 'bg-primary' : 'bg-accent';
                       return (
                         <button
                           key={poiId}
@@ -744,13 +771,22 @@ export function RoutesPage() {
                               : 'bg-muted/30 hover:bg-muted/50 border border-transparent'
                           }`}
                         >
-                          <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0 ${
-                            poi.experienceType === 'AR' ? 'bg-warm' : poi.experienceType === '360' ? 'bg-primary' : 'bg-accent'
-                          }`}>
-                            {idx + 1}
+                          {/* Thumbnail with position number */}
+                          <div className="relative flex-shrink-0">
+                            <div 
+                              className={`w-12 h-12 rounded-lg bg-cover bg-center border-2 ${
+                                poi.experienceType === 'AR' ? 'border-warm' : poi.experienceType === '360' ? 'border-primary' : 'border-accent'
+                              }`}
+                              style={{ backgroundImage: `url(${poi.media.images[0]})` }}
+                            />
+                            <div className={`absolute -top-2 -right-2 w-6 h-6 ${typeColor} rounded-full flex items-center justify-center text-xs font-bold text-white border-2 border-white shadow-sm`}>
+                              {idx + 1}
+                            </div>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium text-foreground truncate">{t(poi.title)}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium text-foreground truncate">{t(poi.title)}</p>
+                            </div>
                             <div className="flex items-center gap-2 mt-1">
                               <TypeBadge type={poi.experienceType} size="sm" />
                               {poi.categoryIds.slice(0, 1).map(catId => {
