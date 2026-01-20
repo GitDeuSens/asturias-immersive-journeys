@@ -85,8 +85,8 @@ export function POIPreviewSheet({ poi, onClose, onViewDetails }: POIPreviewSheet
         <div 
           className="h-40 bg-cover bg-center relative"
           style={{ 
-            backgroundImage: poi.media.images[0] 
-              ? `url(${poi.media.images[0]})` 
+            backgroundImage: poi.media.images[0]?.url 
+              ? `url(${poi.media.images[0].url})` 
               : 'linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted-foreground)/0.2) 100%)'
           }}
         >

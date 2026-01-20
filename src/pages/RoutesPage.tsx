@@ -847,7 +847,7 @@ export function RoutesPage() {
                                     className={`w-12 h-12 rounded-lg bg-cover bg-center border-2 ${
                                       poi.experienceType === 'AR' ? 'border-warm' : poi.experienceType === '360' ? 'border-primary' : 'border-accent'
                                     }`}
-                                    style={{ backgroundImage: `url(${poi.media.images[0]})` }}
+                                    style={{ backgroundImage: `url(${poi.media.images[0]?.url || ''})` }}
                                   />
                                   <div className={`absolute -top-2 -right-2 w-6 h-6 ${typeColor} rounded-full flex items-center justify-center text-xs font-bold text-white border-2 border-white shadow-sm`}>
                                     {globalIndex + 1}
@@ -891,12 +891,12 @@ export function RoutesPage() {
                         >
                           {/* Thumbnail with position number */}
                           <div className="relative flex-shrink-0">
-                            <div 
-                              className={`w-12 h-12 rounded-lg bg-cover bg-center border-2 ${
-                                poi.experienceType === 'AR' ? 'border-warm' : poi.experienceType === '360' ? 'border-primary' : 'border-accent'
-                              }`}
-                              style={{ backgroundImage: `url(${poi.media.images[0]})` }}
-                            />
+                          <div 
+                            className={`w-12 h-12 rounded-lg bg-cover bg-center border-2 ${
+                              poi.experienceType === 'AR' ? 'border-warm' : poi.experienceType === '360' ? 'border-primary' : 'border-accent'
+                            }`}
+                            style={{ backgroundImage: `url(${poi.media.images[0]?.url || ''})` }}
+                          />
                             <div className={`absolute -top-2 -right-2 w-6 h-6 ${typeColor} rounded-full flex items-center justify-center text-xs font-bold text-white border-2 border-white shadow-sm`}>
                               {idx + 1}
                             </div>
@@ -945,7 +945,7 @@ export function RoutesPage() {
                             className={`w-16 h-16 rounded-lg bg-cover bg-center border-2 ${
                               poi.experienceType === 'AR' ? 'border-warm' : poi.experienceType === '360' ? 'border-primary' : 'border-accent'
                             }`}
-                            style={{ backgroundImage: `url(${poi.media.images[0]})` }}
+                            style={{ backgroundImage: `url(${poi.media.images[0]?.url || ''})` }}
                           />
                           <div className={`absolute -top-2 -right-2 w-6 h-6 ${typeColor} rounded-full flex items-center justify-center border-2 border-white shadow-sm`}>
                             <TypeIcon className={`w-3 h-3 ${poi.experienceType === 'AR' ? 'text-foreground' : 'text-white'}`} />
