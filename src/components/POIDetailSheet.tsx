@@ -23,6 +23,7 @@ const texts = {
   launchAR: { es: 'Iniciar AR', en: 'Launch AR', fr: 'Lancer AR' },
   view360: { es: 'Ver en 360°', en: 'View in 360°', fr: 'Voir en 360°' },
   gallery: { es: 'Galería', en: 'Gallery', fr: 'Galerie' },
+  openMaps: { es: 'Abrir en Maps', en: 'Open in Maps', fr: 'Ouvrir dans Maps' },
 };
 
 export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
@@ -31,8 +32,6 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
   const [selectedLang, setSelectedLang] = useState(language);
 
   if (!poi) return null;
-
-  const audioUrl = poi.audioGuides?.[selectedLang as 'es' | 'en' | 'fr'];
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -51,7 +50,7 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm"
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
           onClick={onClose}
         >
           <motion.div
@@ -59,7 +58,7 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="absolute inset-x-0 bottom-0 top-16 md:top-20 bg-background rounded-t-3xl overflow-hidden"
+            className="absolute inset-x-0 bottom-0 top-16 md:top-20 bg-white rounded-t-3xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header with image */}
@@ -68,25 +67,25 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
                 className="absolute inset-0 bg-cover bg-center"
                 style={{ backgroundImage: `url(${poi.media.images[0]})` }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
               
               {/* Close button */}
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-muted/80 transition-colors"
+                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-muted transition-colors"
               >
                 <X className="w-5 h-5 text-foreground" />
               </button>
 
               {/* Experience type badge */}
               <div className="absolute top-4 left-4">
-                <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${
+                <span className={`flex items-center gap-1 ${
                   poi.experienceType === 'AR' ? 'badge-ar'
                   : poi.experienceType === '360' ? 'badge-360'
                   : 'badge-info'
                 }`}>
-                  {poi.experienceType === 'AR' && <Smartphone className="w-4 h-4 inline mr-1" />}
-                  {poi.experienceType === '360' && <Camera className="w-4 h-4 inline mr-1" />}
+                  {poi.experienceType === 'AR' && <Smartphone className="w-3 h-3" />}
+                  {poi.experienceType === '360' && <Camera className="w-3 h-3" />}
                   {poi.experienceType}
                 </span>
               </div>
@@ -96,14 +95,14 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
             <div className="overflow-y-auto max-h-[calc(100vh-16rem)] md:max-h-[calc(100vh-20rem)] p-6 space-y-6">
               {/* Title and categories */}
               <div>
-                <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-3">
+                <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
                   {t(poi.title)}
                 </h1>
                 <div className="flex flex-wrap gap-2">
                   {poi.categoryIds.map(catId => {
                     const cat = categories.find(c => c.id === catId);
                     return cat ? (
-                      <span key={catId} className="category-chip">
+                      <span key={catId} className="px-3 py-1 rounded-full text-sm bg-muted text-muted-foreground">
                         {t(cat.label)}
                       </span>
                     ) : null;
@@ -112,21 +111,21 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
               </div>
 
               {/* Short description */}
-              <p className="text-lg text-foreground/80">
+              <p className="text-lg text-muted-foreground leading-relaxed">
                 {t(poi.shortDescription)}
               </p>
 
               {/* AR Experience button */}
               {poi.experienceType === 'AR' && poi.arExperience && (
-                <div className="p-4 rounded-xl bg-accent/10 border border-accent/30">
-                  <h3 className="font-semibold text-accent mb-2 flex items-center gap-2">
+                <div className="p-5 rounded-xl bg-warm/10 border border-warm/30">
+                  <h3 className="font-bold text-warm mb-2 flex items-center gap-2">
                     <Smartphone className="w-5 h-5" />
                     {t(texts.arExperience)}
                   </h3>
-                  <p className="text-sm text-foreground/70 mb-3">
+                  <p className="text-sm text-foreground/70 mb-4">
                     {t(poi.arExperience.instructions)}
                   </p>
-                  <button className="cta-primary w-full py-3 bg-accent hover:bg-accent/90">
+                  <button className="w-full py-3 rounded-lg bg-warm text-white font-bold uppercase tracking-wide hover:bg-warm/90 transition-colors">
                     {t(texts.launchAR)}
                   </button>
                 </div>
@@ -134,7 +133,7 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
 
               {/* 360 View button */}
               {poi.experienceType === '360' && (
-                <button className="cta-primary w-full py-3 flex items-center justify-center gap-2">
+                <button className="cta-primary w-full flex items-center justify-center gap-2">
                   <Camera className="w-5 h-5" />
                   {t(texts.view360)}
                 </button>
@@ -142,9 +141,9 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
 
               {/* Audio guide */}
               {poi.audioGuides && (
-                <div className="p-4 rounded-xl bg-muted/30 border border-border/50">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                <div className="p-5 rounded-xl bg-muted border border-border">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-bold text-foreground flex items-center gap-2">
                       🎧 {t(texts.audioGuide)}
                     </h3>
                     <div className="flex gap-1">
@@ -153,13 +152,13 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
                           <button
                             key={lang}
                             onClick={() => setSelectedLang(lang)}
-                            className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors ${
                               selectedLang === lang 
-                                ? 'bg-primary text-primary-foreground' 
-                                : 'bg-muted hover:bg-muted/80 text-foreground/60'
+                                ? 'bg-primary text-white' 
+                                : 'bg-white border border-border hover:border-primary text-foreground'
                             }`}
                           >
-                            {lang.toUpperCase()}
+                            {lang}
                           </button>
                         )
                       ))}
@@ -167,7 +166,7 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
                   </div>
                   <button
                     onClick={() => setIsPlaying(!isPlaying)}
-                    className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-primary/20 hover:bg-primary/30 transition-colors text-primary font-medium"
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors text-primary font-bold"
                   >
                     {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
                     {isPlaying ? 'Pausar' : 'Reproducir'}
@@ -176,8 +175,8 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
               )}
 
               {/* Access info */}
-              <div className="space-y-3">
-                <h3 className="font-semibold text-foreground flex items-center gap-2">
+              <div className="space-y-4">
+                <h3 className="font-bold text-foreground flex items-center gap-2">
                   <MapPin className="w-5 h-5 text-primary" />
                   {t(texts.howToGet)}
                 </h3>
@@ -187,12 +186,12 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
                 )}
                 <div className="flex flex-wrap gap-3">
                   {poi.access.accessibility && (
-                    <span className="text-sm text-foreground/60">
+                    <span className="text-sm text-foreground/60 flex items-center gap-1">
                       ♿ {poi.access.accessibility}
                     </span>
                   )}
                   {poi.access.parking && (
-                    <span className="text-sm text-foreground/60">
+                    <span className="text-sm text-foreground/60 flex items-center gap-1">
                       🅿️ {poi.access.parking}
                     </span>
                   )}
@@ -201,10 +200,10 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
                   href={`https://www.google.com/maps/dir/?api=1&destination=${poi.access.lat},${poi.access.lng}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/50 hover:bg-muted text-foreground transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white font-semibold hover:bg-primary/90 transition-colors"
                 >
                   <Navigation className="w-4 h-4" />
-                  Google Maps
+                  {t(texts.openMaps)}
                 </a>
               </div>
 
@@ -212,21 +211,21 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
               {(poi.hours || poi.prices) && (
                 <div className="grid grid-cols-2 gap-4">
                   {poi.hours && (
-                    <div className="p-4 rounded-xl bg-muted/30">
-                      <h4 className="font-medium text-foreground flex items-center gap-2 mb-2">
+                    <div className="p-4 rounded-xl bg-muted">
+                      <h4 className="font-semibold text-foreground flex items-center gap-2 mb-2">
                         <Clock className="w-4 h-4 text-primary" />
                         {t(texts.hours)}
                       </h4>
-                      <p className="text-sm text-foreground/70">{poi.hours}</p>
+                      <p className="text-sm text-muted-foreground">{poi.hours}</p>
                     </div>
                   )}
                   {poi.prices && (
-                    <div className="p-4 rounded-xl bg-muted/30">
-                      <h4 className="font-medium text-foreground flex items-center gap-2 mb-2">
+                    <div className="p-4 rounded-xl bg-muted">
+                      <h4 className="font-semibold text-foreground flex items-center gap-2 mb-2">
                         <Euro className="w-4 h-4 text-primary" />
                         {t(texts.prices)}
                       </h4>
-                      <p className="text-sm text-foreground/70">{poi.prices}</p>
+                      <p className="text-sm text-muted-foreground">{poi.prices}</p>
                     </div>
                   )}
                 </div>
@@ -235,14 +234,14 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
               {/* Gallery */}
               {poi.media.images.length > 1 && (
                 <div>
-                  <h3 className="font-semibold text-foreground mb-3">
+                  <h3 className="font-bold text-foreground mb-3">
                     📷 {t(texts.gallery)}
                   </h3>
                   <div className="flex gap-2 overflow-x-auto pb-2">
                     {poi.media.images.map((img, idx) => (
                       <div
                         key={idx}
-                        className="flex-shrink-0 w-32 h-24 rounded-lg bg-cover bg-center"
+                        className="flex-shrink-0 w-32 h-24 rounded-lg bg-cover bg-center shadow-md"
                         style={{ backgroundImage: `url(${img})` }}
                       />
                     ))}
@@ -252,25 +251,25 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
 
               {/* Contact */}
               {poi.contact && (
-                <div className="space-y-2">
-                  <h3 className="font-semibold text-foreground">
+                <div className="space-y-3">
+                  <h3 className="font-bold text-foreground">
                     {t(texts.contact)}
                   </h3>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex flex-wrap gap-4">
                     {poi.contact.phone && (
-                      <a href={`tel:${poi.contact.phone}`} className="flex items-center gap-2 text-sm text-foreground/70 hover:text-primary">
+                      <a href={`tel:${poi.contact.phone}`} className="flex items-center gap-2 text-sm text-foreground/70 hover:text-primary transition-colors">
                         <Phone className="w-4 h-4" />
                         {poi.contact.phone}
                       </a>
                     )}
                     {poi.contact.email && (
-                      <a href={`mailto:${poi.contact.email}`} className="flex items-center gap-2 text-sm text-foreground/70 hover:text-primary">
+                      <a href={`mailto:${poi.contact.email}`} className="flex items-center gap-2 text-sm text-foreground/70 hover:text-primary transition-colors">
                         <Mail className="w-4 h-4" />
                         {poi.contact.email}
                       </a>
                     )}
                     {poi.contact.website && (
-                      <a href={poi.contact.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-foreground/70 hover:text-primary">
+                      <a href={poi.contact.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-foreground/70 hover:text-primary transition-colors">
                         <Globe className="w-4 h-4" />
                         Web
                       </a>
@@ -281,8 +280,8 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
 
               {/* External links */}
               {poi.links && poi.links.length > 0 && (
-                <div className="space-y-2">
-                  <h3 className="font-semibold text-foreground">
+                <div className="space-y-3">
+                  <h3 className="font-bold text-foreground">
                     {t(texts.links)}
                   </h3>
                   <div className="flex flex-wrap gap-2">
@@ -292,7 +291,7 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-muted/50 hover:bg-muted text-sm text-foreground/80 transition-colors"
+                        className="flex items-center gap-1 px-4 py-2 rounded-lg border border-border hover:border-primary hover:text-primary text-sm font-medium transition-colors"
                       >
                         <ExternalLink className="w-3 h-3" />
                         {link.label}
@@ -305,7 +304,7 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
               {/* Share button */}
               <button
                 onClick={handleShare}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-border hover:bg-muted/50 transition-colors text-foreground"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-primary text-primary font-bold hover:bg-primary hover:text-white transition-colors"
               >
                 <Share2 className="w-5 h-5" />
                 {t(texts.share)}

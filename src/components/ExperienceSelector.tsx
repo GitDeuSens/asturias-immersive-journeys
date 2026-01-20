@@ -21,18 +21,23 @@ export function ExperienceSelector({ onSelect }: ExperienceSelectorProps) {
 
   return (
     <div className="screen-fullscreen bg-background">
+      {/* Green stripe accent */}
+      <div className="absolute top-0 left-8 md:left-12 w-1.5 h-24 bg-primary z-20" />
+      
       {/* Title */}
-      <motion.h1
+      <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="absolute top-8 md:top-12 left-0 right-0 text-center text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-foreground px-6 z-10"
+        className="absolute top-8 md:top-12 left-0 right-0 text-center z-10 px-6"
       >
-        {t(texts.title)}
-      </motion.h1>
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
+          {t(texts.title)}
+        </h1>
+      </motion.div>
 
       {/* Two experience options */}
-      <div className="flex flex-col md:flex-row w-full h-full">
+      <div className="flex flex-col md:flex-row w-full h-full pt-24 md:pt-0">
         {/* Tours 360 */}
         <motion.button
           initial={{ opacity: 0, y: 50 }}
@@ -42,28 +47,35 @@ export function ExperienceSelector({ onSelect }: ExperienceSelectorProps) {
           className="relative flex-1 group overflow-hidden"
         >
           <div 
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+            className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
             style={{ backgroundImage: `url(${covadongaImg})` }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/30" />
-          <div className="absolute inset-0 border-4 border-transparent group-hover:border-primary/50 transition-colors duration-300" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'linear-gradient(to top, hsla(79, 100%, 36%, 0.8), transparent)' }} />
           
           <div className="relative z-10 h-full flex flex-col items-center justify-center px-6">
-            <div className="w-20 h-20 md:w-28 md:h-28 rounded-full bg-primary/20 backdrop-blur-md flex items-center justify-center mb-8 group-hover:bg-primary/40 transition-all duration-300 border-2 border-primary/50 group-hover:scale-110">
-              <View className="w-10 h-10 md:w-14 md:h-14 text-primary" />
+            <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-primary/20 backdrop-blur-md flex items-center justify-center mb-8 group-hover:bg-primary group-hover:scale-110 transition-all duration-300 border-2 border-primary/50">
+              <View className="w-12 h-12 md:w-16 md:h-16 text-primary group-hover:text-white transition-colors" />
             </div>
-            <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold text-foreground mb-4 text-center">
+            <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4 text-center">
               {t(texts.toursTitle)}
             </h2>
-            <p className="text-lg md:text-xl text-foreground/70 text-center">
+            <p className="text-lg md:text-xl text-white/80 text-center">
               {t(texts.toursSubtitle)}
             </p>
+            
+            {/* CTA hint */}
+            <div className="mt-8 px-6 py-3 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="text-white font-semibold uppercase tracking-wider text-sm">
+                {t({ es: 'Explorar tours', en: 'Explore tours', fr: 'Explorer les visites' })}
+              </span>
+            </div>
           </div>
         </motion.button>
 
         {/* Divider */}
-        <div className="hidden md:block w-px bg-gradient-to-b from-transparent via-border to-transparent" />
-        <div className="md:hidden h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+        <div className="hidden md:block w-1 bg-primary" />
+        <div className="md:hidden h-1 bg-primary" />
 
         {/* Immersive Routes */}
         <motion.button
@@ -74,22 +86,29 @@ export function ExperienceSelector({ onSelect }: ExperienceSelectorProps) {
           className="relative flex-1 group overflow-hidden"
         >
           <div 
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+            className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
             style={{ backgroundImage: `url(${caresImg})` }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/30" />
-          <div className="absolute inset-0 border-4 border-transparent group-hover:border-accent/50 transition-colors duration-300" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'linear-gradient(to top, hsla(199, 89%, 48%, 0.8), transparent)' }} />
           
           <div className="relative z-10 h-full flex flex-col items-center justify-center px-6">
-            <div className="w-20 h-20 md:w-28 md:h-28 rounded-full bg-accent/20 backdrop-blur-md flex items-center justify-center mb-8 group-hover:bg-accent/40 transition-all duration-300 border-2 border-accent/50 group-hover:scale-110">
-              <Map className="w-10 h-10 md:w-14 md:h-14 text-accent" />
+            <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-accent/20 backdrop-blur-md flex items-center justify-center mb-8 group-hover:bg-accent group-hover:scale-110 transition-all duration-300 border-2 border-accent/50">
+              <Map className="w-12 h-12 md:w-16 md:h-16 text-accent group-hover:text-white transition-colors" />
             </div>
-            <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold text-foreground mb-4 text-center">
+            <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4 text-center">
               {t(texts.routesTitle)}
             </h2>
-            <p className="text-lg md:text-xl text-foreground/70 text-center">
+            <p className="text-lg md:text-xl text-white/80 text-center">
               {t(texts.routesSubtitle)}
             </p>
+            
+            {/* CTA hint */}
+            <div className="mt-8 px-6 py-3 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="text-white font-semibold uppercase tracking-wider text-sm">
+                {t({ es: 'Ver rutas', en: 'View routes', fr: 'Voir les itinéraires' })}
+              </span>
+            </div>
           </div>
         </motion.button>
       </div>
