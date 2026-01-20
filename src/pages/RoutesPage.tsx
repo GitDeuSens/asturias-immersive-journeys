@@ -920,7 +920,9 @@ export function RoutesPage() {
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-foreground truncate">{t(poi.title)}</p>
                             {poi.access?.address && (
-                              <p className="text-xs text-muted-foreground truncate mt-0.5">{poi.access.address}</p>
+                              <p className="text-xs text-muted-foreground truncate mt-0.5">
+                                {poi.access.address.split(',').slice(-2, -1)[0]?.trim() || poi.access.address.split(',')[0]?.trim()}
+                              </p>
                             )}
                             <div className="flex items-center gap-2 mt-1">
                               <TypeBadge type={poi.experienceType} size="sm" />
@@ -976,7 +978,9 @@ export function RoutesPage() {
                             <TypeBadge type={poi.experienceType} size="sm" />
                           </div>
                           {poi.access?.address && (
-                            <p className="text-xs text-muted-foreground truncate mt-0.5">{poi.access.address}</p>
+                            <p className="text-xs text-muted-foreground truncate mt-0.5">
+                              {poi.access.address.split(',').slice(-2, -1)[0]?.trim() || poi.access.address.split(',')[0]?.trim()}
+                            </p>
                           )}
                           <p className="text-sm text-muted-foreground line-clamp-2 mt-1 mb-2">
                             {t(poi.shortDescription)}
