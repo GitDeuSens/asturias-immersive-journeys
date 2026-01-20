@@ -469,7 +469,7 @@ export function RoutesPage() {
       selectedRoute.poiOrder.forEach((poiId, index) => {
         const poi = getPOIById(poiId);
         if (poi) {
-          const imageUrl = poi.media.images[0];
+          const imageUrl = poi.media.heroImageUrl || poi.media.images[0]?.url;
           const marker = L.marker([poi.access.lat, poi.access.lng], {
             icon: createMarkerIcon(index + 1, poi.experienceType, imageUrl)
           })
@@ -484,7 +484,7 @@ export function RoutesPage() {
     } else if (viewMode === 'pois') {
       // Add all filtered POIs as markers with thumbnails
       filteredPOIs.forEach(poi => {
-        const imageUrl = poi.media.images[0];
+        const imageUrl = poi.media.heroImageUrl || poi.media.images[0]?.url;
         const marker = L.marker([poi.access.lat, poi.access.lng], {
           icon: createPOIMarkerIcon(poi.experienceType, imageUrl)
         })
