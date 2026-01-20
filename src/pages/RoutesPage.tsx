@@ -275,10 +275,10 @@ export function RoutesPage() {
   const [panelExpanded, setPanelExpanded] = useState(true);
   const [expandedDays, setExpandedDays] = useState<number[]>([1]);
 
-  // Límites de Asturias para restringir navegación del mapa
+  // Límites de Asturias para restringir navegación del mapa (ampliados para offset del panel)
   const ASTURIAS_BOUNDS: L.LatLngBoundsExpression = [
-    [42.85, -7.30],  // Suroeste
-    [43.75, -4.45]   // Noreste
+    [42.70, -7.80],  // Suroeste - más margen
+    [43.90, -4.00]   // Noreste - más margen
   ];
 
   // Initialize map
@@ -356,6 +356,35 @@ export function RoutesPage() {
       });
     }
   }, [selectedRoute, getPanelOffset]);
+
+  // Fit map to all visible elements (routes or POIs)
+  const fitToAllElements = useCallback((mode: 'routes' | 'pois') => {
+    if (!mapRef.current) return;
+    
+    let positions: [number, number][] = [];
+    
+    if (mode === 'routes') {
+      // Gather centroids of all filtered routes
+      filteredRoutes.forEach(route => {
+        const centroid = getRouteCentroid(route.polyline);
+        positions.push([centroid.lat, centroid.lng]);
+      });
+    } else if (mode === 'pois') {
+      // Gather positions of all filtered POIs
+      filteredPOIs.forEach(poi => {
+        positions.push([poi.access.lat, poi.access.lng]);
+      });
+    }
+    
+    if (positions.length > 0) {
+      const offset = getPanelOffset();
+      mapRef.current.fitBounds(positions, {
+        paddingTopLeft: [offset.left, offset.top],
+        paddingBottomRight: [offset.right, offset.bottom],
+        maxZoom: 12
+      });
+    }
+  }, [filteredRoutes, filteredPOIs, getPanelOffset]);
 
   // Update markers and polyline when selection changes
   useEffect(() => {
@@ -529,7 +558,11 @@ export function RoutesPage() {
             {/* Back button when route selected */}
             {selectedRoute && (
               <button
-                onClick={() => { setSelectedRoute(null); setSelectedPOI(null); }}
+                onClick={() => { 
+                  setSelectedRoute(null); 
+                  setSelectedPOI(null); 
+                  setTimeout(() => fitToAllElements('routes'), 100);
+                }}
                 className="flex items-center gap-2 text-sm text-primary font-medium hover:text-primary/80 transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -542,7 +575,11 @@ export function RoutesPage() {
               <>
                 <div className="flex rounded-xl bg-muted/50 p-1">
                   <button
-                    onClick={() => { setViewMode('routes'); setSelectedRoute(null); }}
+                    onClick={() => { 
+                      setViewMode('routes'); 
+                      setSelectedRoute(null); 
+                      setTimeout(() => fitToAllElements('routes'), 100);
+                    }}
                     className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg transition-all font-semibold ${
                       viewMode === 'routes' ? 'bg-primary text-primary-foreground' : 'text-foreground/70 hover:text-foreground'
                     }`}
@@ -551,7 +588,11 @@ export function RoutesPage() {
                     {t(texts.routes)}
                   </button>
                   <button
-                    onClick={() => { setViewMode('pois'); setSelectedRoute(null); }}
+                    onClick={() => { 
+                      setViewMode('pois'); 
+                      setSelectedRoute(null); 
+                      setTimeout(() => fitToAllElements('pois'), 100);
+                    }}
                     className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg transition-all font-semibold ${
                       viewMode === 'pois' ? 'bg-primary text-primary-foreground' : 'text-foreground/70 hover:text-foreground'
                     }`}
