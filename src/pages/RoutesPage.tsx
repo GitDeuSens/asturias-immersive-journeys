@@ -427,7 +427,7 @@ export function RoutesPage() {
   const handlePOIClick = (poi: POI) => {
     setSelectedPOI(poi);
     if (mapRef.current) {
-      mapRef.current.flyTo([poi.access.lat, poi.access.lng], 13, { duration: 0.5 });
+      mapRef.current.panTo([poi.access.lat, poi.access.lng], { duration: 0.5 });
     }
   };
 
