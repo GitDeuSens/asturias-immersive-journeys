@@ -236,53 +236,25 @@ const TypeBadge = ({ type, size = 'sm' }: { type: ExperienceType; size?: 'sm' | 
   const config = {
     'AR': { 
       className: 'bg-[hsl(48,100%,50%)]/20 border-[hsl(48,100%,50%)] text-[hsl(48,100%,35%)]', 
-      Icon: Smartphone 
+      icon: '📱' 
     },
     '360': { 
       className: 'bg-primary/20 border-primary text-primary', 
-      Icon: Camera 
+      icon: '🔄' 
     },
     'INFO': { 
       className: 'bg-[hsl(203,100%,32%)]/20 border-[hsl(203,100%,32%)] text-[hsl(203,100%,32%)]', 
-      Icon: Info 
+      icon: 'ℹ️' 
     }
   };
   const style = config[type];
-  const IconComponent = style.Icon;
   const sizeClasses = size === 'sm' ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs';
-  const iconSize = size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5';
   
   return (
     <span className={`inline-flex items-center gap-1 rounded-md border font-bold ${style.className} ${sizeClasses}`}>
-      <IconComponent className={iconSize} />
-      <span>{type === '360' ? '360°' : type}</span>
+      <span>{style.icon}</span>
+      <span>{type}</span>
     </span>
-  );
-};
-
-// Type icon bubble for thumbnails
-const TypeIconBubble = ({ type }: { type: ExperienceType }) => {
-  const config = {
-    'AR': { 
-      className: 'bg-[hsl(48,100%,50%)] text-[hsl(210,11%,15%)]', 
-      Icon: Smartphone 
-    },
-    '360': { 
-      className: 'bg-primary text-primary-foreground', 
-      Icon: Camera 
-    },
-    'INFO': { 
-      className: 'bg-[hsl(203,100%,32%)] text-white', 
-      Icon: Info 
-    }
-  };
-  const style = config[type];
-  const IconComponent = style.Icon;
-  
-  return (
-    <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-sm ${style.className}`}>
-      <IconComponent className="w-3 h-3" />
-    </div>
   );
 };
 
@@ -666,15 +638,13 @@ export function RoutesPage() {
                         : 'bg-muted/30 border-border/50 text-foreground/60 hover:bg-muted/50'
                     };
                     
-                    const TypeIcon = type === 'AR' ? Smartphone : type === '360' ? Camera : Info;
                     return (
                       <button
                         key={type}
                         onClick={() => toggleType(type)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${colorClasses[type]}`}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${colorClasses[type]}`}
                       >
-                        <TypeIcon className="w-3.5 h-3.5" />
-                        {type === '360' ? '360°' : type}
+                        {type === 'AR' ? '📱 AR' : type === '360' ? '🔄 360°' : 'ℹ️ INFO'}
                       </button>
                     );
                   })}
@@ -919,23 +889,17 @@ export function RoutesPage() {
                     className="w-full text-left p-4 rounded-xl bg-card/50 border border-border/50 hover:border-primary/50 transition-all group"
                   >
                     <div className="flex items-start gap-3">
-                      {/* Thumbnail with type bubble */}
-                      <div className="relative flex-shrink-0">
-                        <div 
-                          className={`w-16 h-16 rounded-lg bg-cover bg-center border-2 ${
-                            poi.experienceType === 'AR' ? 'border-[hsl(48,100%,50%)]' : 
-                            poi.experienceType === '360' ? 'border-primary' : 'border-[hsl(203,100%,32%)]'
-                          }`}
-                          style={{ backgroundImage: `url(${poi.media.images[0]})` }}
-                        />
-                        <div className="absolute -top-2 -right-2">
-                          <TypeIconBubble type={poi.experienceType} />
-                        </div>
-                      </div>
+                      <div 
+                        className="w-16 h-16 rounded-lg bg-cover bg-center flex-shrink-0"
+                        style={{ backgroundImage: `url(${poi.media.images[0]})` }}
+                      />
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-sans font-bold text-foreground truncate group-hover:text-primary transition-colors mb-1">
-                          {t(poi.title)}
-                        </h3>
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <h3 className="font-sans font-bold text-foreground truncate group-hover:text-primary transition-colors">
+                            {t(poi.title)}
+                          </h3>
+                          <TypeBadge type={poi.experienceType} size="sm" />
+                        </div>
                         <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
                           {t(poi.shortDescription)}
                         </p>
