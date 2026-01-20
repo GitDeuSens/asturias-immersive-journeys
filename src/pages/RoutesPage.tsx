@@ -665,7 +665,7 @@ export function RoutesPage() {
                     >
                       {/* Header with title and loop badge */}
                       <div className="flex items-start justify-between gap-2 mb-2">
-                        <h3 className="font-serif font-bold text-foreground text-lg group-hover:text-primary transition-colors">
+                        <h3 className="font-bold text-foreground text-lg group-hover:text-primary transition-colors">
                           {t(route.title)}
                         </h3>
                         {route.isLoop && (
@@ -722,7 +722,7 @@ export function RoutesPage() {
                 {/* Route header */}
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-2">
-                    <h2 className="text-xl font-serif font-bold text-foreground">{t(selectedRoute.title)}</h2>
+                    <h2 className="text-xl font-bold text-foreground">{t(selectedRoute.title)}</h2>
                     {selectedRoute.isLoop && (
                       <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-primary/15 text-primary text-[10px] font-bold uppercase tracking-wide whitespace-nowrap border border-primary/30">
                         <RotateCw className="w-3 h-3" />
