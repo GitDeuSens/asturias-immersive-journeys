@@ -384,12 +384,12 @@ export function RoutesPage() {
         }
       }
 
-      // Color neutro para la ruta (gris oscuro) - no implica tipo de experiencia
+      // Color neutro para la ruta (gris oscuro) - siempre discontinua
       polylineRef.current = L.polyline(positions, {
         color: 'hsl(0, 0%, 25%)',
         weight: 5,
         opacity: 0.9,
-        dashArray: selectedRoute.isLoop ? undefined : '12, 8',
+        dashArray: '12, 8',
         lineCap: 'round',
         lineJoin: 'round'
       }).addTo(mapRef.current);
