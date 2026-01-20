@@ -50,12 +50,12 @@ const getARPOICount = (route: Route): number => {
   }, 0);
 };
 
-// Custom marker icons with improved type badge
+// Custom marker icons with improved type badge - Colores oficiales Asturias
 const createMarkerIcon = (number: number, type: ExperienceType) => {
   const typeColors = {
-    'AR': { bg: 'hsl(38, 92%, 50%)', badge: '📱', label: 'AR' },
-    '360': { bg: 'hsl(79, 100%, 36%)', badge: '🔄', label: '360°' },
-    'INFO': { bg: 'hsl(199, 89%, 48%)', badge: 'ℹ️', label: 'INFO' }
+    'AR': { bg: 'hsl(48, 100%, 50%)', badge: '📱', label: 'AR', text: '#1a1a1a' },      // Amarillo Asturias
+    '360': { bg: 'hsl(79, 100%, 36%)', badge: '🔄', label: '360°', text: '#ffffff' },   // Verde Asturias
+    'INFO': { bg: 'hsl(203, 100%, 32%)', badge: 'ℹ️', label: 'INFO', text: '#ffffff' }  // Azul institucional
   };
   const config = typeColors[type];
   
@@ -77,10 +77,10 @@ const createMarkerIcon = (number: number, type: ExperienceType) => {
           align-items: center;
           justify-content: center;
           font-weight: 800;
-          color: white;
+          color: ${config.text};
           font-size: 16px;
           font-family: 'Montserrat', sans-serif;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+          box-shadow: 0 4px 15px rgba(0,0,0,0.25);
         ">
           ${number}
         </div>
@@ -108,9 +108,9 @@ const createMarkerIcon = (number: number, type: ExperienceType) => {
 
 const createPOIMarkerIcon = (type: ExperienceType) => {
   const typeColors = {
-    'AR': { bg: 'hsl(38, 92%, 50%)', icon: '📱' },
-    '360': { bg: 'hsl(79, 100%, 36%)', icon: '🔄' },
-    'INFO': { bg: 'hsl(199, 89%, 48%)', icon: 'ℹ️' }
+    'AR': { bg: 'hsl(48, 100%, 50%)', icon: '📱' },      // Amarillo Asturias
+    '360': { bg: 'hsl(79, 100%, 36%)', icon: '🔄' },     // Verde Asturias
+    'INFO': { bg: 'hsl(203, 100%, 32%)', icon: 'ℹ️' }    // Azul institucional
   };
   const config = typeColors[type];
   
@@ -135,18 +135,27 @@ const createPOIMarkerIcon = (type: ExperienceType) => {
   });
 };
 
-// Experience type badge component
+// Experience type badge component - Colores oficiales Asturias
 const TypeBadge = ({ type, size = 'sm' }: { type: ExperienceType; size?: 'sm' | 'md' }) => {
   const config = {
-    'AR': { bg: 'bg-warm/20', border: 'border-warm', text: 'text-warm', icon: '📱' },
-    '360': { bg: 'bg-primary/20', border: 'border-primary', text: 'text-primary', icon: '🔄' },
-    'INFO': { bg: 'bg-accent/20', border: 'border-accent', text: 'text-accent', icon: 'ℹ️' }
+    'AR': { 
+      className: 'bg-[hsl(48,100%,50%)]/20 border-[hsl(48,100%,50%)] text-[hsl(48,100%,35%)]', 
+      icon: '📱' 
+    },
+    '360': { 
+      className: 'bg-primary/20 border-primary text-primary', 
+      icon: '🔄' 
+    },
+    'INFO': { 
+      className: 'bg-[hsl(203,100%,32%)]/20 border-[hsl(203,100%,32%)] text-[hsl(203,100%,32%)]', 
+      icon: 'ℹ️' 
+    }
   };
   const style = config[type];
   const sizeClasses = size === 'sm' ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs';
   
   return (
-    <span className={`inline-flex items-center gap-1 rounded-md border font-bold ${style.bg} ${style.border} ${style.text} ${sizeClasses}`}>
+    <span className={`inline-flex items-center gap-1 rounded-md border font-bold ${style.className} ${sizeClasses}`}>
       <span>{style.icon}</span>
       <span>{type}</span>
     </span>
@@ -180,8 +189,9 @@ export function RoutesPage() {
       zoomControl: false,
     });
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
+    // Tile layer claro - CartoDB Voyager (gratuito, sin auth)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://osm.org/">OpenStreetMap</a>'
     }).addTo(mapRef.current);
 
     // Add zoom control to bottom-right
@@ -253,10 +263,11 @@ export function RoutesPage() {
         }
       }
 
+      // Colores de ruta: Azul institucional para rutas, verde para lazos
       polylineRef.current = L.polyline(positions, {
-        color: selectedRoute.isLoop ? 'hsl(79, 100%, 36%)' : 'hsl(199, 89%, 48%)',
+        color: selectedRoute.isLoop ? 'hsl(79, 100%, 36%)' : 'hsl(203, 100%, 32%)',
         weight: 5,
-        opacity: 0.9,
+        opacity: 0.95,
         dashArray: selectedRoute.isLoop ? undefined : '12, 8',
         lineCap: 'round',
         lineJoin: 'round'
@@ -361,7 +372,7 @@ export function RoutesPage() {
           initial={{ y: '100%' }}
           animate={{ y: panelExpanded ? 0 : 'calc(100% - 60px)' }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="absolute bottom-0 left-0 right-0 md:top-14 md:bottom-0 md:left-auto md:right-4 md:w-[400px] glass-panel rounded-t-2xl md:rounded-2xl md:my-4 max-h-[75vh] md:max-h-none overflow-hidden flex flex-col"
+          className="absolute bottom-0 left-0 right-0 md:top-14 md:bottom-0 md:left-auto md:right-4 md:w-[400px] bg-white/95 backdrop-blur-md border border-border shadow-xl rounded-t-2xl md:rounded-2xl md:my-4 max-h-[75vh] md:max-h-none overflow-hidden flex flex-col"
         >
           {/* Panel header / Handle */}
           <button
@@ -430,23 +441,32 @@ export function RoutesPage() {
                   className="justify-start"
                 />
 
-                {/* Type filters (both modes) */}
+                {/* Type filters (both modes) - Colores oficiales Asturias */}
                 <div className="flex flex-wrap gap-2">
-                  {(['AR', '360', 'INFO'] as ExperienceType[]).map(type => (
-                    <button
-                      key={type}
-                      onClick={() => toggleType(type)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
-                        selectedTypes.includes(type)
-                          ? type === 'AR' ? 'bg-warm/20 border-warm text-warm'
-                          : type === '360' ? 'bg-primary/20 border-primary text-primary'
-                          : 'bg-accent/20 border-accent text-accent'
-                          : 'bg-muted/30 border-border/50 text-foreground/60 hover:bg-muted/50'
-                      }`}
-                    >
-                      {type === 'AR' ? '📱 AR' : type === '360' ? '🔄 360°' : 'ℹ️ INFO'}
-                    </button>
-                  ))}
+                  {(['AR', '360', 'INFO'] as ExperienceType[]).map(type => {
+                    const isSelected = selectedTypes.includes(type);
+                    const colorClasses = {
+                      'AR': isSelected 
+                        ? 'bg-[hsl(48,100%,50%)]/20 border-[hsl(48,100%,50%)] text-[hsl(48,100%,35%)]' 
+                        : 'bg-muted/30 border-border/50 text-foreground/60 hover:bg-muted/50',
+                      '360': isSelected 
+                        ? 'bg-primary/20 border-primary text-primary'
+                        : 'bg-muted/30 border-border/50 text-foreground/60 hover:bg-muted/50',
+                      'INFO': isSelected 
+                        ? 'bg-[hsl(203,100%,32%)]/20 border-[hsl(203,100%,32%)] text-[hsl(203,100%,32%)]'
+                        : 'bg-muted/30 border-border/50 text-foreground/60 hover:bg-muted/50'
+                    };
+                    
+                    return (
+                      <button
+                        key={type}
+                        onClick={() => toggleType(type)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${colorClasses[type]}`}
+                      >
+                        {type === 'AR' ? '📱 AR' : type === '360' ? '🔄 360°' : 'ℹ️ INFO'}
+                      </button>
+                    );
+                  })}
                 </div>
               </>
             )}
