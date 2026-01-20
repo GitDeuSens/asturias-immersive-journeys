@@ -71,6 +71,7 @@ export interface Route {
   isLoop: boolean;
   poiOrder: string[];
   polyline: { lat: number; lng: number }[];
+  coverImage?: string;
   shortDescription?: Record<string, string>;
   itineraryDays?: {
     day: number;
@@ -207,6 +208,7 @@ export const routes: Route[] = [
     categoryIds: ['nature', 'adventure'],
     isLoop: true,
     poiOrder: ['covadonga', 'picos', 'cares'],
+    coverImage: covadongaImg,
     shortDescription: {
       es: 'Descubre los lagos glaciares y las cumbres míticas',
       en: 'Discover glacial lakes and mythical peaks',
@@ -225,6 +227,7 @@ export const routes: Route[] = [
     categoryIds: ['heritage', 'culture'],
     isLoop: false,
     poiOrder: ['preromanico', 'horreo'],
+    coverImage: preromanicoImg,
     shortDescription: {
       es: 'Un viaje por la historia milenaria',
       en: 'A journey through millennial history',
@@ -241,6 +244,7 @@ export const routes: Route[] = [
     categoryIds: ['nature', 'heritage', 'adventure'],
     isLoop: true,
     poiOrder: ['preromanico', 'horreo', 'covadonga', 'picos', 'cares'],
+    coverImage: picosImg,
     shortDescription: {
       es: 'La experiencia definitiva en 2 días',
       en: 'The ultimate experience in 2 days',

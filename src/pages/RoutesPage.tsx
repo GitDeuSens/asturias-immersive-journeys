@@ -135,6 +135,87 @@ const createPOIMarkerIcon = (type: ExperienceType) => {
   });
 };
 
+// Calculate route centroid (average of all polyline points)
+const getRouteCentroid = (polyline: { lat: number; lng: number }[]) => {
+  const sumLat = polyline.reduce((sum, p) => sum + p.lat, 0);
+  const sumLng = polyline.reduce((sum, p) => sum + p.lng, 0);
+  return {
+    lat: sumLat / polyline.length,
+    lng: sumLng / polyline.length
+  };
+};
+
+// Create route bubble marker with thumbnail image
+const createRouteMarkerIcon = (route: Route) => {
+  const coverImage = route.coverImage || getPOIById(route.poiOrder[0])?.media.images[0] || '';
+  const borderColor = route.isLoop ? 'hsl(79, 100%, 36%)' : 'hsl(203, 100%, 32%)';
+  
+  return L.divIcon({
+    className: 'route-bubble-marker',
+    html: `
+      <div style="
+        position: relative;
+        width: 60px;
+        height: 60px;
+        cursor: pointer;
+      ">
+        <div style="
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          border: 4px solid ${borderColor};
+          box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+          overflow: hidden;
+          background: white;
+        ">
+          <img src="${coverImage}" style="
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          " alt=""/>
+        </div>
+        ${route.isLoop ? `
+          <div style="
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: hsl(79, 100%, 36%);
+            color: white;
+            font-size: 8px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            white-space: nowrap;
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+          ">LAZO</div>
+        ` : ''}
+        <div style="
+          position: absolute;
+          top: -6px;
+          right: -6px;
+          width: 22px;
+          height: 22px;
+          background: white;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 11px;
+          font-weight: 800;
+          color: ${borderColor};
+          box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+          font-family: 'Montserrat', sans-serif;
+        ">${route.poiOrder.length}</div>
+      </div>
+    `,
+    iconSize: [60, 68],
+    iconAnchor: [30, 34],
+  });
+};
+
 // Experience type badge component - Colores oficiales Asturias
 const TypeBadge = ({ type, size = 'sm' }: { type: ExperienceType; size?: 'sm' | 'md' }) => {
   const config = {
@@ -308,8 +389,19 @@ export function RoutesPage() {
           .on('click', () => handlePOIClick(poi));
         markersRef.current.push(marker);
       });
+    } else if (viewMode === 'routes' && !selectedRoute) {
+      // Add route bubble markers at centroids
+      filteredRoutes.forEach(route => {
+        const centroid = getRouteCentroid(route.polyline);
+        const marker = L.marker([centroid.lat, centroid.lng], {
+          icon: createRouteMarkerIcon(route)
+        })
+          .addTo(mapRef.current!)
+          .on('click', () => handleRouteSelect(route));
+        markersRef.current.push(marker);
+      });
     }
-  }, [selectedRoute, viewMode, selectedCategories, selectedTypes, searchQuery, filteredPOIs, fitToRoute]);
+  }, [selectedRoute, viewMode, selectedCategories, selectedTypes, searchQuery, filteredPOIs, filteredRoutes, fitToRoute]);
 
   const toggleCategory = (catId: string) => {
     setSelectedCategories(prev => 
