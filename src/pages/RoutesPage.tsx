@@ -506,6 +506,18 @@ export function RoutesPage() {
     }
   }, [selectedRoute, viewMode, selectedCategories, selectedTypes, searchQuery, filteredPOIs, filteredRoutes, fitToRoute]);
 
+  // Re-center map when filters change (only when no route is selected)
+  useEffect(() => {
+    if (selectedRoute || !mapRef.current) return;
+    
+    // Small delay to allow markers to update first
+    const timer = setTimeout(() => {
+      fitToAllElements(viewMode);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [selectedCategories, selectedTypes, searchQuery, viewMode, fitToAllElements, selectedRoute]);
+
   const toggleCategory = (catId: string) => {
     setSelectedCategories(prev => 
       prev.includes(catId) ? prev.filter(id => id !== catId) : [...prev, catId]
