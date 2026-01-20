@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Smartphone, Camera, Info, Share2, Bookmark } from 'lucide-react';
+import { X, Smartphone, Camera, Info, Share2 } from 'lucide-react';
 import { POI, categories } from '@/data/mockData';
 import { useLanguage } from '@/hooks/useLanguage';
 
@@ -10,8 +10,6 @@ interface POIPreviewSheetProps {
 }
 
 const texts = {
-  viewAR: { es: 'Ver en AR', en: 'View in AR', fr: 'Voir en AR' },
-  open360: { es: 'Abrir 360°', en: 'Open 360°', fr: 'Ouvrir 360°' },
   viewDetails: { es: 'Ver detalles', en: 'View details', fr: 'Voir détails' },
   save: { es: 'Guardar', en: 'Save', fr: 'Sauvegarder' },
 };
@@ -21,20 +19,6 @@ export function POIPreviewSheet({ poi, onClose, onViewDetails }: POIPreviewSheet
 
   if (!poi) return null;
 
-  const getCTA = () => {
-    switch (poi.experienceType) {
-      case 'AR':
-        return { label: t(texts.viewAR), icon: Smartphone, className: 'bg-[hsl(48,100%,50%)] text-[hsl(210,11%,15%)] hover:bg-[hsl(48,100%,45%)]' };
-      case '360':
-        return { label: t(texts.open360), icon: Camera, className: 'bg-primary text-primary-foreground hover:bg-primary/90' };
-      case 'INFO':
-      default:
-        return { label: t(texts.viewDetails), icon: Info, className: 'bg-[hsl(203,100%,32%)] text-white hover:bg-[hsl(203,100%,28%)]' };
-    }
-  };
-
-  const cta = getCTA();
-  const CTAIcon = cta.icon;
 
   const getTypeBadge = () => {
     switch (poi.experienceType) {
@@ -142,10 +126,10 @@ export function POIPreviewSheet({ poi, onClose, onViewDetails }: POIPreviewSheet
             {/* Primary CTA */}
             <button
               onClick={onViewDetails}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm uppercase tracking-wide transition-all shadow-md ${cta.className}`}
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm uppercase tracking-wide transition-all shadow-md bg-[hsl(203,100%,32%)] text-white hover:bg-[hsl(203,100%,28%)]"
             >
-              <CTAIcon className="w-5 h-5" />
-              {cta.label}
+              <Info className="w-5 h-5" />
+              {t(texts.viewDetails)}
             </button>
 
             {/* Secondary CTA - Subtle */}
