@@ -7,6 +7,11 @@ import horreoImg from '@/assets/horreo.jpg';
 import picosImg from '@/assets/picos.jpg';
 import preromanicoImg from '@/assets/preromanico.jpg';
 import rutaSidraImg from '@/assets/ruta-sidra-cover.jpg';
+import museoSidraImg from '@/assets/museo-sidra.jpg';
+import valdediosImg from '@/assets/valdedios.jpg';
+import mujaImg from '@/assets/muja.jpg';
+import laboralImg from '@/assets/laboral.jpg';
+import cimavillaImg from '@/assets/cimavilla.jpg';
 
 // ============ TIPOS BASE ============
 
@@ -728,9 +733,10 @@ export const pois: POI[] = [
       lat: 43.3544,
       lng: -5.5067
     },
-    media: {
-      images: [{ url: rutaSidraImg }]
-    },
+  media: {
+    heroImageUrl: museoSidraImg,
+    images: [{ url: museoSidraImg, caption: { es: 'Museo de la Sidra de Nava', en: 'Nava Cider Museum', fr: 'Musée du Cidre de Nava' } }]
+  },
     practical: {
       openingHours: { es: 'Martes a Domingo: 11:00 - 14:00 y 16:00 - 19:00', en: 'Tuesday to Sunday: 11:00 - 14:00 and 16:00 - 19:00', fr: 'Mardi à Dimanche: 11:00 - 14:00 et 16:00 - 19:00' },
       recommendedDuration: { es: '1-2 horas', en: '1-2 hours', fr: '1-2 heures' }
@@ -768,9 +774,10 @@ export const pois: POI[] = [
       lat: 43.4389,
       lng: -5.5147
     },
-    media: {
-      images: [{ url: preromanicoImg }]
-    },
+  media: {
+    heroImageUrl: valdediosImg,
+    images: [{ url: valdediosImg, caption: { es: 'San Salvador de Valdediós', en: 'San Salvador de Valdediós', fr: 'San Salvador de Valdediós' } }]
+  },
     practical: {
       recommendedDuration: { es: '1-2 horas', en: '1-2 hours', fr: '1-2 heures' }
     },
@@ -811,9 +818,10 @@ export const pois: POI[] = [
       lat: 43.4897,
       lng: -5.2706
     },
-    media: {
-      images: [{ url: rutaSidraImg }]
-    },
+  media: {
+    heroImageUrl: mujaImg,
+    images: [{ url: mujaImg, caption: { es: 'MUJA - Museo del Jurásico', en: 'MUJA - Jurassic Museum', fr: 'MUJA - Musée du Jurassique' } }]
+  },
     practical: {
       recommendedDuration: { es: '2-3 horas', en: '2-3 hours', fr: '2-3 heures' }
     },
@@ -855,9 +863,10 @@ export const pois: POI[] = [
       lat: 43.5253,
       lng: -5.6186
     },
-    media: {
-      images: [{ url: rutaSidraImg }]
-    },
+  media: {
+    heroImageUrl: laboralImg,
+    images: [{ url: laboralImg, caption: { es: 'Laboral Ciudad de la Cultura', en: 'Laboral City of Culture', fr: 'Laboral Cité de la Culture' } }]
+  },
     practical: {
       recommendedDuration: { es: '2-3 horas', en: '2-3 hours', fr: '2-3 heures' }
     },
@@ -898,9 +907,10 @@ export const pois: POI[] = [
       lat: 43.5456,
       lng: -5.6633
     },
-    media: {
-      images: [{ url: rutaSidraImg }]
-    },
+  media: {
+    heroImageUrl: cimavillaImg,
+    images: [{ url: cimavillaImg, caption: { es: 'Barrio de Cimavilla', en: 'Cimavilla Quarter', fr: 'Quartier de Cimavilla' } }]
+  },
     practical: {
       recommendedDuration: { es: '2-4 horas', en: '2-4 hours', fr: '2-4 heures' }
     },
