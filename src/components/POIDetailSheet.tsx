@@ -123,7 +123,7 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="absolute inset-x-0 bottom-0 top-14 bg-white rounded-t-3xl overflow-hidden flex flex-col"
+            className="absolute bottom-0 top-14 left-0 right-0 md:left-1/2 md:-translate-x-1/2 md:max-w-2xl md:w-full bg-white rounded-t-3xl overflow-hidden flex flex-col md:shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* HERO */}
