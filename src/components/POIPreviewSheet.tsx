@@ -113,7 +113,7 @@ export function POIPreviewSheet({ poi, onClose, onViewDetails }: POIPreviewSheet
         {/* Content */}
         <div className="p-4">
           {/* Title */}
-          <h3 className="font-serif font-bold text-xl text-foreground mb-2 leading-tight">
+          <h3 className="font-sans font-bold text-xl text-foreground mb-2 leading-tight">
             {t(poi.title)}
           </h3>
 

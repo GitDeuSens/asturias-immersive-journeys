@@ -184,7 +184,7 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
 
               {/* Title & Chips overlaid at bottom */}
               <div className="absolute bottom-0 left-0 right-0 p-5">
-                <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2 drop-shadow-sm">
+                <h1 className="font-sans text-2xl md:text-3xl font-bold text-foreground mb-2 drop-shadow-sm">
                   {t(poi.title)}
                 </h1>
                 <div className="flex flex-wrap gap-2">

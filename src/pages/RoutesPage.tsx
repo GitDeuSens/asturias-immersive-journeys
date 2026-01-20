@@ -895,7 +895,7 @@ export function RoutesPage() {
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2 mb-1">
-                          <h3 className="font-serif font-bold text-foreground truncate group-hover:text-primary transition-colors">
+                          <h3 className="font-sans font-bold text-foreground truncate group-hover:text-primary transition-colors">
                             {t(poi.title)}
                           </h3>
                           <TypeBadge type={poi.experienceType} size="sm" />
