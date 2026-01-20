@@ -179,14 +179,24 @@ export function RoutesPage() {
   const [panelExpanded, setPanelExpanded] = useState(true);
   const [expandedDays, setExpandedDays] = useState<number[]>([1]);
 
+  // Límites de Asturias para restringir navegación del mapa
+  const ASTURIAS_BOUNDS: L.LatLngBoundsExpression = [
+    [42.85, -7.30],  // Suroeste
+    [43.75, -4.45]   // Noreste
+  ];
+
   // Initialize map
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
     
     mapRef.current = L.map(mapContainerRef.current, {
-      center: [43.28, -5.2],
+      center: [43.36, -5.85],
       zoom: 9,
       zoomControl: false,
+      maxBounds: ASTURIAS_BOUNDS,
+      maxBoundsViscosity: 1.0,
+      minZoom: 8,
+      maxZoom: 18,
     });
 
     // Tile layer claro - CartoDB Voyager (gratuito, sin auth)
@@ -232,7 +242,7 @@ export function RoutesPage() {
     if (!mapRef.current || !selectedRoute) return;
     const positions = selectedRoute.polyline.map(p => [p.lat, p.lng] as [number, number]);
     if (positions.length > 0) {
-      mapRef.current.fitBounds(positions, { padding: [60, 60] });
+      mapRef.current.fitBounds(positions, { padding: [60, 60], maxZoom: 15 });
     }
   }, [selectedRoute]);
 
