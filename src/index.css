@@ -34,13 +34,13 @@
     --muted: 90 10% 95%;
     --muted-foreground: 210 11% 45%;
 
-    /* Accent - Sky Blue (Asturias sky/coast) */
-    --accent: 199 89% 48%;
+    /* Accent - Azul institucional Asturias */
+    --accent: 203 100% 32%; /* #0066A1 */
     --accent-foreground: 0 0% 100%;
 
-    /* Warm accent for AR/special features */
-    --warm: 38 92% 50%;
-    --warm-foreground: 0 0% 100%;
+    /* Warm - Amarillo Asturias (escudo) */
+    --warm: 48 100% 50%; /* #FFD100 */
+    --warm-foreground: 210 11% 15%;
 
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
@@ -51,12 +51,13 @@
 
     --radius: 0.75rem;
 
-    /* Custom Asturias tokens */
-    --asturias-green: 79 100% 36%;
-    --asturias-dark: 150 40% 12%;
-    --asturias-blue: 199 89% 48%;
+    /* Custom Asturias tokens - Paleta oficial */
+    --asturias-green: 79 100% 36%; /* #7AB800 */
+    --asturias-blue: 203 100% 32%; /* #0066A1 Azul institucional */
+    --asturias-yellow: 48 100% 50%; /* #FFD100 Amarillo escudo */
+    --asturias-dark: 210 20% 20%;
     --asturias-stone: 30 20% 55%;
-    --asturias-cream: 45 30% 96%;
+    --asturias-cream: 45 30% 97%;
     --asturias-forest: 140 35% 25%;
     
     /* Gradients */
@@ -187,9 +188,11 @@
     @apply bg-card border-border;
   }
 
-  /* Experience type badges - Turismo style */
+  /* Experience type badges - Colores oficiales Asturias */
   .badge-ar {
-    @apply bg-warm text-warm-foreground font-semibold px-3 py-1 rounded-full text-xs uppercase tracking-wide;
+    @apply font-semibold px-3 py-1 rounded-full text-xs uppercase tracking-wide;
+    background: hsl(var(--asturias-yellow));
+    color: hsl(210, 11%, 15%);
   }
 
   .badge-360 {
@@ -197,7 +200,9 @@
   }
 
   .badge-info {
-    @apply bg-accent text-accent-foreground font-semibold px-3 py-1 rounded-full text-xs uppercase tracking-wide;
+    @apply font-semibold px-3 py-1 rounded-full text-xs uppercase tracking-wide;
+    background: hsl(var(--asturias-blue));
+    color: white;
   }
 
   /* Map markers - cleaner style */
@@ -258,7 +263,9 @@
   /* Route loop indicator */
   .route-loop-badge {
     @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold;
-    @apply bg-accent/15 text-accent border border-accent/30;
+    background: hsl(var(--asturias-blue) / 0.15);
+    color: hsl(var(--asturias-blue));
+    border: 1px solid hsl(var(--asturias-blue) / 0.3);
   }
 
   /* Quote style like turismoasturias.es */
