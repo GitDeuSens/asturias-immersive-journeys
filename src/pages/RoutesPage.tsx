@@ -333,14 +333,29 @@ export function RoutesPage() {
     });
   }, [searchQuery, selectedCategories, selectedTypes, t]);
 
-  // Fit map to route bounds
+  // Get panel offset based on viewport - accounts for side panel on desktop
+  const getPanelOffset = useCallback((): { left: number; right: number; top: number; bottom: number } => {
+    // En desktop (md: 768px+), el panel tiene 400px + márgenes
+    if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+      return { left: 60, right: 460, top: 80, bottom: 60 }; // 400px panel + 60px padding
+    }
+    // En móvil, el panel es un bottom sheet, no afecta horizontalmente
+    return { left: 40, right: 40, top: 80, bottom: 200 }; // bottom sheet ocupa ~200px
+  }, []);
+
+  // Fit map to route bounds with panel offset
   const fitToRoute = useCallback(() => {
     if (!mapRef.current || !selectedRoute) return;
     const positions = selectedRoute.polyline.map(p => [p.lat, p.lng] as [number, number]);
     if (positions.length > 0) {
-      mapRef.current.fitBounds(positions, { padding: [60, 60], maxZoom: 15 });
+      const offset = getPanelOffset();
+      mapRef.current.fitBounds(positions, { 
+        paddingTopLeft: [offset.left, offset.top],
+        paddingBottomRight: [offset.right, offset.bottom],
+        maxZoom: 15 
+      });
     }
-  }, [selectedRoute]);
+  }, [selectedRoute, getPanelOffset]);
 
   // Update markers and polyline when selection changes
   useEffect(() => {
@@ -443,7 +458,22 @@ export function RoutesPage() {
   const handlePOIClick = (poi: POI) => {
     setSelectedPOI(poi);
     if (mapRef.current) {
-      mapRef.current.panTo([poi.access.lat, poi.access.lng], { duration: 0.5 });
+      // Calcular offset para centrar en área visible (excluyendo panel)
+      if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+        // En desktop, desplazar el centro para compensar el panel lateral
+        const targetLatLng = L.latLng(poi.access.lat, poi.access.lng);
+        const targetPoint = mapRef.current.latLngToContainerPoint(targetLatLng);
+        const offsetPoint = L.point(targetPoint.x + 200, targetPoint.y); // +200px = mitad del panel
+        const offsetLatLng = mapRef.current.containerPointToLatLng(offsetPoint);
+        mapRef.current.panTo(offsetLatLng, { duration: 0.5 });
+      } else {
+        // En móvil, ajustar para el bottom sheet
+        const targetLatLng = L.latLng(poi.access.lat, poi.access.lng);
+        const targetPoint = mapRef.current.latLngToContainerPoint(targetLatLng);
+        const offsetPoint = L.point(targetPoint.x, targetPoint.y - 100); // -100px hacia arriba
+        const offsetLatLng = mapRef.current.containerPointToLatLng(offsetPoint);
+        mapRef.current.panTo(offsetLatLng, { duration: 0.5 });
+      }
     }
   };
 
