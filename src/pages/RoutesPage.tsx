@@ -11,7 +11,6 @@ import {
   Camera, 
   Info, 
   Smartphone, 
-  X, 
   Maximize2,
   ChevronRight,
   ChevronLeft
@@ -19,6 +18,7 @@ import {
 import { AppHeader } from '@/components/AppHeader';
 import { CategoryChips } from '@/components/CategoryChips';
 import { POIDetailSheet } from '@/components/POIDetailSheet';
+import { POIPreviewSheet } from '@/components/POIPreviewSheet';
 import { routes, pois, categories, Route, POI, getPOIById, ExperienceType, getCategoryById } from '@/data/mockData';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -336,14 +336,6 @@ export function RoutesPage() {
     setSelectedPOI(poi);
     if (mapRef.current) {
       mapRef.current.flyTo([poi.access.lat, poi.access.lng], 13, { duration: 0.5 });
-    }
-  };
-
-  const getCTAForPOI = (poi: POI) => {
-    switch (poi.experienceType) {
-      case 'AR': return { label: t(texts.viewAR), icon: Smartphone };
-      case '360': return { label: t(texts.open360), icon: Camera };
-      default: return { label: t(texts.viewDetails), icon: Info };
     }
   };
 
@@ -732,66 +724,13 @@ export function RoutesPage() {
         </motion.div>
 
         {/* POI Preview Sheet */}
-        <AnimatePresence>
-          {selectedPOI && (
-            <motion.div
-              initial={{ opacity: 0, y: 100 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 100 }}
-              className="absolute bottom-4 left-4 right-4 md:left-auto md:right-[430px] md:w-80 glass-panel rounded-2xl overflow-hidden z-10 shadow-strong"
-            >
-              <div 
-                className="h-36 bg-cover bg-center relative"
-                style={{ backgroundImage: `url(${selectedPOI.media.images[0]})` }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                <button
-                  onClick={() => setSelectedPOI(null)}
-                  className="absolute top-3 right-3 p-1.5 rounded-full bg-black/40 hover:bg-black/60 transition-colors"
-                >
-                  <X className="w-4 h-4 text-white" />
-                </button>
-                <div className="absolute bottom-3 left-3 right-3">
-                  <TypeBadge type={selectedPOI.experienceType} size="md" />
-                </div>
-              </div>
-              <div className="p-4">
-                <h3 className="font-serif font-bold text-lg text-foreground mb-2">{t(selectedPOI.title)}</h3>
-                
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {selectedPOI.categoryIds.map(catId => {
-                    const cat = getCategoryById(catId);
-                    return cat ? (
-                      <span key={catId} className="category-chip text-[10px]">
-                        {t(cat.label)}
-                      </span>
-                    ) : null;
-                  })}
-                </div>
-
-                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                  {t(selectedPOI.shortDescription)}
-                </p>
-
-                <button
-                  onClick={() => setShowDetailSheet(true)}
-                  className="w-full cta-primary flex items-center justify-center gap-2 py-3 text-base"
-                >
-                  {(() => {
-                    const cta = getCTAForPOI(selectedPOI);
-                    const Icon = cta.icon;
-                    return (
-                      <>
-                        <Icon className="w-5 h-5" />
-                        {cta.label}
-                      </>
-                    );
-                  })()}
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {selectedPOI && !showDetailSheet && (
+          <POIPreviewSheet
+            poi={selectedPOI}
+            onClose={() => setSelectedPOI(null)}
+            onViewDetails={() => setShowDetailSheet(true)}
+          />
+        )}
       </div>
 
       {/* Full POI Detail Sheet */}
