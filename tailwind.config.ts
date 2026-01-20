@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        serif: ['Playfair Display', 'Georgia', 'serif'],
+        sans: ['Montserrat', 'system-ui', 'sans-serif'],
+        display: ['Playfair Display', 'Georgia', 'serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -43,6 +43,10 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        warm: {
+          DEFAULT: "hsl(var(--warm))",
+          foreground: "hsl(var(--warm-foreground))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
@@ -61,19 +65,23 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // Custom Asturias colors
-        fog: "hsl(var(--fog))",
-        stone: "hsl(var(--stone))",
-        forest: {
-          dark: "hsl(var(--forest-dark))",
-          mid: "hsl(var(--forest-mid))",
+        // Asturias custom colors
+        asturias: {
+          green: "hsl(var(--asturias-green))",
+          dark: "hsl(var(--asturias-dark))",
+          blue: "hsl(var(--asturias-blue))",
+          stone: "hsl(var(--asturias-stone))",
+          cream: "hsl(var(--asturias-cream))",
+          forest: "hsl(var(--asturias-forest))",
         },
-        mountain: "hsl(var(--mountain-silhouette))",
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      borderWidth: {
+        '3': '3px',
       },
       keyframes: {
         "accordion-down": {
@@ -89,7 +97,7 @@ export default {
           to: { opacity: "1", transform: "translateY(0)" },
         },
         "scale-in": {
-          from: { opacity: "0", transform: "scale(0.9)" },
+          from: { opacity: "0", transform: "scale(0.95)" },
           to: { opacity: "1", transform: "scale(1)" },
         },
         "slide-up": {

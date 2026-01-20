@@ -2,105 +2,115 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
 /* Asturias Inmersivo Design System
-   Identity: Mountains, deep forest greens, mist/fog, pre-Romanesque stone
-   Mood: Cinematic, atmospheric, immersive
+   Inspired by turismoasturias.es official branding
+   Primary: Asturias Green #7AB800
+   Identity: Mountains, lush valleys, stone villages, natural paradise
 */
 
 @layer base {
   :root {
-    /* Core palette - Forest & Mist */
-    --background: 160 20% 6%;
-    --foreground: 60 10% 95%;
+    /* Core palette - Inspired by Turismo Asturias official branding */
+    --background: 0 0% 100%;
+    --foreground: 210 11% 15%;
 
-    --card: 160 15% 10%;
-    --card-foreground: 60 10% 95%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 11% 15%;
 
-    --popover: 160 15% 8%;
-    --popover-foreground: 60 10% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 11% 15%;
 
-    /* Primary - Deep Emerald */
-    --primary: 152 60% 35%;
-    --primary-foreground: 60 10% 98%;
+    /* Primary - Asturias Official Green */
+    --primary: 79 100% 36%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Stone/Warm Gray */
-    --secondary: 30 8% 25%;
-    --secondary-foreground: 60 10% 90%;
+    /* Secondary - Deep Forest Green */
+    --secondary: 150 30% 20%;
+    --secondary-foreground: 0 0% 98%;
 
-    /* Muted - Mist Gray */
-    --muted: 160 10% 18%;
-    --muted-foreground: 160 10% 60%;
+    /* Muted - Soft Natural Gray */
+    --muted: 90 10% 95%;
+    --muted-foreground: 210 11% 45%;
 
-    /* Accent - Golden Sunlight */
-    --accent: 38 70% 50%;
-    --accent-foreground: 160 20% 6%;
+    /* Accent - Sky Blue (Asturias sky/coast) */
+    --accent: 199 89% 48%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Warm accent for AR/special features */
+    --warm: 38 92% 50%;
+    --warm-foreground: 0 0% 100%;
 
     --destructive: 0 70% 50%;
-    --destructive-foreground: 60 10% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 160 15% 20%;
-    --input: 160 15% 15%;
-    --ring: 152 60% 40%;
+    --border: 90 10% 85%;
+    --input: 90 10% 90%;
+    --ring: 79 100% 36%;
 
     --radius: 0.75rem;
 
-    /* Custom tokens for immersive experience */
-    --fog: 180 10% 90%;
-    --stone: 30 15% 45%;
-    --forest-dark: 160 30% 8%;
-    --forest-mid: 150 25% 20%;
-    --mountain-silhouette: 160 20% 12%;
+    /* Custom Asturias tokens */
+    --asturias-green: 79 100% 36%;
+    --asturias-dark: 150 40% 12%;
+    --asturias-blue: 199 89% 48%;
+    --asturias-stone: 30 20% 55%;
+    --asturias-cream: 45 30% 96%;
+    --asturias-forest: 140 35% 25%;
     
     /* Gradients */
-    --gradient-fog: linear-gradient(180deg, hsla(180, 10%, 90%, 0.1) 0%, hsla(180, 10%, 90%, 0) 100%);
-    --gradient-dark: linear-gradient(180deg, hsl(160, 30%, 8%) 0%, hsl(160, 20%, 4%) 100%);
-    --gradient-hero: linear-gradient(180deg, hsla(160, 30%, 8%, 0.3) 0%, hsla(160, 30%, 8%, 0.9) 100%);
-    --gradient-card: linear-gradient(135deg, hsla(152, 60%, 35%, 0.15) 0%, hsla(160, 15%, 10%, 0.8) 100%);
+    --gradient-hero: linear-gradient(180deg, hsla(0, 0%, 0%, 0.2) 0%, hsla(0, 0%, 0%, 0.7) 100%);
+    --gradient-green: linear-gradient(135deg, hsl(79, 100%, 36%) 0%, hsl(140, 60%, 30%) 100%);
+    --gradient-dark: linear-gradient(180deg, hsl(150, 40%, 12%) 0%, hsl(150, 50%, 6%) 100%);
+    --gradient-nature: linear-gradient(135deg, hsla(79, 100%, 36%, 0.9) 0%, hsla(140, 60%, 25%, 0.95) 100%);
 
     /* Shadows */
-    --shadow-glow: 0 0 60px hsla(152, 60%, 35%, 0.3);
-    --shadow-card: 0 20px 40px hsla(0, 0%, 0%, 0.5);
+    --shadow-soft: 0 4px 20px hsla(0, 0%, 0%, 0.08);
+    --shadow-medium: 0 8px 30px hsla(0, 0%, 0%, 0.12);
+    --shadow-strong: 0 15px 50px hsla(0, 0%, 0%, 0.2);
+    --shadow-green: 0 10px 40px hsla(79, 100%, 36%, 0.25);
 
-    --sidebar-background: 160 20% 8%;
-    --sidebar-foreground: 60 10% 90%;
-    --sidebar-primary: 152 60% 35%;
-    --sidebar-primary-foreground: 60 10% 98%;
-    --sidebar-accent: 160 15% 15%;
-    --sidebar-accent-foreground: 60 10% 90%;
-    --sidebar-border: 160 15% 20%;
-    --sidebar-ring: 152 60% 40%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 210 11% 25%;
+    --sidebar-primary: 79 100% 36%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 90 10% 95%;
+    --sidebar-accent-foreground: 210 11% 25%;
+    --sidebar-border: 90 10% 88%;
+    --sidebar-ring: 79 100% 36%;
   }
 
   .dark {
-    --background: 160 20% 6%;
+    --background: 150 40% 6%;
     --foreground: 60 10% 95%;
-    --card: 160 15% 10%;
+    --card: 150 35% 10%;
     --card-foreground: 60 10% 95%;
-    --popover: 160 15% 8%;
+    --popover: 150 35% 8%;
     --popover-foreground: 60 10% 95%;
-    --primary: 152 60% 35%;
-    --primary-foreground: 60 10% 98%;
-    --secondary: 30 8% 25%;
+    --primary: 79 100% 40%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 150 25% 18%;
     --secondary-foreground: 60 10% 90%;
-    --muted: 160 10% 18%;
-    --muted-foreground: 160 10% 60%;
-    --accent: 38 70% 50%;
-    --accent-foreground: 160 20% 6%;
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 60 10% 98%;
-    --border: 160 15% 20%;
-    --input: 160 15% 15%;
-    --ring: 152 60% 40%;
-    --sidebar-background: 160 20% 8%;
+    --muted: 150 20% 15%;
+    --muted-foreground: 150 10% 60%;
+    --accent: 199 89% 50%;
+    --accent-foreground: 0 0% 100%;
+    --warm: 38 92% 50%;
+    --warm-foreground: 0 0% 100%;
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 150 20% 20%;
+    --input: 150 20% 18%;
+    --ring: 79 100% 45%;
+    --sidebar-background: 150 35% 8%;
     --sidebar-foreground: 60 10% 90%;
-    --sidebar-primary: 152 60% 35%;
-    --sidebar-primary-foreground: 60 10% 98%;
-    --sidebar-accent: 160 15% 15%;
+    --sidebar-primary: 79 100% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 150 20% 15%;
     --sidebar-accent-foreground: 60 10% 90%;
-    --sidebar-border: 160 15% 20%;
-    --sidebar-ring: 152 60% 40%;
+    --sidebar-border: 150 20% 18%;
+    --sidebar-ring: 79 100% 45%;
   }
 }
 
@@ -115,137 +125,185 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Montserrat', system-ui, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', serif;
-    @apply font-semibold tracking-tight;
+    font-family: 'Montserrat', system-ui, sans-serif;
+    @apply font-bold tracking-tight;
+  }
+
+  .font-display {
+    font-family: 'Playfair Display', Georgia, serif;
   }
 }
 
 @layer components {
+  /* Official Asturias header bar */
+  .header-bar {
+    @apply fixed top-0 left-0 right-0 z-50 bg-white shadow-sm;
+    border-bottom: 3px solid hsl(var(--primary));
+  }
+
+  .header-bar.dark-mode {
+    @apply bg-background;
+    background: hsl(var(--asturias-dark));
+  }
+
   /* Cinematic fullscreen containers */
   .screen-fullscreen {
     @apply min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden;
   }
 
-  /* Hero gradient overlay */
+  /* Hero gradient overlay - more vibrant */
   .hero-overlay {
     background: var(--gradient-hero);
   }
 
-  /* Fog animation layer */
-  .fog-layer {
-    @apply absolute inset-0 pointer-events-none opacity-30;
-    background: var(--gradient-fog);
-    animation: fog-drift 20s ease-in-out infinite;
+  /* Nature gradient overlay */
+  .nature-overlay {
+    background: var(--gradient-nature);
   }
 
-  /* Mountain silhouette separator */
-  .mountain-separator {
-    @apply w-full h-24 relative;
-    background: linear-gradient(to right, 
-      transparent 0%, 
-      hsl(var(--mountain-silhouette)) 10%, 
-      hsl(var(--mountain-silhouette)) 90%, 
-      transparent 100%
-    );
-    clip-path: polygon(
-      0% 100%, 5% 60%, 15% 80%, 25% 40%, 35% 70%, 
-      45% 30%, 55% 50%, 65% 20%, 75% 60%, 85% 35%, 
-      95% 70%, 100% 100%
-    );
+  /* Official green stripe accent */
+  .green-stripe {
+    @apply w-1.5 h-full bg-primary absolute left-0 top-0;
   }
 
-  /* Decision cards - full visual impact */
+  /* Decision cards - Turismo Asturias inspired */
   .decision-card {
-    @apply relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-500;
-    @apply border border-white/10 backdrop-blur-sm;
-    background: var(--gradient-card);
-    box-shadow: var(--shadow-card);
+    @apply relative overflow-hidden rounded-xl cursor-pointer transition-all duration-500;
+    @apply bg-white border border-border shadow-md;
+    box-shadow: var(--shadow-soft);
   }
 
   .decision-card:hover {
-    @apply scale-[1.02] border-primary/40;
-    box-shadow: var(--shadow-glow), var(--shadow-card);
+    @apply border-primary;
+    box-shadow: var(--shadow-green);
+    transform: translateY(-4px);
   }
 
-  /* Experience type badges */
+  .dark .decision-card {
+    @apply bg-card border-border;
+  }
+
+  /* Experience type badges - Turismo style */
   .badge-ar {
-    @apply bg-accent text-accent-foreground font-semibold;
+    @apply bg-warm text-warm-foreground font-semibold px-3 py-1 rounded-full text-xs uppercase tracking-wide;
   }
 
   .badge-360 {
-    @apply bg-primary text-primary-foreground font-semibold;
+    @apply bg-primary text-primary-foreground font-semibold px-3 py-1 rounded-full text-xs uppercase tracking-wide;
   }
 
   .badge-info {
-    @apply bg-secondary text-secondary-foreground font-semibold;
+    @apply bg-accent text-accent-foreground font-semibold px-3 py-1 rounded-full text-xs uppercase tracking-wide;
   }
 
-  /* Map markers with numbers */
+  /* Map markers - cleaner style */
   .map-marker {
     @apply w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm;
-    @apply border-2 border-white shadow-lg transition-transform duration-200;
+    @apply border-3 border-white shadow-lg transition-transform duration-200;
   }
 
   .map-marker:hover {
     @apply scale-110;
   }
 
-  /* Glass panel effect */
+  /* Glass panel - softer for light mode */
   .glass-panel {
-    @apply backdrop-blur-xl border border-white/10;
-    background: hsla(160, 15%, 10%, 0.85);
+    @apply backdrop-blur-xl border border-border/50 bg-white/95;
+    box-shadow: var(--shadow-medium);
   }
 
-  /* Category chips */
+  .dark .glass-panel {
+    @apply bg-card/95 border-border;
+  }
+
+  /* Category chips - Turismo style */
   .category-chip {
-    @apply px-3 py-1 rounded-full text-xs font-medium transition-all duration-200;
-    @apply border border-white/20 bg-white/5 text-foreground/80;
+    @apply px-4 py-2 rounded-full text-sm font-medium transition-all duration-200;
+    @apply border border-border bg-muted text-muted-foreground;
   }
 
   .category-chip:hover,
   .category-chip.active {
-    @apply bg-primary/20 border-primary/50 text-primary;
+    @apply bg-primary text-primary-foreground border-primary;
   }
 
-  /* CTA buttons */
+  /* CTA buttons - Official green style */
   .cta-primary {
-    @apply px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300;
+    @apply px-8 py-4 rounded-lg font-bold text-base uppercase tracking-wide transition-all duration-300;
     @apply bg-primary text-primary-foreground;
-    @apply hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30;
-    @apply active:scale-95;
+    @apply hover:shadow-lg active:scale-95;
+    box-shadow: var(--shadow-green);
+  }
+
+  .cta-primary:hover {
+    background: linear-gradient(135deg, hsl(79, 100%, 40%) 0%, hsl(79, 100%, 32%) 100%);
   }
 
   .cta-secondary {
-    @apply px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300;
-    @apply bg-white/10 text-foreground border border-white/20;
-    @apply hover:bg-white/20 hover:border-white/30;
-    @apply active:scale-95;
+    @apply px-8 py-4 rounded-lg font-bold text-base uppercase tracking-wide transition-all duration-300;
+    @apply bg-white text-foreground border-2 border-primary;
+    @apply hover:bg-primary hover:text-primary-foreground;
   }
 
-  /* Route polyline loop indicator */
+  .cta-outline {
+    @apply px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-300;
+    @apply bg-transparent text-primary border-2 border-primary;
+    @apply hover:bg-primary hover:text-primary-foreground;
+  }
+
+  /* Route loop indicator */
   .route-loop-badge {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs;
-    @apply bg-accent/20 text-accent border border-accent/30;
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold;
+    @apply bg-accent/15 text-accent border border-accent/30;
+  }
+
+  /* Quote style like turismoasturias.es */
+  .quote-block {
+    @apply relative pl-12 py-4 text-xl md:text-2xl font-display italic text-muted-foreground;
+  }
+
+  .quote-block::before {
+    content: '"';
+    @apply absolute left-0 top-0 text-7xl text-primary/30 font-display;
+  }
+
+  /* Section headers */
+  .section-header {
+    @apply text-3xl md:text-4xl font-bold text-foreground mb-2;
+  }
+
+  .section-subtitle {
+    @apply text-lg text-muted-foreground max-w-2xl;
+  }
+
+  /* Card hover effects */
+  .card-interactive {
+    @apply transition-all duration-300 cursor-pointer;
+    @apply hover:shadow-lg hover:-translate-y-1;
+  }
+
+  /* Navigation link - Turismo style */
+  .nav-link {
+    @apply relative font-semibold text-sm uppercase tracking-wider text-foreground/80;
+    @apply hover:text-primary transition-colors duration-200;
+  }
+
+  .nav-link::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300;
+  }
+
+  .nav-link:hover::after {
+    @apply w-full;
   }
 }
 
 @layer utilities {
   /* Animation keyframes */
-  @keyframes fog-drift {
-    0%, 100% { 
-      transform: translateX(-5%) translateY(0); 
-      opacity: 0.2; 
-    }
-    50% { 
-      transform: translateX(5%) translateY(-3%); 
-      opacity: 0.35; 
-    }
-  }
-
   @keyframes fade-up {
     from {
       opacity: 0;
@@ -260,11 +318,29 @@
   @keyframes scale-in {
     from {
       opacity: 0;
-      transform: scale(0.9);
+      transform: scale(0.95);
     }
     to {
       opacity: 1;
       transform: scale(1);
+    }
+  }
+
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse-gentle {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
     }
   }
 
@@ -276,9 +352,28 @@
     animation: scale-in 0.4s ease-out forwards;
   }
 
+  .animate-slide-up {
+    animation: slide-up 0.4s ease-out forwards;
+  }
+
+  .animate-pulse-gentle {
+    animation: pulse-gentle 2s ease-in-out infinite;
+  }
+
   .animation-delay-100 { animation-delay: 100ms; }
   .animation-delay-200 { animation-delay: 200ms; }
   .animation-delay-300 { animation-delay: 300ms; }
   .animation-delay-400 { animation-delay: 400ms; }
   .animation-delay-500 { animation-delay: 500ms; }
+
+  /* Text gradients */
+  .text-gradient-green {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-green);
+  }
+
+  /* Border accent */
+  .border-accent-top {
+    border-top: 4px solid hsl(var(--primary));
+  }
 }
