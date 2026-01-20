@@ -12,11 +12,6 @@ import valdediosImg from '@/assets/valdedios.jpg';
 import mujaImg from '@/assets/muja.jpg';
 import laboralImg from '@/assets/laboral.jpg';
 import cimavillaImg from '@/assets/cimavilla.jpg';
-import torazuImg from '@/assets/torazu.jpg';
-import molinosImg from '@/assets/molinos-bimenes.jpg';
-import narzanaImg from '@/assets/narzana.jpg';
-import llastresImg from '@/assets/llastres.jpg';
-import tazonesImg from '@/assets/tazones.jpg';
 
 // ============ TIPOS BASE ============
 
@@ -52,8 +47,6 @@ export const categories: Category[] = [
   { id: 'adventure', label: { es: 'Aventura', en: 'Adventure', fr: 'Aventure' }, icon: 'Compass', color: 'sky' },
   { id: 'gastronomy', label: { es: 'Gastronomía', en: 'Gastronomy', fr: 'Gastronomie' }, icon: 'UtensilsCrossed', color: 'rose' },
   { id: 'culture', label: { es: 'Cultura', en: 'Culture', fr: 'Culture' }, icon: 'BookOpen', color: 'violet' },
-  { id: 'sidra', label: { es: 'Cultura Sidrera', en: 'Cider Culture', fr: 'Culture du Cidre' }, icon: 'Apple', color: 'lime' },
-  { id: 'costa', label: { es: 'Costa', en: 'Coast', fr: 'Côte' }, icon: 'Waves', color: 'cyan' },
 ];
 
 // ============ POI INTERFACE COMPLETA ============
@@ -702,58 +695,16 @@ export const pois: POI[] = [
     }
   },
   // ============ POIs RUTA DE LA SIDRA ============
-  // ========== POI INFO: TORAZU ==========
-  {
-    id: 'torazu',
-    title: { es: 'Torazu (Cabranes)', en: 'Torazu (Cabranes)', fr: 'Torazu (Cabranes)' },
-    categoryIds: ['heritage', 'nature'],
-    tags: ['hórreos', 'pueblo', 'arquitectura', 'rural'],
-    experienceType: 'INFO',
-    shortDescription: {
-      es: 'Pueblo con casonas y hórreos: postal de la arquitectura tradicional asturiana',
-      en: 'Village with manor houses and granaries: a postcard of traditional Asturian architecture',
-      fr: 'Village avec maisons de maître et greniers: carte postale de l\'architecture traditionnelle asturienne'
-    },
-    richText: {
-      blocks: [
-        {
-          type: 'paragraph',
-          text: {
-            es: 'Torazu es una pequeña aldea en el corazón de Cabranes que conserva un conjunto excepcional de arquitectura tradicional asturiana. Sus casonas de piedra y hórreos centenarios crean una estampa única del mundo rural asturiano.',
-            en: 'Torazu is a small village in the heart of Cabranes that preserves an exceptional collection of traditional Asturian architecture. Its stone manor houses and centuries-old granaries create a unique image of rural Asturian life.',
-            fr: 'Torazu est un petit village au cœur de Cabranes qui conserve un ensemble exceptionnel d\'architecture traditionnelle asturienne. Ses maisons de pierre et greniers centenaires créent une image unique de la vie rurale asturienne.'
-          }
-        }
-      ]
-    },
-    audioGuides: {},
-    access: {
-      address: 'Torazu, Cabranes, Asturias',
-      lat: 43.4090,
-      lng: -5.3880
-    },
-    media: {
-      heroImageUrl: torazuImg,
-      images: [{ url: torazuImg, caption: { es: 'Hórreos y casonas de Torazu', en: 'Granaries and manor houses of Torazu', fr: 'Greniers et maisons de Torazu' } }]
-    },
-    practical: {
-      recommendedDuration: { es: '1 hora', en: '1 hour', fr: '1 heure' }
-    },
-    contact: {},
-    links: [],
-    share: { shareUrl: 'https://turismoasturias.es/torazu' }
-  },
-  // ========== POI AR: MUSEO DE LA SIDRA ==========
   {
     id: 'museo-sidra',
-    title: { es: 'Museo de la Sidra (Nava)', en: 'Cider Museum (Nava)', fr: 'Musée du Cidre (Nava)' },
-    categoryIds: ['sidra', 'culture'],
-    tags: ['sidra', 'museo', 'nava', 'tradición', 'escanciado'],
-    experienceType: 'AR',
+    title: { es: 'Museo de la Sidra', en: 'Cider Museum', fr: 'Musée du Cidre' },
+    categoryIds: ['gastronomy', 'culture'],
+    tags: ['sidra', 'museo', 'nava', 'tradición'],
+    experienceType: 'INFO',
     shortDescription: {
-      es: 'El lugar clave para entender la sidra: historia, ritual y el arte del escanciado',
-      en: 'The key place to understand cider: history, ritual and the art of pouring',
-      fr: 'Le lieu clé pour comprendre le cidre: histoire, rituel et art du service'
+      es: 'El templo de la cultura sidrera asturiana',
+      en: 'The temple of Asturian cider culture',
+      fr: 'Le temple de la culture du cidre asturien'
     },
     richText: {
       blocks: [
@@ -779,124 +730,31 @@ export const pois: POI[] = [
     audioGuides: {},
     access: {
       address: 'Plaza Príncipe de Asturias, Nava, Asturias',
-      lat: 43.3580,
-      lng: -5.5050
+      lat: 43.3544,
+      lng: -5.5067
     },
-    media: {
-      heroImageUrl: museoSidraImg,
-      images: [{ url: museoSidraImg, caption: { es: 'Museo de la Sidra de Nava', en: 'Nava Cider Museum', fr: 'Musée du Cidre de Nava' } }]
-    },
+  media: {
+    heroImageUrl: museoSidraImg,
+    images: [{ url: museoSidraImg, caption: { es: 'Museo de la Sidra de Nava', en: 'Nava Cider Museum', fr: 'Musée du Cidre de Nava' } }]
+  },
     practical: {
       openingHours: { es: 'Martes a Domingo: 11:00 - 14:00 y 16:00 - 19:00', en: 'Tuesday to Sunday: 11:00 - 14:00 and 16:00 - 19:00', fr: 'Mardi à Dimanche: 11:00 - 14:00 et 16:00 - 19:00' },
       recommendedDuration: { es: '1-2 horas', en: '1-2 hours', fr: '1-2 heures' }
     },
     contact: { website: 'https://www.museodelasidra.com' },
     links: [],
-    share: { shareUrl: 'https://turismoasturias.es/museo-sidra' },
-    ar: {
-      launchUrl: 'https://example.com/ar/museo-sidra',
-      qrValue: 'https://example.com/ar/museo-sidra',
-      iframe3dUrl: 'https://example.com/embed/3d/sidra-process',
-      instructions: {
-        es: 'Apunta al panel/marker del museo para ver el proceso en 3D y prueba el escanciado virtual.',
-        en: 'Point at the museum panel/marker to see the 3D process and try virtual cider pouring.',
-        fr: 'Pointez vers le panneau/marqueur du musée pour voir le processus en 3D et essayez le service virtuel.'
-      }
-    }
+    share: { shareUrl: 'https://turismoasturias.es/museo-sidra' }
   },
-  // ========== POI INFO: MOLINOS BIMENES ==========
-  {
-    id: 'molinos-bimenes',
-    title: { es: 'Ruta de los Molinos (Bimenes)', en: 'Mill Trail (Bimenes)', fr: 'Route des Moulins (Bimenes)' },
-    categoryIds: ['nature'],
-    tags: ['molinos', 'senderismo', 'río', 'bosque'],
-    experienceType: 'INFO',
-    shortDescription: {
-      es: 'Paseo entre agua y bosque siguiendo antiguos molinos (ideal para desconectar)',
-      en: 'Walk between water and forest following ancient mills (ideal to disconnect)',
-      fr: 'Promenade entre eau et forêt en suivant d\'anciens moulins (idéal pour se déconnecter)'
-    },
-    richText: {
-      blocks: [
-        {
-          type: 'paragraph',
-          text: {
-            es: 'La Ruta de los Molinos de Bimenes es un paseo tranquilo por el corazón verde de la comarca, siguiendo el curso del río y descubriendo los antiguos molinos harineros que salpican el paisaje.',
-            en: 'The Bimenes Mill Trail is a peaceful walk through the green heart of the region, following the river course and discovering the ancient flour mills that dot the landscape.',
-            fr: 'La Route des Moulins de Bimenes est une promenade paisible au cœur vert de la région, suivant le cours de la rivière et découvrant les anciens moulins à farine qui parsèment le paysage.'
-          }
-        }
-      ]
-    },
-    audioGuides: {},
-    access: {
-      address: 'Bimenes, Asturias',
-      lat: 43.3310,
-      lng: -5.5650
-    },
-    media: {
-      heroImageUrl: molinosImg,
-      images: [{ url: molinosImg, caption: { es: 'Molino tradicional en el bosque', en: 'Traditional mill in the forest', fr: 'Moulin traditionnel dans la forêt' } }]
-    },
-    practical: {
-      recommendedDuration: { es: '2-3 horas', en: '2-3 hours', fr: '2-3 heures' }
-    },
-    contact: {},
-    links: [],
-    share: { shareUrl: 'https://turismoasturias.es/molinos-bimenes' }
-  },
-  // ========== POI INFO: NARZANA ==========
-  {
-    id: 'narzana',
-    title: { es: 'Iglesia de Santa María de Narzana', en: 'Church of Santa María de Narzana', fr: 'Église de Santa María de Narzana' },
-    categoryIds: ['heritage', 'culture'],
-    tags: ['románico', 'iglesia', 'camino', 'santiago'],
-    experienceType: 'INFO',
-    shortDescription: {
-      es: 'Joya románica en entorno rural, en pleno Camino de Santiago',
-      en: 'Romanesque jewel in a rural setting, on the Camino de Santiago',
-      fr: 'Joyau roman dans un cadre rural, sur le Chemin de Saint-Jacques'
-    },
-    richText: {
-      blocks: [
-        {
-          type: 'paragraph',
-          text: {
-            es: 'La iglesia de Santa María de Narzana es una pequeña joya del románico asturiano del siglo XII, ubicada en un entorno rural de extraordinaria belleza y en el trazado del Camino de Santiago.',
-            en: 'The church of Santa María de Narzana is a small jewel of 12th-century Asturian Romanesque, located in a rural setting of extraordinary beauty and on the route of the Camino de Santiago.',
-            fr: 'L\'église de Santa María de Narzana est un petit joyau du roman asturien du XIIe siècle, située dans un cadre rural d\'une beauté extraordinaire et sur le tracé du Chemin de Saint-Jacques.'
-          }
-        }
-      ]
-    },
-    audioGuides: {},
-    access: {
-      address: 'Narzana, Sariego, Asturias',
-      lat: 43.3860,
-      lng: -5.5600
-    },
-    media: {
-      heroImageUrl: narzanaImg,
-      images: [{ url: narzanaImg, caption: { es: 'Iglesia románica de Narzana', en: 'Romanesque church of Narzana', fr: 'Église romane de Narzana' } }]
-    },
-    practical: {
-      recommendedDuration: { es: '30 minutos', en: '30 minutes', fr: '30 minutes' }
-    },
-    contact: {},
-    links: [],
-    share: { shareUrl: 'https://turismoasturias.es/narzana' }
-  },
-  // ========== POI INFO: VALDEDIÓS ==========
   {
     id: 'valdedios',
     title: { es: 'Conjunto Monumental de Valdediós', en: 'Valdediós Monumental Complex', fr: 'Ensemble Monumental de Valdediós' },
-    categoryIds: ['heritage', 'nature'],
-    tags: ['prerrománico', 'monasterio', 'villaviciosa', 'valle'],
-    experienceType: 'INFO',
+    categoryIds: ['heritage', 'culture'],
+    tags: ['prerrománico', 'monasterio', 'villaviciosa'],
+    experienceType: '360',
     shortDescription: {
-      es: 'Prerrománico y monasterio en un valle de belleza brutal: pausa obligatoria',
-      en: 'Pre-Romanesque and monastery in a valley of brutal beauty: mandatory stop',
-      fr: 'Préroman et monastère dans une vallée d\'une beauté brutale: arrêt obligatoire'
+      es: 'Joya prerrománica en un valle de ensueño',
+      en: 'Pre-Romanesque jewel in a dream valley',
+      fr: 'Joyau préroman dans une vallée de rêve'
     },
     richText: {
       blocks: [
@@ -913,31 +771,34 @@ export const pois: POI[] = [
     audioGuides: {},
     access: {
       address: 'Valdediós, Villaviciosa, Asturias',
-      lat: 43.4600,
-      lng: -5.4200
+      lat: 43.4389,
+      lng: -5.5147
     },
-    media: {
-      heroImageUrl: valdediosImg,
-      images: [{ url: valdediosImg, caption: { es: 'San Salvador de Valdediós', en: 'San Salvador de Valdediós', fr: 'San Salvador de Valdediós' } }]
-    },
+  media: {
+    heroImageUrl: valdediosImg,
+    images: [{ url: valdediosImg, caption: { es: 'San Salvador de Valdediós', en: 'San Salvador de Valdediós', fr: 'San Salvador de Valdediós' } }]
+  },
     practical: {
       recommendedDuration: { es: '1-2 horas', en: '1-2 hours', fr: '1-2 heures' }
     },
     contact: {},
     links: [],
-    share: { shareUrl: 'https://turismoasturias.es/valdedios' }
+    share: { shareUrl: 'https://turismoasturias.es/valdedios' },
+    tour360: {
+      iframe360Url: 'https://kuula.co/share/collection/7YHTQ',
+      allowFullscreen: true
+    }
   },
-  // ========== POI 360: MUJA ==========
   {
     id: 'muja',
-    title: { es: 'MUJA + entorno icnitas (Colunga)', en: 'MUJA + fossil footprints (Colunga)', fr: 'MUJA + traces fossiles (Colunga)' },
-    categoryIds: ['culture', 'nature', 'costa'],
-    tags: ['dinosaurios', 'museo', 'colunga', 'paleontología', 'costa'],
-    experienceType: '360',
+    title: { es: 'Museo del Jurásico de Asturias', en: 'Jurassic Museum of Asturias', fr: 'Musée du Jurassique des Asturies' },
+    categoryIds: ['culture'],
+    tags: ['dinosaurios', 'museo', 'colunga', 'paleontología'],
+    experienceType: 'AR',
     shortDescription: {
-      es: 'Dinosaurios, fósiles y huellas en la costa: plan perfecto con efecto wow',
-      en: 'Dinosaurs, fossils and footprints on the coast: perfect plan with wow effect',
-      fr: 'Dinosaures, fossiles et empreintes sur la côte: plan parfait avec effet wow'
+      es: 'Viaje al pasado prehistórico asturiano',
+      en: 'Journey to the Asturian prehistoric past',
+      fr: 'Voyage dans le passé préhistorique asturien'
     },
     richText: {
       blocks: [
@@ -954,126 +815,35 @@ export const pois: POI[] = [
     audioGuides: {},
     access: {
       address: 'Rasa de San Telmo, Colunga, Asturias',
-      lat: 43.4850,
-      lng: -5.2700
+      lat: 43.4897,
+      lng: -5.2706
     },
-    media: {
-      heroImageUrl: mujaImg,
-      images: [{ url: mujaImg, caption: { es: 'MUJA - Museo del Jurásico', en: 'MUJA - Jurassic Museum', fr: 'MUJA - Musée du Jurassique' } }]
-    },
+  media: {
+    heroImageUrl: mujaImg,
+    images: [{ url: mujaImg, caption: { es: 'MUJA - Museo del Jurásico', en: 'MUJA - Jurassic Museum', fr: 'MUJA - Musée du Jurassique' } }]
+  },
     practical: {
       recommendedDuration: { es: '2-3 horas', en: '2-3 hours', fr: '2-3 heures' }
     },
     contact: { website: 'https://www.museojurasicoasturias.com' },
     links: [],
     share: { shareUrl: 'https://turismoasturias.es/muja' },
-    tour360: {
-      iframe360Url: 'https://example.com/embed/360/muja',
-      allowFullscreen: true,
-      scenes: [
-        { id: 's1', title: { es: 'Hall principal', en: 'Main Hall', fr: 'Hall principal' } },
-        { id: 's2', title: { es: 'Sala dinosaurios', en: 'Dinosaur Hall', fr: 'Salle dinosaures' } },
-        { id: 's3', title: { es: 'Mirador exterior', en: 'Exterior Viewpoint', fr: 'Belvédère extérieur' } }
-      ]
+    ar: {
+      launchUrl: 'https://muja.ar-experience.com',
+      qrValue: 'https://muja.ar-experience.com',
+      iframe3dUrl: 'https://sketchfab.com/models/dinosaur/embed'
     }
   },
-  // ========== POI 360: LLASTRES ==========
-  {
-    id: 'llastres',
-    title: { es: 'Llastres + Mirador de San Roque', en: 'Llastres + San Roque Viewpoint', fr: 'Llastres + Belvédère de San Roque' },
-    categoryIds: ['costa', 'heritage'],
-    tags: ['pueblo', 'mirador', 'costa', 'marinero'],
-    experienceType: '360',
-    shortDescription: {
-      es: 'Calles empedradas y un mirador con panorama total: el 360 aquí brilla',
-      en: 'Cobbled streets and a viewpoint with total panorama: the 360 shines here',
-      fr: 'Rues pavées et un belvédère avec panorama total: le 360 brille ici'
-    },
-    richText: {
-      blocks: [
-        {
-          type: 'paragraph',
-          text: {
-            es: 'Llastres es uno de los pueblos marineros más bonitos de Asturias, con sus calles empedradas que descienden hacia el puerto. El Mirador de San Roque ofrece una panorámica espectacular de la costa cantábrica.',
-            en: 'Llastres is one of the most beautiful fishing villages in Asturias, with its cobbled streets descending to the port. The San Roque Viewpoint offers a spectacular panoramic view of the Cantabrian coast.',
-            fr: 'Llastres est l\'un des plus beaux villages de pêcheurs des Asturies, avec ses rues pavées qui descendent vers le port. Le Belvédère de San Roque offre une vue panoramique spectaculaire sur la côte cantabrique.'
-          }
-        }
-      ]
-    },
-    audioGuides: {},
-    access: {
-      address: 'Llastres, Colunga, Asturias',
-      lat: 43.5110,
-      lng: -5.2700
-    },
-    media: {
-      heroImageUrl: llastresImg,
-      images: [{ url: llastresImg, caption: { es: 'Pueblo de Llastres', en: 'Llastres Village', fr: 'Village de Llastres' } }]
-    },
-    practical: {
-      recommendedDuration: { es: '1-2 horas', en: '1-2 hours', fr: '1-2 heures' }
-    },
-    contact: {},
-    links: [],
-    share: { shareUrl: 'https://turismoasturias.es/llastres' },
-    tour360: {
-      iframe360Url: 'https://example.com/embed/360/llastres-mirador',
-      allowFullscreen: true
-    }
-  },
-  // ========== POI INFO: TAZONES ==========
-  {
-    id: 'tazones',
-    title: { es: 'Puerto histórico de Tazones', en: 'Historic Port of Tazones', fr: 'Port historique de Tazones' },
-    categoryIds: ['costa', 'culture'],
-    tags: ['puerto', 'marinero', 'historia', 'carlos V'],
-    experienceType: 'INFO',
-    shortDescription: {
-      es: 'Puerto con encanto y sabor marinero: perfecto para cerrar el día con calma',
-      en: 'Charming port with maritime flavor: perfect to end the day calmly',
-      fr: 'Port charmant avec saveur maritime: parfait pour terminer la journée calmement'
-    },
-    richText: {
-      blocks: [
-        {
-          type: 'paragraph',
-          text: {
-            es: 'Tazones es un pequeño puerto pesquero con encanto histórico, famoso por ser el lugar donde desembarcó Carlos V en 1517. Sus calles estrechas y casas de colores conservan la esencia marinera de antaño.',
-            en: 'Tazones is a small fishing port with historic charm, famous for being where Charles V landed in 1517. Its narrow streets and colorful houses preserve the maritime essence of yesteryear.',
-            fr: 'Tazones est un petit port de pêche au charme historique, célèbre pour être le lieu où Charles Quint débarqua en 1517. Ses rues étroites et maisons colorées conservent l\'essence maritime d\'antan.'
-          }
-        }
-      ]
-    },
-    audioGuides: {},
-    access: {
-      address: 'Tazones, Villaviciosa, Asturias',
-      lat: 43.5400,
-      lng: -5.3890
-    },
-    media: {
-      heroImageUrl: tazonesImg,
-      images: [{ url: tazonesImg, caption: { es: 'Puerto de Tazones', en: 'Port of Tazones', fr: 'Port de Tazones' } }]
-    },
-    practical: {
-      recommendedDuration: { es: '1-2 horas', en: '1-2 hours', fr: '1-2 heures' }
-    },
-    contact: {},
-    links: [],
-    share: { shareUrl: 'https://turismoasturias.es/tazones' }
-  },
-  // ========== POI 360: LABORAL ==========
   {
     id: 'laboral',
-    title: { es: 'Laboral Ciudad de la Cultura (Gijón)', en: 'Laboral City of Culture (Gijón)', fr: 'Laboral Cité de la Culture (Gijón)' },
+    title: { es: 'Laboral Ciudad de la Cultura', en: 'Laboral City of Culture', fr: 'Laboral Cité de la Culture' },
     categoryIds: ['culture', 'heritage'],
-    tags: ['arquitectura', 'cultura', 'gijón', 'monumental'],
+    tags: ['arquitectura', 'cultura', 'gijón'],
     experienceType: '360',
     shortDescription: {
-      es: 'Arquitectura monumental + cultura: un 360 aquí se siente espectacular',
-      en: 'Monumental architecture + culture: a 360 here feels spectacular',
-      fr: 'Architecture monumentale + culture: un 360 ici est spectaculaire'
+      es: 'Imponente complejo arquitectónico y cultural',
+      en: 'Impressive architectural and cultural complex',
+      fr: 'Impressionnant complexe architectural et culturel'
     },
     richText: {
       blocks: [
@@ -1090,13 +860,13 @@ export const pois: POI[] = [
     audioGuides: {},
     access: {
       address: 'Luis Moya Blanco 261, Gijón, Asturias',
-      lat: 43.5180,
-      lng: -5.6320
+      lat: 43.5253,
+      lng: -5.6186
     },
-    media: {
-      heroImageUrl: laboralImg,
-      images: [{ url: laboralImg, caption: { es: 'Laboral Ciudad de la Cultura', en: 'Laboral City of Culture', fr: 'Laboral Cité de la Culture' } }]
-    },
+  media: {
+    heroImageUrl: laboralImg,
+    images: [{ url: laboralImg, caption: { es: 'Laboral Ciudad de la Cultura', en: 'Laboral City of Culture', fr: 'Laboral Cité de la Culture' } }]
+  },
     practical: {
       recommendedDuration: { es: '2-3 horas', en: '2-3 hours', fr: '2-3 heures' }
     },
@@ -1104,21 +874,20 @@ export const pois: POI[] = [
     links: [],
     share: { shareUrl: 'https://turismoasturias.es/laboral' },
     tour360: {
-      iframe360Url: 'https://example.com/embed/360/laboral',
+      iframe360Url: 'https://kuula.co/share/collection/laboral',
       allowFullscreen: true
     }
   },
-  // ========== POI INFO: CIMAVILLA ==========
   {
     id: 'cimavilla',
-    title: { es: 'Barrio de Cimavilla + sidrerías (Gijón)', en: 'Cimavilla Quarter + cider houses (Gijón)', fr: 'Quartier de Cimavilla + cidreries (Gijón)' },
-    categoryIds: ['sidra', 'culture', 'costa'],
-    tags: ['sidrerías', 'gijón', 'marinero', 'tapas', 'culín'],
+    title: { es: 'Barrio de Cimavilla', en: 'Cimavilla Neighborhood', fr: 'Quartier de Cimavilla' },
+    categoryIds: ['gastronomy', 'culture'],
+    tags: ['sidrerías', 'gijón', 'marinero', 'tapas'],
     experienceType: 'INFO',
     shortDescription: {
-      es: 'Laberinto histórico con alma marinera y el broche perfecto para un culín final',
-      en: 'Historic labyrinth with maritime soul and the perfect finale for a final cider',
-      fr: 'Labyrinthe historique avec âme maritime et la touche parfaite pour un cidre final'
+      es: 'Laberinto marinero con las mejores sidrerías',
+      en: 'Maritime labyrinth with the best cider houses',
+      fr: 'Labyrinthe maritime avec les meilleures cidreries'
     },
     richText: {
       blocks: [
@@ -1135,13 +904,13 @@ export const pois: POI[] = [
     audioGuides: {},
     access: {
       address: 'Cimavilla, Gijón, Asturias',
-      lat: 43.5460,
-      lng: -5.6615
+      lat: 43.5456,
+      lng: -5.6633
     },
-    media: {
-      heroImageUrl: cimavillaImg,
-      images: [{ url: cimavillaImg, caption: { es: 'Barrio de Cimavilla', en: 'Cimavilla Quarter', fr: 'Quartier de Cimavilla' } }]
-    },
+  media: {
+    heroImageUrl: cimavillaImg,
+    images: [{ url: cimavillaImg, caption: { es: 'Barrio de Cimavilla', en: 'Cimavilla Quarter', fr: 'Quartier de Cimavilla' } }]
+  },
     practical: {
       recommendedDuration: { es: '2-4 horas', en: '2-4 hours', fr: '2-4 heures' }
     },
@@ -1287,51 +1056,44 @@ export const routes: Route[] = [
   },
   {
     id: 'route-sidra',
-    title: { es: 'Entre valles, mareas y manzanas', en: 'Between valleys, tides and apples', fr: 'Entre vallées, marées et pommes' },
-    categoryIds: ['sidra', 'heritage', 'nature', 'costa', 'culture'],
-    isLoop: true,
-    poiOrder: ['torazu', 'museo-sidra', 'molinos-bimenes', 'narzana', 'valdedios', 'muja', 'llastres', 'tazones', 'laboral', 'cimavilla'],
+    title: { es: 'Ruta de la Sidra', en: 'Cider Route', fr: 'Route du Cidre' },
+    categoryIds: ['gastronomy', 'culture', 'heritage'],
+    isLoop: false,
+    poiOrder: ['museo-sidra', 'valdedios', 'muja', 'laboral', 'cimavilla'],
     coverImage: rutaSidraImg,
     shortDescription: {
-      es: 'Roadtrip inmersivo de 4 días para vivir la cultura sidrera, patrimonio rural, paisaje costero y un final urbano en Gijón',
-      en: 'Immersive 4-day roadtrip to experience cider culture, rural heritage, coastal landscape and an urban finale in Gijón',
-      fr: 'Roadtrip immersif de 4 jours pour vivre la culture du cidre, patrimoine rural, paysage côtier et finale urbaine à Gijón'
+      es: 'Cultura sidrera declarada Patrimonio UNESCO',
+      en: 'Cider culture declared UNESCO Heritage',
+      fr: 'Culture du cidre déclarée Patrimoine UNESCO'
     },
     itineraryDays: [
       { 
         day: 1, 
-        title: { es: 'Día 1: Arquitectura tradicional y sidra (Cabranes–Nava–Bimenes)', en: 'Day 1: Traditional architecture and cider (Cabranes–Nava–Bimenes)', fr: 'Jour 1: Architecture traditionnelle et cidre (Cabranes–Nava–Bimenes)' }, 
-        poiIds: ['torazu', 'museo-sidra', 'molinos-bimenes'] 
+        title: { es: 'Día 1: Comarca de la Sidra', en: 'Day 1: Cider Region', fr: 'Jour 1: Région du Cidre' }, 
+        poiIds: ['museo-sidra'] 
       },
       { 
         day: 2, 
-        title: { es: 'Día 2: Románico y valle (Sariego–Villaviciosa)', en: 'Day 2: Romanesque and valley (Sariego–Villaviciosa)', fr: 'Jour 2: Roman et vallée (Sariego–Villaviciosa)' }, 
-        poiIds: ['narzana', 'valdedios'] 
+        title: { es: 'Día 2: Villaviciosa', en: 'Day 2: Villaviciosa', fr: 'Jour 2: Villaviciosa' }, 
+        poiIds: ['valdedios'] 
       },
       { 
         day: 3, 
-        title: { es: 'Día 3: Jurásico y costa (Colunga–Llastres–Tazones)', en: 'Day 3: Jurassic and coast (Colunga–Llastres–Tazones)', fr: 'Jour 3: Jurassique et côte (Colunga–Llastres–Tazones)' }, 
-        poiIds: ['muja', 'llastres', 'tazones'] 
+        title: { es: 'Día 3: Costa Jurásica', en: 'Day 3: Jurassic Coast', fr: 'Jour 3: Côte Jurassique' }, 
+        poiIds: ['muja'] 
       },
       { 
         day: 4, 
-        title: { es: 'Día 4: Final urbano con cultura y sidrerías (Gijón)', en: 'Day 4: Urban finale with culture and cider houses (Gijón)', fr: 'Jour 4: Finale urbaine avec culture et cidreries (Gijón)' }, 
+        title: { es: 'Día 4: Gijón', en: 'Day 4: Gijón', fr: 'Jour 4: Gijón' }, 
         poiIds: ['laboral', 'cimavilla'] 
       },
     ],
     polyline: [
-      { lat: 43.5322, lng: -5.6611 },  // Gijón (inicio)
-      { lat: 43.4090, lng: -5.3880 },  // Torazu
-      { lat: 43.3580, lng: -5.5050 },  // Nava (Museo Sidra)
-      { lat: 43.3310, lng: -5.5650 },  // Bimenes (Molinos)
-      { lat: 43.3860, lng: -5.5600 },  // Narzana
-      { lat: 43.4600, lng: -5.4200 },  // Valdediós
-      { lat: 43.4850, lng: -5.2700 },  // MUJA
-      { lat: 43.5110, lng: -5.2700 },  // Llastres
-      { lat: 43.5400, lng: -5.3890 },  // Tazones
-      { lat: 43.5180, lng: -5.6320 },  // Laboral
-      { lat: 43.5460, lng: -5.6615 },  // Cimavilla
-      { lat: 43.5322, lng: -5.6611 },  // Gijón (cierre loop)
+      { lat: 43.3544, lng: -5.5067 }, // Nava - Museo Sidra
+      { lat: 43.4389, lng: -5.5147 }, // Valdediós
+      { lat: 43.4897, lng: -5.2706 }, // MUJA Colunga
+      { lat: 43.5253, lng: -5.6186 }, // Laboral
+      { lat: 43.5456, lng: -5.6633 }, // Cimavilla
     ],
   },
 ];
