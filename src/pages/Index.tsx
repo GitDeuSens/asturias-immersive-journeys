@@ -1,30 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { WelcomeSplash } from '@/components/WelcomeSplash';
-import { ExplorationMode } from '@/components/ExplorationMode';
+import { DynamicBackground } from '@/components/DynamicBackground';
+import { OnboardingHeader } from '@/components/OnboardingHeader';
+import { ModeSelector } from '@/components/ModeSelector';
 import { ExperienceSelector } from '@/components/ExperienceSelector';
-import { useLanguage, Language, useExplorationMode } from '@/hooks/useLanguage';
+import { useExplorationMode } from '@/hooks/useLanguage';
 
-type FlowStep = 'splash' | 'mode' | 'experience';
+type FlowStep = 'mode' | 'experience';
 
 const Index = () => {
   const navigate = useNavigate();
-  const { setLanguage } = useLanguage();
-  const { mode, setMode } = useExplorationMode();
-  const [step, setStep] = useState<FlowStep>('splash');
-
-  useEffect(() => {
-    // Check if language already set, skip splash
-    const savedLang = localStorage.getItem('asturias-inmersivo-lang');
-    if (savedLang) {
-      setStep('mode');
-    }
-  }, []);
-
-  const handleLanguageSelect = (lang: Language) => {
-    setLanguage(lang);
-    setStep('mode');
-  };
+  const { setMode } = useExplorationMode();
+  const [step, setStep] = useState<FlowStep>('mode');
 
   const handleModeSelect = (selectedMode: 'home' | 'here') => {
     setMode(selectedMode);
@@ -39,11 +26,21 @@ const Index = () => {
     }
   };
 
+  const handleBack = () => {
+    setStep('mode');
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      {step === 'splash' && <WelcomeSplash onContinue={handleLanguageSelect} />}
-      {step === 'mode' && <ExplorationMode onSelect={handleModeSelect} />}
-      {step === 'experience' && <ExperienceSelector onSelect={handleExperienceSelect} />}
+      {/* Dynamic blurred background */}
+      <DynamicBackground blur={10} interval={8000} />
+      
+      {/* Header with language selector */}
+      <OnboardingHeader />
+      
+      {/* Content */}
+      {step === 'mode' && <ModeSelector onSelect={handleModeSelect} />}
+      {step === 'experience' && <ExperienceSelector onSelect={handleExperienceSelect} onBack={handleBack} />}
     </div>
   );
 };
