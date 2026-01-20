@@ -18,6 +18,17 @@ export function POIPreviewSheet({ poi, onClose, onViewDetails }: POIPreviewSheet
   const { t } = useLanguage();
 
   if (!poi) return null;
+  const getButtonStyle = () => {
+    switch (poi.experienceType) {
+      case 'AR':
+        return 'bg-[hsl(48,100%,50%)] text-[hsl(210,11%,15%)] hover:bg-[hsl(48,100%,45%)]';
+      case '360':
+        return 'bg-primary text-primary-foreground hover:bg-primary/90';
+      case 'INFO':
+      default:
+        return 'bg-[hsl(203,100%,32%)] text-white hover:bg-[hsl(203,100%,28%)]';
+    }
+  };
 
 
   const getTypeBadge = () => {
@@ -126,7 +137,7 @@ export function POIPreviewSheet({ poi, onClose, onViewDetails }: POIPreviewSheet
             {/* Primary CTA */}
             <button
               onClick={onViewDetails}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm uppercase tracking-wide transition-all shadow-md bg-[hsl(203,100%,32%)] text-white hover:bg-[hsl(203,100%,28%)]"
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm uppercase tracking-wide transition-all shadow-md ${getButtonStyle()}`}
             >
               <Info className="w-5 h-5" />
               {t(texts.viewDetails)}
