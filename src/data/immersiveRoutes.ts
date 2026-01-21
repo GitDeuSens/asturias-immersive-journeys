@@ -199,19 +199,42 @@ export const immersiveRoutes: ImmersiveRoute[] = [
     duration: { es: '1 día', en: '1 day', fr: '1 jour' },
     difficulty: 'easy',
     isCircular: false,
-    center: { lat: 43.245, lng: -5.663 },
-    maxPoints: 10,
+    center: { lat: 43.243, lng: -5.665 },
+    maxPoints: 2,
     points: [
       {
-        id: 'ar2-mumi',
+        id: 'ar2-mumi-tour360',
         order: 1,
+        title: { es: 'Tour Virtual MUMI', en: 'MUMI Virtual Tour', fr: 'Visite Virtuelle MUMI' },
+        shortDescription: { 
+          es: 'Explora el Museo de la Minería desde cualquier lugar con nuestro tour 360°', 
+          en: 'Explore the Mining Museum from anywhere with our 360° tour', 
+          fr: 'Explorez le Musée de la Mine depuis n\'importe où avec notre visite 360°' 
+        },
+        location: { lat: 43.243, lng: -5.665 },
+        coverImage: mumiImg,
+        content: {
+          image: { url: mumiImg },
+          tour360: { 
+            iframe360Url: 'https://kuula.co/share/collection/mumi360',
+            allowFullscreen: true 
+          },
+        },
+      },
+      {
+        id: 'ar2-mumi',
+        order: 2,
         title: { es: 'MUMI', en: 'MUMI', fr: 'MUMI' },
         shortDescription: { es: 'Museo de la Minería y la Industria', en: 'Mining and Industry Museum', fr: 'Musée de la Mine et de l\'Industrie' },
         location: { lat: 43.243, lng: -5.665 },
         coverImage: mumiImg,
         content: {
           image: { url: mumiImg },
-          tour360: { iframe360Url: 'https://kuula.co/share/mumi', allowFullscreen: true },
+          audioGuide: {
+            es: { url: '/audio/mumi-es.mp3', durationSec: 300 },
+            en: { url: '/audio/mumi-en.mp3', durationSec: 290 },
+            fr: { url: '/audio/mumi-fr.mp3', durationSec: 310 },
+          },
         },
       },
     ],
