@@ -29,46 +29,51 @@ const texts = {
   results: { es: 'resultados', en: 'results', fr: 'résultats' },
 };
 
-// Create route bubble marker
-const createRouteMarkerIcon = (route: ImmersiveRoute) => {
+// Create route bubble marker with name label
+const createRouteMarkerIcon = (route: ImmersiveRoute, routeName: string) => {
   const borderColor = route.isCircular ? 'hsl(79, 100%, 36%)' : 'hsl(203, 100%, 32%)';
+  const truncatedName = routeName.length > 18 ? routeName.substring(0, 16) + '...' : routeName;
   
   return L.divIcon({
     className: 'route-bubble-marker',
     html: `
-      <div style="position: relative; width: 60px; height: 60px; cursor: pointer;">
-        <div style="width: 60px; height: 60px; border-radius: 50%; border: 4px solid ${borderColor}; box-shadow: 0 4px 20px rgba(0,0,0,0.35); overflow: hidden; background: white;">
-          <img src="${route.coverImage}" style="width: 100%; height: 100%; object-fit: cover;" alt=""/>
+      <div style="position: relative; width: 60px; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+        <div style="position: relative; width: 60px; height: 60px;">
+          <div style="width: 60px; height: 60px; border-radius: 50%; border: 4px solid ${borderColor}; box-shadow: 0 4px 20px rgba(0,0,0,0.35); overflow: hidden; background: white;">
+            <img src="${route.coverImage}" style="width: 100%; height: 100%; object-fit: cover;" alt=""/>
+          </div>
+          <div style="position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: ${borderColor}; box-shadow: 0 2px 8px rgba(0,0,0,0.25); font-family: 'Montserrat', sans-serif;">${route.maxPoints}</div>
         </div>
-        ${route.isCircular ? `
-          <div style="position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); background: hsl(79, 100%, 36%); color: white; font-size: 8px; font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap; font-family: 'Montserrat', sans-serif; box-shadow: 0 2px 6px rgba(0,0,0,0.25);">LAZO</div>
-        ` : ''}
-        <div style="position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: ${borderColor}; box-shadow: 0 2px 8px rgba(0,0,0,0.25); font-family: 'Montserrat', sans-serif;">${route.maxPoints}</div>
+        <div style="margin-top: 6px; background: white; color: hsl(0, 0%, 15%); font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 8px; white-space: nowrap; font-family: 'Montserrat', sans-serif; box-shadow: 0 2px 8px rgba(0,0,0,0.2); max-width: 120px; text-align: center; border: 1px solid ${borderColor};">${truncatedName}</div>
       </div>
     `,
-    iconSize: [60, 68],
-    iconAnchor: [30, 34],
+    iconSize: [120, 90],
+    iconAnchor: [60, 45],
   });
 };
 
-// Create point marker for route exploration
-const createPointMarkerIcon = (point: RoutePoint, index: number) => {
+// Create point marker for route exploration with name label
+const createPointMarkerIcon = (point: RoutePoint, index: number, pointName: string) => {
   const hasAR = !!point.content.arExperience;
   const has360 = !!point.content.tour360;
   const borderColor = hasAR ? 'hsl(48, 100%, 50%)' : has360 ? 'hsl(79, 100%, 36%)' : 'hsl(203, 100%, 32%)';
+  const truncatedName = pointName.length > 20 ? pointName.substring(0, 18) + '...' : pointName;
   
   return L.divIcon({
     className: 'custom-marker',
     html: `
-      <div style="position: relative; width: 48px; height: 48px;">
-        <div style="width: 48px; height: 48px; border-radius: 50%; border: 4px solid ${borderColor}; overflow: hidden; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-          ${point.coverImage ? `<img src="${point.coverImage}" style="width: 100%; height: 100%; object-fit: cover;" alt=""/>` : `<div style="width: 100%; height: 100%; background: ${borderColor}20;"></div>`}
+      <div style="display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+        <div style="position: relative; width: 48px; height: 48px;">
+          <div style="width: 48px; height: 48px; border-radius: 50%; border: 4px solid ${borderColor}; overflow: hidden; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            ${point.coverImage ? `<img src="${point.coverImage}" style="width: 100%; height: 100%; object-fit: cover;" alt=""/>` : `<div style="width: 100%; height: 100%; background: ${borderColor}20;"></div>`}
+          </div>
+          <div style="position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; background: ${borderColor}; border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: ${hasAR ? '#1a1a1a' : 'white'}; box-shadow: 0 2px 8px rgba(0,0,0,0.25); font-family: 'Montserrat', sans-serif;">${index + 1}</div>
         </div>
-        <div style="position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; background: ${borderColor}; border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: ${hasAR ? '#1a1a1a' : 'white'}; box-shadow: 0 2px 8px rgba(0,0,0,0.25); font-family: 'Montserrat', sans-serif;">${index + 1}</div>
+        <div style="margin-top: 6px; background: white; color: hsl(0, 0%, 15%); font-size: 9px; font-weight: 700; padding: 3px 6px; border-radius: 6px; white-space: nowrap; font-family: 'Montserrat', sans-serif; box-shadow: 0 2px 8px rgba(0,0,0,0.2); max-width: 100px; text-align: center; border: 1px solid ${borderColor};">${truncatedName}</div>
       </div>
     `,
-    iconSize: [48, 48],
-    iconAnchor: [24, 48],
+    iconSize: [100, 80],
+    iconAnchor: [50, 40],
   });
 };
 
@@ -196,8 +201,9 @@ export function RoutesPage() {
       }).addTo(mapRef.current);
 
       exploringRoute.points.forEach((point, idx) => {
+        const pointName = t(point.title);
         const marker = L.marker([point.location.lat, point.location.lng], {
-          icon: createPointMarkerIcon(point, idx)
+          icon: createPointMarkerIcon(point, idx, pointName)
         })
           .addTo(mapRef.current!)
           .on('click', () => setSelectedPoint(point));
@@ -208,8 +214,9 @@ export function RoutesPage() {
     } else {
       // Show all route bubbles
       filteredRoutes.forEach(route => {
+        const routeName = t(route.title);
         const marker = L.marker([route.center.lat, route.center.lng], {
-          icon: createRouteMarkerIcon(route)
+          icon: createRouteMarkerIcon(route, routeName)
         })
           .addTo(mapRef.current!)
           .on('click', () => {
