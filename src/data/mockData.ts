@@ -1196,8 +1196,11 @@ export interface Tour360 {
   }[];
 }
 
-// Importar imagen del Ecomuseo
+// Importar imágenes de museos
 import ecomuseoSamunoImg from '@/assets/ecomuseo-samuno.jpg';
+import museoFerrocarrilImg from '@/assets/museo-ferrocarril.jpg';
+import musiImg from '@/assets/musi.jpg';
+import mumiImg from '@/assets/mumi.jpg';
 
 export const tours360: Tour360[] = [
   {
@@ -1231,27 +1234,27 @@ export const tours360: Tour360[] = [
     id: 'tour-mumi',
     title: { es: 'MUMI – Museo de la Minería y la Industria de Asturias', en: 'MUMI – Asturias Mining & Industry Museum', fr: 'MUMI – Musée de la Mine et de l\'Industrie des Asturies' },
     categoryIds: ['culture', 'heritage'],
-    coverImage: laboralImg,
+    coverImage: mumiImg,
     scenes: [
-      { id: 'scene1', title: 'Salas y piezas clave', imageUrl: laboralImg, hotspots: [] },
+      { id: 'scene1', title: 'Salas y piezas clave', imageUrl: mumiImg, hotspots: [] },
     ],
   },
   {
     id: 'tour-siderurgia',
-    title: { es: 'Museo de la Siderurgia de Asturias', en: 'Asturias Steelworks Museum', fr: 'Musée de la Sidérurgie des Asturies' },
+    title: { es: 'MUSI – Museo de la Siderurgia de Asturias', en: 'MUSI – Asturias Steelworks Museum', fr: 'MUSI – Musée de la Sidérurgie des Asturies' },
     categoryIds: ['culture', 'heritage'],
-    coverImage: laboralImg,
+    coverImage: musiImg,
     scenes: [
-      { id: 'scene1', title: 'Patrimonio siderúrgico', imageUrl: laboralImg, hotspots: [] },
+      { id: 'scene1', title: 'Patrimonio siderúrgico', imageUrl: musiImg, hotspots: [] },
     ],
   },
   {
     id: 'tour-ferrocarril',
     title: { es: 'Museo del Ferrocarril de Asturias', en: 'Asturias Railway Museum', fr: 'Musée du Chemin de Fer des Asturies' },
     categoryIds: ['culture', 'heritage'],
-    coverImage: laboralImg,
+    coverImage: museoFerrocarrilImg,
     scenes: [
-      { id: 'scene1', title: 'Material móvil e instalaciones', imageUrl: laboralImg, hotspots: [] },
+      { id: 'scene1', title: 'Material móvil e instalaciones', imageUrl: museoFerrocarrilImg, hotspots: [] },
     ],
   },
   {
