@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, 
@@ -9,7 +10,9 @@ import {
   Smartphone,
   ExternalLink,
   ChevronRight,
-  Maximize2
+  Maximize2,
+  Sparkles,
+  ScanLine
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { RoutePoint } from '@/data/immersiveRoutes';
@@ -17,6 +20,7 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import FullscreenModal from '@/components/poi/FullscreenModal';
 
 interface PointDetailSheetProps {
   point: RoutePoint | null;
@@ -34,11 +38,15 @@ const texts = {
   playVideo: { es: 'Reproducir vídeo', en: 'Play video', fr: 'Lire la vidéo' },
   downloadPDF: { es: 'Descargar PDF', en: 'Download PDF', fr: 'Télécharger le PDF' },
   listenAudio: { es: 'Escuchar audioguía', en: 'Listen to audioguide', fr: 'Écouter l\'audioguide' },
+  arExperience: { es: 'Experiencia de Realidad Aumentada', en: 'Augmented Reality Experience', fr: 'Expérience de Réalité Augmentée' },
+  tryARDesktop: { es: 'Probar en este dispositivo', en: 'Try on this device', fr: 'Essayer sur cet appareil' },
+  arRecommendation: { es: 'Recomendado: usa tu móvil para la mejor experiencia AR', en: 'Recommended: use your phone for the best AR experience', fr: 'Recommandé: utilisez votre téléphone pour la meilleure expérience AR' },
 };
 
 export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
   const { t, language } = useLanguage();
   const isMobile = useIsMobile();
+  const [showARFullscreen, setShowARFullscreen] = useState(false);
 
   if (!point) return null;
 
@@ -56,205 +64,280 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
   };
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <motion.div
-        initial={{ x: '100%' }}
-        animate={{ x: 0 }}
-        exit={{ x: '100%' }}
-        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-background z-50 shadow-2xl flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Hero image */}
-        <div 
-          className="relative h-48 bg-cover bg-center flex-shrink-0"
-          style={{ backgroundImage: point.coverImage ? `url(${point.coverImage})` : undefined }}
+    <>
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+          onClick={onClose}
+        />
+        <motion.div
+          initial={{ x: '100%' }}
+          animate={{ x: 0 }}
+          exit={{ x: '100%' }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-background z-50 shadow-2xl flex flex-col"
+          onClick={(e) => e.stopPropagation()}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
-          
-          {/* Close button */}
-          <button 
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+          {/* Hero image */}
+          <div 
+            className="relative h-56 bg-cover bg-center flex-shrink-0"
+            style={{ backgroundImage: point.coverImage ? `url(${point.coverImage})` : undefined }}
           >
-            <X className="w-5 h-5" />
-          </button>
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+            
+            {/* Close button */}
+            <button 
+              onClick={onClose}
+              className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
 
-          {/* AR badge */}
-          {hasAR && (
-            <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-warm/90 text-warm-foreground text-sm font-bold">
-              <Smartphone className="w-4 h-4" />
-              AR
-            </span>
-          )}
-
-          {/* Bottom info */}
-          <div className="absolute bottom-4 left-4 right-4">
-            <h1 className="text-xl font-serif font-bold text-white drop-shadow-lg">
-              {t(point.title)}
-            </h1>
-          </div>
-        </div>
-
-        {/* Scrollable content */}
-        <ScrollArea className="flex-1">
-          <div className="p-6 space-y-6">
-            {/* Description */}
-            <p className="text-muted-foreground leading-relaxed">
-              {t(point.shortDescription)}
-            </p>
-
-            {/* Location */}
-            {point.location.address && (
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
-                <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-foreground">{t(texts.location)}</p>
-                  <p className="text-sm text-muted-foreground">{point.location.address}</p>
-                </div>
-              </div>
+            {/* AR badge */}
+            {hasAR && (
+              <motion.span 
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-warm text-warm-foreground text-sm font-bold shadow-lg"
+              >
+                <Smartphone className="w-4 h-4" />
+                AR
+                <Sparkles className="w-3 h-3" />
+              </motion.span>
             )}
 
-            {/* AR Experience Section */}
-            {hasAR && (
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2">
-                  <Smartphone className="w-4 h-4 text-warm" />
-                  Realidad Aumentada
-                </h3>
+            {/* Bottom info */}
+            <div className="absolute bottom-4 left-4 right-4">
+              <h1 className="text-2xl font-serif font-bold text-white drop-shadow-lg">
+                {t(point.title)}
+              </h1>
+            </div>
+          </div>
 
-                {isMobile ? (
-                  /* Mobile: Direct launch button */
-                  <Button 
-                    onClick={handleLaunchAR}
-                    className="w-full h-14 text-base font-bold bg-warm hover:bg-warm/90 text-warm-foreground"
-                  >
-                    <Smartphone className="w-5 h-5 mr-2" />
-                    {t(texts.launchAR)}
-                    <ExternalLink className="w-4 h-4 ml-2" />
-                  </Button>
-                ) : (
-                  /* Desktop: QR Code */
-                  <div className="bg-white rounded-xl p-6 border border-border shadow-sm">
-                    <div className="flex flex-col items-center text-center space-y-4">
-                      <div className="p-4 bg-white rounded-xl shadow-inner">
-                        <QRCodeSVG 
-                          value={content.arExperience!.qrValue}
-                          size={180}
-                          level="H"
-                          includeMargin={false}
-                          bgColor="white"
-                          fgColor="black"
-                        />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">{t(texts.scanQR)}</p>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {t(texts.scanQRDesc)}
-                        </p>
+          {/* Scrollable content */}
+          <ScrollArea className="flex-1">
+            <div className="p-6 space-y-6">
+              {/* Description */}
+              <p className="text-muted-foreground leading-relaxed text-base">
+                {t(point.shortDescription)}
+              </p>
+
+              {/* Location */}
+              {point.location.address && (
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
+                  <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{t(texts.location)}</p>
+                    <p className="text-sm text-muted-foreground">{point.location.address}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* AR Experience Section - HERO SECTION */}
+              {hasAR && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="space-y-4"
+                >
+                  {/* AR Header with glow effect */}
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-lg bg-warm/20">
+                      <Smartphone className="w-5 h-5 text-warm" />
+                    </div>
+                    <h3 className="text-base font-semibold text-foreground">
+                      {t(texts.arExperience)}
+                    </h3>
+                  </div>
+
+                  {isMobile ? (
+                    /* Mobile: Direct launch button with enhanced styling */
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Button 
+                        onClick={handleLaunchAR}
+                        className="w-full h-16 text-lg font-bold bg-gradient-to-r from-warm to-amber-500 hover:from-warm/90 hover:to-amber-500/90 text-warm-foreground shadow-lg shadow-warm/25 border-0"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-white/20 rounded-lg">
+                            <Smartphone className="w-6 h-6" />
+                          </div>
+                          <span>{t(texts.launchAR)}</span>
+                          <ExternalLink className="w-5 h-5" />
+                        </div>
+                      </Button>
+                    </motion.div>
+                  ) : (
+                    /* Desktop: QR Code with enhanced visual design */
+                    <div className="bg-gradient-to-br from-warm/5 via-background to-amber-500/5 rounded-2xl p-6 border border-warm/20 shadow-lg">
+                      <div className="flex flex-col items-center text-center space-y-5">
+                        {/* QR Code container with glow */}
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-warm/20 rounded-2xl blur-xl" />
+                          <div className="relative p-5 bg-white rounded-2xl shadow-xl border-4 border-warm/30">
+                            <QRCodeSVG 
+                              value={content.arExperience!.qrValue}
+                              size={200}
+                              level="H"
+                              includeMargin={false}
+                              bgColor="white"
+                              fgColor="#1a1a1a"
+                            />
+                          </div>
+                          {/* Scan indicator */}
+                          <motion.div 
+                            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                            initial={{ opacity: 0.5 }}
+                            animate={{ opacity: [0.3, 0.7, 0.3] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                          >
+                            <ScanLine className="w-16 h-16 text-warm/40" />
+                          </motion.div>
+                        </div>
+                        
+                        {/* Instructions */}
+                        <div className="space-y-2">
+                          <p className="font-semibold text-foreground text-lg flex items-center justify-center gap-2">
+                            <Smartphone className="w-5 h-5 text-warm" />
+                            {t(texts.scanQR)}
+                          </p>
+                          <p className="text-sm text-muted-foreground max-w-xs">
+                            {t(texts.scanQRDesc)}
+                          </p>
+                        </div>
+
+                        {/* Desktop fallback option */}
+                        <div className="w-full pt-4 border-t border-border/50">
+                          <p className="text-xs text-muted-foreground mb-3">
+                            {t(texts.arRecommendation)}
+                          </p>
+                          <Button 
+                            variant="outline"
+                            onClick={() => setShowARFullscreen(true)}
+                            className="w-full border-warm/30 text-warm hover:bg-warm/10 hover:text-warm"
+                          >
+                            <Maximize2 className="w-4 h-4 mr-2" />
+                            {t(texts.tryARDesktop)}
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-
-                {/* AR Instructions */}
-                {content.arExperience?.instructions && (
-                  <div className="p-4 rounded-lg bg-warm/10 border border-warm/20">
-                    <p className="text-xs font-semibold text-warm uppercase tracking-wide mb-2">
-                      {t(texts.arInstructions)}
-                    </p>
-                    <p className="text-sm text-foreground whitespace-pre-line">
-                      {t(content.arExperience.instructions)}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* 360 Tour */}
-            {has360 && (
-              <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2">
-                  <Camera className="w-4 h-4 text-primary" />
-                  Tour 360°
-                </h3>
-                <Button 
-                  variant="outline"
-                  className="w-full justify-between"
-                  onClick={() => window.open(content.tour360!.iframe360Url, '_blank')}
-                >
-                  {t(texts.open360)}
-                  <Maximize2 className="w-4 h-4" />
-                </Button>
-              </div>
-            )}
-
-            {/* Other content types */}
-            {(hasVideo || hasAudio || hasPDF) && (
-              <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">
-                  {t(texts.contentAvailable)}
-                </h3>
-                <div className="space-y-2">
-                  {hasVideo && (
-                    <Button 
-                      variant="outline"
-                      className="w-full justify-between"
-                      onClick={() => window.open(content.video!.url, '_blank')}
-                    >
-                      <span className="flex items-center gap-2">
-                        <Play className="w-4 h-4" />
-                        {t(texts.playVideo)}
-                      </span>
-                      <ChevronRight className="w-4 h-4" />
-                    </Button>
                   )}
-                  {hasAudio && content.audioGuide?.[language as keyof typeof content.audioGuide] && (
-                    <Button 
-                      variant="outline"
-                      className="w-full justify-between"
-                      onClick={() => window.open(content.audioGuide![language as keyof typeof content.audioGuide]!.url, '_blank')}
+
+                  {/* AR Instructions */}
+                  {content.arExperience?.instructions && (
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                      className="p-4 rounded-xl bg-warm/10 border border-warm/20"
                     >
-                      <span className="flex items-center gap-2">
-                        <Headphones className="w-4 h-4" />
-                        {t(texts.listenAudio)}
-                      </span>
-                      <ChevronRight className="w-4 h-4" />
-                    </Button>
+                      <p className="text-xs font-semibold text-warm uppercase tracking-wide mb-2 flex items-center gap-2">
+                        <Sparkles className="w-3 h-3" />
+                        {t(texts.arInstructions)}
+                      </p>
+                      <p className="text-sm text-foreground leading-relaxed">
+                        {t(content.arExperience.instructions)}
+                      </p>
+                    </motion.div>
                   )}
-                  {hasPDF && (
-                    <Button 
-                      variant="outline"
-                      className="w-full justify-between"
-                      onClick={() => window.open(content.pdf!.url, '_blank')}
-                    >
-                      <span className="flex items-center gap-2">
-                        <FileText className="w-4 h-4" />
-                        {t(texts.downloadPDF)}
-                      </span>
-                      <ChevronRight className="w-4 h-4" />
-                    </Button>
-                  )}
+                </motion.div>
+              )}
+
+              {/* 360 Tour */}
+              {has360 && (
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2">
+                    <Camera className="w-4 h-4 text-primary" />
+                    Tour 360°
+                  </h3>
+                  <Button 
+                    variant="outline"
+                    className="w-full justify-between"
+                    onClick={() => window.open(content.tour360!.iframe360Url, '_blank')}
+                  >
+                    {t(texts.open360)}
+                    <Maximize2 className="w-4 h-4" />
+                  </Button>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Image caption */}
-            {content.image?.caption && (
-              <p className="text-xs text-muted-foreground italic text-center">
-                {t(content.image.caption)}
-              </p>
-            )}
-          </div>
-        </ScrollArea>
-      </motion.div>
-    </AnimatePresence>
+              {/* Other content types */}
+              {(hasVideo || hasAudio || hasPDF) && (
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">
+                    {t(texts.contentAvailable)}
+                  </h3>
+                  <div className="space-y-2">
+                    {hasVideo && (
+                      <Button 
+                        variant="outline"
+                        className="w-full justify-between"
+                        onClick={() => window.open(content.video!.url, '_blank')}
+                      >
+                        <span className="flex items-center gap-2">
+                          <Play className="w-4 h-4" />
+                          {t(texts.playVideo)}
+                        </span>
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    )}
+                    {hasAudio && content.audioGuide?.[language as keyof typeof content.audioGuide] && (
+                      <Button 
+                        variant="outline"
+                        className="w-full justify-between"
+                        onClick={() => window.open(content.audioGuide![language as keyof typeof content.audioGuide]!.url, '_blank')}
+                      >
+                        <span className="flex items-center gap-2">
+                          <Headphones className="w-4 h-4" />
+                          {t(texts.listenAudio)}
+                        </span>
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    )}
+                    {hasPDF && (
+                      <Button 
+                        variant="outline"
+                        className="w-full justify-between"
+                        onClick={() => window.open(content.pdf!.url, '_blank')}
+                      >
+                        <span className="flex items-center gap-2">
+                          <FileText className="w-4 h-4" />
+                          {t(texts.downloadPDF)}
+                        </span>
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Image caption */}
+              {content.image?.caption && (
+                <p className="text-xs text-muted-foreground italic text-center">
+                  {t(content.image.caption)}
+                </p>
+              )}
+            </div>
+          </ScrollArea>
+        </motion.div>
+      </AnimatePresence>
+
+      {/* AR Fullscreen Modal for Desktop */}
+      {hasAR && (
+        <FullscreenModal
+          isOpen={showARFullscreen}
+          onClose={() => setShowARFullscreen(false)}
+          iframeUrl={content.arExperience!.launchUrl}
+          title={t(point.title)}
+        />
+      )}
+    </>
   );
 }

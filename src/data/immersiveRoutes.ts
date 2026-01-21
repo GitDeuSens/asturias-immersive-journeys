@@ -451,13 +451,12 @@ export const immersiveRoutes: ImmersiveRoute[] = [
             } 
           },
           arExperience: {
-            launchUrl: 'https://asturias-inmersivo.app/ar/termas-valduno',
-            qrValue: 'https://asturias-inmersivo.app/ar/termas-valduno',
-            iframe3dUrl: 'https://sketchfab.com/models/termas-valduno/embed?autostart=1&ui_theme=dark',
+            launchUrl: 'https://clientes.deusens.com/tarragona/2/',
+            qrValue: 'https://clientes.deusens.com/tarragona/2/',
             instructions: {
-              es: 'Apunta tu dispositivo hacia los restos arqueológicos para ver la reconstrucción 3D de las termas. Podrás explorar el Caldarium (sala caliente), el Tepidarium (sala templada) y el sistema de calefacción por hipocausto.',
-              en: 'Point your device at the archaeological remains to see the 3D reconstruction of the baths. You can explore the Caldarium (hot room), Tepidarium (warm room) and the hypocaust heating system.',
-              fr: 'Pointez votre appareil vers les vestiges archéologiques pour voir la reconstruction 3D des thermes. Vous pourrez explorer le Caldarium (salle chaude), le Tepidarium (salle tiède) et le système de chauffage par hypocauste.'
+              es: 'Apunta tu dispositivo hacia los restos arqueológicos para ver la reconstrucción 3D de las termas romanas. Explora el Caldarium (sala caliente), el Tepidarium (sala templada) y el sistema de calefacción por hipocausto.',
+              en: 'Point your device at the archaeological remains to see the 3D reconstruction of the Roman baths. Explore the Caldarium (hot room), Tepidarium (warm room) and the hypocaust heating system.',
+              fr: 'Pointez votre appareil vers les vestiges archéologiques pour voir la reconstruction 3D des thermes romains. Explorez le Caldarium (salle chaude), le Tepidarium (salle tiède) et le système de chauffage par hypocauste.'
             }
           },
         },
