@@ -431,8 +431,8 @@ export const immersiveRoutes: ImmersiveRoute[] = [
     duration: { es: '2-3 horas', en: '2-3 hours', fr: '2-3 heures' },
     difficulty: 'easy',
     isCircular: false,
-    center: { lat: 43.3933, lng: -5.9544 },
-    maxPoints: 8,
+    center: { lat: 43.3910861, lng: -6.0052722 },
+    maxPoints: 1,
     points: [
       {
         id: 'ar13-termas-valduno',
@@ -448,8 +448,8 @@ export const immersiveRoutes: ImmersiveRoute[] = [
           fr: 'Reconstruction AR du complexe thermal romain du Ier-IIe siècle après J.-C.' 
         },
         location: { 
-          lat: 43.3933, 
-          lng: -5.9544,
+          lat: 43.3910861, 
+          lng: -6.0052722,
           address: 'Santa Eulalia de Valduno, Las Regueras, Asturias'
         },
         coverImage: termasValdunoImg,
@@ -476,8 +476,7 @@ export const immersiveRoutes: ImmersiveRoute[] = [
       },
     ],
     polyline: [
-      { lat: 43.3933, lng: -5.9544 },
-      { lat: 43.400, lng: -5.960 },
+      { lat: 43.3910861, lng: -6.0052722 },
     ],
   },
 
