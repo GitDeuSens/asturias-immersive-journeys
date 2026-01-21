@@ -118,7 +118,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
               {/* Points */}
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
                 <MapPin className="w-4 h-4 text-primary" />
-                {route.maxPoints} {t(texts.points)}
+                {route.points.length} {t(texts.points)}
               </span>
 
               {/* Difficulty */}

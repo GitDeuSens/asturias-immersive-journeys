@@ -78,7 +78,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
             </h2>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-xs text-muted-foreground">
-                {route.points.length}/{route.maxPoints} {t(texts.points)}
+                {route.points.length} {t(texts.points)}
               </span>
               {route.isCircular && (
                 <span className="flex items-center gap-1 text-[10px] text-primary font-medium">
