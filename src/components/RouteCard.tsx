@@ -94,7 +94,7 @@ export function RouteCard({ route, onClick }: RouteCardProps) {
           {/* Points count */}
           <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
             <MapPin className="w-3 h-3" />
-            {route.points.length}/{route.maxPoints} pts
+            {route.points.length} pts
           </span>
 
           {/* Difficulty */}
