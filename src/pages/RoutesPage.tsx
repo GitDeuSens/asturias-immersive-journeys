@@ -16,6 +16,7 @@ import { CategoryChips } from '@/components/CategoryChips';
 import { RouteCard } from '@/components/RouteCard';
 import { RouteDetailSheet } from '@/components/RouteDetailSheet';
 import { RouteExplorerView } from '@/components/RouteExplorerView';
+import { PointDetailSheet } from '@/components/PointDetailSheet';
 import { immersiveRoutes, ImmersiveRoute, RoutePoint } from '@/data/immersiveRoutes';
 import { categories } from '@/data/mockData';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -350,6 +351,14 @@ export function RoutesPage() {
             setSelectedRoute(null);
           }}
           onEnterRoute={handleEnterRoute}
+        />
+      )}
+
+      {/* Point Detail Sheet */}
+      {selectedPoint && (
+        <PointDetailSheet 
+          point={selectedPoint}
+          onClose={() => setSelectedPoint(null)}
         />
       )}
     </div>
