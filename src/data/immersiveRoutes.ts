@@ -1038,63 +1038,6 @@ export const immersiveRoutes: ImmersiveRoute[] = [
       { lat: 43.535, lng: -7.020 },
     ],
   },
-
-  {
-    id: 'AR-27',
-    title: { es: 'Cocina de Paisaje · Somiedo', en: 'Landscape Cuisine · Somiedo', fr: 'Cuisine de Paysage · Somiedo' },
-    shortDescription: { es: 'Alta montaña y productos de la Reserva de la Biosfera', en: 'High mountain and products from the Biosphere Reserve', fr: 'Haute montagne et produits de la Réserve de Biosphère' },
-    coverImage: picosImg,
-    theme: { es: 'Alta montaña', en: 'High mountain', fr: 'Haute montagne' },
-    categoryIds: ['gastronomy', 'nature', 'adventure'],
-    duration: { es: '1-2 días', en: '1-2 days', fr: '1-2 jours' },
-    difficulty: 'hard',
-    isCircular: false,
-    center: { lat: 43.057, lng: -6.250 },
-    maxPoints: 8,
-    points: [],
-    polyline: [
-      { lat: 43.050, lng: -6.260 },
-      { lat: 43.064, lng: -6.240 },
-    ],
-  },
-
-  {
-    id: 'AR-28',
-    title: { es: 'Cocina de Paisaje · Tineo', en: 'Landscape Cuisine · Tineo', fr: 'Cuisine de Paysage · Tineo' },
-    shortDescription: { es: 'Territorio rural y productos de la tierra', en: 'Rural territory and local products', fr: 'Territoire rural et produits du terroir' },
-    coverImage: laboralImg,
-    theme: { es: 'Territorio rural', en: 'Rural territory', fr: 'Territoire rural' },
-    categoryIds: ['gastronomy'],
-    duration: { es: '1 día', en: '1 day', fr: '1 jour' },
-    difficulty: 'medium',
-    isCircular: false,
-    center: { lat: 43.335, lng: -6.414 },
-    maxPoints: 9,
-    points: [],
-    polyline: [
-      { lat: 43.330, lng: -6.420 },
-      { lat: 43.340, lng: -6.408 },
-    ],
-  },
-
-  {
-    id: 'AR-29',
-    title: { es: 'Cocina de Paisaje · Allande', en: 'Landscape Cuisine · Allande', fr: 'Cuisine de Paysage · Allande' },
-    shortDescription: { es: 'Paisaje y producto en el corazón del suroccidente', en: 'Landscape and product in the heart of the southwest', fr: 'Paysage et produit au cœur du sud-ouest' },
-    coverImage: laboralImg,
-    theme: { es: 'Paisaje y producto', en: 'Landscape and product', fr: 'Paysage et produit' },
-    categoryIds: ['gastronomy', 'nature'],
-    duration: { es: '1 día', en: '1 day', fr: '1 jour' },
-    difficulty: 'medium',
-    isCircular: false,
-    center: { lat: 43.259, lng: -6.604 },
-    maxPoints: 8,
-    points: [],
-    polyline: [
-      { lat: 43.254, lng: -6.610 },
-      { lat: 43.264, lng: -6.598 },
-    ],
-  },
 ];
 
 // ============ HELPER FUNCTIONS ============
