@@ -1196,41 +1196,107 @@ export interface Tour360 {
   }[];
 }
 
+// Importar imagen del Ecomuseo
+import ecomuseoSamunoImg from '@/assets/ecomuseo-samuno.jpg';
+
 export const tours360: Tour360[] = [
   {
-    id: 'tour-covadonga',
-    title: { es: 'Lagos de Covadonga 360°', en: 'Lakes of Covadonga 360°', fr: 'Lacs de Covadonga 360°' },
-    categoryIds: ['nature'],
-    coverImage: covadongaImg,
+    id: 'tour-ecomuseo-samuno',
+    title: { es: 'Ecomuseo Minero Valle de Samuño', en: 'Samuño Valley Mining Ecomuseum', fr: 'Écomusée Minier Vallée de Samuño' },
+    categoryIds: ['culture', 'heritage'],
+    coverImage: ecomuseoSamunoImg,
     scenes: [
-      { id: 'scene1', title: 'Lago Enol', imageUrl: covadongaImg, hotspots: [] },
+      { id: 'scene1', title: 'Galerías mineras', imageUrl: ecomuseoSamunoImg, hotspots: [] },
     ],
   },
   {
-    id: 'tour-cares',
-    title: { es: 'Ruta del Cares Virtual', en: 'Virtual Cares Trail', fr: 'Sentier du Cares Virtuel' },
-    categoryIds: ['nature', 'adventure'],
-    coverImage: caresImg,
+    id: 'tour-meiq',
+    title: { es: 'MEIQ – Museo Etnográfico e Industrial de Quirós', en: 'MEIQ – Quirós Ethnographic & Industrial Museum', fr: 'MEIQ – Musée Ethnographique et Industriel de Quirós' },
+    categoryIds: ['culture', 'heritage'],
+    coverImage: laboralImg,
     scenes: [
-      { id: 'scene1', title: 'Poncebos', imageUrl: caresImg, hotspots: [] },
+      { id: 'scene1', title: 'Colecciones y talleres', imageUrl: laboralImg, hotspots: [] },
     ],
   },
   {
-    id: 'tour-preromanico',
-    title: { es: 'Prerrománico Asturiano', en: 'Asturian Pre-Romanesque', fr: 'Préroman Asturien' },
-    categoryIds: ['heritage', 'culture'],
-    coverImage: preromanicoImg,
+    id: 'tour-mina-arnao',
+    title: { es: 'Museo de la Mina de Arnao', en: 'Arnao Mine Museum', fr: 'Musée de la Mine d\'Arnao' },
+    categoryIds: ['culture', 'heritage'],
+    coverImage: laboralImg,
     scenes: [
-      { id: 'scene1', title: 'Santa María del Naranco', imageUrl: preromanicoImg, hotspots: [] },
+      { id: 'scene1', title: 'Galerías y casa de bombas', imageUrl: laboralImg, hotspots: [] },
     ],
   },
   {
-    id: 'tour-picos',
-    title: { es: 'Picos de Europa', en: 'Peaks of Europe', fr: 'Pics d\'Europe' },
-    categoryIds: ['nature', 'adventure'],
-    coverImage: picosImg,
+    id: 'tour-mumi',
+    title: { es: 'MUMI – Museo de la Minería y la Industria de Asturias', en: 'MUMI – Asturias Mining & Industry Museum', fr: 'MUMI – Musée de la Mine et de l\'Industrie des Asturies' },
+    categoryIds: ['culture', 'heritage'],
+    coverImage: laboralImg,
     scenes: [
-      { id: 'scene1', title: 'Naranjo de Bulnes', imageUrl: picosImg, hotspots: [] },
+      { id: 'scene1', title: 'Salas y piezas clave', imageUrl: laboralImg, hotspots: [] },
+    ],
+  },
+  {
+    id: 'tour-siderurgia',
+    title: { es: 'Museo de la Siderurgia de Asturias', en: 'Asturias Steelworks Museum', fr: 'Musée de la Sidérurgie des Asturies' },
+    categoryIds: ['culture', 'heritage'],
+    coverImage: laboralImg,
+    scenes: [
+      { id: 'scene1', title: 'Patrimonio siderúrgico', imageUrl: laboralImg, hotspots: [] },
+    ],
+  },
+  {
+    id: 'tour-ferrocarril',
+    title: { es: 'Museo del Ferrocarril de Asturias', en: 'Asturias Railway Museum', fr: 'Musée du Chemin de Fer des Asturies' },
+    categoryIds: ['culture', 'heritage'],
+    coverImage: laboralImg,
+    scenes: [
+      { id: 'scene1', title: 'Material móvil e instalaciones', imageUrl: laboralImg, hotspots: [] },
+    ],
+  },
+  {
+    id: 'tour-oro',
+    title: { es: 'Museo del Oro de Asturias', en: 'Asturias Gold Museum', fr: 'Musée de l\'Or des Asturies' },
+    categoryIds: ['culture', 'heritage'],
+    coverImage: laboralImg,
+    scenes: [
+      { id: 'scene1', title: 'Proceso del oro', imageUrl: laboralImg, hotspots: [] },
+    ],
+  },
+  {
+    id: 'tour-bustiello',
+    title: { es: 'Poblado Minero de Bustiello', en: 'Bustiello Mining Village', fr: 'Village Minier de Bustiello' },
+    categoryIds: ['culture', 'heritage'],
+    coverImage: laboralImg,
+    scenes: [
+      { id: 'scene1', title: 'Conjunto histórico y capilla', imageUrl: laboralImg, hotspots: [] },
+    ],
+  },
+  {
+    id: 'tour-pozo-fondon',
+    title: { es: 'Pozo Fondón', en: 'Fondón Mine Shaft', fr: 'Puits Fondón' },
+    categoryIds: ['culture', 'heritage'],
+    coverImage: laboralImg,
+    scenes: [
+      { id: 'scene1', title: 'Castillete y dependencias', imageUrl: laboralImg, hotspots: [] },
+    ],
+  },
+  {
+    id: 'tour-pozo-santa-barbara',
+    title: { es: 'Pozo Santa Bárbara', en: 'Santa Bárbara Mine Shaft', fr: 'Puits Santa Bárbara' },
+    categoryIds: ['culture', 'heritage'],
+    coverImage: laboralImg,
+    scenes: [
+      { id: 'scene1', title: 'Pozo y entorno', imageUrl: laboralImg, hotspots: [] },
+    ],
+  },
+  {
+    id: 'tour-pozo-soton',
+    title: { es: 'Pozo Sotón y CEMM', en: 'Sotón Shaft & Mining Memory Centre', fr: 'Puits Sotón et Centre de Mémoire Minière' },
+    categoryIds: ['culture', 'heritage'],
+    coverImage: laboralImg,
+    scenes: [
+      { id: 'scene1', title: 'Centro de memoria minera', imageUrl: laboralImg, hotspots: [] },
     ],
   },
 ];
