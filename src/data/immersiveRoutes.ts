@@ -11,6 +11,14 @@ import caresImg from '@/assets/cares.jpg';
 import picosImg from '@/assets/picos.jpg';
 import llastresImg from '@/assets/llastres.jpg';
 import termasValdunoImg from '@/assets/termas-valduno.webp';
+// Ruta de la Sidra assets
+import rutaSidraCoverImg from '@/assets/ruta-sidra-cover.jpg';
+import torazuImg from '@/assets/torazu.jpg';
+import museoSidraImg from '@/assets/museo-sidra.jpg';
+import narzanaImg from '@/assets/narzana.jpg';
+import valdediosImg from '@/assets/valdedios.jpg';
+import mujaImg from '@/assets/muja.jpg';
+import jardinBotanicoImg from '@/assets/jardin-botanico.jpg';
 
 // ============ TIPOS ============
 
@@ -530,20 +538,334 @@ export const immersiveRoutes: ImmersiveRoute[] = [
   // =============== RUTAS COCINA DE PAISAJE (AR-17 a AR-29) ===============
   {
     id: 'AR-17',
-    title: { es: 'Cocina de Paisaje · Oriente', en: 'Landscape Cuisine · East', fr: 'Cuisine de Paysage · Est' },
-    shortDescription: { es: 'Gastronomía y territorio en el oriente asturiano', en: 'Gastronomy and territory in eastern Asturias', fr: 'Gastronomie et territoire dans l\'est des Asturies' },
-    coverImage: covadongaImg,
-    theme: { es: 'Gastronomía y territorio', en: 'Gastronomy and territory', fr: 'Gastronomie et territoire' },
-    categoryIds: ['gastronomy', 'nature'],
-    duration: { es: '1 día', en: '1 day', fr: '1 jour' },
-    difficulty: 'medium',
+    title: { 
+      es: 'Ruta de la Sidra', 
+      en: 'Cider Route', 
+      fr: 'Route du Cidre' 
+    },
+    shortDescription: { 
+      es: 'De las pumaradas rurales a la cultura urbana del escanciado', 
+      en: 'From rural apple orchards to the urban culture of cider pouring', 
+      fr: 'Des vergers ruraux à la culture urbaine du service du cidre' 
+    },
+    fullDescription: {
+      es: 'Un recorrido cultural y territorial que conecta la cultura sidrera asturiana desde el ámbito rural —pumaradas, pueblos tradicionales y llagares centenarios—, pasando por patrimonio histórico y museos de referencia, hasta su culminación urbana en Gijón/Xixón. Una experiencia inmersiva que permite comprender cómo la sidra ha moldeado el paisaje, la arquitectura y la identidad asturiana.',
+      en: 'A cultural and territorial journey connecting Asturian cider culture from the rural realm —apple orchards, traditional villages and centuries-old cider houses—, through historical heritage and renowned museums, to its urban culmination in Gijón/Xixón. An immersive experience to understand how cider has shaped the landscape, architecture and Asturian identity.',
+      fr: 'Un parcours culturel et territorial reliant la culture cidricole asturienne depuis le milieu rural —vergers, villages traditionnels et cidreries centenaires—, en passant par le patrimoine historique et les musées de référence, jusqu\'à son aboutissement urbain à Gijón/Xixón.'
+    },
+    coverImage: rutaSidraCoverImg,
+    theme: { es: 'Gastronomía y cultura sidrera', en: 'Gastronomy and cider culture', fr: 'Gastronomie et culture du cidre' },
+    categoryIds: ['gastronomy', 'heritage', 'culture'],
+    duration: { es: '2-3 días', en: '2-3 days', fr: '2-3 jours' },
+    difficulty: 'easy',
     isCircular: false,
-    center: { lat: 43.358, lng: -4.840 },
-    maxPoints: 9,
-    points: [],
+    center: { lat: 43.4467, lng: -5.4049 },
+    maxPoints: 7,
+    points: [
+      // 1️⃣ Torazu - AR
+      {
+        id: 'ar17-torazu',
+        order: 1,
+        title: { 
+          es: 'Torazu', 
+          en: 'Torazu', 
+          fr: 'Torazu' 
+        },
+        shortDescription: { 
+          es: 'Pueblo tradicional de Cabranes, cuna de la cultura sidrera rural con arquitectura popular y pumaradas centenarias', 
+          en: 'Traditional village of Cabranes, cradle of rural cider culture with folk architecture and centuries-old apple orchards', 
+          fr: 'Village traditionnel de Cabranes, berceau de la culture cidricole rurale avec architecture populaire et vergers centenaires' 
+        },
+        location: { 
+          lat: 43.3879, 
+          lng: -5.3856,
+          address: 'Torazu, Cabranes, Asturias'
+        },
+        coverImage: torazuImg,
+        content: {
+          image: { 
+            url: torazuImg, 
+            caption: { 
+              es: 'Vista del pueblo de Torazu con sus hórreos y paneras tradicionales', 
+              en: 'View of Torazu village with its traditional granaries', 
+              fr: 'Vue du village de Torazu avec ses greniers traditionnels' 
+            } 
+          },
+          audioGuide: {
+            es: { url: '/audio/torazu-es.mp3', durationSec: 180 },
+            en: { url: '/audio/torazu-en.mp3', durationSec: 175 },
+            fr: { url: '/audio/torazu-fr.mp3', durationSec: 185 },
+          },
+          arExperience: {
+            launchUrl: 'https://asturias-inmersivo.app/ar/torazu',
+            qrValue: 'https://asturias-inmersivo.app/ar/torazu',
+            instructions: {
+              es: 'Apunta tu dispositivo hacia las edificaciones tradicionales para ver la recreación de la vida rural sidrera: el proceso de recogida de manzana, el trabajo en el llagar y las celebraciones del espichu.',
+              en: 'Point your device at the traditional buildings to see the recreation of rural cider life: the apple harvest process, work in the cider press and the espichu celebrations.',
+              fr: 'Pointez votre appareil vers les bâtiments traditionnels pour voir la recréation de la vie cidricole rurale: la récolte des pommes, le travail au pressoir et les célébrations de l\'espichu.'
+            }
+          },
+        },
+        tags: ['sidra', 'rural', 'arquitectura', 'AR'],
+      },
+      // 2️⃣ Museo de la Sidra - AR
+      {
+        id: 'ar17-museo-sidra',
+        order: 2,
+        title: { 
+          es: 'Museo de la Sidra de Asturias', 
+          en: 'Asturias Cider Museum', 
+          fr: 'Musée du Cidre des Asturies' 
+        },
+        shortDescription: { 
+          es: 'Centro de interpretación de la cultura sidrera asturiana en Nava, capital de la sidra', 
+          en: 'Interpretation center of Asturian cider culture in Nava, the cider capital', 
+          fr: 'Centre d\'interprétation de la culture cidricole asturienne à Nava, capitale du cidre' 
+        },
+        location: { 
+          lat: 43.3586, 
+          lng: -5.5053,
+          address: 'Plaza Príncipe de Asturias, Nava, Asturias'
+        },
+        coverImage: museoSidraImg,
+        content: {
+          image: { 
+            url: museoSidraImg, 
+            caption: { 
+              es: 'Fachada del Museo de la Sidra de Asturias', 
+              en: 'Facade of the Asturias Cider Museum', 
+              fr: 'Façade du Musée du Cidre des Asturies' 
+            } 
+          },
+          audioGuide: {
+            es: { url: '/audio/museo-sidra-es.mp3', durationSec: 240 },
+            en: { url: '/audio/museo-sidra-en.mp3', durationSec: 235 },
+            fr: { url: '/audio/museo-sidra-fr.mp3', durationSec: 245 },
+          },
+          arExperience: {
+            launchUrl: 'https://asturias-inmersivo.app/ar/museo-sidra',
+            qrValue: 'https://asturias-inmersivo.app/ar/museo-sidra',
+            instructions: {
+              es: 'Visualiza en AR el proceso completo de elaboración de la sidra: desde la pumarada hasta el escanciado. Explora un llagar virtual y aprende las técnicas tradicionales.',
+              en: 'Visualize in AR the complete cider-making process: from the orchard to the pouring. Explore a virtual cider press and learn traditional techniques.',
+              fr: 'Visualisez en RA le processus complet d\'élaboration du cidre: du verger au service. Explorez un pressoir virtuel et apprenez les techniques traditionnelles.'
+            }
+          },
+        },
+        tags: ['sidra', 'museo', 'gastronomía', 'AR'],
+      },
+      // 3️⃣ Iglesia de Santa María de Narzana - INFO
+      {
+        id: 'ar17-narzana',
+        order: 3,
+        title: { 
+          es: 'Iglesia de Santa María de Narzana', 
+          en: 'Church of Santa María de Narzana', 
+          fr: 'Église de Santa María de Narzana' 
+        },
+        shortDescription: { 
+          es: 'Joya del románico rural asturiano del siglo XII en el municipio de Sariego', 
+          en: '12th century jewel of Asturian rural Romanesque in Sariego municipality', 
+          fr: 'Joyau du roman rural asturien du XIIe siècle dans la commune de Sariego' 
+        },
+        location: { 
+          lat: 43.4021, 
+          lng: -5.5674,
+          address: 'Narzana, Sariego, Asturias'
+        },
+        coverImage: narzanaImg,
+        content: {
+          image: { 
+            url: narzanaImg, 
+            caption: { 
+              es: 'Portada románica de la Iglesia de Santa María de Narzana', 
+              en: 'Romanesque portal of the Church of Santa María de Narzana', 
+              fr: 'Portail roman de l\'Église de Santa María de Narzana' 
+            } 
+          },
+          audioGuide: {
+            es: { url: '/audio/narzana-es.mp3', durationSec: 150 },
+            en: { url: '/audio/narzana-en.mp3', durationSec: 145 },
+            fr: { url: '/audio/narzana-fr.mp3', durationSec: 155 },
+          },
+        },
+        tags: ['románico', 'patrimonio', 'iglesia'],
+      },
+      // 4️⃣ Conjunto Monumental de Valdediós - AR
+      {
+        id: 'ar17-valdedios',
+        order: 4,
+        title: { 
+          es: 'Conjunto Monumental de Valdediós', 
+          en: 'Valdediós Monumental Complex', 
+          fr: 'Ensemble Monumental de Valdediós' 
+        },
+        shortDescription: { 
+          es: 'Iglesia prerrománica de San Salvador (s. IX) y Monasterio cisterciense, Patrimonio de la Humanidad UNESCO', 
+          en: 'Pre-Romanesque Church of San Salvador (9th c.) and Cistercian Monastery, UNESCO World Heritage', 
+          fr: 'Église prérromane de San Salvador (IXe s.) et Monastère cistercien, Patrimoine Mondial UNESCO' 
+        },
+        location: { 
+          lat: 43.4467, 
+          lng: -5.4049,
+          address: 'Valdediós, Villaviciosa, Asturias'
+        },
+        coverImage: valdediosImg,
+        content: {
+          image: { 
+            url: valdediosImg, 
+            caption: { 
+              es: 'Iglesia prerrománica de San Salvador de Valdediós, conocida como "El Conventín"', 
+              en: 'Pre-Romanesque Church of San Salvador de Valdediós, known as "El Conventín"', 
+              fr: 'Église prérromane de San Salvador de Valdediós, connue sous le nom de "El Conventín"' 
+            } 
+          },
+          audioGuide: {
+            es: { url: '/audio/valdedios-es.mp3', durationSec: 210 },
+            en: { url: '/audio/valdedios-en.mp3', durationSec: 205 },
+            fr: { url: '/audio/valdedios-fr.mp3', durationSec: 215 },
+          },
+          arExperience: {
+            launchUrl: 'https://asturias-inmersivo.app/ar/valdedios',
+            qrValue: 'https://asturias-inmersivo.app/ar/valdedios',
+            instructions: {
+              es: 'Visualiza la reconstrucción histórica del conjunto monástico: explora el estado original del siglo IX, las ampliaciones cistercienses y la evolución arquitectónica hasta nuestros días.',
+              en: 'Visualize the historical reconstruction of the monastic complex: explore the original 9th century state, Cistercian expansions and architectural evolution to the present day.',
+              fr: 'Visualisez la reconstruction historique du complexe monastique: explorez l\'état original du IXe siècle, les extensions cisterciennes et l\'évolution architecturale jusqu\'à nos jours.'
+            }
+          },
+        },
+        tags: ['prerrománico', 'UNESCO', 'monasterio', 'AR'],
+      },
+      // 5️⃣ MUJA - INFO
+      {
+        id: 'ar17-muja',
+        order: 5,
+        title: { 
+          es: 'Museo del Jurásico de Asturias (MUJA)', 
+          en: 'Jurassic Museum of Asturias (MUJA)', 
+          fr: 'Musée du Jurassique des Asturies (MUJA)' 
+        },
+        shortDescription: { 
+          es: 'Referente paleontológico con la mayor colección de icnitas de dinosaurio de la costa cantábrica', 
+          en: 'Paleontological reference with the largest dinosaur footprint collection on the Cantabrian coast', 
+          fr: 'Référence paléontologique avec la plus grande collection d\'empreintes de dinosaures de la côte cantabrique' 
+        },
+        location: { 
+          lat: 43.4753, 
+          lng: -5.1915,
+          address: 'Rasa de San Telmo, Colunga, Asturias'
+        },
+        coverImage: mujaImg,
+        content: {
+          image: { 
+            url: mujaImg, 
+            caption: { 
+              es: 'Vista exterior del MUJA con su icónica forma de huella de dinosaurio', 
+              en: 'Exterior view of MUJA with its iconic dinosaur footprint shape', 
+              fr: 'Vue extérieure du MUJA avec sa forme iconique d\'empreinte de dinosaure' 
+            } 
+          },
+          audioGuide: {
+            es: { url: '/audio/muja-es.mp3', durationSec: 190 },
+            en: { url: '/audio/muja-en.mp3', durationSec: 185 },
+            fr: { url: '/audio/muja-fr.mp3', durationSec: 195 },
+          },
+        },
+        tags: ['museo', 'dinosaurios', 'paleontología'],
+      },
+      // 6️⃣ Laboral Ciudad de la Cultura - AR
+      {
+        id: 'ar17-laboral',
+        order: 6,
+        title: { 
+          es: 'Laboral Ciudad de la Cultura', 
+          en: 'Laboral City of Culture', 
+          fr: 'Laboral Cité de la Culture' 
+        },
+        shortDescription: { 
+          es: 'El edificio más grande de España: de Universidad Laboral a epicentro cultural de Gijón', 
+          en: 'Spain\'s largest building: from Workers\' University to Gijón\'s cultural epicenter', 
+          fr: 'Le plus grand bâtiment d\'Espagne: de l\'Université Ouvrière à l\'épicentre culturel de Gijón' 
+        },
+        location: { 
+          lat: 43.5225, 
+          lng: -5.6394,
+          address: 'C/ Luis Moya Blanco, 261, Gijón, Asturias'
+        },
+        coverImage: laboralImg,
+        content: {
+          image: { 
+            url: laboralImg, 
+            caption: { 
+              es: 'Torre de la Laboral con su icónica cúpula y el patio central', 
+              en: 'Laboral Tower with its iconic dome and central courtyard', 
+              fr: 'Tour de la Laboral avec sa coupole iconique et la cour centrale' 
+            } 
+          },
+          audioGuide: {
+            es: { url: '/audio/laboral-es.mp3', durationSec: 220 },
+            en: { url: '/audio/laboral-en.mp3', durationSec: 215 },
+            fr: { url: '/audio/laboral-fr.mp3', durationSec: 225 },
+          },
+          arExperience: {
+            launchUrl: 'https://asturias-inmersivo.app/ar/laboral',
+            qrValue: 'https://asturias-inmersivo.app/ar/laboral',
+            instructions: {
+              es: 'Visualiza la evolución arquitectónica del conjunto: desde su construcción como Universidad Laboral en los años 40 hasta su transformación en Ciudad de la Cultura. Explora espacios inaccesibles y detalles ocultos.',
+              en: 'Visualize the architectural evolution of the complex: from its construction as Workers\' University in the 1940s to its transformation into City of Culture. Explore inaccessible spaces and hidden details.',
+              fr: 'Visualisez l\'évolution architecturale du complexe: de sa construction comme Université Ouvrière dans les années 40 à sa transformation en Cité de la Culture. Explorez des espaces inaccessibles et des détails cachés.'
+            }
+          },
+        },
+        tags: ['arquitectura', 'cultura', 'patrimonio', 'AR'],
+      },
+      // 7️⃣ Barrio de Cimavilla - INFO
+      {
+        id: 'ar17-cimavilla',
+        order: 7,
+        title: { 
+          es: 'Barrio de Cimavilla', 
+          en: 'Cimavilla Quarter', 
+          fr: 'Quartier de Cimavilla' 
+        },
+        shortDescription: { 
+          es: 'El casco antiguo marinero de Gijón: sidrerías, cultura popular y el Elogio del Horizonte de Chillida', 
+          en: 'Gijón\'s old seafaring quarter: cider houses, popular culture and Chillida\'s Eulogy to the Horizon', 
+          fr: 'Le vieux quartier maritime de Gijón: cidreries, culture populaire et l\'Éloge de l\'Horizon de Chillida' 
+        },
+        location: { 
+          lat: 43.5450, 
+          lng: -5.6612,
+          address: 'Cimavilla, Gijón, Asturias'
+        },
+        coverImage: cimavillaImg,
+        content: {
+          image: { 
+            url: cimavillaImg, 
+            caption: { 
+              es: 'Vista del barrio de Cimavilla desde el puerto deportivo', 
+              en: 'View of Cimavilla quarter from the marina', 
+              fr: 'Vue du quartier de Cimavilla depuis le port de plaisance' 
+            } 
+          },
+          audioGuide: {
+            es: { url: '/audio/cimavilla-es.mp3', durationSec: 200 },
+            en: { url: '/audio/cimavilla-en.mp3', durationSec: 195 },
+            fr: { url: '/audio/cimavilla-fr.mp3', durationSec: 205 },
+          },
+        },
+        tags: ['sidra', 'urbano', 'gastronomía', 'arte'],
+      },
+    ],
     polyline: [
-      { lat: 43.350, lng: -4.850 },
-      { lat: 43.366, lng: -4.830 },
+      { lat: 43.3879, lng: -5.3856 }, // Torazu
+      { lat: 43.3586, lng: -5.5053 }, // Museo Sidra
+      { lat: 43.4021, lng: -5.5674 }, // Narzana
+      { lat: 43.4467, lng: -5.4049 }, // Valdediós
+      { lat: 43.4753, lng: -5.1915 }, // MUJA
+      { lat: 43.5225, lng: -5.6394 }, // Laboral
+      { lat: 43.5450, lng: -5.6612 }, // Cimavilla
     ],
   },
 
