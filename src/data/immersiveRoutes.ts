@@ -19,6 +19,9 @@ import narzanaImg from '@/assets/narzana.jpg';
 import valdediosImg from '@/assets/valdedios.jpg';
 import mujaImg from '@/assets/muja.jpg';
 import jardinBotanicoImg from '@/assets/jardin-botanico.jpg';
+import prerromanicoImg from '@/assets/preromanico.jpg';
+import playaGriegaImg from '@/assets/playa-griega.jpg';
+import horreoImg from '@/assets/horreo.jpg';
 
 // ============ TIPOS ============
 
@@ -27,6 +30,7 @@ export type Language = 'es' | 'en' | 'fr';
 // Contenido multimedia flexible para cada punto
 export interface RoutePointContent {
   image?: { url: string; caption?: Record<Language, string> };
+  gallery?: Array<{ url: string; caption?: Record<Language, string> }>;
   video?: { url: string; caption?: Record<Language, string> };
   pdf?: { url: string; title: Record<Language, string> };
   audioGuide?: {
@@ -591,11 +595,6 @@ export const immersiveRoutes: ImmersiveRoute[] = [
               fr: 'Vue du village de Torazu avec ses greniers traditionnels' 
             } 
           },
-          audioGuide: {
-            es: { url: '/audio/torazu-es.mp3', durationSec: 180 },
-            en: { url: '/audio/torazu-en.mp3', durationSec: 175 },
-            fr: { url: '/audio/torazu-fr.mp3', durationSec: 185 },
-          },
           arExperience: {
             launchUrl: 'https://asturias-inmersivo.app/ar/torazu',
             qrValue: 'https://asturias-inmersivo.app/ar/torazu',
@@ -636,11 +635,6 @@ export const immersiveRoutes: ImmersiveRoute[] = [
               en: 'Facade of the Asturias Cider Museum', 
               fr: 'Façade du Musée du Cidre des Asturies' 
             } 
-          },
-          audioGuide: {
-            es: { url: '/audio/museo-sidra-es.mp3', durationSec: 240 },
-            en: { url: '/audio/museo-sidra-en.mp3', durationSec: 235 },
-            fr: { url: '/audio/museo-sidra-fr.mp3', durationSec: 245 },
           },
           arExperience: {
             launchUrl: 'https://asturias-inmersivo.app/ar/museo-sidra',
@@ -683,6 +677,10 @@ export const immersiveRoutes: ImmersiveRoute[] = [
               fr: 'Portail roman de l\'Église de Santa María de Narzana' 
             } 
           },
+          gallery: [
+            { url: narzanaImg, caption: { es: 'Fachada principal', en: 'Main facade', fr: 'Façade principale' } },
+            { url: prerromanicoImg, caption: { es: 'Detalle arquitectónico románico', en: 'Romanesque architectural detail', fr: 'Détail architectural roman' } },
+          ],
           audioGuide: {
             es: { url: '/audio/narzana-es.mp3', durationSec: 150 },
             en: { url: '/audio/narzana-en.mp3', durationSec: 145 },
@@ -719,11 +717,6 @@ export const immersiveRoutes: ImmersiveRoute[] = [
               en: 'Pre-Romanesque Church of San Salvador de Valdediós, known as "El Conventín"', 
               fr: 'Église prérromane de San Salvador de Valdediós, connue sous le nom de "El Conventín"' 
             } 
-          },
-          audioGuide: {
-            es: { url: '/audio/valdedios-es.mp3', durationSec: 210 },
-            en: { url: '/audio/valdedios-en.mp3', durationSec: 205 },
-            fr: { url: '/audio/valdedios-fr.mp3', durationSec: 215 },
           },
           arExperience: {
             launchUrl: 'https://asturias-inmersivo.app/ar/valdedios',
@@ -766,6 +759,10 @@ export const immersiveRoutes: ImmersiveRoute[] = [
               fr: 'Vue extérieure du MUJA avec sa forme iconique d\'empreinte de dinosaure' 
             } 
           },
+          gallery: [
+            { url: mujaImg, caption: { es: 'Edificio del MUJA', en: 'MUJA building', fr: 'Bâtiment du MUJA' } },
+            { url: playaGriegaImg, caption: { es: 'Playa de La Griega con icnitas de dinosaurio', en: 'La Griega Beach with dinosaur footprints', fr: 'Plage de La Griega avec empreintes de dinosaures' } },
+          ],
           audioGuide: {
             es: { url: '/audio/muja-es.mp3', durationSec: 190 },
             en: { url: '/audio/muja-en.mp3', durationSec: 185 },
@@ -802,11 +799,6 @@ export const immersiveRoutes: ImmersiveRoute[] = [
               en: 'Laboral Tower with its iconic dome and central courtyard', 
               fr: 'Tour de la Laboral avec sa coupole iconique et la cour centrale' 
             } 
-          },
-          audioGuide: {
-            es: { url: '/audio/laboral-es.mp3', durationSec: 220 },
-            en: { url: '/audio/laboral-en.mp3', durationSec: 215 },
-            fr: { url: '/audio/laboral-fr.mp3', durationSec: 225 },
           },
           arExperience: {
             launchUrl: 'https://asturias-inmersivo.app/ar/laboral',
@@ -849,6 +841,10 @@ export const immersiveRoutes: ImmersiveRoute[] = [
               fr: 'Vue du quartier de Cimavilla depuis le port de plaisance' 
             } 
           },
+          gallery: [
+            { url: cimavillaImg, caption: { es: 'Puerto de Gijón y Cimavilla', en: 'Gijón Port and Cimavilla', fr: 'Port de Gijón et Cimavilla' } },
+            { url: llastresImg, caption: { es: 'Arquitectura marinera asturiana', en: 'Asturian maritime architecture', fr: 'Architecture maritime asturienne' } },
+          ],
           audioGuide: {
             es: { url: '/audio/cimavilla-es.mp3', durationSec: 200 },
             en: { url: '/audio/cimavilla-en.mp3', durationSec: 195 },
