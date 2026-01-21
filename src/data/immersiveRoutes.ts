@@ -559,7 +559,7 @@ export const immersiveRoutes: ImmersiveRoute[] = [
     duration: { es: '2-3 días', en: '2-3 days', fr: '2-3 jours' },
     difficulty: 'easy',
     isCircular: false,
-    center: { lat: 43.4467, lng: -5.4049 },
+    center: { lat: 43.42, lng: -5.48 },
     maxPoints: 7,
     points: [
       // 1️⃣ Torazu - AR
