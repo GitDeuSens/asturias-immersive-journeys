@@ -10,6 +10,7 @@ import covadongaImg from '@/assets/covadonga.jpg';
 import caresImg from '@/assets/cares.jpg';
 import picosImg from '@/assets/picos.jpg';
 import llastresImg from '@/assets/llastres.jpg';
+import termasValdunoImg from '@/assets/termas-valduno.webp';
 
 // ============ TIPOS ============
 
@@ -407,18 +408,65 @@ export const immersiveRoutes: ImmersiveRoute[] = [
     id: 'AR-13',
     title: { es: 'Las Regueras – Termas de Valduno', en: 'Las Regueras – Valduno Baths', fr: 'Las Regueras – Thermes de Valduno' },
     shortDescription: { es: 'Ruta con reconstrucción AR de las termas romanas', en: 'Route with AR reconstruction of Roman baths', fr: 'Route avec reconstruction AR des thermes romains' },
-    coverImage: laboralImg,
+    fullDescription: {
+      es: 'Descubre las Termas Romanas de Santa Eulalia de Valduno, un excepcional conjunto termal de época romana conservado junto a la Iglesia parroquial. La reconstrucción en Realidad Aumentada te permite comprender la estructura original del Caldarium y Tepidarium, siguiendo la orientación canónica recomendada por Vitrubio.',
+      en: 'Discover the Roman Baths of Santa Eulalia de Valduno, an exceptional Roman-era thermal complex preserved next to the parish church. The Augmented Reality reconstruction allows you to understand the original structure of the Caldarium and Tepidarium, following the canonical orientation recommended by Vitruvius.',
+      fr: 'Découvrez les Thermes Romains de Santa Eulalia de Valduno, un ensemble thermal exceptionnel de l\'époque romaine conservé à côté de l\'église paroissiale. La reconstruction en Réalité Augmentée vous permet de comprendre la structure originale du Caldarium et du Tepidarium.'
+    },
+    coverImage: termasValdunoImg,
     theme: { es: 'Patrimonio romano', en: 'Roman heritage', fr: 'Patrimoine romain' },
     categoryIds: ['heritage', 'culture'],
-    duration: { es: '4 horas', en: '4 hours', fr: '4 heures' },
+    duration: { es: '2-3 horas', en: '2-3 hours', fr: '2-3 heures' },
     difficulty: 'easy',
     isCircular: false,
-    center: { lat: 43.404, lng: -5.970 },
+    center: { lat: 43.3933, lng: -5.9544 },
     maxPoints: 8,
-    points: [],
+    points: [
+      {
+        id: 'ar13-termas-valduno',
+        order: 1,
+        title: { 
+          es: 'Termas Romanas de Valduno', 
+          en: 'Roman Baths of Valduno', 
+          fr: 'Thermes Romains de Valduno' 
+        },
+        shortDescription: { 
+          es: 'Reconstrucción AR del conjunto termal romano del siglo I-II d.C.', 
+          en: 'AR reconstruction of the Roman thermal complex from the 1st-2nd century AD', 
+          fr: 'Reconstruction AR du complexe thermal romain du Ier-IIe siècle après J.-C.' 
+        },
+        location: { 
+          lat: 43.3933, 
+          lng: -5.9544,
+          address: 'Santa Eulalia de Valduno, Las Regueras, Asturias'
+        },
+        coverImage: termasValdunoImg,
+        content: {
+          image: { 
+            url: termasValdunoImg, 
+            caption: { 
+              es: 'Restos del Caldarium de las Termas de Valduno', 
+              en: 'Remains of the Caldarium of the Valduno Baths', 
+              fr: 'Vestiges du Caldarium des Thermes de Valduno' 
+            } 
+          },
+          arExperience: {
+            launchUrl: 'https://asturias-inmersivo.app/ar/termas-valduno',
+            qrValue: 'https://asturias-inmersivo.app/ar/termas-valduno',
+            iframe3dUrl: 'https://sketchfab.com/models/termas-valduno/embed?autostart=1&ui_theme=dark',
+            instructions: {
+              es: 'Apunta tu dispositivo hacia los restos arqueológicos para ver la reconstrucción 3D de las termas. Podrás explorar el Caldarium (sala caliente), el Tepidarium (sala templada) y el sistema de calefacción por hipocausto.',
+              en: 'Point your device at the archaeological remains to see the 3D reconstruction of the baths. You can explore the Caldarium (hot room), Tepidarium (warm room) and the hypocaust heating system.',
+              fr: 'Pointez votre appareil vers les vestiges archéologiques pour voir la reconstruction 3D des thermes. Vous pourrez explorer le Caldarium (salle chaude), le Tepidarium (salle tiède) et le système de chauffage par hypocauste.'
+            }
+          },
+        },
+        tags: ['romano', 'termas', 'arqueología', 'AR'],
+      },
+    ],
     polyline: [
-      { lat: 43.400, lng: -5.975 },
-      { lat: 43.408, lng: -5.965 },
+      { lat: 43.3933, lng: -5.9544 },
+      { lat: 43.400, lng: -5.960 },
     ],
   },
 
