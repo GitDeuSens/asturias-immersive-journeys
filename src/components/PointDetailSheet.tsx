@@ -12,7 +12,8 @@ import {
   ChevronRight,
   Maximize2,
   Sparkles,
-  ScanLine
+  ScanLine,
+  Image as ImageIcon
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { RoutePoint } from '@/data/immersiveRoutes';
@@ -41,12 +42,22 @@ const texts = {
   arExperience: { es: 'Experiencia de Realidad Aumentada', en: 'Augmented Reality Experience', fr: 'Expérience de Réalité Augmentée' },
   tryARDesktop: { es: 'Probar en este dispositivo', en: 'Try on this device', fr: 'Essayer sur cet appareil' },
   arRecommendation: { es: 'Recomendado: usa tu móvil para la mejor experiencia AR', en: 'Recommended: use your phone for the best AR experience', fr: 'Recommandé: utilisez votre téléphone pour la meilleure expérience AR' },
+  gallery: { es: 'Galería de imágenes', en: 'Image gallery', fr: 'Galerie d\'images' },
 };
+
+// Placeholder gallery images for demo
+const placeholderGallery = [
+  '/placeholder.svg',
+  '/placeholder.svg',
+  '/placeholder.svg',
+  '/placeholder.svg',
+];
 
 export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
   const { t, language } = useLanguage();
   const isMobile = useIsMobile();
   const [showARFullscreen, setShowARFullscreen] = useState(false);
+  const [selectedGalleryImage, setSelectedGalleryImage] = useState<string | null>(null);
 
   if (!point) return null;
 
@@ -318,6 +329,36 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                 </div>
               )}
 
+              {/* Image Gallery - shown for non-AR POIs */}
+              {!hasAR && (
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4 text-primary" />
+                    {t(texts.gallery)}
+                  </h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {placeholderGallery.map((img, index) => (
+                      <motion.button
+                        key={index}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setSelectedGalleryImage(img)}
+                        className="relative aspect-[4/3] rounded-lg overflow-hidden bg-muted border border-border/50 hover:border-primary/50 transition-colors group"
+                      >
+                        <img 
+                          src={img} 
+                          alt={`Gallery ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                          <Maximize2 className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
+                        </div>
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Image caption */}
               {content.image?.caption && (
                 <p className="text-xs text-muted-foreground italic text-center">
@@ -338,6 +379,38 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
           title={t(point.title)}
         />
       )}
+
+      {/* Gallery Fullscreen Modal */}
+      <AnimatePresence>
+        {selectedGalleryImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4"
+            onClick={() => setSelectedGalleryImage(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative max-w-4xl max-h-[80vh] w-full"
+            >
+              <img 
+                src={selectedGalleryImage} 
+                alt="Gallery fullscreen"
+                className="w-full h-full object-contain rounded-lg"
+              />
+              <button
+                onClick={() => setSelectedGalleryImage(null)}
+                className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
