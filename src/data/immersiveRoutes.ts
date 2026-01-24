@@ -584,25 +584,6 @@ export const immersiveRoutes: ImmersiveRoute[] = [
     ],
   },
 
-  {
-    id: 'AR-16',
-    title: { es: 'Soto del Barco', en: 'Soto del Barco', fr: 'Soto del Barco' },
-    shortDescription: { es: 'Ruta territorial y paisajística por el estuario del Nalón', en: 'Territorial and landscape route through the Nalón estuary', fr: 'Route territoriale et paysagère à travers l\'estuaire du Nalón' },
-    coverImage: laboralImg,
-    theme: { es: 'Paisaje fluvial', en: 'River landscape', fr: 'Paysage fluvial' },
-    categoryIds: ['nature'],
-    duration: { es: '4 horas', en: '4 hours', fr: '4 heures' },
-    difficulty: 'easy',
-    isCircular: false,
-    center: { lat: 43.533, lng: -6.069 },
-    maxPoints: 10,
-    points: [],
-    polyline: [
-      { lat: 43.528, lng: -6.074 },
-      { lat: 43.538, lng: -6.064 },
-    ],
-  },
-
   // =============== RUTAS COCINA DE PAISAJE (AR-17 a AR-29) ===============
   {
     id: 'AR-17',
