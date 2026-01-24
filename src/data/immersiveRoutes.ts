@@ -22,6 +22,7 @@ import jardinBotanicoImg from '@/assets/jardin-botanico.jpg';
 import prerromanicoImg from '@/assets/preromanico.jpg';
 import playaGriegaImg from '@/assets/playa-griega.jpg';
 import horreoImg from '@/assets/horreo.jpg';
+import sotoBarcoImg from '@/assets/soto-barco-cover.jpg';
 
 // ============ TIPOS ============
 
@@ -1099,6 +1100,474 @@ export const immersiveRoutes: ImmersiveRoute[] = [
     polyline: [
       { lat: 43.525, lng: -7.040 },
       { lat: 43.535, lng: -7.020 },
+    ],
+  },
+
+  // =============== AR-16: SOTO DEL BARCO ===============
+  {
+    id: 'AR-16',
+    title: { 
+      es: 'Soto del Barco', 
+      en: 'Soto del Barco', 
+      fr: 'Soto del Barco' 
+    },
+    shortDescription: { 
+      es: 'Historia, mar y patrimonio en la desembocadura del Nalón', 
+      en: 'History, sea and heritage at the Nalón estuary', 
+      fr: 'Histoire, mer et patrimoine à l\'embouchure du Nalón' 
+    },
+    fullDescription: {
+      es: 'Descubre Soto del Barco, donde el río Nalón encuentra el mar Cantábrico. Fábricas modernistas, tradiciones pesqueras ancestrales como la pesca de la angula, patrimonio militar y vistas espectaculares de la ría.',
+      en: 'Discover Soto del Barco, where the Nalón river meets the Cantabrian Sea. Modernist factories, ancestral fishing traditions like elver fishing, military heritage and spectacular estuary views.',
+      fr: 'Découvrez Soto del Barco, où le fleuve Nalón rencontre la mer Cantabrique. Usines modernistes, traditions de pêche ancestrales, patrimoine militaire et vues spectaculaires sur l\'estuaire.'
+    },
+    coverImage: sotoBarcoImg,
+    theme: { es: 'Patrimonio costero', en: 'Coastal heritage', fr: 'Patrimoine côtier' },
+    categoryIds: ['heritage', 'nature', 'gastronomy'],
+    duration: { es: '1 día', en: '1 day', fr: '1 jour' },
+    difficulty: 'easy',
+    isCircular: true,
+    center: { lat: 43.548, lng: -6.065 },
+    maxPoints: 9,
+    points: [
+      // 1) Antigua fábrica de Conservas Lis - AR
+      {
+        id: 'ar16-conservas-lis',
+        order: 1,
+        title: { 
+          es: 'Antigua Fábrica de Conservas Lis', 
+          en: 'Former Lis Canning Factory', 
+          fr: 'Ancienne Conserverie Lis' 
+        },
+        shortDescription: { 
+          es: 'Espectacular edificio modernista de principios del siglo XX', 
+          en: 'Spectacular modernist building from the early 20th century', 
+          fr: 'Spectaculaire bâtiment moderniste du début du XXe siècle' 
+        },
+        location: { 
+          lat: 43.55840, 
+          lng: -6.07587, 
+          address: 'Av. de los Quebrantos, San Juan de la Arena' 
+        },
+        coverImage: sotoBarcoImg,
+        content: {
+          arExperience: {
+            launchUrl: 'https://asturias.es/ar/conservas-lis',
+            qrValue: 'asturias-inmersivo://ar/conservas-lis',
+            iframe3dUrl: 'https://sketchfab.com/models/conservas-lis/embed',
+            instructions: {
+              es: 'Apunta al edificio para ver su reconstrucción virtual en su época de esplendor',
+              en: 'Point at the building to see its virtual reconstruction in its heyday',
+              fr: 'Pointez vers le bâtiment pour voir sa reconstruction virtuelle à son apogée'
+            }
+          },
+          audioGuide: {
+            es: { url: '/audio/conservas-lis-es.mp3', durationSec: 180 },
+            en: { url: '/audio/conservas-lis-en.mp3', durationSec: 175 },
+            fr: { url: '/audio/conservas-lis-fr.mp3', durationSec: 185 },
+          },
+          practicalInfo: {
+            schedule: {
+              es: 'Exterior visitable 24h (vía pública). Interior: no hay visitas regulares.',
+              en: 'Exterior viewable 24h (public road). Interior: no regular visits.',
+              fr: 'Extérieur visible 24h (voie publique). Intérieur: pas de visites régulières.'
+            },
+            prices: {
+              es: 'Gratuito (visita exterior)',
+              en: 'Free (exterior visit)',
+              fr: 'Gratuit (visite extérieure)'
+            }
+          }
+        },
+      },
+      // 2) Centro de interpretación Puerta del Mar - AR
+      {
+        id: 'ar16-puerta-mar',
+        order: 2,
+        title: { 
+          es: 'Centro de Interpretación Puerta del Mar', 
+          en: 'Puerta del Mar Interpretation Center', 
+          fr: 'Centre d\'Interprétation Puerta del Mar' 
+        },
+        shortDescription: { 
+          es: 'La historia marinera de San Juan de la Arena', 
+          en: 'The maritime history of San Juan de la Arena', 
+          fr: 'L\'histoire maritime de San Juan de la Arena' 
+        },
+        location: { 
+          lat: 43.556984, 
+          lng: -6.076402, 
+          address: 'Plaza Casimiro Vega, 3, San Juan de la Arena' 
+        },
+        coverImage: sotoBarcoImg,
+        content: {
+          arExperience: {
+            launchUrl: 'https://asturias.es/ar/puerta-mar',
+            qrValue: 'asturias-inmersivo://ar/puerta-mar',
+            instructions: {
+              es: 'Escanea para explorar la vida marinera tradicional en realidad aumentada',
+              en: 'Scan to explore traditional maritime life in augmented reality',
+              fr: 'Scannez pour explorer la vie maritime traditionnelle en réalité augmentée'
+            }
+          },
+          audioGuide: {
+            es: { url: '/audio/puerta-mar-es.mp3', durationSec: 240 },
+            en: { url: '/audio/puerta-mar-en.mp3', durationSec: 235 },
+            fr: { url: '/audio/puerta-mar-fr.mp3', durationSec: 250 },
+          },
+          practicalInfo: {
+            phone: '985 58 65 58',
+            email: 'turismo@sotodelbarco.com',
+            website: 'https://sotodelbarco.com',
+            schedule: {
+              es: 'Julio–Septiembre: 10:30–14:30 y 16:00–19:00',
+              en: 'July–September: 10:30–14:30 and 16:00–19:00',
+              fr: 'Juillet–Septembre: 10h30–14h30 et 16h00–19h00'
+            },
+            prices: {
+              es: 'Entrada gratuita',
+              en: 'Free admission',
+              fr: 'Entrée gratuite'
+            }
+          }
+        },
+      },
+      // 3) Playa de Los Quebrantos - INFO con imágenes
+      {
+        id: 'ar16-playa-quebrantos',
+        order: 3,
+        title: { 
+          es: 'Playa de Los Quebrantos', 
+          en: 'Los Quebrantos Beach', 
+          fr: 'Plage de Los Quebrantos' 
+        },
+        shortDescription: { 
+          es: 'Extensa playa dorada en la desembocadura del Nalón', 
+          en: 'Extensive golden beach at the Nalón estuary', 
+          fr: 'Vaste plage dorée à l\'embouchure du Nalón' 
+        },
+        location: { 
+          lat: 43.56517, 
+          lng: -6.06942 
+        },
+        coverImage: sotoBarcoImg,
+        content: {
+          image: { 
+            url: sotoBarcoImg,
+            caption: {
+              es: 'Vista panorámica de la Playa de Los Quebrantos',
+              en: 'Panoramic view of Los Quebrantos Beach',
+              fr: 'Vue panoramique de la Plage de Los Quebrantos'
+            }
+          },
+          gallery: [
+            { url: sotoBarcoImg, caption: { es: 'Atardecer en la playa', en: 'Sunset at the beach', fr: 'Coucher de soleil sur la plage' } },
+            { url: sotoBarcoImg, caption: { es: 'Dunas y vegetación', en: 'Dunes and vegetation', fr: 'Dunes et végétation' } },
+          ],
+          audioGuide: {
+            es: { url: '/audio/quebrantos-es.mp3', durationSec: 120 },
+            en: { url: '/audio/quebrantos-en.mp3', durationSec: 115 },
+          },
+          practicalInfo: {
+            schedule: {
+              es: 'Acceso libre (servicios según temporada)',
+              en: 'Free access (services vary by season)',
+              fr: 'Accès libre (services selon la saison)'
+            },
+            prices: {
+              es: 'Gratuito',
+              en: 'Free',
+              fr: 'Gratuit'
+            }
+          }
+        },
+      },
+      // 4) Pesca de la angula - INFO con video
+      {
+        id: 'ar16-pesca-angula',
+        order: 4,
+        title: { 
+          es: 'Pesca de la Angula', 
+          en: 'Elver Fishing', 
+          fr: 'Pêche à la Civelle' 
+        },
+        shortDescription: { 
+          es: 'Tradición pesquera nocturna en el puerto de San Juan', 
+          en: 'Night fishing tradition at San Juan port', 
+          fr: 'Tradition de pêche nocturne au port de San Juan' 
+        },
+        location: { 
+          lat: 43.55660, 
+          lng: -6.07520,
+          address: 'Puerto de San Juan de la Arena / Ría del Nalón' 
+        },
+        coverImage: sotoBarcoImg,
+        content: {
+          image: { url: sotoBarcoImg },
+          video: { 
+            url: 'https://www.youtube.com/watch?v=angula-nalon',
+            caption: { 
+              es: 'Los anguleros del Nalón: una tradición que pervive',
+              en: 'The Nalón elver fishermen: a surviving tradition',
+              fr: 'Les pêcheurs de civelles du Nalón: une tradition qui perdure'
+            }
+          },
+          audioGuide: {
+            es: { url: '/audio/angula-es.mp3', durationSec: 200 },
+            en: { url: '/audio/angula-en.mp3', durationSec: 195 },
+          },
+          practicalInfo: {
+            schedule: {
+              es: 'Actividad nocturna y estacional (octubre–marzo, según regulación)',
+              en: 'Night and seasonal activity (October–March, regulated)',
+              fr: 'Activité nocturne et saisonnière (octobre–mars, réglementée)'
+            },
+            prices: {
+              es: 'Actividad profesional (no visitable)',
+              en: 'Professional activity (not visitable)',
+              fr: 'Activité professionnelle (non visitable)'
+            }
+          }
+        },
+      },
+      // 5) Casamatas en Ranón - INFO con imágenes
+      {
+        id: 'ar16-casamatas-ranon',
+        order: 5,
+        title: { 
+          es: 'Arquitectura Militar: Casamatas en Ranón', 
+          en: 'Military Architecture: Casemates in Ranón', 
+          fr: 'Architecture Militaire: Casemates à Ranón' 
+        },
+        shortDescription: { 
+          es: 'Restos de fortificaciones costeras y trincheras de la Guerra Civil', 
+          en: 'Remains of coastal fortifications and Civil War trenches', 
+          fr: 'Vestiges de fortifications côtières et tranchées de la Guerre Civile' 
+        },
+        location: { 
+          lat: 43.56975, 
+          lng: -6.07896,
+          address: 'Mirador de las Trincheras, Ranón' 
+        },
+        coverImage: sotoBarcoImg,
+        content: {
+          image: { url: sotoBarcoImg },
+          gallery: [
+            { url: sotoBarcoImg, caption: { es: 'Casamata de defensa costera', en: 'Coastal defense casemate', fr: 'Casemate de défense côtière' } },
+            { url: sotoBarcoImg, caption: { es: 'Trincheras restauradas', en: 'Restored trenches', fr: 'Tranchées restaurées' } },
+            { url: sotoBarcoImg, caption: { es: 'Vista desde el mirador', en: 'View from the viewpoint', fr: 'Vue depuis le belvédère' } },
+          ],
+          audioGuide: {
+            es: { url: '/audio/casamatas-es.mp3', durationSec: 180 },
+          },
+          practicalInfo: {
+            schedule: {
+              es: 'Acceso libre',
+              en: 'Free access',
+              fr: 'Accès libre'
+            },
+            prices: {
+              es: 'Gratuito',
+              en: 'Free',
+              fr: 'Gratuit'
+            }
+          }
+        },
+      },
+      // 6) Castillo de San Martín - AR
+      {
+        id: 'ar16-castillo-san-martin',
+        order: 6,
+        title: { 
+          es: 'Castillo de San Martín', 
+          en: 'San Martín Castle', 
+          fr: 'Château de San Martín' 
+        },
+        shortDescription: { 
+          es: 'Restos medievales con vistas a la ría del Nalón', 
+          en: 'Medieval remains overlooking the Nalón estuary', 
+          fr: 'Vestiges médiévaux surplombant l\'estuaire du Nalón' 
+        },
+        location: { 
+          lat: 43.54192, 
+          lng: -6.07508 
+        },
+        coverImage: sotoBarcoImg,
+        content: {
+          arExperience: {
+            launchUrl: 'https://asturias.es/ar/castillo-san-martin',
+            qrValue: 'asturias-inmersivo://ar/castillo-san-martin',
+            iframe3dUrl: 'https://sketchfab.com/models/castillo-san-martin/embed',
+            instructions: {
+              es: 'Reconstrucción virtual del castillo medieval en su época de esplendor',
+              en: 'Virtual reconstruction of the medieval castle in its heyday',
+              fr: 'Reconstruction virtuelle du château médiéval à son apogée'
+            }
+          },
+          audioGuide: {
+            es: { url: '/audio/castillo-martin-es.mp3', durationSec: 160 },
+            en: { url: '/audio/castillo-martin-en.mp3', durationSec: 155 },
+          },
+          practicalInfo: {
+            schedule: {
+              es: 'Acceso libre (exterior/entorno)',
+              en: 'Free access (exterior/surroundings)',
+              fr: 'Accès libre (extérieur/environs)'
+            },
+            prices: {
+              es: 'Gratuito',
+              en: 'Free',
+              fr: 'Gratuit'
+            }
+          }
+        },
+      },
+      // 7) Vista de la ría del Nalón - INFO con imágenes
+      {
+        id: 'ar16-mirador-pozaco',
+        order: 7,
+        title: { 
+          es: 'Mirador Punta de El Pozaco', 
+          en: 'El Pozaco Point Viewpoint', 
+          fr: 'Belvédère Punta de El Pozaco' 
+        },
+        shortDescription: { 
+          es: 'Vistas espectaculares de la desembocadura del Nalón', 
+          en: 'Spectacular views of the Nalón estuary', 
+          fr: 'Vues spectaculaires sur l\'embouchure du Nalón' 
+        },
+        location: { 
+          lat: 43.56610, 
+          lng: -6.06278 
+        },
+        coverImage: sotoBarcoImg,
+        content: {
+          image: { 
+            url: sotoBarcoImg,
+            caption: {
+              es: 'La ría del Nalón desde El Pozaco',
+              en: 'The Nalón estuary from El Pozaco',
+              fr: 'L\'estuaire du Nalón depuis El Pozaco'
+            }
+          },
+          gallery: [
+            { url: sotoBarcoImg, caption: { es: 'Atardecer sobre la ría', en: 'Sunset over the estuary', fr: 'Coucher de soleil sur l\'estuaire' } },
+            { url: sotoBarcoImg, caption: { es: 'Puerto de San Juan', en: 'San Juan Port', fr: 'Port de San Juan' } },
+          ],
+          practicalInfo: {
+            schedule: {
+              es: 'Acceso libre',
+              en: 'Free access',
+              fr: 'Accès libre'
+            },
+            prices: {
+              es: 'Gratuito',
+              en: 'Free',
+              fr: 'Gratuit'
+            }
+          }
+        },
+      },
+      // 8) Teatro Clarín - AR
+      {
+        id: 'ar16-teatro-clarin',
+        order: 8,
+        title: { 
+          es: 'Teatro Clarín', 
+          en: 'Clarín Theatre', 
+          fr: 'Théâtre Clarín' 
+        },
+        shortDescription: { 
+          es: 'Centro cultural emblemático de Soto del Barco', 
+          en: 'Emblematic cultural center of Soto del Barco', 
+          fr: 'Centre culturel emblématique de Soto del Barco' 
+        },
+        location: { 
+          lat: 43.53110, 
+          lng: -6.07268,
+          address: 'Plaza Herminio de la Noval, 2, Soto del Barco' 
+        },
+        coverImage: sotoBarcoImg,
+        content: {
+          arExperience: {
+            launchUrl: 'https://asturias.es/ar/teatro-clarin',
+            qrValue: 'asturias-inmersivo://ar/teatro-clarin',
+            instructions: {
+              es: 'Descubre la historia del teatro y sus personajes ilustres en realidad aumentada',
+              en: 'Discover the history of the theatre and its illustrious characters in AR',
+              fr: 'Découvrez l\'histoire du théâtre et ses personnages illustres en RA'
+            }
+          },
+          audioGuide: {
+            es: { url: '/audio/teatro-clarin-es.mp3', durationSec: 200 },
+            en: { url: '/audio/teatro-clarin-en.mp3', durationSec: 195 },
+          },
+          practicalInfo: {
+            phone: '985 58 85 94',
+            schedule: {
+              es: 'Según programación (taquilla/funciones)',
+              en: 'According to programming (box office/shows)',
+              fr: 'Selon la programmation (guichet/spectacles)'
+            },
+            prices: {
+              es: 'Según evento',
+              en: 'Depends on event',
+              fr: 'Selon l\'événement'
+            }
+          }
+        },
+      },
+      // 9) La Ferrería - INFO
+      {
+        id: 'ar16-la-ferreria',
+        order: 9,
+        title: { 
+          es: 'La Ferrería', 
+          en: 'La Ferrería', 
+          fr: 'La Ferrería' 
+        },
+        shortDescription: { 
+          es: 'Pintoresca aldea tradicional asturiana', 
+          en: 'Picturesque traditional Asturian village', 
+          fr: 'Pittoresque village traditionnel asturien' 
+        },
+        location: { 
+          lat: 43.52713, 
+          lng: -6.03462,
+          address: 'La Ferrería, Soto del Barco' 
+        },
+        coverImage: sotoBarcoImg,
+        content: {
+          image: { url: sotoBarcoImg },
+          audioGuide: {
+            es: { url: '/audio/ferreria-es.mp3', durationSec: 140 },
+          },
+          practicalInfo: {
+            schedule: {
+              es: 'Acceso libre',
+              en: 'Free access',
+              fr: 'Accès libre'
+            },
+            prices: {
+              es: 'Gratuito',
+              en: 'Free',
+              fr: 'Gratuit'
+            }
+          }
+        },
+      },
+    ],
+    polyline: [
+      { lat: 43.55840, lng: -6.07587 },
+      { lat: 43.556984, lng: -6.076402 },
+      { lat: 43.56517, lng: -6.06942 },
+      { lat: 43.55660, lng: -6.07520 },
+      { lat: 43.56975, lng: -6.07896 },
+      { lat: 43.54192, lng: -6.07508 },
+      { lat: 43.56610, lng: -6.06278 },
+      { lat: 43.53110, lng: -6.07268 },
+      { lat: 43.52713, lng: -6.03462 },
+      { lat: 43.55840, lng: -6.07587 }, // Circular - vuelve al inicio
     ],
   },
 ];
