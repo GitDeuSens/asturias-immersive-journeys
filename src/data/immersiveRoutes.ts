@@ -252,6 +252,10 @@ export const immersiveRoutes: ImmersiveRoute[] = [
         coverImage: mumiImg,
         content: {
           image: { url: mumiImg },
+          video: { 
+            url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            caption: { es: 'Visita virtual al MUMI', en: 'Virtual tour of MUMI', fr: 'Visite virtuelle du MUMI' }
+          },
           audioGuide: {
             es: { url: '/audio/mumi-es.mp3', durationSec: 300 },
             en: { url: '/audio/mumi-en.mp3', durationSec: 290 },

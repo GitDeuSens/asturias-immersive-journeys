@@ -339,9 +339,46 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                 </div>
               )}
 
-              {/* Practical Information - shown for all POIs */}
-              {(content.practicalInfo?.phone || content.practicalInfo?.email || content.practicalInfo?.website || content.practicalInfo?.schedule || content.practicalInfo?.prices) && (
+              {/* Image Gallery - shown for non-AR POIs */}
+              {!hasAR && (
                 <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4 text-primary" />
+                    {t(texts.gallery)}
+                  </h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {placeholderGallery.map((img, index) => (
+                      <motion.button
+                        key={index}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setSelectedGalleryImage(img)}
+                        className="relative aspect-[4/3] rounded-lg overflow-hidden bg-muted border border-border/50 hover:border-primary/50 transition-colors group"
+                      >
+                        <img 
+                          src={img} 
+                          alt={`Gallery ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                          <Maximize2 className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
+                        </div>
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Image caption */}
+              {content.image?.caption && (
+                <p className="text-xs text-muted-foreground italic text-center">
+                  {t(content.image.caption)}
+                </p>
+              )}
+
+              {/* Practical Information - shown at the bottom for all POIs */}
+              {(content.practicalInfo?.phone || content.practicalInfo?.email || content.practicalInfo?.website || content.practicalInfo?.schedule || content.practicalInfo?.prices) && (
+                <div className="space-y-3 pt-4 border-t border-border/50">
                   <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2">
                     <Info className="w-4 h-4 text-primary" />
                     {t(texts.practicalInfo)}
@@ -417,43 +454,6 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                     )}
                   </div>
                 </div>
-              )}
-
-              {/* Image Gallery - shown for non-AR POIs */}
-              {!hasAR && (
-                <div className="space-y-3">
-                  <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2">
-                    <ImageIcon className="w-4 h-4 text-primary" />
-                    {t(texts.gallery)}
-                  </h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    {placeholderGallery.map((img, index) => (
-                      <motion.button
-                        key={index}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => setSelectedGalleryImage(img)}
-                        className="relative aspect-[4/3] rounded-lg overflow-hidden bg-muted border border-border/50 hover:border-primary/50 transition-colors group"
-                      >
-                        <img 
-                          src={img} 
-                          alt={`Gallery ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                          <Maximize2 className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
-                        </div>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Image caption */}
-              {content.image?.caption && (
-                <p className="text-xs text-muted-foreground italic text-center">
-                  {t(content.image.caption)}
-                </p>
               )}
             </div>
           </ScrollArea>
