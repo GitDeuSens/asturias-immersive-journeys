@@ -226,6 +226,21 @@ export const immersiveRoutes: ImmersiveRoute[] = [
             iframe360Url: 'https://kuula.co/share/collection/mumi360',
             allowFullscreen: true 
           },
+          practicalInfo: {
+            phone: '+34 985 662 562',
+            email: 'info@mumi.es',
+            website: 'https://mumi.es',
+            schedule: {
+              es: 'Martes a Domingo: 10:00 - 14:00 y 16:00 - 19:00\nLunes: Cerrado',
+              en: 'Tuesday to Sunday: 10:00 - 14:00 and 16:00 - 19:00\nMonday: Closed',
+              fr: 'Mardi à Dimanche: 10h00 - 14h00 et 16h00 - 19h00\nLundi: Fermé'
+            },
+            prices: {
+              es: 'Adultos: 8€\nMenores de 12 años: Gratis\nGrupos (+15): 6€/persona',
+              en: 'Adults: €8\nUnder 12: Free\nGroups (+15): €6/person',
+              fr: 'Adultes: 8€\nMoins de 12 ans: Gratuit\nGroupes (+15): 6€/personne'
+            }
+          },
         },
       },
       {
@@ -241,6 +256,21 @@ export const immersiveRoutes: ImmersiveRoute[] = [
             es: { url: '/audio/mumi-es.mp3', durationSec: 300 },
             en: { url: '/audio/mumi-en.mp3', durationSec: 290 },
             fr: { url: '/audio/mumi-fr.mp3', durationSec: 310 },
+          },
+          practicalInfo: {
+            phone: '+34 985 662 562',
+            email: 'reservas@mumi.es',
+            website: 'https://mumi.es',
+            schedule: {
+              es: 'Martes a Domingo: 10:00 - 14:00 y 16:00 - 19:00\nLunes: Cerrado',
+              en: 'Tuesday to Sunday: 10:00 - 14:00 and 16:00 - 19:00\nMonday: Closed',
+              fr: 'Mardi à Dimanche: 10h00 - 14h00 et 16h00 - 19h00\nLundi: Fermé'
+            },
+            prices: {
+              es: 'Adultos: 8€\nMenores de 12 años: Gratis\nGrupos (+15): 6€/persona',
+              en: 'Adults: €8\nUnder 12: Free\nGroups (+15): €6/person',
+              fr: 'Adultes: 8€\nMoins de 12 ans: Gratuit\nGroupes (+15): 6€/personne'
+            }
           },
         },
       },
