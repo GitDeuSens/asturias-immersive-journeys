@@ -13,7 +13,13 @@ import {
   Maximize2,
   Sparkles,
   ScanLine,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Phone,
+  Mail,
+  Globe,
+  Clock,
+  Euro,
+  Info
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { RoutePoint } from '@/data/immersiveRoutes';
@@ -43,6 +49,10 @@ const texts = {
   tryARDesktop: { es: 'Probar en este dispositivo', en: 'Try on this device', fr: 'Essayer sur cet appareil' },
   arRecommendation: { es: 'Recomendado: usa tu móvil para la mejor experiencia AR', en: 'Recommended: use your phone for the best AR experience', fr: 'Recommandé: utilisez votre téléphone pour la meilleure expérience AR' },
   gallery: { es: 'Galería de imágenes', en: 'Image gallery', fr: 'Galerie d\'images' },
+  practicalInfo: { es: 'Información práctica', en: 'Practical information', fr: 'Informations pratiques' },
+  schedule: { es: 'Horarios', en: 'Schedule', fr: 'Horaires' },
+  prices: { es: 'Precios', en: 'Prices', fr: 'Prix' },
+  contact: { es: 'Contacto', en: 'Contact', fr: 'Contact' },
 };
 
 // Placeholder gallery images for demo
@@ -324,6 +334,86 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                         </span>
                         <ChevronRight className="w-4 h-4" />
                       </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Practical Information - shown for all POIs */}
+              {(content.practicalInfo?.phone || content.practicalInfo?.email || content.practicalInfo?.website || content.practicalInfo?.schedule || content.practicalInfo?.prices) && (
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2">
+                    <Info className="w-4 h-4 text-primary" />
+                    {t(texts.practicalInfo)}
+                  </h3>
+                  <div className="space-y-2 p-4 rounded-xl bg-muted/30 border border-border/50">
+                    {/* Contact info */}
+                    {(content.practicalInfo?.phone || content.practicalInfo?.email || content.practicalInfo?.website) && (
+                      <div className="space-y-2">
+                        {content.practicalInfo?.phone && (
+                          <a 
+                            href={`tel:${content.practicalInfo.phone}`}
+                            className="flex items-center gap-3 text-sm text-foreground hover:text-primary transition-colors"
+                          >
+                            <Phone className="w-4 h-4 text-muted-foreground" />
+                            {content.practicalInfo.phone}
+                          </a>
+                        )}
+                        {content.practicalInfo?.email && (
+                          <a 
+                            href={`mailto:${content.practicalInfo.email}`}
+                            className="flex items-center gap-3 text-sm text-foreground hover:text-primary transition-colors"
+                          >
+                            <Mail className="w-4 h-4 text-muted-foreground" />
+                            {content.practicalInfo.email}
+                          </a>
+                        )}
+                        {content.practicalInfo?.website && (
+                          <a 
+                            href={content.practicalInfo.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 text-sm text-foreground hover:text-primary transition-colors"
+                          >
+                            <Globe className="w-4 h-4 text-muted-foreground" />
+                            {content.practicalInfo.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                          </a>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Schedule */}
+                    {content.practicalInfo?.schedule && (
+                      <div className="pt-2 border-t border-border/50">
+                        <div className="flex items-start gap-3">
+                          <Clock className="w-4 h-4 text-muted-foreground mt-0.5" />
+                          <div>
+                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                              {t(texts.schedule)}
+                            </p>
+                            <p className="text-sm text-foreground whitespace-pre-line">
+                              {t(content.practicalInfo.schedule)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Prices */}
+                    {content.practicalInfo?.prices && (
+                      <div className="pt-2 border-t border-border/50">
+                        <div className="flex items-start gap-3">
+                          <Euro className="w-4 h-4 text-muted-foreground mt-0.5" />
+                          <div>
+                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                              {t(texts.prices)}
+                            </p>
+                            <p className="text-sm text-foreground whitespace-pre-line">
+                              {t(content.practicalInfo.prices)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>

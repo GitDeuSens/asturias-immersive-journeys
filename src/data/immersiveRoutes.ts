@@ -48,6 +48,13 @@ export interface RoutePointContent {
     iframe360Url: string;
     allowFullscreen: boolean;
   };
+  practicalInfo?: {
+    phone?: string;
+    email?: string;
+    website?: string;
+    schedule?: Record<Language, string>;
+    prices?: Record<Language, string>;
+  };
 }
 
 // Punto de ruta (chapita)
