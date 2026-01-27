@@ -7,8 +7,37 @@
 /* Asturias Inmersivo Design System
    Inspired by turismoasturias.es official branding
    Primary: Asturias Green #7AB800
-   Identity: Mountains, lush valleys, stone villages, natural paradise
+   WCAG 2.1 AA Compliant Color Contrast
 */
+
+/* Accessibility: Global focus and motion */
+@layer base {
+  /* Focus visible for keyboard navigation */
+  :focus-visible {
+    outline: 3px solid hsl(79, 100%, 36%);
+    outline-offset: 2px;
+  }
+  
+  /* Reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+  
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    :root {
+      --border: 0 0% 20%;
+      --muted-foreground: 210 11% 30%;
+    }
+  }
+}
 
 @layer base {
   :root {
