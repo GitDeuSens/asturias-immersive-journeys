@@ -2,32 +2,40 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import L from 'leaflet';
 import { 
-  Route as RouteIcon, 
   MapPin, 
   Search, 
   ChevronUp, 
   ChevronDown, 
   Maximize2,
   ChevronLeft,
-  RotateCw
+  List,
+  Map as MapIcon,
+  Navigation,
+  Locate
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { AppHeader } from '@/components/AppHeader';
 import { CategoryChips } from '@/components/CategoryChips';
-import { RouteCard } from '@/components/RouteCard';
+import { RouteCard } from '@/components/RouteCardEnhanced';
 import { RouteDetailSheet } from '@/components/RouteDetailSheet';
 import { RouteExplorerView } from '@/components/RouteExplorerView';
 import { PointDetailSheet } from '@/components/PointDetailSheet';
+import { SEOHead } from '@/components/SEOHead';
+import { Footer } from '@/components/Footer';
 import { immersiveRoutes, ImmersiveRoute, RoutePoint } from '@/data/immersiveRoutes';
 import { categories } from '@/data/mockData';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useGeolocation } from '@/hooks/useGeolocation';
+import { 
+  createUserPositionMarker, 
+  createClusterGroup, 
+  injectMapStyles,
+  calculateRouteDistance,
+  formatDistance,
+  openNavigation
+} from '@/lib/mapUtils';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import 'leaflet/dist/leaflet.css';
-
-const texts = {
-  routes: { es: 'Rutas Inmersivas', en: 'Immersive Routes', fr: 'Itinéraires Immersifs' },
-  search: { es: 'Buscar rutas...', en: 'Search routes...', fr: 'Rechercher...' },
-  fitBounds: { es: 'Ajustar vista', en: 'Fit view', fr: 'Ajuster la vue' },
-  results: { es: 'resultados', en: 'results', fr: 'résultats' },
-};
 
 // Create route bubble marker with name label
 const createRouteMarkerIcon = (route: ImmersiveRoute, routeName: string) => {
@@ -37,10 +45,10 @@ const createRouteMarkerIcon = (route: ImmersiveRoute, routeName: string) => {
   return L.divIcon({
     className: 'route-bubble-marker',
     html: `
-      <div style="position: relative; width: 60px; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+      <div style="position: relative; width: 60px; display: flex; flex-direction: column; align-items: center; cursor: pointer;" role="button" aria-label="${routeName}">
         <div style="position: relative; width: 60px; height: 60px;">
           <div style="width: 60px; height: 60px; border-radius: 50%; border: 4px solid ${borderColor}; box-shadow: 0 4px 20px rgba(0,0,0,0.35); overflow: hidden; background: white;">
-            <img src="${route.coverImage}" style="width: 100%; height: 100%; object-fit: cover;" alt=""/>
+            <img src="${route.coverImage}" style="width: 100%; height: 100%; object-fit: cover;" alt="${routeName}"/>
           </div>
           <div style="position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: ${borderColor}; box-shadow: 0 2px 8px rgba(0,0,0,0.25); font-family: 'Montserrat', sans-serif;">${route.maxPoints}</div>
         </div>
@@ -62,10 +70,10 @@ const createPointMarkerIcon = (point: RoutePoint, index: number, pointName: stri
   return L.divIcon({
     className: 'custom-marker',
     html: `
-      <div style="display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+      <div style="display: flex; flex-direction: column; align-items: center; cursor: pointer;" role="button" aria-label="${pointName}">
         <div style="position: relative; width: 48px; height: 48px;">
           <div style="width: 48px; height: 48px; border-radius: 50%; border: 4px solid ${borderColor}; overflow: hidden; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-            ${point.coverImage ? `<img src="${point.coverImage}" style="width: 100%; height: 100%; object-fit: cover;" alt=""/>` : `<div style="width: 100%; height: 100%; background: ${borderColor}20;"></div>`}
+            ${point.coverImage ? `<img src="${point.coverImage}" style="width: 100%; height: 100%; object-fit: cover;" alt="${pointName}"/>` : `<div style="width: 100%; height: 100%; background: ${borderColor}20;"></div>`}
           </div>
           <div style="position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; background: ${borderColor}; border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: ${hasAR ? '#1a1a1a' : 'white'}; box-shadow: 0 2px 8px rgba(0,0,0,0.25); font-family: 'Montserrat', sans-serif;">${index + 1}</div>
         </div>
@@ -78,11 +86,14 @@ const createPointMarkerIcon = (point: RoutePoint, index: number, pointName: stri
 };
 
 export function RoutesPage() {
-  const { t } = useLanguage();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language as 'es' | 'en' | 'fr';
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const markersRef = useRef<L.Marker[]>([]);
   const polylineRef = useRef<L.Polyline | null>(null);
+  const userMarkerRef = useRef<L.Marker | null>(null);
+  const clusterGroupRef = useRef<L.MarkerClusterGroup | null>(null);
   
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -91,11 +102,21 @@ export function RoutesPage() {
   const [exploringRoute, setExploringRoute] = useState<ImmersiveRoute | null>(null);
   const [selectedPoint, setSelectedPoint] = useState<RoutePoint | null>(null);
   const [panelExpanded, setPanelExpanded] = useState(true);
+  const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
+  
+  // Geolocation
+  const { latitude, longitude, error: geoError, requestLocation, hasLocation } = useGeolocation();
+  const userPosition = hasLocation ? { lat: latitude!, lng: longitude! } : null;
 
   const ASTURIAS_BOUNDS: L.LatLngBoundsExpression = [
     [42.70, -7.80],
     [43.90, -4.00]
   ];
+
+  // Inject map styles on mount
+  useEffect(() => {
+    injectMapStyles();
+  }, []);
 
   // Initialize map
   useEffect(() => {
@@ -109,7 +130,14 @@ export function RoutesPage() {
       maxBoundsViscosity: 1.0,
       minZoom: 8,
       maxZoom: 18,
+      keyboard: true,
+      keyboardPanDelta: 80,
     });
+
+    // Make map focusable for keyboard navigation
+    mapContainerRef.current.setAttribute('tabindex', '0');
+    mapContainerRef.current.setAttribute('role', 'application');
+    mapContainerRef.current.setAttribute('aria-label', t('a11y.mapInteractive'));
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://osm.org/">OpenStreetMap</a>'
@@ -117,24 +145,40 @@ export function RoutesPage() {
 
     L.control.zoom({ position: 'bottomright' }).addTo(mapRef.current);
 
+    // Initialize cluster group
+    clusterGroupRef.current = createClusterGroup();
+    mapRef.current.addLayer(clusterGroupRef.current);
+
     return () => {
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
       }
     };
-  }, []);
+  }, [t]);
+
+  // Update user position marker
+  useEffect(() => {
+    if (!mapRef.current || !userPosition) return;
+
+    if (userMarkerRef.current) {
+      userMarkerRef.current.setLatLng([userPosition.lat, userPosition.lng]);
+    } else {
+      userMarkerRef.current = createUserPositionMarker(userPosition.lat, userPosition.lng);
+      userMarkerRef.current.addTo(mapRef.current);
+    }
+  }, [userPosition]);
 
   const filteredRoutes = useMemo(() => {
     return immersiveRoutes.filter(route => {
       const matchesSearch = searchQuery === '' || 
-        t(route.title).toLowerCase().includes(searchQuery.toLowerCase()) ||
-        t(route.theme).toLowerCase().includes(searchQuery.toLowerCase());
+        route.title[lang].toLowerCase().includes(searchQuery.toLowerCase()) ||
+        route.theme[lang].toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = selectedCategories.length === 0 || 
         route.categoryIds.some(id => selectedCategories.includes(id));
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, selectedCategories, t]);
+  }, [searchQuery, selectedCategories, lang]);
 
   const getPanelOffset = useCallback(() => {
     if (typeof window !== 'undefined' && window.innerWidth >= 768) {
@@ -169,12 +213,20 @@ export function RoutesPage() {
     }
   }, [filteredRoutes, getPanelOffset]);
 
+  const centerOnUser = useCallback(() => {
+    if (!mapRef.current || !userPosition) return;
+    mapRef.current.setView([userPosition.lat, userPosition.lng], 12);
+  }, [userPosition]);
+
   // Update markers
   useEffect(() => {
-    if (!mapRef.current) return;
+    if (!mapRef.current || !clusterGroupRef.current) return;
 
+    // Clear existing markers
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
+    clusterGroupRef.current.clearLayers();
+    
     if (polylineRef.current) {
       polylineRef.current.remove();
       polylineRef.current = null;
@@ -201,7 +253,7 @@ export function RoutesPage() {
       }).addTo(mapRef.current);
 
       exploringRoute.points.forEach((point, idx) => {
-        const pointName = t(point.title);
+        const pointName = point.title[lang];
         const marker = L.marker([point.location.lat, point.location.lng], {
           icon: createPointMarkerIcon(point, idx, pointName)
         })
@@ -212,21 +264,22 @@ export function RoutesPage() {
 
       fitToRoute(exploringRoute);
     } else {
-      // Show all route bubbles
+      // Add all routes to cluster group
       filteredRoutes.forEach(route => {
-        const routeName = t(route.title);
+        const routeName = route.title[lang];
         const marker = L.marker([route.center.lat, route.center.lng], {
           icon: createRouteMarkerIcon(route, routeName)
         })
-          .addTo(mapRef.current!)
           .on('click', () => {
             setSelectedRoute(route);
             setShowRouteDetail(true);
           });
+        
+        clusterGroupRef.current!.addLayer(marker);
         markersRef.current.push(marker);
       });
     }
-  }, [exploringRoute, filteredRoutes, fitToRoute]);
+  }, [exploringRoute, filteredRoutes, fitToRoute, lang]);
 
   // Re-center when filters change
   useEffect(() => {
@@ -254,72 +307,68 @@ export function RoutesPage() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
+      <SEOHead 
+        title={t('routes.title')}
+        description={t('routes.title')}
+      />
       <AppHeader variant="light" />
       
-      <div className="flex-1 relative pt-14">
-        <div ref={mapContainerRef} className="h-full w-full z-0" />
-
-        {/* Fit button */}
-        <AnimatePresence>
-          {exploringRoute && (
-            <motion.button
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              onClick={() => fitToRoute(exploringRoute)}
-              className="absolute top-20 right-4 z-10 flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground font-semibold text-sm shadow-lg hover:bg-primary/90 transition-colors"
-            >
-              <Maximize2 className="w-4 h-4" />
-              {t(texts.fitBounds)}
-            </motion.button>
-          )}
-        </AnimatePresence>
-
-        {/* Side Panel */}
-        <motion.div
-          initial={{ y: '100%' }}
-          animate={{ y: panelExpanded ? 0 : 'calc(100% - 60px)' }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="absolute bottom-0 left-0 right-0 md:top-14 md:bottom-0 md:left-auto md:right-4 md:w-[400px] bg-white/95 backdrop-blur-md border border-border shadow-xl rounded-t-2xl md:rounded-2xl md:my-4 max-h-[75vh] md:max-h-none overflow-hidden flex flex-col"
-        >
-          {/* Mobile handle */}
-          <button
-            onClick={() => setPanelExpanded(!panelExpanded)}
-            className="w-full p-4 flex items-center justify-between border-b border-border/50 md:hidden"
-          >
-            <span className="font-serif font-bold text-foreground">
-              {exploringRoute ? t(exploringRoute.title) : t(texts.routes)}
-            </span>
-            {panelExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
-          </button>
-
-          {exploringRoute ? (
-            <RouteExplorerView 
-              route={exploringRoute}
-              onBack={handleExitRoute}
-              onSelectPoint={setSelectedPoint}
-              selectedPoint={selectedPoint}
+      <main id="main-content" className="flex-1 relative pt-14">
+        {/* Map view */}
+        {viewMode === 'map' && (
+          <>
+            <div 
+              ref={mapContainerRef} 
+              className="h-full w-full z-0 absolute inset-0"
+              aria-label={t('a11y.mapInteractive')}
             />
-          ) : (
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {/* Header */}
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-serif font-bold text-foreground">{t(texts.routes)}</h2>
-                <span className="text-xs text-muted-foreground">
-                  {filteredRoutes.length} {t(texts.results)}
-                </span>
-              </div>
 
+            {/* Map controls */}
+            <div className="absolute top-20 right-4 z-10 flex flex-col gap-2">
+              {/* User location button */}
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={userPosition ? centerOnUser : requestLocation}
+                className={`shadow-lg ${userPosition ? 'bg-accent text-accent-foreground' : ''}`}
+                aria-label={userPosition ? t('map.yourLocation') : t('map.enableLocation')}
+              >
+                <Locate className="w-4 h-4" />
+              </Button>
+
+              {/* Fit bounds button */}
+              {exploringRoute && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => fitToRoute(exploringRoute)}
+                  className="shadow-lg"
+                  aria-label={t('routes.fitBounds')}
+                >
+                  <Maximize2 className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* List view */}
+        {viewMode === 'list' && (
+          <ScrollArea className="h-[calc(100vh-3.5rem)]">
+            <div className="container mx-auto px-4 py-6 max-w-4xl">
+              <h1 className="text-2xl font-bold text-foreground mb-6">{t('routes.title')}</h1>
+              
               {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <div className="relative mb-4">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
                 <input
-                  type="text"
-                  placeholder={t(texts.search)}
+                  type="search"
+                  placeholder={t('routes.search')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-muted/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+                  aria-label={t('routes.search')}
                 />
               </div>
 
@@ -328,11 +377,11 @@ export function RoutesPage() {
                 categories={categories}
                 selectedIds={selectedCategories}
                 onToggle={toggleCategory}
-                className="justify-start"
+                className="mb-6"
               />
 
-              {/* Routes list */}
-              <div className="space-y-3">
+              {/* Routes grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {filteredRoutes.map(route => (
                   <RouteCard 
                     key={route.id} 
@@ -344,10 +393,119 @@ export function RoutesPage() {
                   />
                 ))}
               </div>
+
+              {filteredRoutes.length === 0 && (
+                <div className="text-center py-12">
+                  <MapPin className="w-12 h-12 mx-auto text-muted-foreground/30 mb-4" aria-hidden="true" />
+                  <p className="text-muted-foreground">{t('common.results')}: 0</p>
+                </div>
+              )}
             </div>
-          )}
-        </motion.div>
-      </div>
+            <Footer />
+          </ScrollArea>
+        )}
+
+        {/* View toggle (mobile) */}
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-20 md:hidden">
+          <div className="flex rounded-full bg-background border border-border shadow-lg overflow-hidden">
+            <button
+              onClick={() => setViewMode('map')}
+              className={`px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors ${viewMode === 'map' ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted'}`}
+              aria-pressed={viewMode === 'map'}
+            >
+              <MapIcon className="w-4 h-4" aria-hidden="true" />
+              {t('common.viewMap')}
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors ${viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted'}`}
+              aria-pressed={viewMode === 'list'}
+            >
+              <List className="w-4 h-4" aria-hidden="true" />
+              {t('common.viewList')}
+            </button>
+          </div>
+        </div>
+
+        {/* Side Panel (map view only) */}
+        {viewMode === 'map' && (
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: panelExpanded ? 0 : 'calc(100% - 60px)' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="absolute bottom-0 left-0 right-0 md:top-14 md:bottom-0 md:left-auto md:right-4 md:w-[400px] bg-white/95 backdrop-blur-md border border-border shadow-xl rounded-t-2xl md:rounded-2xl md:my-4 max-h-[75vh] md:max-h-none overflow-hidden flex flex-col"
+          >
+            {/* Mobile handle */}
+            <button
+              onClick={() => setPanelExpanded(!panelExpanded)}
+              className="w-full p-4 flex items-center justify-between border-b border-border/50 md:hidden"
+              aria-expanded={panelExpanded}
+              aria-controls="routes-panel"
+            >
+              <span className="font-serif font-bold text-foreground">
+                {exploringRoute ? exploringRoute.title[lang] : t('routes.title')}
+              </span>
+              {panelExpanded ? <ChevronDown className="w-5 h-5" aria-hidden="true" /> : <ChevronUp className="w-5 h-5" aria-hidden="true" />}
+            </button>
+
+            <div id="routes-panel">
+              {exploringRoute ? (
+                <RouteExplorerView 
+                  route={exploringRoute}
+                  onBack={handleExitRoute}
+                  onSelectPoint={setSelectedPoint}
+                  selectedPoint={selectedPoint}
+                />
+              ) : (
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                  {/* Header */}
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-serif font-bold text-foreground">{t('routes.title')}</h2>
+                    <span className="text-xs text-muted-foreground" aria-live="polite">
+                      {filteredRoutes.length} {t('common.results')}
+                    </span>
+                  </div>
+
+                  {/* Search */}
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
+                    <input
+                      type="search"
+                      placeholder={t('routes.search')}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-muted/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+                      aria-label={t('routes.search')}
+                    />
+                  </div>
+
+                  {/* Categories */}
+                  <CategoryChips
+                    categories={categories}
+                    selectedIds={selectedCategories}
+                    onToggle={toggleCategory}
+                    className="justify-start"
+                  />
+
+                  {/* Routes list */}
+                  <div className="space-y-3">
+                    {filteredRoutes.map(route => (
+                      <RouteCard 
+                        key={route.id} 
+                        route={route}
+                        onClick={() => {
+                          setSelectedRoute(route);
+                          setShowRouteDetail(true);
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </main>
 
       {/* Route Detail Sheet */}
       {showRouteDetail && selectedRoute && (

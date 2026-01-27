@@ -11,13 +11,17 @@ import {
   FileText,
   Headphones,
   Smartphone,
-  Info
+  Info,
+  Ruler,
+  Navigation
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { ImmersiveRoute, RoutePoint } from '@/data/immersiveRoutes';
-import { useLanguage } from '@/hooks/useLanguage';
 import { getCategoryById } from '@/data/mockData';
+import { calculateRouteDistance, formatDistance, openNavigation } from '@/lib/mapUtils';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ShareButtons } from '@/components/ShareButtons';
 
 interface RouteDetailSheetProps {
   route: ImmersiveRoute | null;
@@ -25,34 +29,26 @@ interface RouteDetailSheetProps {
   onEnterRoute: (route: ImmersiveRoute) => void;
 }
 
-const texts = {
-  enterRoute: { es: 'Entrar en la ruta', en: 'Enter route', fr: 'Entrer dans l\'itinéraire' },
-  duration: { es: 'Duración', en: 'Duration', fr: 'Durée' },
-  difficulty: { es: 'Dificultad', en: 'Difficulty', fr: 'Difficulté' },
-  points: { es: 'puntos', en: 'points', fr: 'points' },
-  theme: { es: 'Temática', en: 'Theme', fr: 'Thème' },
-  circular: { es: 'Ruta circular', en: 'Circular route', fr: 'Route circulaire' },
-  linear: { es: 'Ruta lineal', en: 'Linear route', fr: 'Route linéaire' },
-  tour360Available: { es: 'Tour 360° disponible', en: '360° tour available', fr: 'Tour 360° disponible' },
-  preview: { es: 'Vista previa de la ruta', en: 'Route preview', fr: 'Aperçu de l\'itinéraire' },
-};
-
-const difficultyLabels = {
-  easy: { es: 'Fácil', en: 'Easy', fr: 'Facile' },
-  medium: { es: 'Media', en: 'Medium', fr: 'Moyenne' },
-  hard: { es: 'Difícil', en: 'Hard', fr: 'Difficile' },
-};
-
-const difficultyColors = {
-  easy: 'bg-primary/20 text-primary border-primary',
-  medium: 'bg-warm/20 text-warm border-warm',
-  hard: 'bg-destructive/20 text-destructive border-destructive',
-};
-
 export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSheetProps) {
-  const { t } = useLanguage();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language as 'es' | 'en' | 'fr';
 
   if (!route) return null;
+
+  const distance = calculateRouteDistance(route.polyline);
+
+  const difficultyColors = {
+    easy: 'bg-primary/20 text-primary border-primary',
+    medium: 'bg-warm/20 text-warm border-warm',
+    hard: 'bg-destructive/20 text-destructive border-destructive',
+  };
+
+  const handleNavigateToStart = () => {
+    if (route.polyline.length > 0) {
+      const start = route.polyline[0];
+      openNavigation(start.lat, start.lng, route.title[lang]);
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -62,6 +58,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
+        role="presentation"
       />
       <motion.div
         initial={{ x: '100%' }}
@@ -70,18 +67,24 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
         className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-background z-50 shadow-2xl flex flex-col"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="route-detail-title"
       >
         {/* Hero image */}
         <div 
           className="relative h-56 bg-cover bg-center flex-shrink-0"
           style={{ backgroundImage: `url(${route.coverImage})` }}
+          role="img"
+          aria-label={route.title[lang]}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" aria-hidden="true" />
           
           {/* Close button */}
           <button 
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+            className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+            aria-label={t('common.close')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -93,11 +96,11 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
 
           {/* Bottom info */}
           <div className="absolute bottom-4 left-4 right-4">
-            <h1 className="text-2xl font-serif font-bold text-white drop-shadow-lg mb-1">
-              {t(route.title)}
+            <h1 id="route-detail-title" className="text-2xl font-serif font-bold text-white drop-shadow-lg mb-1">
+              {route.title[lang]}
             </h1>
             <p className="text-white/90 text-sm font-medium">
-              {t(route.theme)}
+              {route.theme[lang]}
             </p>
           </div>
         </div>
@@ -110,35 +113,43 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
               {/* Duration */}
               {route.duration && (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
-                  <Clock className="w-4 h-4 text-primary" />
-                  {t(route.duration)}
+                  <Clock className="w-4 h-4 text-primary" aria-hidden="true" />
+                  {route.duration[lang]}
+                </span>
+              )}
+              
+              {/* Distance - NEW */}
+              {distance > 0 && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
+                  <Ruler className="w-4 h-4 text-primary" aria-hidden="true" />
+                  {formatDistance(distance)}
                 </span>
               )}
               
               {/* Points */}
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
-                <MapPin className="w-4 h-4 text-primary" />
-                {route.points.length} {t(texts.points)}
+                <MapPin className="w-4 h-4 text-primary" aria-hidden="true" />
+                {route.points.length} {t('routes.points')}
               </span>
 
               {/* Difficulty */}
               {route.difficulty && (
                 <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-medium ${difficultyColors[route.difficulty]}`}>
-                  <Mountain className="w-4 h-4" />
-                  {t(difficultyLabels[route.difficulty])}
+                  <Mountain className="w-4 h-4" aria-hidden="true" />
+                  {t(`difficulty.${route.difficulty}`)}
                 </span>
               )}
 
               {/* Circular/Linear */}
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
-                <RotateCw className={`w-4 h-4 ${route.isCircular ? 'text-primary' : 'text-muted-foreground'}`} />
-                {route.isCircular ? t(texts.circular) : t(texts.linear)}
+                <RotateCw className={`w-4 h-4 ${route.isCircular ? 'text-primary' : 'text-muted-foreground'}`} aria-hidden="true" />
+                {route.isCircular ? t('routes.circular') : t('routes.linear')}
               </span>
 
               {/* 360 tour */}
               {route.tour360?.available && (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/20 text-primary text-sm font-bold border border-primary/30">
-                  <Camera className="w-4 h-4" />
+                  <Camera className="w-4 h-4" aria-hidden="true" />
                   360°
                 </span>
               )}
@@ -147,9 +158,24 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
             {/* Description */}
             <div>
               <p className="text-muted-foreground leading-relaxed">
-                {route.fullDescription ? t(route.fullDescription) : t(route.shortDescription)}
+                {route.fullDescription ? route.fullDescription[lang] : route.shortDescription[lang]}
               </p>
             </div>
+
+            {/* Navigation button - NEW */}
+            {route.polyline.length > 0 && (
+              <Button
+                variant="outline"
+                className="w-full justify-between"
+                onClick={handleNavigateToStart}
+              >
+                <span className="flex items-center gap-2">
+                  <Navigation className="w-4 h-4" aria-hidden="true" />
+                  {t('routes.howToGet')}
+                </span>
+                <ChevronRight className="w-4 h-4" aria-hidden="true" />
+              </Button>
+            )}
 
             {/* Categories */}
             <div className="flex flex-wrap gap-2">
@@ -157,21 +183,31 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
                 const cat = getCategoryById(catId);
                 return cat ? (
                   <span key={catId} className="category-chip">
-                    {t(cat.label)}
+                    {cat.label[lang]}
                   </span>
                 ) : null;
               })}
+            </div>
+
+            {/* Share buttons - NEW */}
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-2">{t('common.share')}</p>
+              <ShareButtons 
+                title={route.title[lang]}
+                description={route.shortDescription[lang]}
+                hashtags={['AsturiasParaisoNatural', 'AsturiasInmersivo', route.id.replace('-', '')]}
+              />
             </div>
 
             {/* Points preview (if any) */}
             {route.points.length > 0 && (
               <div>
                 <h3 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">
-                  {t(texts.preview)} ({route.points.length})
+                  {t('routes.points')} ({route.points.length})
                 </h3>
                 <div className="space-y-2">
                   {route.points.slice(0, 3).map((point, idx) => (
-                    <PointPreviewCard key={point.id} point={point} index={idx} />
+                    <PointPreviewCard key={point.id} point={point} index={idx} lang={lang} />
                   ))}
                   {route.points.length > 3 && (
                     <p className="text-xs text-muted-foreground text-center py-2">
@@ -190,8 +226,8 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
             onClick={() => onEnterRoute(route)}
             className="w-full h-12 text-base font-bold bg-primary hover:bg-primary/90"
           >
-            {t(texts.enterRoute)}
-            <ChevronRight className="w-5 h-5 ml-2" />
+            {t('routes.enterRoute')}
+            <ChevronRight className="w-5 h-5 ml-2" aria-hidden="true" />
           </Button>
         </div>
       </motion.div>
@@ -200,8 +236,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
 }
 
 // Small point preview card
-function PointPreviewCard({ point, index }: { point: RoutePoint; index: number }) {
-  const { t } = useLanguage();
+function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: number; lang: 'es' | 'en' | 'fr' }) {
   const content = point.content;
   
   // Determine what content types are available
@@ -218,6 +253,8 @@ function PointPreviewCard({ point, index }: { point: RoutePoint; index: number }
         <div 
           className="w-12 h-12 rounded-lg bg-cover bg-center border-2 border-primary/30"
           style={{ backgroundImage: point.coverImage ? `url(${point.coverImage})` : undefined }}
+          role="img"
+          aria-label={point.title[lang]}
         />
         <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center text-xs font-bold text-white border-2 border-white shadow-sm">
           {index + 1}
@@ -226,15 +263,15 @@ function PointPreviewCard({ point, index }: { point: RoutePoint; index: number }
       
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-foreground text-sm truncate">{t(point.title)}</p>
+        <p className="font-medium text-foreground text-sm truncate">{point.title[lang]}</p>
         <div className="flex items-center gap-1.5 mt-1">
-          {hasAR && <Smartphone className="w-3.5 h-3.5 text-warm" />}
-          {has360 && <Camera className="w-3.5 h-3.5 text-primary" />}
-          {hasVideo && <Play className="w-3.5 h-3.5 text-muted-foreground" />}
-          {hasAudio && <Headphones className="w-3.5 h-3.5 text-muted-foreground" />}
-          {hasPDF && <FileText className="w-3.5 h-3.5 text-muted-foreground" />}
+          {hasAR && <Smartphone className="w-3.5 h-3.5 text-warm" aria-label="AR" />}
+          {has360 && <Camera className="w-3.5 h-3.5 text-primary" aria-label="360°" />}
+          {hasVideo && <Play className="w-3.5 h-3.5 text-muted-foreground" aria-label="Video" />}
+          {hasAudio && <Headphones className="w-3.5 h-3.5 text-muted-foreground" aria-label="Audio" />}
+          {hasPDF && <FileText className="w-3.5 h-3.5 text-muted-foreground" aria-label="PDF" />}
           {!hasAR && !has360 && !hasVideo && !hasAudio && !hasPDF && (
-            <Info className="w-3.5 h-3.5 text-accent" />
+            <Info className="w-3.5 h-3.5 text-accent" aria-label="Info" />
           )}
         </div>
       </div>
