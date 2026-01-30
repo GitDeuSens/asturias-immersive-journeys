@@ -123,14 +123,14 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="absolute bottom-0 top-14 left-0 right-0 md:left-1/2 md:-translate-x-1/2 md:max-w-2xl md:w-full bg-white rounded-t-3xl overflow-hidden flex flex-col md:shadow-2xl"
+            className="absolute bottom-0 top-14 left-0 right-0 md:left-1/2 md:-translate-x-1/2 md:max-w-2xl md:w-full bg-card rounded-t-3xl overflow-hidden flex flex-col md:shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* HERO */}
             <div className="relative h-52 md:h-64 flex-shrink-0">
               <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: heroImage ? `url(${heroImage})` : undefined }} />
-              <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent" />
-              <button onClick={onClose} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-muted transition-colors">
+              <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
+              <button onClick={onClose} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-card shadow-lg flex items-center justify-center hover:bg-muted transition-colors">
                 <X className="w-5 h-5 text-foreground" />
               </button>
               <div className="absolute top-4 left-4">
@@ -143,7 +143,7 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
                 <div className="flex flex-wrap gap-2">
                   {poi.categoryIds.map(catId => {
                     const cat = categories.find(c => c.id === catId);
-                    return cat ? <span key={catId} className="px-3 py-1 rounded-full text-xs font-medium bg-white/90 text-foreground shadow-sm">{t(cat.label)}</span> : null;
+                    return cat ? <span key={catId} className="px-3 py-1 rounded-full text-xs font-medium bg-card/90 text-foreground shadow-sm">{t(cat.label)}</span> : null;
                   })}
                 </div>
               </div>

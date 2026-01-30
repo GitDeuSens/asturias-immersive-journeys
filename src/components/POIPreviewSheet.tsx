@@ -79,7 +79,7 @@ export function POIPreviewSheet({ poi, onClose, onViewDetails }: POIPreviewSheet
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 100 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="absolute bottom-4 left-4 right-4 md:left-auto md:right-[430px] md:w-[340px] bg-white rounded-2xl overflow-hidden z-10 shadow-xl border border-border/50"
+        className="absolute bottom-4 left-4 right-4 md:left-auto md:right-[430px] md:w-[340px] bg-card rounded-2xl overflow-hidden z-10 shadow-xl border border-border/50"
       >
         {/* Hero Image */}
         <div 

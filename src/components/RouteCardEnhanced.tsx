@@ -49,7 +49,7 @@ export function RouteCard({ route, onClick }: RouteCardProps) {
 
         {/* Circular badge */}
         {route.isCircular && (
-          <span className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-full bg-white/90 backdrop-blur-sm text-primary text-[10px] font-bold uppercase tracking-wide border border-primary/30">
+          <span className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-full bg-card/90 backdrop-blur-sm text-primary text-[10px] font-bold uppercase tracking-wide border border-primary/30">
             <RotateCw className="w-3 h-3" aria-hidden="true" />
             {t('routes.circular')}
           </span>
