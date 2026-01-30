@@ -5,6 +5,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { CategoryChips } from '@/components/CategoryChips';
 import { KuulaTourEmbed } from '@/components/KuulaTourEmbed';
 import { GlobalSearch } from '@/components/GlobalSearch';
+import { Footer } from '@/components/Footer';
 import { tours360, categories, Tour360 } from '@/data/mockData';
 import { getVirtualTours } from '@/lib/api/directus-client';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -214,6 +215,8 @@ export function Tours360Page() {
             ))}
           </motion.div>
         </div>
+
+        <Footer />
       </main>
 
       {/* Tour Viewer Modal - Now using KuulaTourEmbed */}

@@ -9,6 +9,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SEOHead } from '@/components/SEOHead';
+import { Footer } from '@/components/Footer';
 import { getARScenes } from '@/lib/api/directus-client';
 import { useLanguage } from '@/hooks/useLanguage';
 import type { ARScene, Language } from '@/lib/types';
@@ -231,6 +232,8 @@ export function ARExperiencesPage() {
             </motion.div>
           )}
         </div>
+
+        <Footer />
       </main>
     </div>
   );

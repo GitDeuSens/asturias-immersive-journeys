@@ -15,6 +15,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { AppHeader } from '@/components/AppHeader';
 import { SEOHead } from '@/components/SEOHead';
+import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -238,6 +239,8 @@ export function VRExperiencesPage() {
             ))}
           </div>
         </div>
+
+        <Footer />
       </main>
 
       {/* Detail Modal */}
