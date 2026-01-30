@@ -433,7 +433,7 @@ export function RoutesPage() {
             initial={{ y: '100%' }}
             animate={{ y: panelExpanded ? 0 : 'calc(100% - 60px)' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="absolute bottom-0 left-0 right-0 md:top-14 md:bottom-0 md:left-auto md:right-4 md:w-[400px] bg-white/95 backdrop-blur-md border border-border shadow-xl rounded-t-2xl md:rounded-2xl md:my-4 max-h-[75vh] md:max-h-none overflow-hidden flex flex-col"
+            className="absolute bottom-0 left-0 right-0 md:top-14 md:bottom-0 md:left-auto md:right-4 md:w-[400px] bg-card/95 backdrop-blur-md border border-border shadow-xl rounded-t-2xl md:rounded-2xl md:my-4 max-h-[75vh] md:max-h-none overflow-hidden flex flex-col"
           >
             {/* Mobile handle */}
             <button
