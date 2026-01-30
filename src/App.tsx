@@ -6,6 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { SkipToContent } from '@/components/SkipToContent';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { NetworkStatusAlert } from '@/components/NetworkStatusAlert';
 import { initGA, trackPageView } from '@/lib/analytics';
 
 // Lazy load pages for performance
@@ -47,30 +49,33 @@ function AnalyticsTracker() {
 const queryClient = new QueryClient();
 
 const App = () => (
-  <HelmetProvider>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <SkipToContent />
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AnalyticsTracker />
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/experience" element={<Index />} />
-              <Route path="/tours" element={<Tours360Page />} />
-              <Route path="/routes" element={<RoutesPage />} />
-              <Route path="/vr" element={<VRExperiencesPage />} />
-              <Route path="/ar" element={<ARExperiencesPage />} />
-              <Route path="/ar/:slug" element={<ARScenePage />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
-  </HelmetProvider>
+  <ErrorBoundary>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <SkipToContent />
+          <NetworkStatusAlert />
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AnalyticsTracker />
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/experience" element={<Index />} />
+                <Route path="/tours" element={<Tours360Page />} />
+                <Route path="/routes" element={<RoutesPage />} />
+                <Route path="/vr" element={<VRExperiencesPage />} />
+                <Route path="/ar" element={<ARExperiencesPage />} />
+                <Route path="/ar/:slug" element={<ARScenePage />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
+  </ErrorBoundary>
 );
 
 export default App;

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Home, MapPin, Navigation, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useGeolocation } from '@/hooks/useGeolocation';
-import { toast } from 'sonner';
+import { GeolocationErrorAlert } from '@/components/GeolocationErrorAlert';
 
 interface ModeSelectorProps {
   onSelect: (mode: 'home' | 'here') => void;
@@ -40,11 +40,6 @@ const texts = {
     en: 'Location access will be requested',
     fr: 'L\'accès à la localisation sera demandé'
   },
-  locationError: {
-    es: 'No se pudo obtener la ubicación. Puedes continuar sin ella.',
-    en: 'Could not get location. You can continue without it.',
-    fr: 'Impossible d\'obtenir la localisation. Vous pouvez continuer sans elle.'
-  },
   gettingLocation: {
     es: 'Obteniendo ubicación...',
     en: 'Getting location...',
@@ -54,8 +49,9 @@ const texts = {
 
 export function ModeSelector({ onSelect }: ModeSelectorProps) {
   const { t } = useLanguage();
-  const { requestLocation, loading } = useGeolocation();
+  const { requestLocation, loading, error, clearLocation } = useGeolocation();
   const [selectedMode, setSelectedMode] = useState<'home' | 'here' | null>(null);
+  const [geoError, setGeoError] = useState<string | null>(null);
 
   const handleHomeSelect = () => {
     setSelectedMode('home');
@@ -64,19 +60,39 @@ export function ModeSelector({ onSelect }: ModeSelectorProps) {
 
   const handleHereSelect = async () => {
     setSelectedMode('here');
+    setGeoError(null);
     const success = await requestLocation();
     
-    if (!success) {
-      toast.warning(t(texts.locationError), {
-        duration: 4000,
-      });
+    if (!success && error) {
+      setGeoError(error);
     }
     
+    // Continue anyway - user can still explore without location
     onSelect('here');
+  };
+
+  const handleRetryLocation = async () => {
+    setGeoError(null);
+    clearLocation();
+    await requestLocation();
+    if (error) {
+      setGeoError(error);
+    }
+  };
+
+  const handleDismissError = () => {
+    setGeoError(null);
   };
 
   return (
     <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 pt-20 pb-10">
+      {/* Geolocation Error Alert */}
+      <GeolocationErrorAlert 
+        error={geoError} 
+        onDismiss={handleDismissError}
+        onRetry={handleRetryLocation}
+      />
+
       {/* Title */}
       <motion.h1
         initial={{ opacity: 0, y: 20 }}
