@@ -1,10 +1,14 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { View, ChevronRight, X, Filter } from 'lucide-react';
+import { View, ChevronRight, X, Filter, Search } from 'lucide-react';
 import { AppHeader } from '@/components/AppHeader';
 import { CategoryChips } from '@/components/CategoryChips';
+import { KuulaTourEmbed } from '@/components/KuulaTourEmbed';
+import { GlobalSearch } from '@/components/GlobalSearch';
 import { tours360, categories, Tour360 } from '@/data/mockData';
+import { getVirtualTours } from '@/lib/api/directus-client';
 import { useLanguage } from '@/hooks/useLanguage';
+import type { KuulaTour, Language } from '@/lib/types';
 
 const texts = {
   title: { es: 'Tours Virtuales 360°', en: 'Virtual Tours 360°', fr: 'Visites Virtuelles 360°' },
@@ -12,14 +16,26 @@ const texts = {
   startTour: { es: 'Iniciar Tour', en: 'Start Tour', fr: 'Démarrer la visite' },
   scenes: { es: 'escenas', en: 'scenes', fr: 'scènes' },
   close: { es: 'Cerrar', en: 'Close', fr: 'Fermer' },
-  viewerPlaceholder: { es: 'Visor 360° (placeholder)', en: '360° Viewer (placeholder)', fr: 'Visionneuse 360° (placeholder)' },
   allCategories: { es: 'Todas las categorías', en: 'All categories', fr: 'Toutes les catégories' },
+  searchPlaceholder: { es: 'Buscar tours...', en: 'Search tours...', fr: 'Rechercher des visites...' },
 };
 
 export function Tours360Page() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [activeTour, setActiveTour] = useState<Tour360 | null>(null);
+  const [activeTourData, setActiveTourData] = useState<KuulaTour | null>(null);
+  const [kuulaTours, setKuulaTours] = useState<KuulaTour[]>([]);
+  const [showSearch, setShowSearch] = useState(false);
+
+  // Load tours from API
+  useEffect(() => {
+    async function loadTours() {
+      const tours = await getVirtualTours(language as Language);
+      setKuulaTours(tours);
+    }
+    loadTours();
+  }, [language]);
 
   const filteredTours = useMemo(() => {
     if (selectedCategories.length === 0) return tours360;
@@ -34,6 +50,31 @@ export function Tours360Page() {
         ? prev.filter(id => id !== catId)
         : [...prev, catId]
     );
+  };
+
+  const handleTourClick = (tour: Tour360) => {
+    setActiveTour(tour);
+    // Find matching Kuula tour data
+    const kuulaTour = kuulaTours.find(kt => kt.id === tour.id);
+    if (kuulaTour) {
+      setActiveTourData(kuulaTour);
+    } else {
+      // Create a mock KuulaTour from Tour360
+      setActiveTourData({
+        id: tour.id,
+        title: tour.title,
+        description: { es: '', en: '', fr: '' },
+        kuula_embed_url: `https://kuula.co/share/collection/${tour.id}?logo=1&info=1&fs=1&vr=0&sd=1&thumbs=1`,
+        thumbnail_url: tour.coverImage,
+        total_panoramas: tour.scenes.length,
+        published: true,
+      });
+    }
+  };
+
+  const closeTour = () => {
+    setActiveTour(null);
+    setActiveTourData(null);
   };
 
   return (
@@ -55,14 +96,37 @@ export function Tours360Page() {
                   {t(texts.title)}
                 </h1>
               </div>
-              <p className="text-lg text-white/90 max-w-2xl mx-auto">
+              <p className="text-lg text-white/90 max-w-2xl mx-auto mb-6">
                 {t(texts.subtitle)}
               </p>
+
+              {/* Search toggle */}
+              <button
+                onClick={() => setShowSearch(!showSearch)}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+              >
+                <Search className="w-4 h-4" />
+                <span>{t(texts.searchPlaceholder)}</span>
+              </button>
             </motion.div>
           </div>
         </div>
 
         <div className="container mx-auto px-4 max-w-6xl">
+          {/* Search bar */}
+          <AnimatePresence>
+            {showSearch && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-6 overflow-hidden"
+              >
+                <GlobalSearch locale={language as Language} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Category filters */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -95,7 +159,7 @@ export function Tours360Page() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 * index }}
                 className="group cursor-pointer bg-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-border hover:border-primary"
-                onClick={() => setActiveTour(tour)}
+                onClick={() => handleTourClick(tour)}
               >
                 <div className="relative">
                   <div 
@@ -152,9 +216,9 @@ export function Tours360Page() {
         </div>
       </main>
 
-      {/* Tour Viewer Modal */}
+      {/* Tour Viewer Modal - Now using KuulaTourEmbed */}
       <AnimatePresence>
-        {activeTour && (
+        {activeTour && activeTourData && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -172,7 +236,7 @@ export function Tours360Page() {
                 </h2>
               </div>
               <button
-                onClick={() => setActiveTour(null)}
+                onClick={closeTour}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-white"
               >
                 <X className="w-4 h-4" />
@@ -180,17 +244,15 @@ export function Tours360Page() {
               </button>
             </div>
 
-            {/* Viewer placeholder */}
-            <div className="flex-1 flex items-center justify-center p-8">
-              <div className="text-center max-w-4xl w-full">
-                <div 
-                  className="w-full aspect-video bg-cover bg-center rounded-2xl mb-6 shadow-2xl"
-                  style={{ backgroundImage: `url(${activeTour.coverImage})` }}
+            {/* Kuula Tour Embed */}
+            <div className="flex-1 p-4 overflow-auto">
+              <div className="max-w-5xl mx-auto h-full">
+                <KuulaTourEmbed 
+                  tour={activeTourData} 
+                  locale={language as Language}
+                  showControls={false}
+                  onClose={closeTour}
                 />
-                <div className="flex items-center justify-center gap-3 text-white/60">
-                  <View className="w-8 h-8" />
-                  <span className="text-lg">{t(texts.viewerPlaceholder)}</span>
-                </div>
               </div>
             </div>
           </motion.div>
