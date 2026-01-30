@@ -1,0 +1,8 @@
+# Netlify/Cloudflare Pages SPA redirects
+# All routes redirect to index.html for client-side routing
+
+# Handle old/legacy URLs (add redirects as needed)
+# /old-path    /new-path    301
+
+# SPA fallback - must be last
+/*    /index.html    200
