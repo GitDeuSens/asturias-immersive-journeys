@@ -143,6 +143,13 @@ const resources = {
       'a11y.playPause': 'Reproducir/Pausar',
       'a11y.fullscreen': 'Pantalla completa',
       
+      // Settings
+      'settings.language': 'Idioma',
+      'settings.theme': 'Tema',
+      'settings.lightTheme': 'Claro',
+      'settings.darkTheme': 'Oscuro',
+      'settings.systemTheme': 'Sistema',
+      
       // Footer
       'footer.privacy': 'Política de privacidad',
       'footer.cookies': 'Política de cookies',
@@ -297,6 +304,13 @@ const resources = {
       'a11y.playPause': 'Play/Pause',
       'a11y.fullscreen': 'Fullscreen',
       
+      // Settings
+      'settings.language': 'Language',
+      'settings.theme': 'Theme',
+      'settings.lightTheme': 'Light',
+      'settings.darkTheme': 'Dark',
+      'settings.systemTheme': 'System',
+      
       // Footer
       'footer.privacy': 'Privacy Policy',
       'footer.cookies': 'Cookie Policy',
@@ -450,6 +464,13 @@ const resources = {
       'a11y.imageGallery': 'Galerie d\'images',
       'a11y.playPause': 'Lecture/Pause',
       'a11y.fullscreen': 'Plein écran',
+      
+      // Settings
+      'settings.language': 'Langue',
+      'settings.theme': 'Thème',
+      'settings.lightTheme': 'Clair',
+      'settings.darkTheme': 'Sombre',
+      'settings.systemTheme': 'Système',
       
       // Footer
       'footer.privacy': 'Politique de confidentialité',
