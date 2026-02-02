@@ -312,9 +312,9 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
             variant="secondary"
             size="icon"
             onClick={handleClose}
-            className="rounded-full shadow-lg bg-background/90 backdrop-blur-sm"
+            className="rounded-full shadow-lg bg-card/95 backdrop-blur-sm border border-border hover:bg-muted"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 text-foreground" />
           </Button>
 
           {isNavigating && (
@@ -323,18 +323,18 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
                 variant="secondary"
                 size="icon"
                 onClick={() => setVoiceEnabled(!voiceEnabled)}
-                className="rounded-full shadow-lg bg-background/90 backdrop-blur-sm"
+                className="rounded-full shadow-lg bg-card/95 backdrop-blur-sm border border-border hover:bg-muted"
               >
-                {voiceEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+                {voiceEnabled ? <Volume2 className="w-5 h-5 text-foreground" /> : <VolumeX className="w-5 h-5 text-foreground" />}
               </Button>
               <Button
                 variant="secondary"
                 size="icon"
                 onClick={recalculateRoute}
-                className="rounded-full shadow-lg bg-background/90 backdrop-blur-sm"
+                className="rounded-full shadow-lg bg-card/95 backdrop-blur-sm border border-border hover:bg-muted"
                 disabled={isLoading || isOfflineMode}
               >
-                <RotateCcw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
+                <RotateCcw className={`w-5 h-5 text-foreground ${isLoading ? 'animate-spin' : ''}`} />
               </Button>
             </div>
           )}
