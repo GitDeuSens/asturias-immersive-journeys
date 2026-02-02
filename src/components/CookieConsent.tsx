@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Cookie, X, Check, Settings, ExternalLink } from 'lucide-react';
+import { Cookie, X, Check, SlidersHorizontal, ExternalLink } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { initGA, trackCookieConsent } from '@/lib/analytics';
 
 const CONSENT_KEY = 'asturias-inmersivo-cookie-consent';
 
@@ -63,6 +64,14 @@ export function CookieConsent() {
     };
     localStorage.setItem(CONSENT_KEY, JSON.stringify(consentData));
     setIsVisible(false);
+    
+    // Track consent event
+    trackCookieConsent(status, { ...prefs });
+    
+    // Initialize analytics if user accepted
+    if (prefs.analytics) {
+      initGA();
+    }
   };
 
   if (!isVisible) return null;
@@ -130,11 +139,12 @@ export function CookieConsent() {
                     
                     <button
                       onClick={() => setShowSettings(!showSettings)}
-                      className="flex items-center gap-2 px-5 py-2.5 text-foreground hover:bg-muted rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                      className="p-2.5 text-foreground hover:bg-muted rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                       aria-expanded={showSettings}
+                      aria-label={t('cookies.customize')}
+                      title={t('cookies.customize')}
                     >
-                      <Settings className="w-4 h-4" aria-hidden="true" />
-                      {t('cookies.customize')}
+                      <SlidersHorizontal className="w-5 h-5" aria-hidden="true" />
                     </button>
                   </div>
                 </div>

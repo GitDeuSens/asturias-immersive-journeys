@@ -1,5 +1,6 @@
 // ============ ANALYTICS INTEGRATION ============
 // 🗄️ GA4 tracking for user interactions and events
+// Respects user cookie consent preferences
 
 declare global {
   interface Window {
@@ -9,11 +10,30 @@ declare global {
 }
 
 const GA4_ID = import.meta.env.VITE_GA4_ID;
+const CONSENT_KEY = 'asturias-inmersivo-cookie-consent';
 
-// Initialize GA4
+// Check if analytics cookies are allowed
+export const hasAnalyticsConsent = (): boolean => {
+  try {
+    const consent = localStorage.getItem(CONSENT_KEY);
+    if (!consent) return false;
+    
+    const parsed = JSON.parse(consent);
+    return parsed.preferences?.analytics === true;
+  } catch {
+    return false;
+  }
+};
+
+// Initialize GA4 (only if consent given)
 export const initGA = () => {
   if (!GA4_ID) {
     console.warn('[Analytics] GA4_ID not configured - analytics disabled');
+    return;
+  }
+
+  if (!hasAnalyticsConsent()) {
+    console.log('[Analytics] User has not consented to analytics cookies');
     return;
   }
 
@@ -31,12 +51,15 @@ export const initGA = () => {
   window.gtag('js', new Date());
   window.gtag('config', GA4_ID, {
     page_path: window.location.pathname,
+    anonymize_ip: true, // GDPR compliance
   });
+  
+  console.log('[Analytics] GA4 initialized with consent');
 };
 
 // Track page view
 export const trackPageView = (url: string) => {
-  if (!window.gtag) return;
+  if (!window.gtag || !hasAnalyticsConsent()) return;
 
   window.gtag('config', GA4_ID, {
     page_path: url,
@@ -48,6 +71,11 @@ export const trackEvent = (
   eventName: string, 
   params?: Record<string, string | number | boolean>
 ) => {
+  if (!hasAnalyticsConsent()) {
+    console.log('[Analytics] Event blocked (no consent):', eventName);
+    return;
+  }
+  
   if (!window.gtag) {
     console.log('[Analytics] Event (dev):', eventName, params);
     return;
@@ -189,5 +217,15 @@ export const trackLanguageChanged = (fromLang: string, toLang: string) => {
 export const trackThemeChanged = (theme: string) => {
   trackEvent('theme_changed', {
     theme,
+  });
+};
+
+export const trackCookieConsent = (status: string, preferences: Record<string, boolean>) => {
+  // This event is allowed even without full consent as it tracks the consent itself
+  if (!window.gtag) return;
+  
+  window.gtag('event', 'cookie_consent', {
+    consent_status: status,
+    ...preferences,
   });
 };
