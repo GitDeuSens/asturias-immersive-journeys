@@ -363,24 +363,24 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
                 onClick={() => setSelectedMode('walking')}
                 className={`flex flex-col items-center gap-2 p-4 rounded-xl transition-all border-2 ${
                   selectedMode === 'walking'
-                    ? 'bg-primary/20 border-primary'
-                    : 'bg-muted/50 border-transparent hover:bg-muted'
+                    ? 'bg-primary/10 border-primary shadow-sm'
+                    : 'bg-muted/50 border-border hover:bg-muted hover:border-muted-foreground/30'
                 }`}
               >
                 <Footprints className={`w-8 h-8 ${selectedMode === 'walking' ? 'text-primary' : 'text-muted-foreground'}`} />
-                <span className="font-medium">{t('navigation.walking')}</span>
+                <span className={`font-medium ${selectedMode === 'walking' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('navigation.walking')}</span>
               </button>
 
               <button
                 onClick={() => setSelectedMode('driving')}
                 className={`flex flex-col items-center gap-2 p-4 rounded-xl transition-all border-2 ${
                   selectedMode === 'driving'
-                    ? 'bg-primary/20 border-primary'
-                    : 'bg-muted/50 border-transparent hover:bg-muted'
+                    ? 'bg-primary/10 border-primary shadow-sm'
+                    : 'bg-muted/50 border-border hover:bg-muted hover:border-muted-foreground/30'
                 }`}
               >
                 <Car className={`w-8 h-8 ${selectedMode === 'driving' ? 'text-primary' : 'text-muted-foreground'}`} />
-                <span className="font-medium">{t('navigation.driving')}</span>
+                <span className={`font-medium ${selectedMode === 'driving' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('navigation.driving')}</span>
               </button>
             </div>
 
