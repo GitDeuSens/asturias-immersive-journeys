@@ -91,14 +91,14 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
           {/* Close button */}
           <button 
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+            className="absolute top-4 right-4 p-2 rounded-full bg-background/80 backdrop-blur-sm text-foreground hover:bg-background transition-colors focus:outline-none focus:ring-2 focus:ring-primary shadow-lg"
             aria-label={t('common.close')}
           >
             <X className="w-5 h-5" />
           </button>
 
           {/* Route ID */}
-          <span className="absolute top-4 left-4 px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-sm text-white text-sm font-bold">
+          <span className="absolute top-4 left-4 px-3 py-1.5 rounded-lg bg-background/80 backdrop-blur-sm text-foreground text-sm font-bold shadow-lg">
             {route.id}
           </span>
 
