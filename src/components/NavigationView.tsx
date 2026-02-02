@@ -463,7 +463,7 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
             className="bg-card rounded-t-3xl shadow-2xl overflow-hidden"
           >
             {/* Current instruction */}
-            <div className="p-4 bg-primary text-primary-foreground">
+            <div className="p-4 bg-primary text-primary-foreground rounded-t-3xl">
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
                   <ManeuverIcon type={getManeuverIcon(currentStep)} className="w-8 h-8" />
