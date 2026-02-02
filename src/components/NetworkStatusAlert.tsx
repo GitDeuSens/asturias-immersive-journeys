@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { WifiOff, Wifi, AlertTriangle } from 'lucide-react';
+import { WifiOff, Wifi, AlertTriangle, Database } from 'lucide-react';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useLanguage } from '@/hooks/useLanguage';
+import { getCacheStats, clearExpiredCache } from '@/lib/offlineCache';
 
 const texts = {
   offline: {
@@ -14,6 +15,16 @@ const texts = {
     es: 'Algunas funciones pueden no estar disponibles',
     en: 'Some features may not be available',
     fr: 'Certaines fonctionnalités peuvent ne pas être disponibles'
+  },
+  offlineWithCache: {
+    es: 'Modo sin conexión - Datos disponibles',
+    en: 'Offline mode - Data available',
+    fr: 'Mode hors ligne - Données disponibles'
+  },
+  offlineCacheDescription: {
+    es: 'rutas guardadas para uso offline',
+    en: 'routes saved for offline use',
+    fr: 'itinéraires enregistrés pour une utilisation hors ligne'
   },
   backOnline: {
     es: '¡Conexión restaurada!',
@@ -37,6 +48,21 @@ export function NetworkStatusAlert() {
   const { t } = useLanguage();
   const [showRestored, setShowRestored] = useState(false);
   const [showSlowWarning, setShowSlowWarning] = useState(false);
+  const [cachedRouteCount, setCachedRouteCount] = useState(0);
+
+  // Clear expired cache on mount
+  useEffect(() => {
+    clearExpiredCache();
+  }, []);
+
+  // Check cache stats when going offline
+  useEffect(() => {
+    if (!isOnline) {
+      getCacheStats().then(stats => {
+        setCachedRouteCount(stats.routeCount);
+      });
+    }
+  }, [isOnline]);
 
   // Show "connection restored" message when coming back online
   useEffect(() => {
@@ -65,17 +91,35 @@ export function NetworkStatusAlert() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -100, opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="fixed top-0 left-0 right-0 z-[100] bg-destructive text-destructive-foreground px-4 py-3 shadow-lg"
+          className={`fixed top-0 left-0 right-0 z-[100] px-4 py-3 shadow-lg ${
+            cachedRouteCount > 0 
+              ? 'bg-amber-500 text-white' 
+              : 'bg-destructive text-destructive-foreground'
+          }`}
           role="alert"
           aria-live="assertive"
           aria-atomic="true"
         >
           <div className="container mx-auto flex items-center justify-center gap-3">
-            <WifiOff className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
-            <div className="text-center">
-              <p className="font-semibold text-sm">{t(texts.offline)}</p>
-              <p className="text-xs opacity-90">{t(texts.offlineDescription)}</p>
-            </div>
+            {cachedRouteCount > 0 ? (
+              <>
+                <Database className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
+                <div className="text-center">
+                  <p className="font-semibold text-sm">{t(texts.offlineWithCache)}</p>
+                  <p className="text-xs opacity-90">
+                    {cachedRouteCount} {t(texts.offlineCacheDescription)}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <WifiOff className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
+                <div className="text-center">
+                  <p className="font-semibold text-sm">{t(texts.offline)}</p>
+                  <p className="text-xs opacity-90">{t(texts.offlineDescription)}</p>
+                </div>
+              </>
+            )}
           </div>
         </motion.div>
       )}
