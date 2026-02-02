@@ -73,7 +73,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
           mass: 0.9,
           opacity: { duration: 0.2, ease: 'easeOut' }
         }}
-        className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-background z-50 shadow-2xl flex flex-col overflow-hidden"
+        className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-background z-50 shadow-2xl flex flex-col overflow-hidden md:rounded-l-3xl"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -255,7 +255,7 @@ function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: nu
   const hasPDF = !!content.pdf;
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
+    <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50">
       {/* Thumbnail */}
       <div className="relative flex-shrink-0">
         <div 
