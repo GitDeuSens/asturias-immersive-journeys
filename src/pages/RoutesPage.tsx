@@ -7,10 +7,6 @@ import {
   ChevronUp, 
   ChevronDown, 
   Maximize2,
-  ChevronLeft,
-  List,
-  Map as MapIcon,
-  Navigation,
   Locate
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -102,7 +98,7 @@ export function RoutesPage() {
   const [exploringRoute, setExploringRoute] = useState<ImmersiveRoute | null>(null);
   const [selectedPoint, setSelectedPoint] = useState<RoutePoint | null>(null);
   const [panelExpanded, setPanelExpanded] = useState(true);
-  const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
+  
   
   // Geolocation
   const { latitude, longitude, error: geoError, requestLocation, hasLocation } = useGeolocation();
@@ -316,122 +312,42 @@ export function RoutesPage() {
       
       <main id="main-content" className="flex-1 relative pt-14">
         {/* Map view */}
-        {viewMode === 'map' && (
-          <>
-            <div 
-              ref={mapContainerRef} 
-              className="h-full w-full z-0 absolute inset-0"
-              aria-label={t('a11y.mapInteractive')}
-            />
+        <div 
+          ref={mapContainerRef} 
+          className="h-full w-full z-0 absolute inset-0"
+          aria-label={t('a11y.mapInteractive')}
+        />
 
-            {/* Map controls */}
-            <div className="absolute top-20 right-4 z-10 flex flex-col gap-2">
-              {/* User location button */}
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={userPosition ? centerOnUser : requestLocation}
-                className={`shadow-lg ${userPosition ? 'bg-accent text-accent-foreground' : ''}`}
-                aria-label={userPosition ? t('map.yourLocation') : t('map.enableLocation')}
-              >
-                <Locate className="w-4 h-4" />
-              </Button>
+        {/* Map controls */}
+        <div className="absolute top-20 right-4 z-10 flex flex-col gap-2">
+          {/* User location button */}
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={userPosition ? centerOnUser : requestLocation}
+            className={`shadow-lg ${userPosition ? 'bg-accent text-accent-foreground' : ''}`}
+            aria-label={userPosition ? t('map.yourLocation') : t('map.enableLocation')}
+          >
+            <Locate className="w-4 h-4" />
+          </Button>
 
-              {/* Fit bounds button */}
-              {exploringRoute && (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => fitToRoute(exploringRoute)}
-                  className="shadow-lg"
-                  aria-label={t('routes.fitBounds')}
-                >
-                  <Maximize2 className="w-4 h-4" />
-                </Button>
-              )}
-            </div>
-          </>
-        )}
+          {/* Fit bounds button */}
+          {exploringRoute && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => fitToRoute(exploringRoute)}
+              className="shadow-lg"
+              aria-label={t('routes.fitBounds')}
+            >
+              <Maximize2 className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
 
-        {/* List view */}
-        {viewMode === 'list' && (
-          <ScrollArea className="h-[calc(100vh-3.5rem)]">
-            <div className="container mx-auto px-4 py-6 max-w-4xl">
-              <h1 className="text-2xl font-bold text-foreground mb-6">{t('routes.title')}</h1>
-              
-              {/* Search */}
-              <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-                <input
-                  type="search"
-                  placeholder={t('routes.search')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-muted/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
-                  aria-label={t('routes.search')}
-                />
-              </div>
 
-              {/* Categories */}
-              <CategoryChips
-                categories={categories}
-                selectedIds={selectedCategories}
-                onToggle={toggleCategory}
-                className="mb-6"
-              />
-
-              {/* Routes grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {filteredRoutes.map(route => (
-                  <RouteCard 
-                    key={route.id} 
-                    route={route}
-                    onClick={() => {
-                      setSelectedRoute(route);
-                      setShowRouteDetail(true);
-                    }}
-                  />
-                ))}
-              </div>
-
-              {filteredRoutes.length === 0 && (
-                <div className="text-center py-12">
-                  <MapPin className="w-12 h-12 mx-auto text-muted-foreground/30 mb-4" aria-hidden="true" />
-                  <p className="text-muted-foreground">{t('common.results')}: 0</p>
-                </div>
-              )}
-            </div>
-            <Footer />
-          </ScrollArea>
-        )}
-
-        {/* View toggle (mobile) - Only show when NOT exploring a route */}
-        {!exploringRoute && (
-          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-20 md:hidden">
-            <div className="flex rounded-full bg-card border border-border shadow-lg overflow-hidden">
-              <button
-                onClick={() => setViewMode('map')}
-                className={`px-4 py-2.5 flex items-center gap-2 text-sm font-medium transition-colors ${viewMode === 'map' ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted'}`}
-                aria-pressed={viewMode === 'map'}
-              >
-                <MapIcon className="w-4 h-4" aria-hidden="true" />
-                {t('common.viewMap')}
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`px-4 py-2.5 flex items-center gap-2 text-sm font-medium transition-colors ${viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted'}`}
-                aria-pressed={viewMode === 'list'}
-              >
-                <List className="w-4 h-4" aria-hidden="true" />
-                {t('common.viewList')}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Side Panel (map view only) */}
-        {viewMode === 'map' && (
-          <motion.div
+        {/* Side Panel */}
+        <motion.div
             initial={{ y: '100%' }}
             animate={{ y: panelExpanded ? 0 : 'calc(100% - 60px)' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
@@ -506,7 +422,6 @@ export function RoutesPage() {
               )}
             </div>
           </motion.div>
-        )}
       </main>
 
       {/* Route Detail Sheet */}
