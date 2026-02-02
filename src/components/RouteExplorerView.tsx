@@ -17,8 +17,9 @@ import {
   Navigation,
   Footprints
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { ImmersiveRoute, RoutePoint } from '@/data/immersiveRoutes';
-import { useLanguage, useExplorationMode } from '@/hooks/useLanguage';
+import { useExplorationMode } from '@/hooks/useLanguage';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -36,19 +37,9 @@ interface RouteExplorerViewProps {
   selectedPoint: RoutePoint | null;
 }
 
-const texts = {
-  back: { es: 'Salir de la ruta', en: 'Exit route', fr: 'Quitter l\'itinéraire' },
-  exploring: { es: 'Explorando', en: 'Exploring', fr: 'Exploration' },
-  points: { es: 'puntos', en: 'points', fr: 'points' },
-  noPointsYet: { es: 'Los puntos de esta ruta están en desarrollo', en: 'Points for this route are in development', fr: 'Les points de cet itinéraire sont en développement' },
-  progress: { es: 'Progreso', en: 'Progress', fr: 'Progression' },
-  viewContent: { es: 'Ver contenido', en: 'View content', fr: 'Voir le contenu' },
-  nearestPoint: { es: 'Punto más cercano', en: 'Nearest point', fr: 'Point le plus proche' },
-  startHere: { es: 'Empezar aquí', en: 'Start here', fr: 'Commencer ici' },
-};
-
 export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint }: RouteExplorerViewProps) {
-  const { t, language } = useLanguage();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language as 'es' | 'en' | 'fr';
   const { mode } = useExplorationMode();
   const { latitude, longitude, hasLocation } = useGeolocation();
   const [visitedPoints, setVisitedPoints] = useState<Set<string>>(new Set());
@@ -67,7 +58,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
     route.points.forEach(point => {
       const dest: NavigationDestination = {
         id: point.id,
-        name: typeof point.title === 'string' ? point.title : point.title[language] || point.title.es,
+        name: typeof point.title === 'string' ? point.title : point.title[lang] || point.title.es,
         lat: point.location.lat,
         lng: point.location.lng,
         type: 'route-point',
@@ -79,7 +70,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
       });
     });
     return distances;
-  }, [route.points, latitude, longitude, hasLocation, mode, language]);
+  }, [route.points, latitude, longitude, hasLocation, mode, lang]);
 
   // Find nearest point
   const nearestPoint = useMemo(() => {
@@ -112,7 +103,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
           className="flex items-center gap-2 text-sm text-primary font-medium hover:text-primary/80 transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
-          {t(texts.back)}
+          {t('routes.exitRoute')}
         </button>
 
         {/* Route info */}
@@ -123,14 +114,14 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
           />
           <div className="flex-1 min-w-0">
             <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
-              {t(texts.exploring)}
+              {t('routes.exploring')}
             </span>
             <h2 className="font-sans font-bold text-foreground text-lg leading-tight truncate">
-              {t(route.title)}
+              {route.title[lang]}
             </h2>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-xs text-muted-foreground">
-                {route.points.length} {t(texts.points)}
+                {route.points.length} {t('routes.points')}
               </span>
               {route.isCircular && (
                 <span className="flex items-center gap-1 text-[10px] text-primary font-medium">
@@ -145,7 +136,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
         {route.points.length > 0 && (
           <div className="space-y-1">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">{t(texts.progress)}</span>
+              <span className="text-muted-foreground">{t('routes.progress')}</span>
               <span className="font-bold text-primary">{progress}%</span>
             </div>
             <Progress value={progress} className="h-2" />
@@ -166,12 +157,12 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
               <div className="flex items-center gap-2 mb-2">
                 <Navigation className="w-4 h-4 text-primary" />
                 <span className="text-xs font-semibold text-primary uppercase tracking-wide">
-                  {t(texts.nearestPoint)}
+                  {t('navigation.nearestPoint')}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-semibold text-foreground">{t(nearestPoint.title)}</p>
+                  <p className="font-semibold text-foreground">{nearestPoint.title[lang]}</p>
                   <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
                     <MapPin className="w-3 h-3" />
                     {pointDistances.get(nearestPoint.id)?.distance}
@@ -185,7 +176,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
                   onClick={() => handlePointClick(nearestPoint)}
                   className="text-xs"
                 >
-                  {t(texts.startHere)}
+                  {t('navigation.startHere')}
                 </Button>
               </div>
             </motion.div>
@@ -211,7 +202,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
                 <MapPin className="w-8 h-8 text-muted-foreground/50" />
               </div>
               <p className="text-sm text-muted-foreground">
-                {t(texts.noPointsYet)}
+                {t('routes.noPoints')}
               </p>
             </div>
           )}
@@ -234,9 +225,9 @@ interface PointCardProps {
 }
 
 function PointCard({ point, index, isVisited, isSelected, isLast, isNearest, distanceInfo, onClick }: PointCardProps) {
-  const { t } = useLanguage();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language as 'es' | 'en' | 'fr';
   const content = point.content;
-  
   // Determine what content types are available
   const hasAR = !!content.arExperience;
   const has360 = !!content.tour360;
@@ -310,10 +301,10 @@ function PointCard({ point, index, isVisited, isSelected, isLast, isNearest, dis
         {/* Content */}
         <div className="flex-1 min-w-0 py-1">
           <h4 className="font-semibold text-foreground truncate">
-            {t(point.title)}
+            {point.title[lang]}
           </h4>
           <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
-            {t(point.shortDescription)}
+            {point.shortDescription[lang]}
           </p>
           
           {/* Content type indicators + distance */}

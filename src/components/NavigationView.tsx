@@ -25,8 +25,8 @@ import {
   WifiOff,
   TrendingUp,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useNavigation, TransportMode } from '@/hooks/useNavigation';
-import { useLanguage } from '@/hooks/useLanguage';
 import { RouteStep, formatRouteDistance, formatRouteDuration, getManeuverIcon } from '@/lib/osrmService';
 import { createUserPositionMarker, injectMapStyles } from '@/lib/mapUtils';
 import { Button } from '@/components/ui/button';
@@ -37,27 +37,6 @@ interface NavigationViewProps {
   destination: { name: string; lat: number; lng: number };
   onClose: () => void;
 }
-
-const texts = {
-  loading: { es: 'Calculando ruta...', en: 'Calculating route...', fr: 'Calcul de l\'itinéraire...' },
-  error: { es: 'Error', en: 'Error', fr: 'Erreur' },
-  retry: { es: 'Reintentar', en: 'Retry', fr: 'Réessayer' },
-  arrived: { es: '¡Has llegado!', en: 'You arrived!', fr: 'Vous êtes arrivé!' },
-  arrivedDesc: { es: 'Has llegado a tu destino', en: 'You have arrived at your destination', fr: 'Vous êtes arrivé à destination' },
-  close: { es: 'Cerrar', en: 'Close', fr: 'Fermer' },
-  recalculate: { es: 'Recalcular', en: 'Recalculate', fr: 'Recalculer' },
-  remaining: { es: 'restante', en: 'remaining', fr: 'restant' },
-  walking: { es: 'A pie', en: 'Walking', fr: 'À pied' },
-  driving: { es: 'En coche', en: 'Driving', fr: 'En voiture' },
-  stepOf: { es: 'Paso', en: 'Step', fr: 'Étape' },
-  of: { es: 'de', en: 'of', fr: 'sur' },
-  allSteps: { es: 'Todas las indicaciones', en: 'All directions', fr: 'Toutes les indications' },
-  stopNavigation: { es: 'Detener navegación', en: 'Stop navigation', fr: 'Arrêter la navigation' },
-  selectMode: { es: 'Selecciona modo de transporte', en: 'Select transport mode', fr: 'Sélectionnez le mode de transport' },
-  start: { es: 'Iniciar', en: 'Start', fr: 'Démarrer' },
-  offlineMode: { es: 'Modo sin conexión', en: 'Offline mode', fr: 'Mode hors ligne' },
-  progress: { es: 'Progreso', en: 'Progress', fr: 'Progression' },
-};
 
 // Maneuver icon component
 function ManeuverIcon({ type, className = '' }: { type: string; className?: string }) {
@@ -83,7 +62,7 @@ function ManeuverIcon({ type, className = '' }: { type: string; className?: stri
 }
 
 export function NavigationView({ destination, onClose }: NavigationViewProps) {
-  const { t } = useLanguage();
+  const { t, i18n } = useTranslation();
   const {
     isNavigating,
     isLoading,
@@ -283,7 +262,7 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/90 text-white text-xs font-semibold shadow-lg"
             >
               <WifiOff className="w-3.5 h-3.5" />
-              {t(texts.offlineMode)}
+              {t('navigation.offlineMode')}
             </motion.div>
           </div>
         )}
@@ -321,7 +300,7 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
               </div>
               <div className="text-xs">
                 <p className="font-semibold text-foreground">{formatRouteDistance(distanceTraveled)}</p>
-                <p className="text-muted-foreground">{t(texts.progress)}</p>
+                <p className="text-muted-foreground">{t('navigation.progress')}</p>
               </div>
             </div>
           </div>
@@ -375,7 +354,7 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
           >
             <div className="text-center">
               <h3 className="text-lg font-bold text-foreground">{destination.name}</h3>
-              <p className="text-sm text-muted-foreground mt-1">{t(texts.selectMode)}</p>
+              <p className="text-sm text-muted-foreground mt-1">{t('navigation.selectMode')}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -388,7 +367,7 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
                 }`}
               >
                 <Footprints className={`w-8 h-8 ${selectedMode === 'walking' ? 'text-primary' : 'text-muted-foreground'}`} />
-                <span className="font-medium">{t(texts.walking)}</span>
+                <span className="font-medium">{t('navigation.walking')}</span>
               </button>
 
               <button
@@ -400,13 +379,13 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
                 }`}
               >
                 <Car className={`w-8 h-8 ${selectedMode === 'driving' ? 'text-primary' : 'text-muted-foreground'}`} />
-                <span className="font-medium">{t(texts.driving)}</span>
+                <span className="font-medium">{t('navigation.driving')}</span>
               </button>
             </div>
 
             <Button onClick={handleStart} className="w-full h-12 text-base font-bold gap-2">
               <NavigationIcon className="w-5 h-5" />
-              {t(texts.start)}
+              {t('navigation.start')}
             </Button>
           </motion.div>
         )}
@@ -421,7 +400,7 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
             className="bg-card rounded-t-3xl shadow-2xl p-8 flex flex-col items-center gap-4"
           >
             <Loader2 className="w-10 h-10 text-primary animate-spin" />
-            <p className="text-muted-foreground">{t(texts.loading)}</p>
+            <p className="text-muted-foreground">{t('navigation.calculatingRoute')}</p>
           </motion.div>
         )}
 
@@ -437,16 +416,16 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
             <div className="flex items-center gap-3 text-destructive">
               <AlertCircle className="w-6 h-6" />
               <div>
-                <p className="font-bold">{t(texts.error)}</p>
+                <p className="font-bold">{t('navigation.error')}</p>
                 <p className="text-sm text-muted-foreground">{error}</p>
               </div>
             </div>
             <div className="flex gap-3">
               <Button variant="outline" onClick={handleClose} className="flex-1">
-                {t(texts.close)}
+                {t('common.close')}
               </Button>
               <Button onClick={handleStart} className="flex-1">
-                {t(texts.retry)}
+                {t('navigation.retry')}
               </Button>
             </div>
           </motion.div>
@@ -465,11 +444,11 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
               <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-primary/20 flex items-center justify-center">
                 <Flag className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-xl font-bold text-foreground">{t(texts.arrived)}</h3>
+              <h3 className="text-xl font-bold text-foreground">{t('navigation.arrived')}</h3>
               <p className="text-muted-foreground mt-1">{destination.name}</p>
             </div>
             <Button onClick={handleClose} className="w-full">
-              {t(texts.close)}
+              {t('common.close')}
             </Button>
           </motion.div>
         )}
@@ -505,7 +484,7 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-3.5 h-3.5 text-primary" />
-                  <span className="text-xs font-medium text-muted-foreground">{t(texts.progress)}</span>
+                  <span className="text-xs font-medium text-muted-foreground">{t('navigation.progress')}</span>
                 </div>
                 <span className="text-xs font-bold text-primary">{progressPercent}%</span>
               </div>
@@ -528,12 +507,12 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
                 {isOfflineMode && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 text-[10px] font-bold">
                     <WifiOff className="w-3 h-3" />
-                    {t(texts.offlineMode)}
+                    {t('navigation.offlineMode')}
                   </span>
                 )}
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   {transportMode === 'walking' ? <Footprints className="w-4 h-4" /> : <Car className="w-4 h-4" />}
-                  <span>{t(texts.stepOf)} {currentStepIndex + 1} {t(texts.of)} {route.steps.length}</span>
+                  <span>{t('navigation.stepOf')} {currentStepIndex + 1} {t('navigation.of')} {route.steps.length}</span>
                 </div>
               </div>
             </div>
@@ -565,7 +544,7 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
                 >
                   <div className="px-4 py-2 bg-muted/30">
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      {t(texts.allSteps)}
+                      {t('navigation.allSteps')}
                     </p>
                   </div>
                   <ScrollArea className="max-h-48">
@@ -603,7 +582,7 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
                 onClick={handleClose}
                 className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
               >
-                {t(texts.stopNavigation)}
+                {t('navigation.stopNavigation')}
               </Button>
             </div>
           </motion.div>
