@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ChevronLeft, 
@@ -13,13 +13,21 @@ import {
   Info,
   ChevronRight,
   Check,
-  X
+  X,
+  Navigation,
+  Footprints
 } from 'lucide-react';
 import { ImmersiveRoute, RoutePoint } from '@/data/immersiveRoutes';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useLanguage, useExplorationMode } from '@/hooks/useLanguage';
+import { useGeolocation } from '@/hooks/useGeolocation';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
+import { 
+  calculateDistanceTo, 
+  formatTime,
+  type NavigationDestination 
+} from '@/lib/navigationService';
 
 interface RouteExplorerViewProps {
   route: ImmersiveRoute;
@@ -35,15 +43,59 @@ const texts = {
   noPointsYet: { es: 'Los puntos de esta ruta están en desarrollo', en: 'Points for this route are in development', fr: 'Les points de cet itinéraire sont en développement' },
   progress: { es: 'Progreso', en: 'Progress', fr: 'Progression' },
   viewContent: { es: 'Ver contenido', en: 'View content', fr: 'Voir le contenu' },
+  nearestPoint: { es: 'Punto más cercano', en: 'Nearest point', fr: 'Point le plus proche' },
+  startHere: { es: 'Empezar aquí', en: 'Start here', fr: 'Commencer ici' },
 };
 
 export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint }: RouteExplorerViewProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { mode } = useExplorationMode();
+  const { latitude, longitude, hasLocation } = useGeolocation();
   const [visitedPoints, setVisitedPoints] = useState<Set<string>>(new Set());
   
   const progress = route.points.length > 0 
     ? Math.round((visitedPoints.size / route.points.length) * 100) 
     : 0;
+
+  // Calculate distances for all points (only in "here" mode)
+  const pointDistances = useMemo(() => {
+    if (mode !== 'here' || !hasLocation || latitude === null || longitude === null) {
+      return new Map<string, { distance: string; walkTime: number }>();
+    }
+    
+    const distances = new Map<string, { distance: string; walkTime: number }>();
+    route.points.forEach(point => {
+      const dest: NavigationDestination = {
+        id: point.id,
+        name: typeof point.title === 'string' ? point.title : point.title[language] || point.title.es,
+        lat: point.location.lat,
+        lng: point.location.lng,
+        type: 'route-point',
+      };
+      const result = calculateDistanceTo(latitude, longitude, dest);
+      distances.set(point.id, {
+        distance: result.distanceFormatted,
+        walkTime: result.estimatedWalkingTime,
+      });
+    });
+    return distances;
+  }, [route.points, latitude, longitude, hasLocation, mode, language]);
+
+  // Find nearest point
+  const nearestPoint = useMemo(() => {
+    if (pointDistances.size === 0) return null;
+    let nearest: RoutePoint | null = null;
+    let minDistance = Infinity;
+    
+    route.points.forEach(point => {
+      const distData = pointDistances.get(point.id);
+      if (distData && distData.walkTime < minDistance) {
+        minDistance = distData.walkTime;
+        nearest = point;
+      }
+    });
+    return nearest;
+  }, [pointDistances, route.points]);
 
   const handlePointClick = (point: RoutePoint) => {
     setVisitedPoints(prev => new Set([...prev, point.id]));
@@ -104,6 +156,41 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
       {/* Points timeline/list */}
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-2">
+          {/* Nearest point suggestion (only in "here" mode) */}
+          {nearestPoint && mode === 'here' && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-4 p-3 rounded-xl bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/30"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <Navigation className="w-4 h-4 text-primary" />
+                <span className="text-xs font-semibold text-primary uppercase tracking-wide">
+                  {t(texts.nearestPoint)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-foreground">{t(nearestPoint.title)}</p>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                    <MapPin className="w-3 h-3" />
+                    {pointDistances.get(nearestPoint.id)?.distance}
+                    <span className="mx-1">•</span>
+                    <Footprints className="w-3 h-3" />
+                    {formatTime(pointDistances.get(nearestPoint.id)?.walkTime || 0)}
+                  </p>
+                </div>
+                <Button 
+                  size="sm" 
+                  onClick={() => handlePointClick(nearestPoint)}
+                  className="text-xs"
+                >
+                  {t(texts.startHere)}
+                </Button>
+              </div>
+            </motion.div>
+          )}
+
           {route.points.length > 0 ? (
             route.points.map((point, idx) => (
               <PointCard 
@@ -113,6 +200,8 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
                 isVisited={visitedPoints.has(point.id)}
                 isSelected={selectedPoint?.id === point.id}
                 isLast={idx === route.points.length - 1}
+                isNearest={nearestPoint?.id === point.id}
+                distanceInfo={pointDistances.get(point.id)}
                 onClick={() => handlePointClick(point)}
               />
             ))
@@ -139,10 +228,12 @@ interface PointCardProps {
   isVisited: boolean;
   isSelected: boolean;
   isLast: boolean;
+  isNearest: boolean;
+  distanceInfo?: { distance: string; walkTime: number };
   onClick: () => void;
 }
 
-function PointCard({ point, index, isVisited, isSelected, isLast, onClick }: PointCardProps) {
+function PointCard({ point, index, isVisited, isSelected, isLast, isNearest, distanceInfo, onClick }: PointCardProps) {
   const { t } = useLanguage();
   const content = point.content;
   
@@ -188,6 +279,8 @@ function PointCard({ point, index, isVisited, isSelected, isLast, onClick }: Poi
         className={`w-full flex items-start gap-3 p-3 rounded-xl transition-all text-left ${
           isSelected 
             ? 'bg-primary/20 border-2 border-primary' 
+            : isNearest
+            ? 'bg-accent/20 border-2 border-accent'
             : isVisited
             ? 'bg-muted/30 border border-primary/30'
             : 'bg-muted/30 hover:bg-muted/50 border border-transparent'
@@ -223,8 +316,8 @@ function PointCard({ point, index, isVisited, isSelected, isLast, onClick }: Poi
             {t(point.shortDescription)}
           </p>
           
-          {/* Content type indicators */}
-          <div className="flex items-center gap-2 mt-2">
+          {/* Content type indicators + distance */}
+          <div className="flex items-center gap-2 mt-2 flex-wrap">
             {hasAR && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-warm/20 text-warm text-[10px] font-bold border border-warm/30">
                 <Smartphone className="w-3 h-3" />
@@ -241,6 +334,14 @@ function PointCard({ point, index, isVisited, isSelected, isLast, onClick }: Poi
             {hasAudio && <Headphones className="w-4 h-4 text-muted-foreground" />}
             {hasPDF && <FileText className="w-4 h-4 text-muted-foreground" />}
             {hasImage && !hasAR && !has360 && <Info className="w-4 h-4 text-accent" />}
+            
+            {/* Distance indicator */}
+            {distanceInfo && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-muted-foreground text-[10px] font-medium ml-auto">
+                <MapPin className="w-3 h-3" />
+                {distanceInfo.distance}
+              </span>
+            )}
           </div>
         </div>
 

@@ -114,6 +114,19 @@ const resources = {
       'map.enableLocation': 'Activar ubicación',
       'map.clusterPoints': 'puntos de interés',
       
+      // Navigation
+      'navigation.getDirections': 'Cómo llegar',
+      'navigation.walking': 'A pie',
+      'navigation.driving': 'En coche',
+      'navigation.chooseMode': 'Elige cómo llegar',
+      'navigation.fromYourLocation': 'Desde tu ubicación',
+      'navigation.nearestPoint': 'Punto más cercano',
+      'navigation.startHere': 'Empezar aquí',
+      'navigation.nearYou': 'Cerca de ti',
+      'navigation.withinRadius': 'en un radio de',
+      'navigation.noLocation': 'Activa tu ubicación para ver qué tienes cerca',
+      'navigation.nothingNearby': 'No hay puntos cercanos en un radio de 50km',
+      
       // Categories
       'category.nature': 'Naturaleza',
       'category.heritage': 'Patrimonio',
@@ -295,6 +308,20 @@ const resources = {
       'map.enableLocation': 'Enable location',
       'map.clusterPoints': 'points of interest',
       
+      // Navigation
+      'navigation.getDirections': 'Get directions',
+      'navigation.walking': 'Walking',
+      'navigation.driving': 'Driving',
+      'navigation.chooseMode': 'Choose how to get there',
+      'navigation.fromYourLocation': 'From your location',
+      'navigation.nearestPoint': 'Nearest point',
+      'navigation.startHere': 'Start here',
+      'navigation.nearYou': 'Near you',
+      'navigation.withinRadius': 'within',
+      'navigation.noLocation': 'Enable location to see what\'s nearby',
+      'navigation.nothingNearby': 'No points within 50km radius',
+      
+      
       // Categories
       'category.nature': 'Nature',
       'category.heritage': 'Heritage',
@@ -475,6 +502,20 @@ const resources = {
       'map.locationActive': 'Position active',
       'map.enableLocation': 'Activer la position',
       'map.clusterPoints': 'points d\'intérêt',
+      
+      // Navigation
+      'navigation.getDirections': 'Itinéraire',
+      'navigation.walking': 'À pied',
+      'navigation.driving': 'En voiture',
+      'navigation.chooseMode': 'Choisissez comment y aller',
+      'navigation.fromYourLocation': 'Depuis votre position',
+      'navigation.nearestPoint': 'Point le plus proche',
+      'navigation.startHere': 'Commencer ici',
+      'navigation.nearYou': 'Près de vous',
+      'navigation.withinRadius': 'dans un rayon de',
+      'navigation.noLocation': 'Activez la localisation pour voir ce qui est proche',
+      'navigation.nothingNearby': 'Aucun point dans un rayon de 50km',
+      
       
       // Categories
       'category.nature': 'Nature',
