@@ -460,10 +460,10 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            className="bg-card rounded-t-3xl shadow-2xl overflow-hidden"
+            className="rounded-t-3xl shadow-2xl overflow-hidden bg-primary"
           >
             {/* Current instruction */}
-            <div className="p-4 bg-primary text-primary-foreground rounded-t-3xl">
+            <div className="p-4 text-primary-foreground">
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
                   <ManeuverIcon type={getManeuverIcon(currentStep)} className="w-8 h-8" />
@@ -478,6 +478,8 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
                 </div>
               </div>
             </div>
+
+            <div className="bg-card">
 
             {/* Progress bar */}
             <div className="px-4 py-2 border-b border-border/50 bg-muted/30">
@@ -584,6 +586,7 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
               >
                 {t('navigation.stopNavigation')}
               </Button>
+            </div>
             </div>
           </motion.div>
         )}
