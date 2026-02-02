@@ -460,7 +460,7 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            className="bg-card rounded-t-3xl shadow-2xl"
+            className="bg-card rounded-t-3xl shadow-2xl overflow-hidden"
           >
             {/* Current instruction */}
             <div className="p-4 bg-primary text-primary-foreground rounded-t-3xl">
