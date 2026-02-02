@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Navigation, Car, Footprints, X, MapIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useTranslation } from 'react-i18next';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useExplorationMode } from '@/hooks/useLanguage';
 import { 
@@ -22,22 +22,12 @@ interface NavigationButtonProps {
   className?: string;
 }
 
-const texts = {
-  navigate: { es: 'Cómo llegar', en: 'Get directions', fr: 'Itinéraire' },
-  walking: { es: 'A pie', en: 'Walking', fr: 'À pied' },
-  driving: { es: 'En coche', en: 'Driving', fr: 'En voiture' },
-  close: { es: 'Cerrar', en: 'Close', fr: 'Fermer' },
-  chooseMode: { es: 'Elige cómo llegar', en: 'Choose how to get there', fr: 'Choisissez comment y aller' },
-  inApp: { es: 'Navegar en app', en: 'Navigate in app', fr: 'Naviguer dans l\'app' },
-  externalMaps: { es: 'Abrir en Maps', en: 'Open in Maps', fr: 'Ouvrir dans Maps' },
-};
-
 export function NavigationButton({ 
   destination, 
   variant = 'primary',
   className = '' 
 }: NavigationButtonProps) {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const { latitude, longitude, hasLocation } = useGeolocation();
   const { mode } = useExplorationMode();
   const [showOptions, setShowOptions] = useState(false);
@@ -71,7 +61,7 @@ export function NavigationButton({
         className={`gap-2 ${className}`}
       >
         <Navigation className="w-4 h-4" />
-        {t(texts.navigate)}
+        {t('navigation.getDirections')}
       </Button>
     );
   }
@@ -85,7 +75,7 @@ export function NavigationButton({
           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors ${className}`}
         >
           <Navigation className="w-3.5 h-3.5" />
-          {distanceResult ? distanceResult.distanceFormatted : t(texts.navigate)}
+          {distanceResult ? distanceResult.distanceFormatted : t('navigation.getDirections')}
         </button>
 
         {/* In-app navigation fullscreen */}
@@ -123,7 +113,7 @@ export function NavigationButton({
         className={`gap-2 ${className}`}
       >
         <Navigation className="w-4 h-4" />
-        {t(texts.navigate)}
+        {t('navigation.getDirections')}
         {distanceResult && (
           <span className="ml-1 text-xs opacity-80">
             ({distanceResult.distanceFormatted})
@@ -176,7 +166,7 @@ function OptionsModal({
   onExternalWalking,
   onExternalDriving 
 }: OptionsModalProps) {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   return (
     <motion.div
@@ -197,12 +187,12 @@ function OptionsModal({
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-foreground">
-            {t(texts.chooseMode)}
+            {t('navigation.chooseMode')}
           </h3>
           <button
             onClick={onClose}
             className="p-2 rounded-full hover:bg-muted transition-colors"
-            aria-label={t(texts.close)}
+            aria-label={t('common.close')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -213,7 +203,7 @@ function OptionsModal({
           <p className="font-semibold text-foreground">{destination.name}</p>
           {distanceResult && (
             <p className="text-sm text-muted-foreground mt-1">
-              {distanceResult.distanceFormatted} desde tu ubicación
+              {distanceResult.distanceFormatted} {t('navigation.fromYourLocation').toLowerCase()}
             </p>
           )}
         </div>
@@ -227,14 +217,14 @@ function OptionsModal({
             <Navigation className="w-6 h-6" />
           </div>
           <div className="flex-1 text-left">
-            <p className="font-bold">{t(texts.inApp)}</p>
-            <p className="text-sm opacity-80">Paso a paso con mapa en tiempo real</p>
+            <p className="font-bold">{t('navigation.inApp')}</p>
+            <p className="text-sm opacity-80">{t('navigation.stepByStep')}</p>
           </div>
         </button>
 
         {/* External maps options */}
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-          {t(texts.externalMaps)}
+          {t('navigation.externalMaps')}
         </p>
         <div className="grid grid-cols-2 gap-3">
           <button
@@ -245,7 +235,7 @@ function OptionsModal({
               <Footprints className="w-5 h-5 text-accent-foreground" />
             </div>
             <div className="text-center">
-              <p className="font-medium text-foreground text-sm">{t(texts.walking)}</p>
+              <p className="font-medium text-foreground text-sm">{t('navigation.walking')}</p>
               {distanceResult && (
                 <p className="text-xs text-muted-foreground">
                   ~{formatTime(distanceResult.estimatedWalkingTime)}
@@ -262,7 +252,7 @@ function OptionsModal({
               <Car className="w-5 h-5 text-accent-foreground" />
             </div>
             <div className="text-center">
-              <p className="font-medium text-foreground text-sm">{t(texts.driving)}</p>
+              <p className="font-medium text-foreground text-sm">{t('navigation.driving')}</p>
               {distanceResult && (
                 <p className="text-xs text-muted-foreground">
                   ~{formatTime(distanceResult.estimatedDrivingTime)}

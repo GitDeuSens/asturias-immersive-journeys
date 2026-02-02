@@ -405,27 +405,29 @@ export function RoutesPage() {
           </ScrollArea>
         )}
 
-        {/* View toggle (mobile) */}
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-20 md:hidden">
-          <div className="flex rounded-full bg-background border border-border shadow-lg overflow-hidden">
-            <button
-              onClick={() => setViewMode('map')}
-              className={`px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors ${viewMode === 'map' ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted'}`}
-              aria-pressed={viewMode === 'map'}
-            >
-              <MapIcon className="w-4 h-4" aria-hidden="true" />
-              {t('common.viewMap')}
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors ${viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted'}`}
-              aria-pressed={viewMode === 'list'}
-            >
-              <List className="w-4 h-4" aria-hidden="true" />
-              {t('common.viewList')}
-            </button>
+        {/* View toggle (mobile) - Only show when NOT exploring a route */}
+        {!exploringRoute && (
+          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-20 md:hidden">
+            <div className="flex rounded-full bg-card border border-border shadow-lg overflow-hidden">
+              <button
+                onClick={() => setViewMode('map')}
+                className={`px-4 py-2.5 flex items-center gap-2 text-sm font-medium transition-colors ${viewMode === 'map' ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted'}`}
+                aria-pressed={viewMode === 'map'}
+              >
+                <MapIcon className="w-4 h-4" aria-hidden="true" />
+                {t('common.viewMap')}
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-4 py-2.5 flex items-center gap-2 text-sm font-medium transition-colors ${viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted'}`}
+                aria-pressed={viewMode === 'list'}
+              >
+                <List className="w-4 h-4" aria-hidden="true" />
+                {t('common.viewList')}
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Side Panel (map view only) */}
         {viewMode === 'map' && (

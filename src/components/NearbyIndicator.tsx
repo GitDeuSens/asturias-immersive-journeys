@@ -7,7 +7,7 @@ import {
   formatTime,
   type NavigationDestination 
 } from '@/lib/navigationService';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useTranslation } from 'react-i18next';
 import { useMemo } from 'react';
 
 interface NearbyIndicatorProps {
@@ -17,19 +17,13 @@ interface NearbyIndicatorProps {
   className?: string;
 }
 
-const texts = {
-  calculating: { es: 'Calculando...', en: 'Calculating...', fr: 'Calcul en cours...' },
-  walking: { es: 'a pie', en: 'walking', fr: 'à pied' },
-  driving: { es: 'en coche', en: 'by car', fr: 'en voiture' },
-};
-
 export function NearbyIndicator({ 
   destination, 
   showTime = true, 
   compact = false,
   className = '' 
 }: NearbyIndicatorProps) {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const { latitude, longitude, hasLocation } = useGeolocation();
   const { mode } = useExplorationMode();
 

@@ -1,51 +1,13 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WifiOff, Wifi, AlertTriangle, Database } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import { useLanguage } from '@/hooks/useLanguage';
 import { getCacheStats, clearExpiredCache } from '@/lib/offlineCache';
-
-const texts = {
-  offline: {
-    es: 'Sin conexión a Internet',
-    en: 'No internet connection',
-    fr: 'Pas de connexion Internet'
-  },
-  offlineDescription: {
-    es: 'Algunas funciones pueden no estar disponibles',
-    en: 'Some features may not be available',
-    fr: 'Certaines fonctionnalités peuvent ne pas être disponibles'
-  },
-  offlineWithCache: {
-    es: 'Modo sin conexión - Datos disponibles',
-    en: 'Offline mode - Data available',
-    fr: 'Mode hors ligne - Données disponibles'
-  },
-  offlineCacheDescription: {
-    es: 'rutas guardadas para uso offline',
-    en: 'routes saved for offline use',
-    fr: 'itinéraires enregistrés pour une utilisation hors ligne'
-  },
-  backOnline: {
-    es: '¡Conexión restaurada!',
-    en: 'Connection restored!',
-    fr: 'Connexion restaurée!'
-  },
-  slowConnection: {
-    es: 'Conexión lenta detectada',
-    en: 'Slow connection detected',
-    fr: 'Connexion lente détectée'
-  },
-  slowConnectionDescription: {
-    es: 'El contenido puede tardar más en cargar',
-    en: 'Content may take longer to load',
-    fr: 'Le contenu peut prendre plus de temps à charger'
-  }
-};
 
 export function NetworkStatusAlert() {
   const { isOnline, wasOffline, effectiveType } = useNetworkStatus();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [showRestored, setShowRestored] = useState(false);
   const [showSlowWarning, setShowSlowWarning] = useState(false);
   const [cachedRouteCount, setCachedRouteCount] = useState(0);
@@ -105,9 +67,9 @@ export function NetworkStatusAlert() {
               <>
                 <Database className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
                 <div className="text-center">
-                  <p className="font-semibold text-sm">{t(texts.offlineWithCache)}</p>
+                  <p className="font-semibold text-sm">{t('network.offlineWithCache')}</p>
                   <p className="text-xs opacity-90">
-                    {cachedRouteCount} {t(texts.offlineCacheDescription)}
+                    {cachedRouteCount} {t('navigation.cachedRoutes')}
                   </p>
                 </div>
               </>
@@ -115,8 +77,8 @@ export function NetworkStatusAlert() {
               <>
                 <WifiOff className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
                 <div className="text-center">
-                  <p className="font-semibold text-sm">{t(texts.offline)}</p>
-                  <p className="text-xs opacity-90">{t(texts.offlineDescription)}</p>
+                  <p className="font-semibold text-sm">{t('network.offline')}</p>
+                  <p className="text-xs opacity-90">{t('network.offlineDescription')}</p>
                 </div>
               </>
             )}
@@ -138,7 +100,7 @@ export function NetworkStatusAlert() {
         >
           <div className="container mx-auto flex items-center justify-center gap-3">
             <Wifi className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
-            <p className="font-semibold text-sm">{t(texts.backOnline)}</p>
+            <p className="font-semibold text-sm">{t('network.backOnline')}</p>
           </div>
         </motion.div>
       )}
@@ -158,8 +120,8 @@ export function NetworkStatusAlert() {
           <div className="container mx-auto flex items-center justify-center gap-3">
             <AlertTriangle className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
             <div className="text-center">
-              <p className="font-semibold text-sm">{t(texts.slowConnection)}</p>
-              <p className="text-xs opacity-90">{t(texts.slowConnectionDescription)}</p>
+              <p className="font-semibold text-sm">{t('network.slowConnection')}</p>
+              <p className="text-xs opacity-90">{t('network.slowConnectionDescription')}</p>
             </div>
           </div>
         </motion.div>
