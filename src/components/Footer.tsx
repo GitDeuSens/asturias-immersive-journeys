@@ -124,31 +124,31 @@ export const Footer = forwardRef<HTMLElement>(
 
             {/* Navigation */}
             <div>
-              <h3 className="font-semibold text-secondary-foreground mb-4">Navegación</h3>
+              <h3 className="font-semibold text-secondary-foreground mb-4">{t('nav.home') && 'Navegación'}</h3>
               <nav aria-label="Footer navigation">
                 <ul className="space-y-2">
                   <li>
-                    <a href="/" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:text-primary">
+                    <a href="/" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
                       {t('nav.home')}
                     </a>
                   </li>
                   <li>
-                    <a href="/tours" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:text-primary">
+                    <a href="/tours" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
                       {t('nav.tours360')}
                     </a>
                   </li>
                   <li>
-                    <a href="/routes" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:text-primary">
+                    <a href="/routes" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
                       {t('nav.routes')}
                     </a>
                   </li>
                   <li>
-                    <a href="/vr" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:text-primary">
+                    <a href="/vr" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
                       {t('nav.vrExperiences')}
                     </a>
                   </li>
                   <li>
-                    <a href="/ar" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:text-primary">
+                    <a href="/ar" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
                       {t('nav.arExperiences')}
                     </a>
                   </li>
@@ -165,29 +165,29 @@ export const Footer = forwardRef<HTMLElement>(
                     href="https://turismoasturias.es" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors inline-flex items-center gap-1 focus:outline-none focus:text-primary"
+                    className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors inline-flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
                   >
                     turismoasturias.es
                     <ExternalLink className="w-3 h-3" aria-hidden="true" />
                   </a>
                 </li>
                 <li>
-                  <a href="/privacy" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:text-primary">
+                  <a href="/privacy" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
                     {t('footer.privacy')}
                   </a>
                 </li>
                 <li>
-                  <a href="/cookies" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:text-primary">
+                  <a href="/cookies" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
                     {t('footer.cookies')}
                   </a>
                 </li>
                 <li>
-                  <a href="/legal" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:text-primary">
+                  <a href="/legal" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
                     {t('footer.legal')}
                   </a>
                 </li>
                 <li>
-                  <a href="/accessibility" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:text-primary">
+                  <a href="/accessibility" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
                     {t('footer.accessibility')}
                   </a>
                 </li>
@@ -196,12 +196,27 @@ export const Footer = forwardRef<HTMLElement>(
           </div>
         </div>
 
-        {/* Copyright */}
+        {/* Copyright + Developer credit */}
         <div className="border-t border-border/20 py-4">
           <div className="container mx-auto px-4">
-            <p className="text-center text-xs text-secondary-foreground/60">
-              {t('footer.copyright')}
-            </p>
+            <div className="flex flex-col md:flex-row items-center justify-between gap-2">
+              <p className="text-center md:text-left text-xs text-secondary-foreground/60">
+                {t('footer.copyright')}
+              </p>
+              <p className="text-center md:text-right text-xs text-secondary-foreground/60">
+                {t('footer.developedBy')}{' '}
+                <a 
+                  href="https://deusens.com/es" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:text-primary/80 transition-colors font-medium inline-flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
+                  aria-label="Deusens - Desarrollador de la plataforma (abre en nueva ventana)"
+                >
+                  Deusens
+                  <ExternalLink className="w-3 h-3" aria-hidden="true" />
+                </a>
+              </p>
+            </div>
           </div>
         </div>
       </footer>

@@ -66,9 +66,12 @@ export function NetworkStatusAlert() {
           exit={{ y: -100, opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className="fixed top-0 left-0 right-0 z-[100] bg-destructive text-destructive-foreground px-4 py-3 shadow-lg"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
         >
           <div className="container mx-auto flex items-center justify-center gap-3">
-            <WifiOff className="w-5 h-5 flex-shrink-0" />
+            <WifiOff className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
             <div className="text-center">
               <p className="font-semibold text-sm">{t(texts.offline)}</p>
               <p className="text-xs opacity-90">{t(texts.offlineDescription)}</p>
@@ -85,9 +88,12 @@ export function NetworkStatusAlert() {
           exit={{ y: -100, opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className="fixed top-0 left-0 right-0 z-[100] bg-primary text-primary-foreground px-4 py-3 shadow-lg"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
         >
           <div className="container mx-auto flex items-center justify-center gap-3">
-            <Wifi className="w-5 h-5 flex-shrink-0" />
+            <Wifi className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
             <p className="font-semibold text-sm">{t(texts.backOnline)}</p>
           </div>
         </motion.div>
@@ -101,9 +107,12 @@ export function NetworkStatusAlert() {
           exit={{ y: -100, opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className="fixed top-0 left-0 right-0 z-[100] bg-warm text-warm-foreground px-4 py-3 shadow-lg"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
         >
           <div className="container mx-auto flex items-center justify-center gap-3">
-            <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+            <AlertTriangle className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
             <div className="text-center">
               <p className="font-semibold text-sm">{t(texts.slowConnection)}</p>
               <p className="text-xs opacity-90">{t(texts.slowConnectionDescription)}</p>

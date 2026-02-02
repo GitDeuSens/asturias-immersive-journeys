@@ -95,11 +95,18 @@ const NotFound = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header bar */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+      <header 
+        className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border"
+        role="banner"
+      >
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link 
+            to="/" 
+            className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg"
+            aria-label="Asturias Inmersivo - Ir al inicio"
+          >
             <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Mountain className="w-6 h-6 text-primary-foreground" />
+              <Mountain className="w-6 h-6 text-primary-foreground" aria-hidden="true" />
             </div>
             <div className="hidden sm:block">
               <span className="font-bold text-lg text-foreground">Asturias</span>
@@ -110,7 +117,12 @@ const NotFound = () => {
       </header>
 
       {/* Main content */}
-      <main className="flex-1 flex items-center justify-center px-4 pt-20 pb-12">
+      <main 
+        id="main-content" 
+        className="flex-1 flex items-center justify-center px-4 pt-20 pb-12"
+        role="main"
+        aria-labelledby="notfound-title"
+      >
         <div className="max-w-2xl mx-auto text-center">
           {/* 404 Animation */}
           <motion.div
@@ -134,6 +146,7 @@ const NotFound = () => {
                   ease: "easeInOut"
                 }}
                 className="absolute inset-0 flex items-center justify-center"
+                aria-hidden="true"
               >
                 <Compass className="w-20 h-20 sm:w-28 sm:h-28 text-primary" />
               </motion.div>
@@ -146,7 +159,7 @@ const NotFound = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+            <h1 id="notfound-title" className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               {c.title}
             </h1>
             <p className="text-xl text-primary font-medium mb-2">
@@ -187,18 +200,21 @@ const NotFound = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.5 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
+            role="group"
+            aria-label="Navigation options"
           >
             <Button
               variant="outline"
               onClick={() => window.history.back()}
               className="gap-2"
+              aria-label={c.back}
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               {c.back}
             </Button>
             <Link to="/">
-              <Button className="gap-2 w-full sm:w-auto">
-                <Home className="w-4 h-4" />
+              <Button className="gap-2 w-full sm:w-auto" aria-label={c.home}>
+                <Home className="w-4 h-4" aria-hidden="true" />
                 {c.home}
               </Button>
             </Link>
@@ -210,6 +226,7 @@ const NotFound = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.5 }}
             className="mt-8 text-xs text-muted-foreground/50 font-mono"
+            aria-hidden="true"
           >
             {location.pathname}
           </motion.p>
@@ -217,7 +234,7 @@ const NotFound = () => {
       </main>
 
       {/* Footer */}
-      <footer className="py-6 px-4 border-t border-border bg-muted/30">
+      <footer className="py-6 px-4 border-t border-border bg-muted/30" role="contentinfo">
         <div className="container mx-auto text-center">
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} Asturias Inmersivo · Turismo de Asturias

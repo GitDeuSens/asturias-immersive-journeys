@@ -86,7 +86,13 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div 
+          className="min-h-screen bg-background flex items-center justify-center p-6"
+          role="alert"
+          aria-live="assertive"
+          aria-labelledby="error-title"
+          aria-describedby="error-description"
+        >
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -96,7 +102,7 @@ export class ErrorBoundary extends Component<Props, State> {
             {/* Logo */}
             <div className="flex justify-center mb-6">
               <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center">
-                <Mountain className="w-10 h-10 text-primary-foreground" />
+                <Mountain className="w-10 h-10 text-primary-foreground" aria-hidden="true" />
               </div>
             </div>
 
@@ -107,34 +113,36 @@ export class ErrorBoundary extends Component<Props, State> {
               transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
               className="w-20 h-20 mx-auto mb-6 rounded-full bg-destructive/10 flex items-center justify-center"
             >
-              <AlertTriangle className="w-10 h-10 text-destructive" />
+              <AlertTriangle className="w-10 h-10 text-destructive" aria-hidden="true" />
             </motion.div>
 
             {/* Title */}
-            <h1 className="text-2xl font-bold text-foreground mb-3">
+            <h1 id="error-title" className="text-2xl font-bold text-foreground mb-3">
               {this.t(texts.title)}
             </h1>
 
             {/* Description */}
-            <p className="text-muted-foreground mb-8">
+            <p id="error-description" className="text-muted-foreground mb-8">
               {this.t(texts.description)}
             </p>
 
             {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center" role="group" aria-label="Error recovery actions">
               <Button
                 onClick={this.handleReload}
                 className="gap-2"
+                aria-label={this.t(texts.reload)}
               >
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="w-4 h-4" aria-hidden="true" />
                 {this.t(texts.reload)}
               </Button>
               <Button
                 variant="outline"
                 onClick={this.handleGoHome}
                 className="gap-2"
+                aria-label={this.t(texts.home)}
               >
-                <Home className="w-4 h-4" />
+                <Home className="w-4 h-4" aria-hidden="true" />
                 {this.t(texts.home)}
               </Button>
             </div>

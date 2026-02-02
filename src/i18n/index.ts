@@ -29,6 +29,7 @@ const resources = {
       'nav.routes': 'Rutas Inmersivas',
       'nav.map': 'Mapa',
       'nav.vrExperiences': 'Experiencias VR',
+      'nav.arExperiences': 'Experiencias AR',
       'nav.help': 'Ayuda',
       
       // Header
@@ -155,8 +156,11 @@ const resources = {
       'footer.cookies': 'Política de cookies',
       'footer.accessibility': 'Declaración de accesibilidad',
       'footer.contact': 'Contacto',
+      'footer.legal': 'Aviso legal',
       'footer.fundedBy': 'Financiado por la Unión Europea – NextGenerationEU',
       'footer.copyright': '© 2024 Principado de Asturias. Todos los derechos reservados.',
+      'footer.developedBy': 'Desarrollado por',
+      'footer.arExperiences': 'Experiencias AR',
       
       // Errors
       'error.generic': 'Ha ocurrido un error',
@@ -190,6 +194,7 @@ const resources = {
       'nav.routes': 'Immersive Routes',
       'nav.map': 'Map',
       'nav.vrExperiences': 'VR Experiences',
+      'nav.arExperiences': 'AR Experiences',
       'nav.help': 'Help',
       
       // Header
@@ -316,8 +321,11 @@ const resources = {
       'footer.cookies': 'Cookie Policy',
       'footer.accessibility': 'Accessibility Statement',
       'footer.contact': 'Contact',
+      'footer.legal': 'Legal Notice',
       'footer.fundedBy': 'Funded by the European Union – NextGenerationEU',
       'footer.copyright': '© 2024 Principality of Asturias. All rights reserved.',
+      'footer.developedBy': 'Developed by',
+      'footer.arExperiences': 'AR Experiences',
       
       // Errors
       'error.generic': 'An error has occurred',
@@ -351,6 +359,7 @@ const resources = {
       'nav.routes': 'Itinéraires Immersifs',
       'nav.map': 'Carte',
       'nav.vrExperiences': 'Expériences VR',
+      'nav.arExperiences': 'Expériences AR',
       'nav.help': 'Aide',
       
       // Header
@@ -477,8 +486,11 @@ const resources = {
       'footer.cookies': 'Politique de cookies',
       'footer.accessibility': 'Déclaration d\'accessibilité',
       'footer.contact': 'Contact',
+      'footer.legal': 'Mentions légales',
       'footer.fundedBy': 'Financé par l\'Union Européenne – NextGenerationEU',
       'footer.copyright': '© 2024 Principauté des Asturies. Tous droits réservés.',
+      'footer.developedBy': 'Développé par',
+      'footer.arExperiences': 'Expériences AR',
       
       // Errors
       'error.generic': 'Une erreur s\'est produite',
