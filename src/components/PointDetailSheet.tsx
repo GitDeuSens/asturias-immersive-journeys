@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, 
@@ -19,15 +19,25 @@ import {
   Globe,
   Clock,
   Euro,
-  Info
+  Info,
+  Navigation,
+  Footprints,
+  Car
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { RoutePoint } from '@/data/immersiveRoutes';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useLanguage, useExplorationMode } from '@/hooks/useLanguage';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useGeolocation } from '@/hooks/useGeolocation';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import FullscreenModal from '@/components/poi/FullscreenModal';
+import { NavigationButton } from '@/components/NavigationButton';
+import { 
+  calculateDistanceTo, 
+  formatTime,
+  type NavigationDestination 
+} from '@/lib/navigationService';
 
 interface PointDetailSheetProps {
   point: RoutePoint | null;
@@ -53,6 +63,10 @@ const texts = {
   schedule: { es: 'Horarios', en: 'Schedule', fr: 'Horaires' },
   prices: { es: 'Precios', en: 'Prices', fr: 'Prix' },
   contact: { es: 'Contacto', en: 'Contact', fr: 'Contact' },
+  howToGet: { es: 'Cómo llegar', en: 'How to get there', fr: 'Comment y arriver' },
+  fromYourLocation: { es: 'Desde tu ubicación', en: 'From your location', fr: 'Depuis votre position' },
+  walking: { es: 'a pie', en: 'walking', fr: 'à pied' },
+  driving: { es: 'en coche', en: 'by car', fr: 'en voiture' },
 };
 
 // Placeholder gallery images for demo
@@ -88,6 +102,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
     <>
       <AnimatePresence>
         <motion.div
+          key="overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -95,6 +110,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
           onClick={onClose}
         />
         <motion.div
+          key="sheet"
           initial={{ x: '100%' }}
           animate={{ x: 0 }}
           exit={{ x: '100%' }}
@@ -145,6 +161,9 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
               <p className="text-muted-foreground leading-relaxed text-base">
                 {t(point.shortDescription)}
               </p>
+
+              {/* Navigation Section - Priority for "here" mode */}
+              <NavigationSection point={point} />
 
               {/* Location */}
               {point.location.address && (
@@ -502,5 +521,70 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+// Navigation Section Component for "here" mode
+function NavigationSection({ point }: { point: RoutePoint }) {
+  const { t, language } = useLanguage();
+  const { mode } = useExplorationMode();
+  const { latitude, longitude, hasLocation } = useGeolocation();
+
+  // Only show in "here" mode with location
+  if (mode !== 'here' || !hasLocation || latitude === null || longitude === null) {
+    return null;
+  }
+
+  const destination: NavigationDestination = {
+    id: point.id,
+    name: typeof point.title === 'string' ? point.title : point.title[language as keyof typeof point.title] || point.title.es,
+    lat: point.location.lat,
+    lng: point.location.lng,
+    type: 'route-point',
+  };
+
+  const distanceResult = calculateDistanceTo(latitude, longitude, destination);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="p-4 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20"
+    >
+      {/* Header */}
+      <div className="flex items-center gap-2 mb-3">
+        <div className="p-2 rounded-lg bg-primary/20">
+          <Navigation className="w-5 h-5 text-primary" />
+        </div>
+        <div>
+          <h3 className="font-semibold text-foreground">{texts.howToGet[language as keyof typeof texts.howToGet]}</h3>
+          <p className="text-xs text-muted-foreground">{texts.fromYourLocation[language as keyof typeof texts.fromYourLocation]}</p>
+        </div>
+      </div>
+
+      {/* Distance info */}
+      <div className="flex items-center gap-4 mb-4 p-3 rounded-lg bg-card/50">
+        <div className="text-center">
+          <p className="text-2xl font-bold text-primary">{distanceResult.distanceFormatted}</p>
+        </div>
+        <div className="flex-1 grid grid-cols-2 gap-2 text-sm">
+          <div className="flex items-center gap-1.5 text-muted-foreground">
+            <Footprints className="w-4 h-4" />
+            <span>{formatTime(distanceResult.estimatedWalkingTime)}</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-muted-foreground">
+            <Car className="w-4 h-4" />
+            <span>{formatTime(distanceResult.estimatedDrivingTime)}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation button */}
+      <NavigationButton 
+        destination={destination} 
+        variant="primary"
+        className="w-full"
+      />
+    </motion.div>
   );
 }
