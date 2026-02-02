@@ -22,6 +22,8 @@ import {
   Clock,
   AlertCircle,
   Loader2,
+  WifiOff,
+  TrendingUp,
 } from 'lucide-react';
 import { useNavigation, TransportMode } from '@/hooks/useNavigation';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -29,6 +31,7 @@ import { RouteStep, formatRouteDistance, formatRouteDuration, getManeuverIcon } 
 import { createUserPositionMarker, injectMapStyles } from '@/lib/mapUtils';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Progress } from '@/components/ui/progress';
 
 interface NavigationViewProps {
   destination: { name: string; lat: number; lng: number };
@@ -52,6 +55,8 @@ const texts = {
   stopNavigation: { es: 'Detener navegación', en: 'Stop navigation', fr: 'Arrêter la navigation' },
   selectMode: { es: 'Selecciona modo de transporte', en: 'Select transport mode', fr: 'Sélectionnez le mode de transport' },
   start: { es: 'Iniciar', en: 'Start', fr: 'Démarrer' },
+  offlineMode: { es: 'Modo sin conexión', en: 'Offline mode', fr: 'Mode hors ligne' },
+  progress: { es: 'Progreso', en: 'Progress', fr: 'Progression' },
 };
 
 // Maneuver icon component
@@ -91,6 +96,10 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
     distanceRemaining,
     timeRemaining,
     userPosition,
+    progressPercent,
+    distanceTraveled,
+    traveledPath,
+    isOfflineMode,
     startNavigation,
     stopNavigation,
     recalculateRoute,
@@ -98,7 +107,8 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const routeLayerRef = useRef<L.Polyline | null>(null);
+  const remainingRouteRef = useRef<L.Polyline | null>(null);
+  const traveledRouteRef = useRef<L.Polyline | null>(null);
   const userMarkerRef = useRef<L.Marker | null>(null);
   const destMarkerRef = useRef<L.Marker | null>(null);
 
@@ -150,30 +160,63 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
     };
   }, [destination]);
 
-  // Update route polyline on map
+  // Update route polylines on map (bicolor: traveled + remaining)
   useEffect(() => {
     if (!mapRef.current || !route) return;
 
-    // Remove old route
-    if (routeLayerRef.current) {
-      routeLayerRef.current.remove();
+    // Remove old routes
+    if (remainingRouteRef.current) {
+      remainingRouteRef.current.remove();
+    }
+    if (traveledRouteRef.current) {
+      traveledRouteRef.current.remove();
     }
 
-    // Draw route polyline
-    const coords = route.geometry.map(p => [p.lat, p.lng] as L.LatLngTuple);
-    routeLayerRef.current = L.polyline(coords, {
-      color: 'hsl(203, 100%, 32%)',
+    // Find the closest point index on route based on progress
+    const geometry = route.geometry;
+    let splitIndex = 0;
+    
+    if (userPosition && isNavigating) {
+      let minDist = Infinity;
+      for (let i = 0; i < geometry.length; i++) {
+        const point = geometry[i];
+        const dist = Math.hypot(point.lat - userPosition.lat, point.lng - userPosition.lng);
+        if (dist < minDist) {
+          minDist = dist;
+          splitIndex = i;
+        }
+      }
+    }
+
+    // Draw traveled portion (green)
+    if (splitIndex > 0) {
+      const traveledCoords = geometry.slice(0, splitIndex + 1).map(p => [p.lat, p.lng] as L.LatLngTuple);
+      traveledRouteRef.current = L.polyline(traveledCoords, {
+        color: 'hsl(142, 76%, 36%)', // Green
+        weight: 7,
+        opacity: 0.9,
+        lineCap: 'round',
+        lineJoin: 'round',
+      }).addTo(mapRef.current);
+    }
+
+    // Draw remaining portion (blue)
+    const remainingCoords = geometry.slice(splitIndex).map(p => [p.lat, p.lng] as L.LatLngTuple);
+    remainingRouteRef.current = L.polyline(remainingCoords, {
+      color: 'hsl(203, 100%, 32%)', // Blue
       weight: 6,
       opacity: 0.8,
       lineCap: 'round',
       lineJoin: 'round',
     }).addTo(mapRef.current);
 
-    // Fit bounds to show entire route
-    mapRef.current.fitBounds(routeLayerRef.current.getBounds(), {
-      padding: [50, 50],
-    });
-  }, [route]);
+    // Fit bounds to show entire route on first load
+    if (!isNavigating) {
+      const allCoords = geometry.map(p => [p.lat, p.lng] as L.LatLngTuple);
+      const bounds = L.latLngBounds(allCoords);
+      mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+    }
+  }, [route, userPosition, isNavigating]);
 
   // Update user position marker
   useEffect(() => {
@@ -231,6 +274,59 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
     >
       {/* Map */}
       <div ref={mapContainerRef} className="flex-1 relative">
+        {/* Offline mode indicator on map */}
+        {isOfflineMode && (
+          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-[1000]">
+            <motion.div
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/90 text-white text-xs font-semibold shadow-lg"
+            >
+              <WifiOff className="w-3.5 h-3.5" />
+              {t(texts.offlineMode)}
+            </motion.div>
+          </div>
+        )}
+
+        {/* Progress badge on map */}
+        {isNavigating && progressPercent > 0 && (
+          <div className="absolute bottom-4 left-4 z-[1000]">
+            <div className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-background/95 backdrop-blur-sm shadow-lg border border-border">
+              <div className="relative w-10 h-10">
+                <svg className="w-10 h-10 transform -rotate-90">
+                  <circle
+                    cx="20"
+                    cy="20"
+                    r="16"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    fill="none"
+                    className="text-muted"
+                  />
+                  <circle
+                    cx="20"
+                    cy="20"
+                    r="16"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    fill="none"
+                    strokeDasharray={`${progressPercent} 100`}
+                    strokeLinecap="round"
+                    className="text-primary"
+                  />
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-primary">
+                  {progressPercent}%
+                </span>
+              </div>
+              <div className="text-xs">
+                <p className="font-semibold text-foreground">{formatRouteDistance(distanceTraveled)}</p>
+                <p className="text-muted-foreground">{t(texts.progress)}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Top controls */}
         <div className="absolute top-4 left-4 right-4 z-[1000] flex justify-between items-start">
           <Button
@@ -257,7 +353,7 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
                 size="icon"
                 onClick={recalculateRoute}
                 className="rounded-full shadow-lg bg-background/90 backdrop-blur-sm"
-                disabled={isLoading}
+                disabled={isLoading || isOfflineMode}
               >
                 <RotateCcw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
               </Button>
@@ -404,6 +500,18 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
               </div>
             </div>
 
+            {/* Progress bar */}
+            <div className="px-4 py-2 border-b border-border/50 bg-muted/30">
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-3.5 h-3.5 text-primary" />
+                  <span className="text-xs font-medium text-muted-foreground">{t(texts.progress)}</span>
+                </div>
+                <span className="text-xs font-bold text-primary">{progressPercent}%</span>
+              </div>
+              <Progress value={progressPercent} className="h-2" />
+            </div>
+
             {/* Stats bar */}
             <div className="px-4 py-3 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -416,9 +524,17 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
                   <span className="font-semibold">{formatRouteDuration(timeRemaining)}</span>
                 </div>
               </div>
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                {transportMode === 'walking' ? <Footprints className="w-4 h-4" /> : <Car className="w-4 h-4" />}
-                <span>{t(texts.stepOf)} {currentStepIndex + 1} {t(texts.of)} {route.steps.length}</span>
+              <div className="flex items-center gap-2">
+                {isOfflineMode && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 text-[10px] font-bold">
+                    <WifiOff className="w-3 h-3" />
+                    {t(texts.offlineMode)}
+                  </span>
+                )}
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  {transportMode === 'walking' ? <Footprints className="w-4 h-4" /> : <Car className="w-4 h-4" />}
+                  <span>{t(texts.stepOf)} {currentStepIndex + 1} {t(texts.of)} {route.steps.length}</span>
+                </div>
               </div>
             </div>
 
