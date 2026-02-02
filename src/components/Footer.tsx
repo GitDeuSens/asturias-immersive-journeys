@@ -1,7 +1,6 @@
 import { forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Mountain, ExternalLink, Cookie } from 'lucide-react';
-import { openCookieSettings } from '@/hooks/useCookieConsent';
+import { Mountain, ExternalLink } from 'lucide-react';
 
 // Import institutional logos
 import nextgenEuLogo from '@/assets/logos/nextgen-eu.png';
@@ -181,15 +180,6 @@ export const Footer = forwardRef<HTMLElement>(
                   <a href="/cookies" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
                     {t('footer.cookies')}
                   </a>
-                </li>
-                <li>
-                  <button 
-                    onClick={openCookieSettings}
-                    className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded inline-flex items-center gap-1"
-                  >
-                    <Cookie className="w-3 h-3" aria-hidden="true" />
-                    {t('footer.cookieSettings', 'Configurar cookies')}
-                  </button>
                 </li>
                 <li>
                   <a href="/legal" className="text-sm text-secondary-foreground/70 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
