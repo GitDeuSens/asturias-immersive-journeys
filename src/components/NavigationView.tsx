@@ -249,7 +249,7 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] bg-background flex flex-col"
+        className="fixed inset-0 z-[100] bg-transparent flex flex-col"
     >
       {/* Map */}
       <div ref={mapContainerRef} className="flex-1 relative">
