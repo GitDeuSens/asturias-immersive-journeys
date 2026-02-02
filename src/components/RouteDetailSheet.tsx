@@ -63,10 +63,16 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
       />
       <motion.div
         key="sheet"
-        initial={{ x: '100%' }}
-        animate={{ x: 0 }}
-        exit={{ x: '100%' }}
-        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        initial={{ x: '100%', opacity: 0.8 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: '100%', opacity: 0.8 }}
+        transition={{ 
+          type: 'spring', 
+          damping: 28, 
+          stiffness: 200,
+          mass: 0.9,
+          opacity: { duration: 0.2, ease: 'easeOut' }
+        }}
         className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-background z-50 shadow-2xl flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
         role="dialog"

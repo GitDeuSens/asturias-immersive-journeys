@@ -150,8 +150,9 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
           {/* Nearest point suggestion (only in "here" mode) */}
           {nearestPoint && mode === 'here' && (
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="mb-4 p-3 rounded-xl bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/30"
             >
               <div className="flex items-center gap-2 mb-2">
@@ -263,9 +264,13 @@ function PointCard({ point, index, isVisited, isSelected, isLast, isNearest, dis
       )}
 
       <motion.button
-        initial={{ opacity: 0, x: -10 }}
+        initial={{ opacity: 0, x: -8 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: index * 0.05 }}
+        transition={{ 
+          delay: index * 0.04,
+          duration: 0.3,
+          ease: [0.25, 0.46, 0.45, 0.94]
+        }}
         onClick={onClick}
         className={`w-full flex items-start gap-3 p-3 rounded-xl transition-all text-left ${
           isSelected 
