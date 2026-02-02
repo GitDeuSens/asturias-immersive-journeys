@@ -2,6 +2,13 @@ import { forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Mountain, ExternalLink } from 'lucide-react';
 
+// Import institutional logos
+import nextgenEuLogo from '@/assets/logos/nextgen-eu.png';
+import planRecuperacionLogo from '@/assets/logos/plan-recuperacion.png';
+import ministerioTurismoLogo from '@/assets/logos/ministerio-turismo.png';
+import principadoAsturiasLogo from '@/assets/logos/principado-asturias.png';
+import asturiasParaisoNaturalLogo from '@/assets/logos/asturias-paraiso-natural.png';
+
 export const Footer = forwardRef<HTMLElement>(
   function Footer(_, ref) {
     const { t } = useTranslation();
@@ -19,52 +26,76 @@ export const Footer = forwardRef<HTMLElement>(
             <p className="text-center text-sm text-secondary-foreground/80 mb-4">
               {t('footer.fundedBy')}
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
-              {/* EU Logo placeholder */}
+            <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
+              {/* NextGenerationEU Logo */}
               <a 
                 href="https://next-generation-eu.europa.eu/index_es" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="h-12 w-auto flex items-center justify-center bg-white/10 rounded px-4 py-2 hover:bg-white/20 transition-colors"
+                className="h-16 md:h-20 w-auto flex items-center justify-center bg-white rounded-lg px-3 py-2 hover:shadow-lg transition-all hover:scale-105"
+                aria-label="NextGenerationEU - Financiado por la Unión Europea"
               >
-                <span className="text-xs font-semibold">🇪🇺 NextGenerationEU</span>
+                <img 
+                  src={nextgenEuLogo} 
+                  alt="NextGenerationEU - Financiado por la Unión Europea" 
+                  className="h-12 md:h-16 w-auto object-contain"
+                />
               </a>
               {/* Plan de Recuperación */}
               <a 
                 href="https://planderecuperacion.gob.es/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="h-12 w-auto flex items-center justify-center bg-white/10 rounded px-4 py-2 hover:bg-white/20 transition-colors"
+                className="h-16 md:h-20 w-auto flex items-center justify-center bg-white rounded-lg px-3 py-2 hover:shadow-lg transition-all hover:scale-105"
+                aria-label="Plan de Recuperación, Transformación y Resiliencia"
               >
-                <span className="text-xs font-semibold">Plan de Recuperación</span>
+                <img 
+                  src={planRecuperacionLogo} 
+                  alt="Plan de Recuperación, Transformación y Resiliencia" 
+                  className="h-12 md:h-16 w-auto object-contain"
+                />
               </a>
               {/* Ministerio */}
               <a 
                 href="https://www.mintur.gob.es/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="h-12 w-auto flex items-center justify-center bg-white/10 rounded px-4 py-2 hover:bg-white/20 transition-colors"
+                className="h-16 md:h-20 w-auto flex items-center justify-center bg-white rounded-lg px-3 py-2 hover:shadow-lg transition-all hover:scale-105"
+                aria-label="Ministerio de Industria y Turismo de España"
               >
-                <span className="text-xs font-semibold">Min. Industria y Turismo</span>
+                <img 
+                  src={ministerioTurismoLogo} 
+                  alt="Ministerio de Industria y Turismo de España" 
+                  className="h-12 md:h-16 w-auto object-contain"
+                />
               </a>
               {/* Principado */}
               <a 
                 href="https://www.asturias.es/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="h-12 w-auto flex items-center justify-center bg-white/10 rounded px-4 py-2 hover:bg-white/20 transition-colors"
+                className="h-16 md:h-20 w-auto flex items-center justify-center bg-white rounded-lg px-3 py-2 hover:shadow-lg transition-all hover:scale-105"
+                aria-label="Principado de Asturias"
               >
-                <span className="text-xs font-semibold">Principado de Asturias</span>
+                <img 
+                  src={principadoAsturiasLogo} 
+                  alt="Escudo del Principado de Asturias" 
+                  className="h-12 md:h-16 w-auto object-contain"
+                />
               </a>
               {/* Asturias Paraíso Natural */}
               <a 
                 href="https://turismoasturias.es/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="h-12 w-auto flex items-center justify-center bg-primary/20 rounded px-4 py-2 hover:bg-primary/30 transition-colors"
+                className="h-16 md:h-20 w-auto flex items-center justify-center bg-white rounded-lg px-3 py-2 hover:shadow-lg transition-all hover:scale-105"
+                aria-label="Asturias Paraíso Natural"
               >
-                <Mountain className="w-5 h-5 text-primary mr-2" aria-hidden="true" />
-                <span className="text-xs font-bold text-primary">Asturias Paraíso Natural</span>
+                <img 
+                  src={asturiasParaisoNaturalLogo} 
+                  alt="Asturias Paraíso Natural" 
+                  className="h-12 md:h-16 w-auto object-contain"
+                />
               </a>
             </div>
           </div>
