@@ -460,7 +460,10 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            className="rounded-t-3xl shadow-2xl overflow-hidden bg-primary"
+            className="rounded-t-3xl shadow-2xl overflow-hidden"
+            style={{
+              background: 'linear-gradient(to bottom, hsl(var(--primary)) 0%, hsl(var(--primary)) 80px, hsl(var(--card)) 80px, hsl(var(--card)) 100%)'
+            }}
           >
             {/* Current instruction */}
             <div className="p-4 text-primary-foreground">
