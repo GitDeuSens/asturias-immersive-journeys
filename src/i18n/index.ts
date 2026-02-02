@@ -162,6 +162,22 @@ const resources = {
       'footer.developedBy': 'Desarrollado por',
       'footer.arExperiences': 'Experiencias AR',
       
+      // Cookie Consent
+      'cookies.consentTitle': 'Utilizamos cookies',
+      'cookies.consentDescription': 'Usamos cookies para mejorar tu experiencia de navegación, mostrar contenido personalizado y analizar nuestro tráfico.',
+      'cookies.learnMore': 'Más información',
+      'cookies.acceptAll': 'Aceptar todas',
+      'cookies.rejectAll': 'Rechazar',
+      'cookies.customize': 'Personalizar',
+      'cookies.savePreferences': 'Guardar preferencias',
+      'cookies.necessary': 'Cookies necesarias',
+      'cookies.necessaryDesc': 'Esenciales para el funcionamiento del sitio web.',
+      'cookies.analytics': 'Cookies analíticas',
+      'cookies.analyticsDesc': 'Nos ayudan a entender cómo usas el sitio.',
+      'cookies.marketing': 'Cookies de marketing',
+      'cookies.marketingDesc': 'Utilizadas para mostrarte anuncios relevantes.',
+      'cookies.required': 'Obligatorio',
+      
       // Errors
       'error.generic': 'Ha ocurrido un error',
       'error.notFound': 'Página no encontrada',
@@ -327,6 +343,22 @@ const resources = {
       'footer.developedBy': 'Developed by',
       'footer.arExperiences': 'AR Experiences',
       
+      // Cookie Consent
+      'cookies.consentTitle': 'We use cookies',
+      'cookies.consentDescription': 'We use cookies to improve your browsing experience, show personalized content and analyze our traffic.',
+      'cookies.learnMore': 'Learn more',
+      'cookies.acceptAll': 'Accept all',
+      'cookies.rejectAll': 'Reject',
+      'cookies.customize': 'Customize',
+      'cookies.savePreferences': 'Save preferences',
+      'cookies.necessary': 'Necessary cookies',
+      'cookies.necessaryDesc': 'Essential for the website to function properly.',
+      'cookies.analytics': 'Analytics cookies',
+      'cookies.analyticsDesc': 'Help us understand how you use the site.',
+      'cookies.marketing': 'Marketing cookies',
+      'cookies.marketingDesc': 'Used to show you relevant ads.',
+      'cookies.required': 'Required',
+      
       // Errors
       'error.generic': 'An error has occurred',
       'error.notFound': 'Page not found',
@@ -491,6 +523,22 @@ const resources = {
       'footer.copyright': '© 2024 Principauté des Asturies. Tous droits réservés.',
       'footer.developedBy': 'Développé par',
       'footer.arExperiences': 'Expériences AR',
+      
+      // Cookie Consent
+      'cookies.consentTitle': 'Nous utilisons des cookies',
+      'cookies.consentDescription': 'Nous utilisons des cookies pour améliorer votre expérience de navigation, afficher du contenu personnalisé et analyser notre trafic.',
+      'cookies.learnMore': 'En savoir plus',
+      'cookies.acceptAll': 'Tout accepter',
+      'cookies.rejectAll': 'Refuser',
+      'cookies.customize': 'Personnaliser',
+      'cookies.savePreferences': 'Enregistrer les préférences',
+      'cookies.necessary': 'Cookies nécessaires',
+      'cookies.necessaryDesc': 'Essentiels au bon fonctionnement du site.',
+      'cookies.analytics': 'Cookies analytiques',
+      'cookies.analyticsDesc': 'Nous aident à comprendre comment vous utilisez le site.',
+      'cookies.marketing': 'Cookies marketing',
+      'cookies.marketingDesc': 'Utilisés pour vous montrer des publicités pertinentes.',
+      'cookies.required': 'Requis',
       
       // Errors
       'error.generic': 'Une erreur s\'est produite',

@@ -12,7 +12,7 @@ const languages = [
 
 export function OnboardingHeader() {
   const { t, i18n } = useTranslation();
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme, isDark } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -35,7 +35,7 @@ export function OnboardingHeader() {
   };
 
   const toggleTheme = () => {
-    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+    setTheme(isDark ? 'light' : 'dark');
   };
 
   return (
@@ -64,17 +64,17 @@ export function OnboardingHeader() {
         {/* Right controls */}
         <div className="flex items-center gap-2">
           {/* Theme toggle button */}
-          <button
-            onClick={toggleTheme}
-            className="p-2.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all duration-200"
-            aria-label={resolvedTheme === 'dark' ? t('settings.lightTheme') : t('settings.darkTheme')}
-          >
-            {resolvedTheme === 'dark' ? (
-              <Sun className="w-5 h-5" aria-hidden="true" />
-            ) : (
-              <Moon className="w-5 h-5" aria-hidden="true" />
-            )}
-          </button>
+            <button
+              onClick={toggleTheme}
+              className="p-2.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all duration-200"
+              aria-label={isDark ? t('settings.lightTheme') : t('settings.darkTheme')}
+            >
+              {isDark ? (
+                <Sun className="w-5 h-5" aria-hidden="true" />
+              ) : (
+                <Moon className="w-5 h-5" aria-hidden="true" />
+              )}
+            </button>
 
           {/* Language Selector Dropdown */}
           <div className="relative" ref={dropdownRef}>

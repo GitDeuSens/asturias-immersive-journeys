@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, ChevronDown, Sun, Moon, Monitor, Globe, Check } from 'lucide-react';
+import { ChevronDown, Sun, Moon, Globe, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTheme, Theme } from '@/hooks/useTheme';
 
@@ -13,7 +13,6 @@ const languages = [
 const themeOptions: { value: Theme; icon: typeof Sun; labelKey: string }[] = [
   { value: 'light', icon: Sun, labelKey: 'settings.lightTheme' },
   { value: 'dark', icon: Moon, labelKey: 'settings.darkTheme' },
-  { value: 'system', icon: Monitor, labelKey: 'settings.systemTheme' },
 ];
 
 interface SettingsDropdownProps {
@@ -22,7 +21,7 @@ interface SettingsDropdownProps {
 
 export function SettingsDropdown({ variant = 'light' }: SettingsDropdownProps) {
   const { t, i18n } = useTranslation();
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme, isDark } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -65,7 +64,7 @@ export function SettingsDropdown({ variant = 'light' }: SettingsDropdownProps) {
         aria-haspopup="menu"
       >
         <span className="text-base">{currentLang.flag}</span>
-        {resolvedTheme === 'dark' ? (
+        {isDark ? (
           <Moon className="w-4 h-4" aria-hidden="true" />
         ) : (
           <Sun className="w-4 h-4" aria-hidden="true" />
@@ -116,7 +115,7 @@ export function SettingsDropdown({ variant = 'light' }: SettingsDropdownProps) {
             {/* Theme section */}
             <div className="p-2">
               <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-                {resolvedTheme === 'dark' ? (
+                {isDark ? (
                   <Moon className="w-3.5 h-3.5" aria-hidden="true" />
                 ) : (
                   <Sun className="w-3.5 h-3.5" aria-hidden="true" />

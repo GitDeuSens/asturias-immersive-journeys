@@ -52,6 +52,9 @@ function AnalyticsTracker() {
 
 const queryClient = new QueryClient();
 
+// Lazy load CookieConsent
+const CookieConsent = lazy(() => import("./components/CookieConsent").then(m => ({ default: m.CookieConsent })));
+
 const App = () => (
   <ErrorBoundary>
     <HelmetProvider>
@@ -78,6 +81,10 @@ const App = () => (
                 <Route path="/legal" element={<LegalPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
+            </Suspense>
+            {/* Cookie Consent Banner */}
+            <Suspense fallback={null}>
+              <CookieConsent />
             </Suspense>
           </BrowserRouter>
         </TooltipProvider>

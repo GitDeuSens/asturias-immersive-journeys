@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 
-export type Theme = 'light' | 'dark' | 'system';
+export type Theme = 'light' | 'dark';
 
 const THEME_KEY = 'asturias-inmersivo-theme';
 
-function getSystemTheme(): 'light' | 'dark' {
+function getSystemTheme(): Theme {
   if (typeof window !== 'undefined') {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
@@ -15,50 +15,44 @@ export function useTheme() {
   const [theme, setThemeState] = useState<Theme>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem(THEME_KEY);
-      if (saved === 'light' || saved === 'dark' || saved === 'system') {
+      if (saved === 'light' || saved === 'dark') {
         return saved;
       }
     }
-    return 'system';
-  });
-
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => {
-    if (theme === 'system') {
-      return getSystemTheme();
-    }
-    return theme;
+    // Default to system preference
+    return getSystemTheme();
   });
 
   // Apply theme to document
   useEffect(() => {
     const root = document.documentElement;
-    const resolved = theme === 'system' ? getSystemTheme() : theme;
     
     root.classList.remove('light', 'dark');
-    root.classList.add(resolved);
-    setResolvedTheme(resolved);
+    root.classList.add(theme);
     
     // Update meta theme-color
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) {
-      metaTheme.setAttribute('content', resolved === 'dark' ? '#0f1f14' : '#7AB800');
+      metaTheme.setAttribute('content', theme === 'dark' ? '#0f1f14' : '#7AB800');
     }
   }, [theme]);
 
-  // Listen for system theme changes
+  // Listen for system theme changes (only if no saved preference)
   useEffect(() => {
-    if (theme !== 'system') return;
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme) return; // User has explicit preference, don't follow system
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (e: MediaQueryListEvent) => {
-      setResolvedTheme(e.matches ? 'dark' : 'light');
+      const newTheme = e.matches ? 'dark' : 'light';
+      setThemeState(newTheme);
       document.documentElement.classList.remove('light', 'dark');
-      document.documentElement.classList.add(e.matches ? 'dark' : 'light');
+      document.documentElement.classList.add(newTheme);
     };
 
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [theme]);
+  }, []);
 
   const setTheme = useCallback((newTheme: Theme) => {
     setThemeState(newTheme);
@@ -66,14 +60,13 @@ export function useTheme() {
   }, []);
 
   const toggleTheme = useCallback(() => {
-    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
-  }, [resolvedTheme, setTheme]);
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  }, [theme, setTheme]);
 
   return { 
     theme, 
     setTheme, 
     toggleTheme,
-    resolvedTheme,
-    isDark: resolvedTheme === 'dark',
+    isDark: theme === 'dark',
   };
 }
