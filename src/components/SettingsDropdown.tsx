@@ -63,7 +63,7 @@ export function SettingsDropdown({ variant = 'light' }: SettingsDropdownProps) {
         aria-expanded={isOpen}
         aria-haspopup="menu"
       >
-        <span className="text-base">{currentLang.flag}</span>
+        <span className="text-xs font-bold">{currentLang.label}</span>
         {isDark ? (
           <Moon className="w-4 h-4" aria-hidden="true" />
         ) : (
@@ -101,7 +101,7 @@ export function SettingsDropdown({ variant = 'light' }: SettingsDropdownProps) {
                     role="menuitem"
                   >
                     <span className="flex items-center gap-2">
-                      <span className="text-base">{lang.flag}</span>
+                      <span className="text-xs font-bold w-6">{lang.label}</span>
                       <span className="font-medium text-sm">{lang.fullLabel}</span>
                     </span>
                     {i18n.language === lang.code && (
