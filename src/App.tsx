@@ -17,6 +17,10 @@ const RoutesPage = lazy(() => import("./pages/RoutesPage").then(m => ({ default:
 const VRExperiencesPage = lazy(() => import("./components/VRExperiencesPage").then(m => ({ default: m.VRExperiencesPage })));
 const ARScenePage = lazy(() => import("./pages/ARScenePage").then(m => ({ default: m.ARScenePage })));
 const ARExperiencesPage = lazy(() => import("./pages/ARExperiencesPage").then(m => ({ default: m.ARExperiencesPage })));
+const AccessibilityPage = lazy(() => import("./pages/AccessibilityPage"));
+const PrivacyPage = lazy(() => import("./pages/PrivacyPage"));
+const CookiesPage = lazy(() => import("./pages/CookiesPage"));
+const LegalPage = lazy(() => import("./pages/LegalPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Loading fallback
@@ -68,6 +72,10 @@ const App = () => (
                 <Route path="/vr" element={<VRExperiencesPage />} />
                 <Route path="/ar" element={<ARExperiencesPage />} />
                 <Route path="/ar/:slug" element={<ARScenePage />} />
+                <Route path="/accessibility" element={<AccessibilityPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
+                <Route path="/cookies" element={<CookiesPage />} />
+                <Route path="/legal" element={<LegalPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
