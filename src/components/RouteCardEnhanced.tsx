@@ -35,7 +35,7 @@ export const RouteCard = forwardRef<HTMLButtonElement, RouteCardProps>(
           ease: [0.25, 0.46, 0.45, 0.94]
         }}
         onClick={onClick}
-        className="w-full text-left rounded-xl bg-card/50 border border-border/50 hover:border-primary/50 hover:bg-card/80 transition-all duration-200 group overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        className="w-full text-left rounded-2xl bg-card/50 border border-border/50 hover:border-primary/50 hover:bg-card/80 transition-all duration-200 group overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
         aria-label={`${t('common.viewDetails')}: ${route.title[lang]}`}
       >
         {/* Cover image */}

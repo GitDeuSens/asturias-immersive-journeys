@@ -360,7 +360,7 @@ export function RoutesPage() {
               mass: 0.9,
               opacity: { duration: 0.25, ease: 'easeOut' }
             }}
-            className="absolute bottom-0 left-0 right-0 md:top-14 md:bottom-0 md:left-auto md:right-4 md:w-[400px] bg-card/95 backdrop-blur-md border border-border shadow-xl rounded-t-2xl md:rounded-2xl md:my-4 max-h-[75vh] md:max-h-none overflow-hidden flex flex-col z-20"
+            className="absolute bottom-0 left-0 right-0 md:top-14 md:bottom-0 md:left-auto md:right-4 md:w-[400px] bg-card/95 backdrop-blur-md border border-border shadow-xl rounded-t-3xl md:rounded-3xl md:my-4 max-h-[75vh] md:max-h-none overflow-hidden flex flex-col z-20"
           >
             {/* Mobile handle */}
             <button
