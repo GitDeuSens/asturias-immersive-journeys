@@ -4,6 +4,11 @@ import { Cookie, X, Check, SlidersHorizontal, ExternalLink } from 'lucide-react'
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { initGA, trackCookieConsent } from '@/lib/analytics';
+import { 
+  subscribeToCookieSettings, 
+  getShouldShowCookieSettings, 
+  closeCookieSettings 
+} from '@/hooks/useCookieConsent';
 
 const CONSENT_KEY = 'asturias-inmersivo-cookie-consent';
 
@@ -32,6 +37,18 @@ export function CookieConsent() {
       const timer = setTimeout(() => setIsVisible(true), 1000);
       return () => clearTimeout(timer);
     }
+  }, []);
+
+  // Listen for external requests to open cookie settings
+  useEffect(() => {
+    const unsubscribe = subscribeToCookieSettings(() => {
+      if (getShouldShowCookieSettings()) {
+        setIsVisible(true);
+        setShowSettings(true);
+        closeCookieSettings();
+      }
+    });
+    return unsubscribe;
   }, []);
 
   const handleAcceptAll = () => {
