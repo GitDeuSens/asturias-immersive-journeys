@@ -348,10 +348,19 @@ export function RoutesPage() {
 
         {/* Side Panel */}
         <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: panelExpanded ? 0 : 'calc(100% - 60px)' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="absolute bottom-0 left-0 right-0 md:top-14 md:bottom-0 md:left-auto md:right-4 md:w-[400px] bg-card/95 backdrop-blur-md border border-border shadow-xl rounded-t-2xl md:rounded-2xl md:my-4 max-h-[75vh] md:max-h-none overflow-hidden flex flex-col"
+            initial={{ y: '100%', opacity: 0 }}
+            animate={{ 
+              y: panelExpanded ? 0 : 'calc(100% - 60px)', 
+              opacity: 1 
+            }}
+            transition={{ 
+              type: 'spring', 
+              damping: 28, 
+              stiffness: 180,
+              mass: 0.9,
+              opacity: { duration: 0.25, ease: 'easeOut' }
+            }}
+            className="absolute bottom-0 left-0 right-0 md:top-14 md:bottom-0 md:left-auto md:right-4 md:w-[400px] bg-card/95 backdrop-blur-md border border-border shadow-xl rounded-t-2xl md:rounded-2xl md:my-4 max-h-[75vh] md:max-h-none overflow-hidden flex flex-col z-20"
           >
             {/* Mobile handle */}
             <button
