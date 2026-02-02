@@ -3,7 +3,9 @@ import { motion } from 'framer-motion';
 import { AppHeader } from '@/components/AppHeader';
 import { Footer } from '@/components/Footer';
 import { SEOHead } from '@/components/SEOHead';
-import { Cookie } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Cookie, Settings } from 'lucide-react';
+import { openCookieSettings } from '@/hooks/useCookieConsent';
 
 const cookiesContent = {
   es: {
@@ -172,9 +174,17 @@ export function CookiesPage() {
 
             {/* Intro */}
             <section className="mb-8 p-6 bg-muted/50 rounded-xl">
-              <p className="text-foreground/80 leading-relaxed">
+              <p className="text-foreground/80 leading-relaxed mb-4">
                 {content.intro}
               </p>
+              <Button 
+                onClick={openCookieSettings}
+                variant="outline"
+                className="gap-2"
+              >
+                <Settings className="w-4 h-4" aria-hidden="true" />
+                {lang === 'en' ? 'Manage my preferences' : lang === 'fr' ? 'Gérer mes préférences' : 'Gestionar mis preferencias'}
+              </Button>
             </section>
 
             {/* What are cookies */}
