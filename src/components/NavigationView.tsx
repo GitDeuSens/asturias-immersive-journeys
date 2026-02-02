@@ -249,10 +249,10 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] bg-transparent flex flex-col"
+      className="fixed inset-0 z-[100]"
     >
-      {/* Map */}
-      <div ref={mapContainerRef} className="flex-1 relative">
+      {/* Map - fullscreen background */}
+      <div ref={mapContainerRef} className="absolute inset-0">
         {/* Offline mode indicator on map */}
         {isOfflineMode && (
           <div className="absolute top-16 left-1/2 -translate-x-1/2 z-[1000]">
@@ -341,16 +341,17 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
         </div>
       </div>
 
-      {/* Bottom panel */}
-      <AnimatePresence mode="wait">
-        {/* Mode selection (before start) */}
-        {!hasStarted && (
-          <motion.div
-            key="mode-select"
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            className="bg-card rounded-t-3xl shadow-2xl p-6 space-y-4"
+      {/* Bottom panel - positioned over map */}
+      <div className="absolute bottom-0 left-0 right-0 z-[1000]">
+        <AnimatePresence mode="wait">
+          {/* Mode selection (before start) */}
+          {!hasStarted && (
+            <motion.div
+              key="mode-select"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              className="bg-card rounded-t-3xl shadow-2xl p-6 space-y-4"
           >
             <div className="text-center">
               <h3 className="text-lg font-bold text-foreground">{destination.name}</h3>
@@ -590,7 +591,8 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
             </div>
           </motion.div>
         )}
-      </AnimatePresence>
+        </AnimatePresence>
+      </div>
     </motion.div>
   );
 }
