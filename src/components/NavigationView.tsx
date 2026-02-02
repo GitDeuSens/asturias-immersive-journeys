@@ -461,12 +461,9 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             className="rounded-t-3xl shadow-2xl overflow-hidden"
-            style={{
-              background: 'linear-gradient(to bottom, hsl(var(--primary)) 0%, hsl(var(--primary)) 80px, hsl(var(--card)) 80px, hsl(var(--card)) 100%)'
-            }}
           >
-            {/* Current instruction */}
-            <div className="p-4 text-primary-foreground">
+            {/* Current instruction - green header with its own rounding */}
+            <div className="p-4 bg-primary text-primary-foreground rounded-t-3xl">
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
                   <ManeuverIcon type={getManeuverIcon(currentStep)} className="w-8 h-8" />
