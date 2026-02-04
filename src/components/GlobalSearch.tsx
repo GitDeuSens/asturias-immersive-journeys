@@ -202,7 +202,7 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
           ref={inputRef}
           type="text"
           value={query}
-          onChange={(e) => search(e.target.value)}
+          onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => query.length >= 2 && setShowDropdown(true)}
           placeholder={placeholder || texts.placeholder[locale]}
