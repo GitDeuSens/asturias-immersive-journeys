@@ -188,6 +188,10 @@ export function GlobalSearch({
     }
   };
 
+  public search(event: any) {
+    console.log(' que es ?? ', event);
+  }
+  
   return (
     <div className="relative w-full">
       {/* Search input */}
@@ -197,7 +201,7 @@ export function GlobalSearch({
           ref={inputRef}
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => search(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => query.length >= 2 && setShowDropdown(true)}
           placeholder={placeholder || texts.placeholder[locale]}
