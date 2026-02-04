@@ -97,7 +97,7 @@ export function Tours360Page() {
 
               {/* Search toggle */}
               <button
-                onClick={() => setShowSearch(showSearch)}
+                onClick={() => setShowSearch(!showSearch)}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
               >
                 <Search className="w-4 h-4" />
