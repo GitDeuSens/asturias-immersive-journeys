@@ -188,7 +188,7 @@ export function GlobalSearch({
     }
   };
 
-  public search(event: any) {
+  search(event: any) {
     console.log(' que es ?? ', event);
   }
   
