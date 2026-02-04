@@ -1,7 +1,7 @@
 // ============ GLOBAL SEARCH COMPONENT ============
 // Real-time search with categorized results
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, MapPin, Route, Sparkles, Building2 } from "lucide-react";
@@ -127,15 +127,44 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
     localStorage.setItem("asturias-recent-searches", JSON.stringify(updated));
   };
 
+  // Apply local text filtering to results
+  const filteredResults = useMemo(() => {
+    if (!results) return null;
+
+    const filteredMuseums = filterByText(results.museums, query, (m) => [
+      m.name.es, m.name.en, m.name.fr, m.municipality, m.address
+    ]);
+
+    const filteredRoutes = filterByText(results.routes, query, (r: any) => [
+      r.title?.es, r.title?.en, r.title?.fr, r.description?.es
+    ]);
+
+    const filteredArScenes = filterByText(results.ar_scenes, query, (a) => [
+      a.title.es, a.title.en, a.title.fr, a.description?.es
+    ]);
+
+    const filteredPois = filterByText(results.pois, query, (p: any) => [
+      p.title?.es, p.title?.en, p.title?.fr, p.address
+    ]);
+
+    return {
+      museums: filteredMuseums,
+      routes: filteredRoutes,
+      ar_scenes: filteredArScenes,
+      pois: filteredPois,
+      total: filteredMuseums.length + filteredRoutes.length + filteredArScenes.length + filteredPois.length
+    };
+  }, [results, query]);
+
   const getAllResults = useCallback(() => {
-    if (!results) return [];
+    if (!filteredResults) return [];
     return [
-      ...results.museums.map((m) => ({ type: "museum", data: m })),
-      ...results.routes.map((r) => ({ type: "route", data: r })),
-      ...results.ar_scenes.map((a) => ({ type: "ar", data: a })),
-      ...results.pois.map((p) => ({ type: "poi", data: p })),
+      ...filteredResults.museums.map((m) => ({ type: "museum", data: m })),
+      ...filteredResults.routes.map((r) => ({ type: "route", data: r })),
+      ...filteredResults.ar_scenes.map((a) => ({ type: "ar", data: a })),
+      ...filteredResults.pois.map((p) => ({ type: "poi", data: p })),
     ];
-  }, [results]);
+  }, [filteredResults]);
 
   const navigateToResult = useCallback(
     (result: { type: string; data: any }) => {
@@ -264,15 +293,15 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
             exit={{ opacity: 0, y: -10 }}
             className="absolute z-50 w-full mt-2 bg-popover border border-border rounded-xl shadow-lg overflow-hidden max-h-[70vh] overflow-y-auto"
           >
-            {results && results.total > 0 ? (
+            {filteredResults && filteredResults.total > 0 ? (
               <div className="p-2">
                 {/* Museums */}
-                {results.museums.length > 0 && (
+                {filteredResults.museums.length > 0 && (
                   <div className="mb-4">
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-2 mb-2">
                       {texts.museums[locale]}
                     </p>
-                    {results.museums.slice(0, 3).map((museum, idx) => (
+                    {filteredResults.museums.slice(0, 3).map((museum, idx) => (
                       <button
                         key={museum.id}
                         onClick={() => navigateToResult({ type: "museum", data: museum })}
@@ -293,17 +322,17 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
                 )}
 
                 {/* Routes */}
-                {results.routes.length > 0 && (
+                {filteredResults.routes.length > 0 && (
                   <div className="mb-4">
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-2 mb-2">
                       {texts.routes[locale]}
                     </p>
-                    {results.routes.slice(0, 3).map((route: any, idx: number) => (
+                    {filteredResults.routes.slice(0, 3).map((route: any, idx: number) => (
                       <button
                         key={route.id}
                         onClick={() => navigateToResult({ type: "route", data: route })}
                         className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-left ${
-                          selectedIndex === results.museums.length + idx
+                          selectedIndex === filteredResults.museums.length + idx
                             ? "bg-accent text-accent-foreground"
                             : "hover:bg-muted"
                         }`}
@@ -320,17 +349,17 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
                 )}
 
                 {/* AR Scenes */}
-                {results.ar_scenes.length > 0 && (
+                {filteredResults.ar_scenes.length > 0 && (
                   <div className="mb-4">
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-2 mb-2">
                       {texts.ar[locale]}
                     </p>
-                    {results.ar_scenes.slice(0, 3).map((scene, idx) => (
+                    {filteredResults.ar_scenes.slice(0, 3).map((scene, idx) => (
                       <button
                         key={scene.id}
                         onClick={() => navigateToResult({ type: "ar", data: scene })}
                         className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-left ${
-                          selectedIndex === results.museums.length + results.routes.length + idx
+                          selectedIndex === filteredResults.museums.length + filteredResults.routes.length + idx
                             ? "bg-accent text-accent-foreground"
                             : "hover:bg-muted"
                         }`}
@@ -346,7 +375,7 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
                   </div>
                 )}
               </div>
-            ) : results && results.total === 0 ? (
+            ) : filteredResults && filteredResults.total === 0 ? (
               <div className="p-8 text-center">
                 <p className="text-muted-foreground">{texts.noResults[locale]}</p>
                 <p className="text-sm text-muted-foreground/60 mt-1">"{query}"</p>
