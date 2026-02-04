@@ -1,24 +1,28 @@
-import { useState, useMemo, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { View, ChevronRight, X, Filter, Search } from 'lucide-react';
-import { AppHeader } from '@/components/AppHeader';
-import { CategoryChips } from '@/components/CategoryChips';
-import { KuulaTourEmbed } from '@/components/KuulaTourEmbed';
-import { GlobalSearch } from '@/components/GlobalSearch';
-import { Footer } from '@/components/Footer';
-import { tours360, categories, Tour360 } from '@/data/mockData';
-import { getVirtualTours } from '@/lib/api/directus-client';
-import { useLanguage } from '@/hooks/useLanguage';
-import type { KuulaTour, Language } from '@/lib/types';
+import { useState, useMemo, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { View, ChevronRight, X, Filter, Search } from "lucide-react";
+import { AppHeader } from "@/components/AppHeader";
+import { CategoryChips } from "@/components/CategoryChips";
+import { KuulaTourEmbed } from "@/components/KuulaTourEmbed";
+import { GlobalSearch } from "@/components/GlobalSearch";
+import { Footer } from "@/components/Footer";
+import { tours360, categories, Tour360 } from "@/data/mockData";
+import { getVirtualTours } from "@/lib/api/directus-client";
+import { useLanguage } from "@/hooks/useLanguage";
+import type { KuulaTour, Language } from "@/lib/types";
 
 const texts = {
-  title: { es: 'Tours Virtuales 360°', en: 'Virtual Tours 360°', fr: 'Visites Virtuelles 360°' },
-  subtitle: { es: 'Explora Asturias desde cualquier lugar', en: 'Explore Asturias from anywhere', fr: 'Explorez les Asturies de n\'importe où' },
-  startTour: { es: 'Iniciar Tour', en: 'Start Tour', fr: 'Démarrer la visite' },
-  scenes: { es: 'escenas', en: 'scenes', fr: 'scènes' },
-  close: { es: 'Cerrar', en: 'Close', fr: 'Fermer' },
-  allCategories: { es: 'Todas las categorías', en: 'All categories', fr: 'Toutes les catégories' },
-  searchPlaceholder: { es: 'Buscar tours...', en: 'Search tours...', fr: 'Rechercher des visites...' },
+  title: { es: "Tours Virtuales 360°", en: "Virtual Tours 360°", fr: "Visites Virtuelles 360°" },
+  subtitle: {
+    es: "Explora Asturias desde cualquier lugar",
+    en: "Explore Asturias from anywhere",
+    fr: "Explorez les Asturies de n'importe où",
+  },
+  startTour: { es: "Iniciar Tour", en: "Start Tour", fr: "Démarrer la visite" },
+  scenes: { es: "escenas", en: "scenes", fr: "scènes" },
+  close: { es: "Cerrar", en: "Close", fr: "Fermer" },
+  allCategories: { es: "Todas las categorías", en: "All categories", fr: "Toutes les catégories" },
+  searchPlaceholder: { es: "Buscar tours...", en: "Search tours...", fr: "Rechercher des visites..." },
 };
 
 export function Tours360Page() {
@@ -40,23 +44,17 @@ export function Tours360Page() {
 
   const filteredTours = useMemo(() => {
     if (selectedCategories.length === 0) return tours360;
-    return tours360.filter(tour => 
-      tour.categoryIds.some(catId => selectedCategories.includes(catId))
-    );
+    return tours360.filter((tour) => tour.categoryIds.some((catId) => selectedCategories.includes(catId)));
   }, [selectedCategories]);
 
   const toggleCategory = (catId: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(catId) 
-        ? prev.filter(id => id !== catId)
-        : [...prev, catId]
-    );
+    setSelectedCategories((prev) => (prev.includes(catId) ? prev.filter((id) => id !== catId) : [...prev, catId]));
   };
 
   const handleTourClick = (tour: Tour360) => {
     setActiveTour(tour);
     // Find matching Kuula tour data
-    const kuulaTour = kuulaTours.find(kt => kt.id === tour.id);
+    const kuulaTour = kuulaTours.find((kt) => kt.id === tour.id);
     if (kuulaTour) {
       setActiveTourData(kuulaTour);
     } else {
@@ -64,7 +62,7 @@ export function Tours360Page() {
       setActiveTourData({
         id: tour.id,
         title: tour.title,
-        description: { es: '', en: '', fr: '' },
+        description: { es: "", en: "", fr: "" },
         kuula_embed_url: `https://kuula.co/share/collection/${tour.id}?logo=1&info=1&fs=1&vr=0&sd=1&thumbs=1`,
         thumbnail_url: tour.coverImage,
         total_panoramas: tour.scenes.length,
@@ -81,7 +79,7 @@ export function Tours360Page() {
   return (
     <div className="min-h-screen bg-background">
       <AppHeader variant="light" />
-      
+
       <main className="pt-20 pb-12">
         {/* Hero section */}
         <div className="bg-gradient-to-r from-primary to-asturias-forest py-12 mb-8">
@@ -93,17 +91,13 @@ export function Tours360Page() {
             >
               <div className="flex items-center justify-center gap-3 mb-4">
                 <View className="w-10 h-10" />
-                <h1 className="text-4xl md:text-5xl font-bold">
-                  {t(texts.title)}
-                </h1>
+                <h1 className="text-4xl md:text-5xl font-bold">{t(texts.title)}</h1>
               </div>
-              <p className="text-lg text-white/90 max-w-2xl mx-auto mb-6">
-                {t(texts.subtitle)}
-              </p>
+              <p className="text-lg text-white/90 max-w-2xl mx-auto mb-6">{t(texts.subtitle)}</p>
 
               {/* Search toggle */}
               <button
-                onClick={() => setShowSearch(!showSearch)}
+                onClick={() => setShowSearch(showSearch)}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
               >
                 <Search className="w-4 h-4" />
@@ -119,7 +113,7 @@ export function Tours360Page() {
             {showSearch && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
+                animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 className="mb-6 overflow-hidden"
               >
@@ -139,11 +133,7 @@ export function Tours360Page() {
               <Filter className="w-5 h-5 text-muted-foreground" />
               <span className="font-semibold text-foreground">{t(texts.allCategories)}</span>
             </div>
-            <CategoryChips
-              categories={categories}
-              selectedIds={selectedCategories}
-              onToggle={toggleCategory}
-            />
+            <CategoryChips categories={categories} selectedIds={selectedCategories} onToggle={toggleCategory} />
           </motion.div>
 
           {/* Tours grid */}
@@ -163,12 +153,12 @@ export function Tours360Page() {
                 onClick={() => handleTourClick(tour)}
               >
                 <div className="relative">
-                  <div 
+                  <div
                     className="aspect-[16/10] bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
                     style={{ backgroundImage: `url(${tour.coverImage})` }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  
+
                   {/* 360 badge */}
                   <div className="absolute top-3 left-3">
                     <span className="badge-360 flex items-center gap-1">
@@ -176,7 +166,7 @@ export function Tours360Page() {
                       360°
                     </span>
                   </div>
-                  
+
                   {/* Play button overlay */}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center">
@@ -184,15 +174,15 @@ export function Tours360Page() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="p-5">
                   <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
                     {t(tour.title)}
                   </h3>
-                  
+
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {tour.categoryIds.map(catId => {
-                      const cat = categories.find(c => c.id === catId);
+                    {tour.categoryIds.map((catId) => {
+                      const cat = categories.find((c) => c.id === catId);
                       return cat ? (
                         <span key={catId} className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
                           {t(cat.label)}
@@ -234,9 +224,7 @@ export function Tours360Page() {
                 <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
                   <View className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-xl font-bold text-white">
-                  {t(activeTour.title)}
-                </h2>
+                <h2 className="text-xl font-bold text-white">{t(activeTour.title)}</h2>
               </div>
               <button
                 onClick={closeTour}
@@ -250,8 +238,8 @@ export function Tours360Page() {
             {/* Kuula Tour Embed */}
             <div className="flex-1 p-4 overflow-auto">
               <div className="max-w-5xl mx-auto h-full">
-                <KuulaTourEmbed 
-                  tour={activeTourData} 
+                <KuulaTourEmbed
+                  tour={activeTourData}
                   locale={language as Language}
                   showControls={false}
                   onClose={closeTour}
