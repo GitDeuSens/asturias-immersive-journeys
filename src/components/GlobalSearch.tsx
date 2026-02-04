@@ -1,16 +1,16 @@
 // ============ GLOBAL SEARCH COMPONENT ============
 // Real-time search with categorized results
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, MapPin, Route, Sparkles, Building2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useDebounce } from "@/hooks/useDebounce";
-import { searchContent } from "@/lib/api/directus-client";
-import { trackSearch } from "@/lib/analytics";
-import type { Language, SearchResults } from "@/lib/types";
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, X, MapPin, Route, Sparkles, Building2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useDebounce } from '@/hooks/useDebounce';
+import { searchContent } from '@/lib/api/directus-client';
+import { trackSearch } from '@/lib/analytics';
+import type { Language, SearchResults } from '@/lib/types';
 
 interface GlobalSearchProps {
   locale?: Language;
@@ -20,47 +20,23 @@ interface GlobalSearchProps {
 }
 
 const texts = {
-  placeholder: { es: "Buscar experiencias...", en: "Search experiences...", fr: "Rechercher des expériences..." },
-  museums: { es: "Museos", en: "Museums", fr: "Musées" },
-  routes: { es: "Rutas", en: "Routes", fr: "Itinéraires" },
-  ar: { es: "Experiencias AR", en: "AR Experiences", fr: "Expériences AR" },
-  pois: { es: "Puntos de interés", en: "Points of interest", fr: "Points d'intérêt" },
-  noResults: { es: "No se encontraron resultados", en: "No results found", fr: "Aucun résultat trouvé" },
-  viewAll: { es: "Ver todos los resultados", en: "View all results", fr: "Voir tous les résultats" },
-  recentSearches: { es: "Búsquedas recientes", en: "Recent searches", fr: "Recherches récentes" },
+  placeholder: { es: 'Buscar experiencias...', en: 'Search experiences...', fr: 'Rechercher des expériences...' },
+  museums: { es: 'Museos', en: 'Museums', fr: 'Musées' },
+  routes: { es: 'Rutas', en: 'Routes', fr: 'Itinéraires' },
+  ar: { es: 'Experiencias AR', en: 'AR Experiences', fr: 'Expériences AR' },
+  pois: { es: 'Puntos de interés', en: 'Points of interest', fr: 'Points d\'intérêt' },
+  noResults: { es: 'No se encontraron resultados', en: 'No results found', fr: 'Aucun résultat trouvé' },
+  viewAll: { es: 'Ver todos los resultados', en: 'View all results', fr: 'Voir tous les résultats' },
+  recentSearches: { es: 'Búsquedas recientes', en: 'Recent searches', fr: 'Recherches récentes' },
 };
 
-/**
- * Filters an array of items by matching a query against specified text fields
- * @param items - Array of items to filter
- * @param query - Search query string
- * @param getFields - Function that extracts searchable text fields from an item
- * @returns Filtered array of items that match the query
- */
-export function filterByText<T>(
-  items: T[],
-  query: string,
-  getFields: (item: T) => string[]
-): T[] {
-  if (!query || query.trim().length === 0) return items;
-  
-  const normalizedQuery = query.toLowerCase().trim();
-  const queryWords = normalizedQuery.split(/\s+/).filter(Boolean);
-  
-  return items.filter((item) => {
-    const fields = getFields(item)
-      .filter(Boolean)
-      .map((f) => f.toLowerCase());
-    
-    // Match if all query words are found in any of the fields
-    return queryWords.every((word) =>
-      fields.some((field) => field.includes(word))
-    );
-  });
-};
-
-export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = true }: GlobalSearchProps) {
-  const [query, setQuery] = useState("");
+export function GlobalSearch({
+  locale = 'es',
+  placeholder,
+  onClose,
+  isOpen = true,
+}: GlobalSearchProps) {
+  const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResults | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -74,7 +50,7 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
 
   // Load recent searches from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem("asturias-recent-searches");
+    const saved = localStorage.getItem('asturias-recent-searches');
     if (saved) {
       try {
         setRecentSearches(JSON.parse(saved));
@@ -115,112 +91,77 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
       // Save to recent searches
       saveRecentSearch(searchQuery);
     } catch (error) {
-      console.error("Search error:", error);
+      console.error('Search error:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const saveRecentSearch = (searchQuery: string) => {
-    const updated = [searchQuery, ...recentSearches.filter((q) => q !== searchQuery)].slice(0, 5);
+    const updated = [searchQuery, ...recentSearches.filter(q => q !== searchQuery)].slice(0, 5);
     setRecentSearches(updated);
-    localStorage.setItem("asturias-recent-searches", JSON.stringify(updated));
+    localStorage.setItem('asturias-recent-searches', JSON.stringify(updated));
   };
 
-  // Apply local text filtering to results
-  const filteredResults = useMemo(() => {
-    if (!results) return null;
-
-    const filteredMuseums = filterByText(results.museums, query, (m) => [
-      m.name.es, m.name.en, m.name.fr, m.municipality, m.address
-    ]);
-
-    const filteredRoutes = filterByText(results.routes, query, (r: any) => [
-      r.title?.es, r.title?.en, r.title?.fr, r.description?.es
-    ]);
-
-    const filteredArScenes = filterByText(results.ar_scenes, query, (a) => [
-      a.title.es, a.title.en, a.title.fr, a.description?.es
-    ]);
-
-    const filteredPois = filterByText(results.pois, query, (p: any) => [
-      p.title?.es, p.title?.en, p.title?.fr, p.address
-    ]);
-
-    return {
-      museums: filteredMuseums,
-      routes: filteredRoutes,
-      ar_scenes: filteredArScenes,
-      pois: filteredPois,
-      total: filteredMuseums.length + filteredRoutes.length + filteredArScenes.length + filteredPois.length
-    };
-  }, [results, query]);
-
   const getAllResults = useCallback(() => {
-    if (!filteredResults) return [];
+    if (!results) return [];
     return [
-      ...filteredResults.museums.map((m) => ({ type: "museum", data: m })),
-      ...filteredResults.routes.map((r) => ({ type: "route", data: r })),
-      ...filteredResults.ar_scenes.map((a) => ({ type: "ar", data: a })),
-      ...filteredResults.pois.map((p) => ({ type: "poi", data: p })),
+      ...results.museums.map(m => ({ type: 'museum', data: m })),
+      ...results.routes.map(r => ({ type: 'route', data: r })),
+      ...results.ar_scenes.map(a => ({ type: 'ar', data: a })),
+      ...results.pois.map(p => ({ type: 'poi', data: p })),
     ];
-  }, [filteredResults]);
+  }, [results]);
 
-  const navigateToResult = useCallback(
-    (result: { type: string; data: any }) => {
-      switch (result.type) {
-        case "museum":
-          navigate(`/tours?museum=${result.data.id}`);
-          break;
-        case "route":
-          navigate(`/routes?route=${result.data.id}`);
-          break;
-        case "ar":
-          navigate(`/ar/${result.data.slug}`);
-          break;
-        case "poi":
-          navigate(`/routes?poi=${result.data.id}`);
-          break;
-      }
-      setShowDropdown(false);
-      setQuery("");
-      onClose?.();
-    },
-    [navigate, onClose],
-  );
+  const navigateToResult = useCallback((result: { type: string; data: any }) => {
+    switch (result.type) {
+      case 'museum':
+        navigate(`/tours?museum=${result.data.id}`);
+        break;
+      case 'route':
+        navigate(`/routes?route=${result.data.id}`);
+        break;
+      case 'ar':
+        navigate(`/ar/${result.data.slug}`);
+        break;
+      case 'poi':
+        navigate(`/routes?poi=${result.data.id}`);
+        break;
+    }
+    setShowDropdown(false);
+    setQuery('');
+    onClose?.();
+  }, [navigate, onClose]);
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      const allResults = getAllResults();
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    const allResults = getAllResults();
 
-      switch (e.key) {
-        case "ArrowDown":
-          e.preventDefault();
-          setSelectedIndex((prev) => Math.min(prev + 1, allResults.length - 1));
-          break;
-        case "ArrowUp":
-          e.preventDefault();
-          setSelectedIndex((prev) => Math.max(prev - 1, -1));
-          break;
-        case "Enter":
-          e.preventDefault();
-          if (selectedIndex >= 0 && allResults[selectedIndex]) {
-            navigateToResult(allResults[selectedIndex]);
-          }
-          break;
-        case "Escape":
-          setShowDropdown(false);
-          inputRef.current?.blur();
-          onClose?.();
-          break;
-      }
-    },
-    [getAllResults, selectedIndex, navigateToResult, onClose],
-  );
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedIndex(prev => Math.min(prev + 1, allResults.length - 1));
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedIndex(prev => Math.max(prev - 1, -1));
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedIndex >= 0 && allResults[selectedIndex]) {
+          navigateToResult(allResults[selectedIndex]);
+        }
+        break;
+      case 'Escape':
+        setShowDropdown(false);
+        inputRef.current?.blur();
+        onClose?.();
+        break;
+    }
+  }, [getAllResults, selectedIndex, navigateToResult, onClose]);
 
   const highlightMatch = (text: string, query: string) => {
     if (!query) return text;
-    const parts = text.split(new RegExp(`(${query})`, "gi"));
+    const parts = text.split(new RegExp(`(${query})`, 'gi'));
     return parts.map((part, i) =>
       part.toLowerCase() === query.toLowerCase() ? (
         <mark key={i} className="bg-primary/30 text-foreground rounded px-0.5">
@@ -228,25 +169,29 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
         </mark>
       ) : (
         part
-      ),
+      )
     );
   };
 
   const getResultIcon = (type: string) => {
     switch (type) {
-      case "museum":
+      case 'museum':
         return <Building2 className="w-4 h-4" />;
-      case "route":
+      case 'route':
         return <Route className="w-4 h-4" />;
-      case "ar":
+      case 'ar':
         return <Sparkles className="w-4 h-4" />;
-      case "poi":
+      case 'poi':
         return <MapPin className="w-4 h-4" />;
       default:
         return null;
     }
   };
 
+  const search = (event: any) {
+    console.log(' que es ?? ', event);
+  }
+  
   return (
     <div className="relative w-full">
       {/* Search input */}
@@ -256,7 +201,7 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
           ref={inputRef}
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => performSearch(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => query.length >= 2 && setShowDropdown(true)}
           placeholder={placeholder || texts.placeholder[locale]}
@@ -267,7 +212,7 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
             variant="ghost"
             size="icon"
             onClick={() => {
-              setQuery("");
+              setQuery('');
               setResults(null);
               setShowDropdown(false);
             }}
@@ -293,20 +238,22 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
             exit={{ opacity: 0, y: -10 }}
             className="absolute z-50 w-full mt-2 bg-popover border border-border rounded-xl shadow-lg overflow-hidden max-h-[70vh] overflow-y-auto"
           >
-            {filteredResults && filteredResults.total > 0 ? (
+            {results && results.total > 0 ? (
               <div className="p-2">
                 {/* Museums */}
-                {filteredResults.museums.length > 0 && (
+                {results.museums.length > 0 && (
                   <div className="mb-4">
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-2 mb-2">
                       {texts.museums[locale]}
                     </p>
-                    {filteredResults.museums.slice(0, 3).map((museum, idx) => (
+                    {results.museums.slice(0, 3).map((museum, idx) => (
                       <button
                         key={museum.id}
-                        onClick={() => navigateToResult({ type: "museum", data: museum })}
+                        onClick={() => navigateToResult({ type: 'museum', data: museum })}
                         className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-left ${
-                          selectedIndex === idx ? "bg-accent text-accent-foreground" : "hover:bg-muted"
+                          selectedIndex === idx
+                            ? 'bg-accent text-accent-foreground'
+                            : 'hover:bg-muted'
                         }`}
                       >
                         <Building2 className="w-4 h-4 text-muted-foreground flex-shrink-0" />
@@ -314,7 +261,9 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
                           <p className="font-medium text-foreground truncate">
                             {highlightMatch(museum.name[locale] || museum.name.es, query)}
                           </p>
-                          <p className="text-xs text-muted-foreground truncate">{museum.municipality}</p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {museum.municipality}
+                          </p>
                         </div>
                       </button>
                     ))}
@@ -322,19 +271,19 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
                 )}
 
                 {/* Routes */}
-                {filteredResults.routes.length > 0 && (
+                {results.routes.length > 0 && (
                   <div className="mb-4">
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-2 mb-2">
                       {texts.routes[locale]}
                     </p>
-                    {filteredResults.routes.slice(0, 3).map((route: any, idx: number) => (
+                    {results.routes.slice(0, 3).map((route: any, idx: number) => (
                       <button
                         key={route.id}
-                        onClick={() => navigateToResult({ type: "route", data: route })}
+                        onClick={() => navigateToResult({ type: 'route', data: route })}
                         className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-left ${
-                          selectedIndex === filteredResults.museums.length + idx
-                            ? "bg-accent text-accent-foreground"
-                            : "hover:bg-muted"
+                          selectedIndex === results.museums.length + idx
+                            ? 'bg-accent text-accent-foreground'
+                            : 'hover:bg-muted'
                         }`}
                       >
                         <Route className="w-4 h-4 text-muted-foreground flex-shrink-0" />
@@ -349,19 +298,19 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
                 )}
 
                 {/* AR Scenes */}
-                {filteredResults.ar_scenes.length > 0 && (
+                {results.ar_scenes.length > 0 && (
                   <div className="mb-4">
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-2 mb-2">
                       {texts.ar[locale]}
                     </p>
-                    {filteredResults.ar_scenes.slice(0, 3).map((scene, idx) => (
+                    {results.ar_scenes.slice(0, 3).map((scene, idx) => (
                       <button
                         key={scene.id}
-                        onClick={() => navigateToResult({ type: "ar", data: scene })}
+                        onClick={() => navigateToResult({ type: 'ar', data: scene })}
                         className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-left ${
-                          selectedIndex === filteredResults.museums.length + filteredResults.routes.length + idx
-                            ? "bg-accent text-accent-foreground"
-                            : "hover:bg-muted"
+                          selectedIndex === results.museums.length + results.routes.length + idx
+                            ? 'bg-accent text-accent-foreground'
+                            : 'hover:bg-muted'
                         }`}
                       >
                         <Sparkles className="w-4 h-4 text-muted-foreground flex-shrink-0" />
@@ -375,7 +324,7 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
                   </div>
                 )}
               </div>
-            ) : filteredResults && filteredResults.total === 0 ? (
+            ) : results && results.total === 0 ? (
               <div className="p-8 text-center">
                 <p className="text-muted-foreground">{texts.noResults[locale]}</p>
                 <p className="text-sm text-muted-foreground/60 mt-1">"{query}"</p>
