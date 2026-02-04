@@ -30,6 +30,35 @@ const texts = {
   recentSearches: { es: "Búsquedas recientes", en: "Recent searches", fr: "Recherches récentes" },
 };
 
+/**
+ * Filters an array of items by matching a query against specified text fields
+ * @param items - Array of items to filter
+ * @param query - Search query string
+ * @param getFields - Function that extracts searchable text fields from an item
+ * @returns Filtered array of items that match the query
+ */
+export function filterByText<T>(
+  items: T[],
+  query: string,
+  getFields: (item: T) => string[]
+): T[] {
+  if (!query || query.trim().length === 0) return items;
+  
+  const normalizedQuery = query.toLowerCase().trim();
+  const queryWords = normalizedQuery.split(/\s+/).filter(Boolean);
+  
+  return items.filter((item) => {
+    const fields = getFields(item)
+      .filter(Boolean)
+      .map((f) => f.toLowerCase());
+    
+    // Match if all query words are found in any of the fields
+    return queryWords.every((word) =>
+      fields.some((field) => field.includes(word))
+    );
+  });
+};
+
 export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = true }: GlobalSearchProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResults | null>(null);
