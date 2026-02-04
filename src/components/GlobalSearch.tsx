@@ -188,9 +188,9 @@ export function GlobalSearch({
     }
   };
 
-  const search = (event: any) {
+  const search = (event: any) => {
     console.log(' que es ?? ', event);
-  }
+  };
   
   return (
     <div className="relative w-full">
