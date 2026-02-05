@@ -97,16 +97,20 @@ export function openNavigationTo(destination: NavigationDestination): void {
   
   if (isIOS) {
     // Apple Maps - walking mode
-    window.open(
-      `maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=w&q=${encodedName}`,
-      '_blank'
-    );
+    const url = `maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=w&q=${encodedName}`;
+    const newWindow = window.open(url, '_blank');
+    // Fallback if popup was blocked
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      window.location.href = url;
+    }
   } else {
     // Google Maps - walking mode
-    window.open(
-      `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking`,
-      '_blank'
-    );
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking`;
+    const newWindow = window.open(url, '_blank');
+    // Fallback if popup was blocked
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      window.location.href = url;
+    }
   }
 }
 
@@ -120,15 +124,17 @@ export function openDrivingNavigationTo(destination: NavigationDestination): voi
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   
   if (isIOS) {
-    window.open(
-      `maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d&q=${encodedName}`,
-      '_blank'
-    );
+    const url = `maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d&q=${encodedName}`;
+    const newWindow = window.open(url, '_blank');
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      window.location.href = url;
+    }
   } else {
-    window.open(
-      `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`,
-      '_blank'
-    );
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
+    const newWindow = window.open(url, '_blank');
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      window.location.href = url;
+    }
   }
 }
 
