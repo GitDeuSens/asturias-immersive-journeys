@@ -109,7 +109,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
 
         {/* Scrollable content */}
         <ScrollArea className="flex-1">
-          <div className="pt-3 pl-3">
+          <div className="pt-3 pl-6">
             <h1 id="route-detail-title" className="text-2xl font-serif font-bold mb-1">
               {route.title[lang]}
             </h1>
