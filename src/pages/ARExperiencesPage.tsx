@@ -1,43 +1,47 @@
 // ============ AR EXPERIENCES LIST PAGE ============
 // List of all available AR experiences
 
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Sparkles, Clock, MapPin, ChevronRight, Filter } from 'lucide-react';
-import { AppHeader } from '@/components/AppHeader';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { SEOHead } from '@/components/SEOHead';
-import { Footer } from '@/components/Footer';
-import { getARScenes } from '@/lib/api/directus-client';
-import { useLanguage } from '@/hooks/useLanguage';
-import type { ARScene, Language } from '@/lib/types';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Sparkles, Clock, MapPin, ChevronRight, Filter } from "lucide-react";
+import { AppHeader } from "@/components/AppHeader";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { SEOHead } from "@/components/SEOHead";
+import { Footer } from "@/components/Footer";
+import { getARScenes } from "@/lib/api/directus-client";
+import { useLanguage } from "@/hooks/useLanguage";
+import type { ARScene, Language } from "@/lib/types";
 
 const texts = {
-  title: { es: 'Experiencias AR', en: 'AR Experiences', fr: 'Expériences AR' },
-  subtitle: { 
-    es: 'Descubre Asturias a través de la Realidad Aumentada', 
-    en: 'Discover Asturias through Augmented Reality',
-    fr: 'Découvrez les Asturies à travers la Réalité Augmentée'
+  title: { es: "Experiencias AR", en: "AR Experiences", fr: "Expériences AR" },
+  subtitle: {
+    es: "Descubre Asturias a través de la Realidad Aumentada",
+    en: "Discover Asturias through Augmented Reality",
+    fr: "Découvrez les Asturies à travers la Réalité Augmentée",
   },
-  duration: { es: 'min', en: 'min', fr: 'min' },
-  difficulty: { 
-    easy: { es: 'Fácil', en: 'Easy', fr: 'Facile' },
-    moderate: { es: 'Moderado', en: 'Moderate', fr: 'Modéré' },
-    advanced: { es: 'Avanzado', en: 'Advanced', fr: 'Avancé' }
+  duration: { es: "min", en: "min", fr: "min" },
+  difficulty: {
+    easy: { es: "Fácil", en: "Easy", fr: "Facile" },
+    moderate: { es: "Moderado", en: "Moderate", fr: "Modéré" },
+    advanced: { es: "Avanzado", en: "Advanced", fr: "Avancé" },
   },
   arType: {
-    slam: { es: 'Superficie', en: 'Surface', fr: 'Surface' },
-    'image-tracking': { es: 'Marcador', en: 'Marker', fr: 'Marqueur' },
-    geo: { es: 'GPS', en: 'GPS', fr: 'GPS' }
+    slam: { es: "Superficie", en: "Surface", fr: "Surface" },
+    "image-tracking": { es: "Marcador", en: "Marker", fr: "Marqueur" },
+    geo: { es: "GPS", en: "GPS", fr: "GPS" },
   },
-  startExperience: { es: 'Iniciar experiencia', en: 'Start experience', fr: 'Démarrer l\'expérience' },
-  filterAll: { es: 'Todas', en: 'All', fr: 'Toutes' },
-  filterSLAM: { es: 'Superficie', en: 'Surface', fr: 'Surface' },
-  filterMarker: { es: 'Marcador', en: 'Marker', fr: 'Marqueur' },
-  filterGeo: { es: 'GPS', en: 'GPS', fr: 'GPS' },
-  noScenes: { es: 'No hay experiencias disponibles', en: 'No experiences available', fr: 'Aucune expérience disponible' },
+  startExperience: { es: "Iniciar experiencia", en: "Start experience", fr: "Démarrer l'expérience" },
+  filterAll: { es: "Todas", en: "All", fr: "Toutes" },
+  filterSLAM: { es: "Superficie", en: "Surface", fr: "Surface" },
+  filterMarker: { es: "Marcador", en: "Marker", fr: "Marqueur" },
+  filterGeo: { es: "GPS", en: "GPS", fr: "GPS" },
+  noScenes: {
+    es: "No hay experiencias disponibles",
+    en: "No experiences available",
+    fr: "Aucune expérience disponible",
+  },
 };
 
 export function ARExperiencesPage() {
@@ -45,7 +49,7 @@ export function ARExperiencesPage() {
   const locale = language as Language;
   const [scenes, setScenes] = useState<ARScene[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'slam' | 'image-tracking' | 'geo'>('all');
+  const [filter, setFilter] = useState<"all" | "slam" | "image-tracking" | "geo">("all");
 
   useEffect(() => {
     async function loadScenes() {
@@ -54,7 +58,7 @@ export function ARExperiencesPage() {
         const data = await getARScenes(locale);
         setScenes(data);
       } catch (error) {
-        console.error('Error loading AR scenes:', error);
+        console.error("Error loading AR scenes:", error);
       } finally {
         setIsLoading(false);
       }
@@ -62,23 +66,18 @@ export function ARExperiencesPage() {
     loadScenes();
   }, [locale]);
 
-  const filteredScenes = filter === 'all' 
-    ? scenes 
-    : scenes.filter(s => s.needle_type === filter);
+  const filteredScenes = filter === "all" ? scenes : scenes.filter((s) => s.needle_type === filter);
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead
-        title={texts.title[locale]}
-        description={texts.subtitle[locale]}
-      />
+      <SEOHead title={texts.title[locale]} description={texts.subtitle[locale]} />
 
       <AppHeader variant="light" />
 
       <main className="pt-20 pb-12">
         {/* Hero section */}
         <div className="bg-gradient-to-r from-primary to-asturias-forest py-12 mb-8">
-          <div className="container mx-auto px-4 max-w-6xl">
+          <div className="pb-5 container mx-auto px-4 max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -86,18 +85,14 @@ export function ARExperiencesPage() {
             >
               <div className="flex items-center justify-center gap-3 mb-4">
                 <Sparkles className="w-10 h-10" />
-                <h1 className="text-4xl md:text-5xl font-bold">
-                  {texts.title[locale]}
-                </h1>
+                <h1 className="text-4xl md:text-5xl font-bold">{texts.title[locale]}</h1>
               </div>
-              <p className="text-lg text-white/90 max-w-2xl mx-auto">
-                {texts.subtitle[locale]}
-              </p>
+              <p className="text-lg text-white/90 max-w-2xl mx-auto">{texts.subtitle[locale]}</p>
             </motion.div>
           </div>
         </div>
 
-        <div className="container mx-auto px-4 max-w-6xl">
+        <div className="pb-5 container mx-auto px-4 max-w-6xl">
           {/* Filters */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -108,23 +103,24 @@ export function ARExperiencesPage() {
             <div className="flex items-center gap-3 mb-4">
               <Filter className="w-5 h-5 text-muted-foreground" />
               <span className="font-semibold text-foreground">
-                {locale === 'es' ? 'Filtrar por tipo' : 
-                 locale === 'en' ? 'Filter by type' : 
-                 'Filtrer par type'}
+                {locale === "es" ? "Filtrar por tipo" : locale === "en" ? "Filter by type" : "Filtrer par type"}
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
-              {(['all', 'slam', 'image-tracking', 'geo'] as const).map((type) => (
+              {(["all", "slam", "image-tracking", "geo"] as const).map((type) => (
                 <Button
                   key={type}
-                  variant={filter === type ? 'default' : 'outline'}
+                  variant={filter === type ? "default" : "outline"}
                   size="sm"
                   onClick={() => setFilter(type)}
                 >
-                  {type === 'all' ? texts.filterAll[locale] :
-                   type === 'slam' ? texts.filterSLAM[locale] :
-                   type === 'image-tracking' ? texts.filterMarker[locale] :
-                   texts.filterGeo[locale]}
+                  {type === "all"
+                    ? texts.filterAll[locale]
+                    : type === "slam"
+                      ? texts.filterSLAM[locale]
+                      : type === "image-tracking"
+                        ? texts.filterMarker[locale]
+                        : texts.filterGeo[locale]}
                 </Button>
               ))}
             </div>
@@ -165,12 +161,12 @@ export function ARExperiencesPage() {
                     className="group block bg-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-border hover:border-primary"
                   >
                     <div className="relative">
-                      <div 
+                      <div
                         className="aspect-[16/10] bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
                         style={{ backgroundImage: `url(${scene.preview_image})` }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                      
+
                       {/* AR badge */}
                       <div className="absolute top-3 left-3">
                         <Badge className="bg-primary/90 text-primary-foreground">
@@ -185,7 +181,7 @@ export function ARExperiencesPage() {
                           {texts.arType[scene.needle_type][locale]}
                         </Badge>
                       </div>
-                      
+
                       {/* Play button overlay */}
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center">
@@ -193,12 +189,12 @@ export function ARExperiencesPage() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="p-5">
                       <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
                         {scene.title[locale] || scene.title.es}
                       </h3>
-                      
+
                       <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
                         {scene.description[locale] || scene.description.es}
                       </p>

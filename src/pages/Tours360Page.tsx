@@ -49,14 +49,14 @@ export function Tours360Page() {
 
   // Prepare local search data from filtered tours
   const localSearchData: LocalSearchItem[] = useMemo(() => {
-    return filteredTours.map(tour => ({
+    return filteredTours.map((tour) => ({
       id: tour.id,
       title: tour.title, // Pass full multilingual object for search across all languages
       subtitle: tour.categoryIds
-        .map(catId => categories.find(c => c.id === catId))
+        .map((catId) => categories.find((c) => c.id === catId))
         .filter(Boolean)
-        .map(cat => t(cat!.label))
-        .join(', '),
+        .map((cat) => t(cat!.label))
+        .join(", "),
     }));
   }, [filteredTours, t]);
 
@@ -90,7 +90,7 @@ export function Tours360Page() {
   };
 
   const handleLocalSearchSelect = (item: LocalSearchItem) => {
-    const tour = tours360.find(t => t.id === item.id);
+    const tour = tours360.find((t) => t.id === item.id);
     if (tour) {
       handleTourClick(tour);
       setShowSearch(false);
@@ -104,7 +104,7 @@ export function Tours360Page() {
       <main className="pt-20 pb-12">
         {/* Hero section */}
         <div className="bg-gradient-to-r from-primary to-asturias-forest py-12 mb-8">
-          <div className="container mx-auto px-4 max-w-6xl">
+          <div className="pb-5 container mx-auto px-4 max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -128,7 +128,7 @@ export function Tours360Page() {
           </div>
         </div>
 
-        <div className="container mx-auto px-4 max-w-6xl">
+        <div className="pb-5 container mx-auto px-4 max-w-6xl">
           {/* Search bar */}
           <AnimatePresence>
             {showSearch && (
@@ -138,7 +138,7 @@ export function Tours360Page() {
                 exit={{ opacity: 0, height: 0 }}
                 className="mb-6"
               >
-                <GlobalSearch 
+                <GlobalSearch
                   locale={language as Language}
                   localData={localSearchData}
                   onLocalSelect={handleLocalSearchSelect}
