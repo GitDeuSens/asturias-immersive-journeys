@@ -45,14 +45,14 @@ const texts = {
   results: { es: "Resultados", en: "Results", fr: "Résultats" },
 };
 
-export function GlobalSearch({ 
-  locale = "es", 
-  placeholder, 
-  onClose, 
+export function GlobalSearch({
+  locale = "es",
+  placeholder,
+  onClose,
   isOpen = true,
   localData,
   onLocalSelect,
-  localIcon
+  localIcon,
 }: GlobalSearchProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResults | null>(null);
@@ -111,28 +111,37 @@ export function GlobalSearch({
   }, [debouncedQuery, locale, isLocalMode, localData]);
 
   const getItemTitle = (item: LocalSearchItem): string => {
-    if (typeof item.title === 'string') return item.title;
-    return item.title[locale] || item.title.es || '';
+    if (typeof item.title === "string") return item.title;
+    return item.title[locale] || item.title.es || "";
   };
 
   // Get all text values from title for search (supports multilingual)
   const getAllTitleText = (item: LocalSearchItem): string => {
-    if (typeof item.title === 'string') return item.title;
-    return Object.values(item.title).join(' ');
+    if (typeof item.title === "string") return item.title;
+    return Object.values(item.title).join(" ");
   };
 
   const performLocalSearch = (searchQuery: string) => {
     if (!localData) return;
-    
-    const normalizedQuery = searchQuery.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    
-    const filtered = localData.filter(item => {
+
+    const normalizedQuery = searchQuery
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+    const filtered = localData.filter((item) => {
       // Search across all language variants
-      const allTitles = getAllTitleText(item).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      const subtitle = (item.subtitle || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const allTitles = getAllTitleText(item)
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+      const subtitle = (item.subtitle || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
       return allTitles.includes(normalizedQuery) || subtitle.includes(normalizedQuery);
     });
-    
+
     setLocalResults(filtered);
     setShowDropdown(true);
     setSelectedIndex(-1);
@@ -289,9 +298,7 @@ export function GlobalSearch({
     console.log(" que es ?? ", event);
   };
 
-  const defaultPlaceholder = isLocalMode 
-    ? texts.placeholderLocal[locale] 
-    : texts.placeholder[locale];
+  const defaultPlaceholder = isLocalMode ? texts.placeholderLocal[locale] : texts.placeholder[locale];
 
   return (
     <div className="relative w-full">
@@ -300,7 +307,7 @@ export function GlobalSearch({
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
         <Input
           ref={inputRef}
-          type="search"
+          type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={isLocalMode ? handleLocalKeyDown : handleKeyDown}
@@ -366,9 +373,7 @@ export function GlobalSearch({
                       <p className="font-medium text-foreground truncate">
                         {highlightMatch(getItemTitle(item), query)}
                       </p>
-                      {item.subtitle && (
-                        <p className="text-xs text-muted-foreground truncate">{item.subtitle}</p>
-                      )}
+                      {item.subtitle && <p className="text-xs text-muted-foreground truncate">{item.subtitle}</p>}
                     </div>
                   </button>
                 ))}
