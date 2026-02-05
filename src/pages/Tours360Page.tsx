@@ -104,7 +104,7 @@ export function Tours360Page() {
       <main className="pt-20">
         {/* Hero section */}
         <div className="bg-gradient-to-r from-primary to-asturias-forest py-12 mb-8">
-          <div className="container mx-auto px-4 max-w-6xl">
+          <div className="container mx-auto pb-5 px-4 max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -128,7 +128,7 @@ export function Tours360Page() {
           </div>
         </div>
 
-        <div className="container mx-auto px-4 max-w-6xl">
+        <div className="container mx-auto pb-5 px-4 max-w-6xl">
           {/* Search bar */}
           <AnimatePresence>
             {showSearch && (
