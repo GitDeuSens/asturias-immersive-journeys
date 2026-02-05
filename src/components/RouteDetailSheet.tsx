@@ -1,10 +1,10 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  X, 
-  MapPin, 
-  Clock, 
-  RotateCw, 
-  Mountain, 
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  X,
+  MapPin,
+  Clock,
+  RotateCw,
+  Mountain,
   ChevronRight,
   Camera,
   Play,
@@ -13,15 +13,15 @@ import {
   Smartphone,
   Info,
   Ruler,
-  Navigation
-} from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { ImmersiveRoute, RoutePoint } from '@/data/immersiveRoutes';
-import { getCategoryById } from '@/data/mockData';
-import { calculateRouteDistance, formatDistance } from '@/lib/mapUtils';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { ShareButtons } from '@/components/ShareButtons';
+  Navigation,
+} from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { ImmersiveRoute, RoutePoint } from "@/data/immersiveRoutes";
+import { getCategoryById } from "@/data/mockData";
+import { calculateRouteDistance, formatDistance } from "@/lib/mapUtils";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { ShareButtons } from "@/components/ShareButtons";
 
 interface RouteDetailSheetProps {
   route: ImmersiveRoute | null;
@@ -31,16 +31,16 @@ interface RouteDetailSheetProps {
 
 export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSheetProps) {
   const { t, i18n } = useTranslation();
-  const lang = i18n.language as 'es' | 'en' | 'fr';
+  const lang = i18n.language as "es" | "en" | "fr";
 
   if (!route) return null;
 
   const distance = calculateRouteDistance(route.polyline);
 
   const difficultyColors = {
-    easy: 'bg-primary/20 text-primary border-primary',
-    medium: 'bg-warm/20 text-warm border-warm',
-    hard: 'bg-destructive/20 text-destructive border-destructive',
+    easy: "bg-primary/20 text-primary border-primary",
+    medium: "bg-warm/20 text-warm border-warm",
+    hard: "bg-destructive/20 text-destructive border-destructive",
   };
 
   const routeStartDirectionsUrl = (() => {
@@ -67,15 +67,15 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
       />
       <motion.div
         key="sheet"
-        initial={{ x: '100%', opacity: 0.8 }}
+        initial={{ x: "100%", opacity: 0.8 }}
         animate={{ x: 0, opacity: 1 }}
-        exit={{ x: '100%', opacity: 0.8 }}
-        transition={{ 
-          type: 'spring', 
-          damping: 28, 
+        exit={{ x: "100%", opacity: 0.8 }}
+        transition={{
+          type: "spring",
+          damping: 28,
           stiffness: 200,
           mass: 0.9,
-          opacity: { duration: 0.2, ease: 'easeOut' }
+          opacity: { duration: 0.2, ease: "easeOut" },
         }}
         className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-background z-50 shadow-2xl flex flex-col overflow-hidden md:rounded-l-3xl"
         onClick={(e) => e.stopPropagation()}
@@ -84,19 +84,17 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
         aria-labelledby="route-detail-title"
       >
         {/* Hero image */}
-        <div 
+        <div
           className="relative h-56 bg-cover bg-center flex-shrink-0"
           style={{ backgroundImage: `url(${route.coverImage})` }}
           role="img"
           aria-label={route.title[lang]}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" aria-hidden="true" />
-          
           {/* Close button */}
-          <button 
+          <button
             onClick={onClose}
             className="absolute top-4 right-4 p-2 rounded-full bg-background/80 backdrop-blur-sm text-foreground hover:bg-background transition-colors focus:outline-none focus:ring-2 focus:ring-primary shadow-lg"
-            aria-label={t('common.close')}
+            aria-label={t("common.close")}
           >
             <X className="w-5 h-5" />
           </button>
@@ -111,9 +109,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
             <h1 id="route-detail-title" className="text-2xl font-serif font-bold text-white drop-shadow-lg mb-1">
               {route.title[lang]}
             </h1>
-            <p className="text-white/90 text-sm font-medium">
-              {route.theme[lang]}
-            </p>
+            <p className="text-white/90 text-sm font-medium">{route.theme[lang]}</p>
           </div>
         </div>
 
@@ -129,7 +125,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
                   {route.duration[lang]}
                 </span>
               )}
-              
+
               {/* Distance - NEW */}
               {distance > 0 && (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
@@ -137,16 +133,18 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
                   {formatDistance(distance)}
                 </span>
               )}
-              
+
               {/* Points */}
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
                 <MapPin className="w-4 h-4 text-primary" aria-hidden="true" />
-                {route.points.length} {t('routes.points')}
+                {route.points.length} {t("routes.points")}
               </span>
 
               {/* Difficulty */}
               {route.difficulty && (
-                <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-medium ${difficultyColors[route.difficulty]}`}>
+                <span
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-medium ${difficultyColors[route.difficulty]}`}
+                >
                   <Mountain className="w-4 h-4" aria-hidden="true" />
                   {t(`difficulty.${route.difficulty}`)}
                 </span>
@@ -154,8 +152,11 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
 
               {/* Circular/Linear */}
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
-                <RotateCw className={`w-4 h-4 ${route.isCircular ? 'text-primary' : 'text-muted-foreground'}`} aria-hidden="true" />
-                {route.isCircular ? t('routes.circular') : t('routes.linear')}
+                <RotateCw
+                  className={`w-4 h-4 ${route.isCircular ? "text-primary" : "text-muted-foreground"}`}
+                  aria-hidden="true"
+                />
+                {route.isCircular ? t("routes.circular") : t("routes.linear")}
               </span>
 
               {/* 360 tour */}
@@ -180,7 +181,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
                 <a href={routeStartDirectionsUrl} target="_blank" rel="noopener noreferrer">
                   <span className="flex items-center gap-2">
                     <Navigation className="w-4 h-4" aria-hidden="true" />
-                    {t('routes.howToGet')}
+                    {t("routes.howToGet")}
                   </span>
                   <ChevronRight className="w-4 h-4" aria-hidden="true" />
                 </a>
@@ -189,7 +190,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
 
             {/* Categories */}
             <div className="flex flex-wrap gap-2">
-              {route.categoryIds.map(catId => {
+              {route.categoryIds.map((catId) => {
                 const cat = getCategoryById(catId);
                 return cat ? (
                   <span key={catId} className="category-chip">
@@ -201,11 +202,11 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
 
             {/* Share buttons - NEW */}
             <div>
-              <p className="text-sm font-semibold text-foreground mb-2">{t('common.share')}</p>
-              <ShareButtons 
+              <p className="text-sm font-semibold text-foreground mb-2">{t("common.share")}</p>
+              <ShareButtons
                 title={route.title[lang]}
                 description={route.shortDescription[lang]}
-                hashtags={['AsturiasParaisoNatural', 'AsturiasInmersivo', route.id.replace('-', '')]}
+                hashtags={["AsturiasParaisoNatural", "AsturiasInmersivo", route.id.replace("-", "")]}
               />
             </div>
 
@@ -213,16 +214,14 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
             {route.points.length > 0 && (
               <div>
                 <h3 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">
-                  {t('routes.points')} ({route.points.length})
+                  {t("routes.points")} ({route.points.length})
                 </h3>
                 <div className="space-y-2">
                   {route.points.slice(0, 3).map((point, idx) => (
                     <PointPreviewCard key={point.id} point={point} index={idx} lang={lang} />
                   ))}
                   {route.points.length > 3 && (
-                    <p className="text-xs text-muted-foreground text-center py-2">
-                      +{route.points.length - 3} más...
-                    </p>
+                    <p className="text-xs text-muted-foreground text-center py-2">+{route.points.length - 3} más...</p>
                   )}
                 </div>
               </div>
@@ -232,11 +231,11 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
 
         {/* CTA Footer */}
         <div className="p-4 border-t border-border bg-background flex-shrink-0">
-          <Button 
+          <Button
             onClick={() => onEnterRoute(route)}
             className="w-full h-12 text-base font-bold bg-primary hover:bg-primary/90"
           >
-            {t('routes.enterRoute')}
+            {t("routes.enterRoute")}
             <ChevronRight className="w-5 h-5 ml-2" aria-hidden="true" />
           </Button>
         </div>
@@ -246,9 +245,9 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
 }
 
 // Small point preview card
-function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: number; lang: 'es' | 'en' | 'fr' }) {
+function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: number; lang: "es" | "en" | "fr" }) {
   const content = point.content;
-  
+
   // Determine what content types are available
   const hasAR = !!content.arExperience;
   const has360 = !!content.tour360;
@@ -260,7 +259,7 @@ function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: nu
     <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50">
       {/* Thumbnail */}
       <div className="relative flex-shrink-0">
-        <div 
+        <div
           className="w-12 h-12 rounded-lg bg-cover bg-center border-2 border-primary/30"
           style={{ backgroundImage: point.coverImage ? `url(${point.coverImage})` : undefined }}
           role="img"
@@ -270,7 +269,7 @@ function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: nu
           {index + 1}
         </div>
       </div>
-      
+
       {/* Info */}
       <div className="flex-1 min-w-0">
         <p className="font-medium text-foreground text-sm truncate">{point.title[lang]}</p>
