@@ -370,7 +370,6 @@ export function RoutesPage() {
           <style>
 
             .panel-lateral {
-                overflow-y: scroll;
                 appearance: none;
                 scrollbar-width: none;
             }
