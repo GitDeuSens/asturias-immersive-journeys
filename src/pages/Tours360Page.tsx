@@ -51,14 +51,14 @@ export function Tours360Page() {
   const localSearchData: LocalSearchItem[] = useMemo(() => {
     return filteredTours.map(tour => ({
       id: tour.id,
-      title: t(tour.title),
+      title: tour.title, // Pass full multilingual object for search across all languages
       subtitle: tour.categoryIds
         .map(catId => categories.find(c => c.id === catId))
         .filter(Boolean)
         .map(cat => t(cat!.label))
         .join(', '),
     }));
-  }, [filteredTours, t, language]);
+  }, [filteredTours, t]);
 
   const toggleCategory = (catId: string) => {
     setSelectedCategories((prev) => (prev.includes(catId) ? prev.filter((id) => id !== catId) : [...prev, catId]));
@@ -136,7 +136,7 @@ export function Tours360Page() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mb-6 overflow-hidden"
+                className="mb-6"
               >
                 <GlobalSearch 
                   locale={language as Language}

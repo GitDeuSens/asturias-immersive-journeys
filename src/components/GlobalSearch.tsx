@@ -15,7 +15,7 @@ import type { Language, SearchResults } from "@/lib/types";
 // Generic item for local filtering
 export interface LocalSearchItem {
   id: string;
-  title: Record<Language, string> | string;
+  title: Record<string, string> | string;
   subtitle?: string;
   image?: string;
   type?: string;
@@ -115,15 +115,22 @@ export function GlobalSearch({
     return item.title[locale] || item.title.es || '';
   };
 
+  // Get all text values from title for search (supports multilingual)
+  const getAllTitleText = (item: LocalSearchItem): string => {
+    if (typeof item.title === 'string') return item.title;
+    return Object.values(item.title).join(' ');
+  };
+
   const performLocalSearch = (searchQuery: string) => {
     if (!localData) return;
     
     const normalizedQuery = searchQuery.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     
     const filtered = localData.filter(item => {
-      const title = getItemTitle(item).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      // Search across all language variants
+      const allTitles = getAllTitleText(item).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       const subtitle = (item.subtitle || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      return title.includes(normalizedQuery) || subtitle.includes(normalizedQuery);
+      return allTitles.includes(normalizedQuery) || subtitle.includes(normalizedQuery);
     });
     
     setLocalResults(filtered);
