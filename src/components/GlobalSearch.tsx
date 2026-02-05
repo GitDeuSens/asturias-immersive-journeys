@@ -77,6 +77,7 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
 
     try {
       const data = await searchContent(searchQuery, locale);
+      console.log(" datos ", data);
       setResults(data);
       setShowDropdown(true);
 
@@ -200,7 +201,7 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
         <Input
           ref={inputRef}
-          type="text"
+          type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
