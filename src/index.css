@@ -178,7 +178,7 @@
 @layer components {
   /* Official Asturias header bar */
   .header-bar {
-    @apply fixed top-0 left-0 right-0 z-50 bg-white shadow-sm;
+    @apply fixed -top-3 left-0 right-0 z-50 bg-white shadow-sm;
     border-bottom: 3px solid hsl(var(--primary));
   }
 
