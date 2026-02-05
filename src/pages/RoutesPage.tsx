@@ -296,12 +296,6 @@ export function RoutesPage() {
     setTimeout(() => fitToAllRoutes(), 100);
   };
 
-  const panelLateral {
-    overflow-y: scroll,
-    appearance: none,
-    scrollbar-width: none
-  }
-
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <SEOHead title={t("routes.title")} description={t("routes.title")} />
