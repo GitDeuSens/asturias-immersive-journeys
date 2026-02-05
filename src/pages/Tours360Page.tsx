@@ -51,14 +51,14 @@ export function Tours360Page() {
   const localSearchData: LocalSearchItem[] = useMemo(() => {
     return filteredTours.map(tour => ({
       id: tour.id,
-      title: tour.title,
+      title: t(tour.title),
       subtitle: tour.categoryIds
         .map(catId => categories.find(c => c.id === catId))
         .filter(Boolean)
         .map(cat => t(cat!.label))
         .join(', '),
     }));
-  }, [filteredTours, t]);
+  }, [filteredTours, t, language]);
 
   const toggleCategory = (catId: string) => {
     setSelectedCategories((prev) => (prev.includes(catId) ? prev.filter((id) => id !== catId) : [...prev, catId]));
