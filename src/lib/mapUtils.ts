@@ -89,16 +89,29 @@ export const formatDistance = (km: number): string => {
 // Open navigation to coordinates
 export const openNavigation = (lat: number, lng: number, name?: string): void => {
   const encodedName = name ? encodeURIComponent(name) : '';
+
+  // Prefer a real anchor click to ensure the navigation happens in a new tab
+  // and never attempts to load inside the preview iframe (can trigger ERR_BLOCKED_BY_RESPONSE).
+  const openInNewTab = (url: string) => {
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    // Appending improves reliability in some browsers
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
   
   // Check if iOS
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   
   if (isIOS) {
     // Apple Maps
-    window.open(`maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d${name ? `&q=${encodedName}` : ''}`, '_blank');
+    openInNewTab(`maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d${name ? `&q=${encodedName}` : ''}`);
   } else {
     // Google Maps
-    window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}${name ? `&destination_place_id=${encodedName}` : ''}`, '_blank');
+    openInNewTab(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}${name ? `&destination_place_id=${encodedName}` : ''}`);
   }
 };
 
