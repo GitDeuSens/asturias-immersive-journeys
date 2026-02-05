@@ -1,8 +1,8 @@
-import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  X, 
-  MapPin, 
+import { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  X,
+  MapPin,
   Camera,
   Play,
   FileText,
@@ -22,22 +22,18 @@ import {
   Info,
   Navigation,
   Footprints,
-  Car
-} from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
-import { RoutePoint } from '@/data/immersiveRoutes';
-import { useLanguage, useExplorationMode } from '@/hooks/useLanguage';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { useGeolocation } from '@/hooks/useGeolocation';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import FullscreenModal from '@/components/poi/FullscreenModal';
-import { NavigationButton } from '@/components/NavigationButton';
-import { 
-  calculateDistanceTo, 
-  formatTime,
-  type NavigationDestination 
-} from '@/lib/navigationService';
+  Car,
+} from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
+import { RoutePoint } from "@/data/immersiveRoutes";
+import { useLanguage, useExplorationMode } from "@/hooks/useLanguage";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useGeolocation } from "@/hooks/useGeolocation";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import FullscreenModal from "@/components/poi/FullscreenModal";
+import { NavigationButton } from "@/components/NavigationButton";
+import { calculateDistanceTo, formatTime, type NavigationDestination } from "@/lib/navigationService";
 
 interface PointDetailSheetProps {
   point: RoutePoint | null;
@@ -45,37 +41,44 @@ interface PointDetailSheetProps {
 }
 
 const texts = {
-  launchAR: { es: 'Abrir experiencia AR', en: 'Launch AR experience', fr: 'Lancer l\'expérience AR' },
-  scanQR: { es: 'Escanea con tu móvil', en: 'Scan with your phone', fr: 'Scannez avec votre téléphone' },
-  scanQRDesc: { es: 'Apunta la cámara de tu móvil al código QR para abrir la experiencia de Realidad Aumentada', en: 'Point your phone camera at the QR code to open the Augmented Reality experience', fr: 'Pointez la caméra de votre téléphone vers le code QR pour ouvrir l\'expérience de Réalité Augmentée' },
-  arInstructions: { es: 'Instrucciones AR', en: 'AR Instructions', fr: 'Instructions AR' },
-  location: { es: 'Ubicación', en: 'Location', fr: 'Emplacement' },
-  contentAvailable: { es: 'Contenido disponible', en: 'Available content', fr: 'Contenu disponible' },
-  open360: { es: 'Abrir tour 360°', en: 'Open 360° tour', fr: 'Ouvrir le tour 360°' },
-  playVideo: { es: 'Reproducir vídeo', en: 'Play video', fr: 'Lire la vidéo' },
-  downloadPDF: { es: 'Descargar PDF', en: 'Download PDF', fr: 'Télécharger le PDF' },
-  listenAudio: { es: 'Escuchar audioguía', en: 'Listen to audioguide', fr: 'Écouter l\'audioguide' },
-  arExperience: { es: 'Experiencia de Realidad Aumentada', en: 'Augmented Reality Experience', fr: 'Expérience de Réalité Augmentée' },
-  tryARDesktop: { es: 'Probar en este dispositivo', en: 'Try on this device', fr: 'Essayer sur cet appareil' },
-  arRecommendation: { es: 'Recomendado: usa tu móvil para la mejor experiencia AR', en: 'Recommended: use your phone for the best AR experience', fr: 'Recommandé: utilisez votre téléphone pour la meilleure expérience AR' },
-  gallery: { es: 'Galería de imágenes', en: 'Image gallery', fr: 'Galerie d\'images' },
-  practicalInfo: { es: 'Información práctica', en: 'Practical information', fr: 'Informations pratiques' },
-  schedule: { es: 'Horarios', en: 'Schedule', fr: 'Horaires' },
-  prices: { es: 'Precios', en: 'Prices', fr: 'Prix' },
-  contact: { es: 'Contacto', en: 'Contact', fr: 'Contact' },
-  howToGet: { es: 'Cómo llegar', en: 'How to get there', fr: 'Comment y arriver' },
-  fromYourLocation: { es: 'Desde tu ubicación', en: 'From your location', fr: 'Depuis votre position' },
-  walking: { es: 'a pie', en: 'walking', fr: 'à pied' },
-  driving: { es: 'en coche', en: 'by car', fr: 'en voiture' },
+  launchAR: { es: "Abrir experiencia AR", en: "Launch AR experience", fr: "Lancer l'expérience AR" },
+  scanQR: { es: "Escanea con tu móvil", en: "Scan with your phone", fr: "Scannez avec votre téléphone" },
+  scanQRDesc: {
+    es: "Apunta la cámara de tu móvil al código QR para abrir la experiencia de Realidad Aumentada",
+    en: "Point your phone camera at the QR code to open the Augmented Reality experience",
+    fr: "Pointez la caméra de votre téléphone vers le code QR pour ouvrir l'expérience de Réalité Augmentée",
+  },
+  arInstructions: { es: "Instrucciones AR", en: "AR Instructions", fr: "Instructions AR" },
+  location: { es: "Ubicación", en: "Location", fr: "Emplacement" },
+  contentAvailable: { es: "Contenido disponible", en: "Available content", fr: "Contenu disponible" },
+  open360: { es: "Abrir tour 360°", en: "Open 360° tour", fr: "Ouvrir le tour 360°" },
+  playVideo: { es: "Reproducir vídeo", en: "Play video", fr: "Lire la vidéo" },
+  downloadPDF: { es: "Descargar PDF", en: "Download PDF", fr: "Télécharger le PDF" },
+  listenAudio: { es: "Escuchar audioguía", en: "Listen to audioguide", fr: "Écouter l'audioguide" },
+  arExperience: {
+    es: "Experiencia de Realidad Aumentada",
+    en: "Augmented Reality Experience",
+    fr: "Expérience de Réalité Augmentée",
+  },
+  tryARDesktop: { es: "Probar en este dispositivo", en: "Try on this device", fr: "Essayer sur cet appareil" },
+  arRecommendation: {
+    es: "Recomendado: usa tu móvil para la mejor experiencia AR",
+    en: "Recommended: use your phone for the best AR experience",
+    fr: "Recommandé: utilisez votre téléphone pour la meilleure expérience AR",
+  },
+  gallery: { es: "Galería de imágenes", en: "Image gallery", fr: "Galerie d'images" },
+  practicalInfo: { es: "Información práctica", en: "Practical information", fr: "Informations pratiques" },
+  schedule: { es: "Horarios", en: "Schedule", fr: "Horaires" },
+  prices: { es: "Precios", en: "Prices", fr: "Prix" },
+  contact: { es: "Contacto", en: "Contact", fr: "Contact" },
+  howToGet: { es: "Cómo llegar", en: "How to get there", fr: "Comment y arriver" },
+  fromYourLocation: { es: "Desde tu ubicación", en: "From your location", fr: "Depuis votre position" },
+  walking: { es: "a pie", en: "walking", fr: "à pied" },
+  driving: { es: "en coche", en: "by car", fr: "en voiture" },
 };
 
 // Placeholder gallery images for demo
-const placeholderGallery = [
-  '/placeholder.svg',
-  '/placeholder.svg',
-  '/placeholder.svg',
-  '/placeholder.svg',
-];
+const placeholderGallery = ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg", "/placeholder.svg"];
 
 export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
   const { t, language } = useLanguage();
@@ -94,7 +97,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
 
   const handleLaunchAR = () => {
     if (content.arExperience?.launchUrl) {
-      window.open(content.arExperience.launchUrl, '_blank');
+      window.open(content.arExperience.launchUrl, "_blank");
     }
   };
 
@@ -111,28 +114,28 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
         />
         <motion.div
           key="sheet"
-          initial={{ x: '100%', opacity: 0.8 }}
+          initial={{ x: "100%", opacity: 0.8 }}
           animate={{ x: 0, opacity: 1 }}
-          exit={{ x: '100%', opacity: 0.8 }}
-          transition={{ 
-            type: 'spring', 
-            damping: 28, 
+          exit={{ x: "100%", opacity: 0.8 }}
+          transition={{
+            type: "spring",
+            damping: 28,
             stiffness: 200,
             mass: 0.9,
-            opacity: { duration: 0.2, ease: 'easeOut' }
+            opacity: { duration: 0.2, ease: "easeOut" },
           }}
           className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-background z-50 shadow-2xl flex flex-col overflow-hidden md:rounded-l-3xl"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Hero image */}
-          <div 
+          <div
             className="relative h-56 bg-cover bg-center flex-shrink-0"
             style={{ backgroundImage: point.coverImage ? `url(${point.coverImage})` : undefined }}
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-            
+            <div />
+
             {/* Close button */}
-            <button 
+            <button
               onClick={onClose}
               className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
             >
@@ -141,7 +144,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
 
             {/* AR badge */}
             {hasAR && (
-              <motion.span 
+              <motion.span
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-warm text-warm-foreground text-sm font-bold shadow-lg"
@@ -154,9 +157,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
 
             {/* Bottom info */}
             <div className="absolute bottom-4 left-4 right-4">
-              <h1 className="text-2xl font-serif font-bold text-white drop-shadow-lg">
-                {t(point.title)}
-              </h1>
+              <h1 className="text-2xl font-serif font-bold text-white drop-shadow-lg">{t(point.title)}</h1>
             </div>
           </div>
 
@@ -164,9 +165,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
           <ScrollArea className="flex-1">
             <div className="p-6 space-y-6">
               {/* Description */}
-              <p className="text-muted-foreground leading-relaxed text-base">
-                {t(point.shortDescription)}
-              </p>
+              <p className="text-muted-foreground leading-relaxed text-base">{t(point.shortDescription)}</p>
 
               {/* Navigation Section - Priority for "here" mode */}
               <NavigationSection point={point} />
@@ -184,7 +183,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
 
               {/* AR Experience Section - HERO SECTION */}
               {hasAR && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
@@ -195,18 +194,13 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                     <div className="p-2 rounded-lg bg-warm/20">
                       <Smartphone className="w-5 h-5 text-warm" />
                     </div>
-                    <h3 className="text-base font-semibold text-foreground">
-                      {t(texts.arExperience)}
-                    </h3>
+                    <h3 className="text-base font-semibold text-foreground">{t(texts.arExperience)}</h3>
                   </div>
 
                   {isMobile ? (
                     /* Mobile: Direct launch button with enhanced styling */
-                    <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <Button 
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <Button
                         onClick={handleLaunchAR}
                         className="w-full h-16 text-lg font-bold bg-gradient-to-r from-warm to-amber-500 hover:from-warm/90 hover:to-amber-500/90 text-warm-foreground shadow-lg shadow-warm/25 border-0"
                       >
@@ -227,7 +221,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                         <div className="relative">
                           <div className="absolute inset-0 bg-warm/20 rounded-2xl blur-xl" />
                           <div className="relative p-5 bg-white rounded-2xl shadow-xl border-4 border-warm/30">
-                            <QRCodeSVG 
+                            <QRCodeSVG
                               value={content.arExperience!.qrValue}
                               size={200}
                               level="H"
@@ -237,7 +231,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                             />
                           </div>
                           {/* Scan indicator */}
-                          <motion.div 
+                          <motion.div
                             className="absolute inset-0 flex items-center justify-center pointer-events-none"
                             initial={{ opacity: 0.5 }}
                             animate={{ opacity: [0.3, 0.7, 0.3] }}
@@ -246,24 +240,20 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                             <ScanLine className="w-16 h-16 text-warm/40" />
                           </motion.div>
                         </div>
-                        
+
                         {/* Instructions */}
                         <div className="space-y-2">
                           <p className="font-semibold text-foreground text-lg flex items-center justify-center gap-2">
                             <Smartphone className="w-5 h-5 text-warm" />
                             {t(texts.scanQR)}
                           </p>
-                          <p className="text-sm text-muted-foreground max-w-xs">
-                            {t(texts.scanQRDesc)}
-                          </p>
+                          <p className="text-sm text-muted-foreground max-w-xs">{t(texts.scanQRDesc)}</p>
                         </div>
 
                         {/* Desktop fallback option */}
                         <div className="w-full pt-4 border-t border-border/50">
-                          <p className="text-xs text-muted-foreground mb-3">
-                            {t(texts.arRecommendation)}
-                          </p>
-                          <Button 
+                          <p className="text-xs text-muted-foreground mb-3">{t(texts.arRecommendation)}</p>
+                          <Button
                             variant="outline"
                             onClick={() => setShowARFullscreen(true)}
                             className="w-full border-warm/30 text-warm hover:bg-warm/10 hover:text-warm"
@@ -278,7 +268,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
 
                   {/* AR Instructions */}
                   {content.arExperience?.instructions && (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.4 }}
@@ -288,9 +278,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                         <Sparkles className="w-3 h-3" />
                         {t(texts.arInstructions)}
                       </p>
-                      <p className="text-sm text-foreground leading-relaxed">
-                        {t(content.arExperience.instructions)}
-                      </p>
+                      <p className="text-sm text-foreground leading-relaxed">{t(content.arExperience.instructions)}</p>
                     </motion.div>
                   )}
                 </motion.div>
@@ -303,10 +291,10 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                     <Camera className="w-4 h-4 text-primary" />
                     Tour 360°
                   </h3>
-                  <Button 
+                  <Button
                     variant="outline"
                     className="w-full justify-between"
-                    onClick={() => window.open(content.tour360!.iframe360Url, '_blank')}
+                    onClick={() => window.open(content.tour360!.iframe360Url, "_blank")}
                   >
                     {t(texts.open360)}
                     <Maximize2 className="w-4 h-4" />
@@ -322,10 +310,10 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                   </h3>
                   <div className="space-y-2">
                     {hasVideo && (
-                      <Button 
+                      <Button
                         variant="outline"
                         className="w-full justify-between"
-                        onClick={() => window.open(content.video!.url, '_blank')}
+                        onClick={() => window.open(content.video!.url, "_blank")}
                       >
                         <span className="flex items-center gap-2">
                           <Play className="w-4 h-4" />
@@ -335,10 +323,12 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                       </Button>
                     )}
                     {hasAudio && content.audioGuide?.[language as keyof typeof content.audioGuide] && (
-                      <Button 
+                      <Button
                         variant="outline"
                         className="w-full justify-between"
-                        onClick={() => window.open(content.audioGuide![language as keyof typeof content.audioGuide]!.url, '_blank')}
+                        onClick={() =>
+                          window.open(content.audioGuide![language as keyof typeof content.audioGuide]!.url, "_blank")
+                        }
                       >
                         <span className="flex items-center gap-2">
                           <Headphones className="w-4 h-4" />
@@ -348,10 +338,10 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                       </Button>
                     )}
                     {hasPDF && (
-                      <Button 
+                      <Button
                         variant="outline"
                         className="w-full justify-between"
-                        onClick={() => window.open(content.pdf!.url, '_blank')}
+                        onClick={() => window.open(content.pdf!.url, "_blank")}
                       >
                         <span className="flex items-center gap-2">
                           <FileText className="w-4 h-4" />
@@ -380,11 +370,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                         onClick={() => setSelectedGalleryImage(img)}
                         className="relative aspect-[4/3] rounded-xl overflow-hidden bg-muted border border-border/50 hover:border-primary/50 transition-colors group"
                       >
-                        <img 
-                          src={img} 
-                          alt={`Gallery ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
+                        <img src={img} alt={`Gallery ${index + 1}`} className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                           <Maximize2 className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
                         </div>
@@ -396,13 +382,15 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
 
               {/* Image caption */}
               {content.image?.caption && (
-                <p className="text-xs text-muted-foreground italic text-center">
-                  {t(content.image.caption)}
-                </p>
+                <p className="text-xs text-muted-foreground italic text-center">{t(content.image.caption)}</p>
               )}
 
               {/* Practical Information - shown at the bottom for all POIs */}
-              {(content.practicalInfo?.phone || content.practicalInfo?.email || content.practicalInfo?.website || content.practicalInfo?.schedule || content.practicalInfo?.prices) && (
+              {(content.practicalInfo?.phone ||
+                content.practicalInfo?.email ||
+                content.practicalInfo?.website ||
+                content.practicalInfo?.schedule ||
+                content.practicalInfo?.prices) && (
                 <div className="space-y-3 pt-4 border-t border-border/50">
                   <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2">
                     <Info className="w-4 h-4 text-primary" />
@@ -410,10 +398,12 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                   </h3>
                   <div className="space-y-2 p-4 rounded-xl bg-muted/30 border border-border/50">
                     {/* Contact info */}
-                    {(content.practicalInfo?.phone || content.practicalInfo?.email || content.practicalInfo?.website) && (
+                    {(content.practicalInfo?.phone ||
+                      content.practicalInfo?.email ||
+                      content.practicalInfo?.website) && (
                       <div className="space-y-2">
                         {content.practicalInfo?.phone && (
-                          <a 
+                          <a
                             href={`tel:${content.practicalInfo.phone}`}
                             className="flex items-center gap-3 text-sm text-foreground hover:text-primary transition-colors"
                           >
@@ -422,7 +412,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                           </a>
                         )}
                         {content.practicalInfo?.email && (
-                          <a 
+                          <a
                             href={`mailto:${content.practicalInfo.email}`}
                             className="flex items-center gap-3 text-sm text-foreground hover:text-primary transition-colors"
                           >
@@ -431,19 +421,19 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                           </a>
                         )}
                         {content.practicalInfo?.website && (
-                          <a 
+                          <a
                             href={content.practicalInfo.website}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-3 text-sm text-foreground hover:text-primary transition-colors"
                           >
                             <Globe className="w-4 h-4 text-muted-foreground" />
-                            {content.practicalInfo.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                            {content.practicalInfo.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
                           </a>
                         )}
                       </div>
                     )}
-                    
+
                     {/* Schedule */}
                     {content.practicalInfo?.schedule && (
                       <div className="pt-2 border-t border-border/50">
@@ -460,7 +450,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                         </div>
                       </div>
                     )}
-                    
+
                     {/* Prices */}
                     {content.practicalInfo?.prices && (
                       <div className="pt-2 border-t border-border/50">
@@ -511,8 +501,8 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
               exit={{ scale: 0.9, opacity: 0 }}
               className="relative max-w-4xl max-h-[80vh] w-full"
             >
-              <img 
-                src={selectedGalleryImage} 
+              <img
+                src={selectedGalleryImage}
                 alt="Gallery fullscreen"
                 className="w-full h-full object-contain rounded-lg"
               />
@@ -537,16 +527,19 @@ function NavigationSection({ point }: { point: RoutePoint }) {
   const { latitude, longitude, hasLocation } = useGeolocation();
 
   // Only show in "here" mode with location
-  if (mode !== 'here' || !hasLocation || latitude === null || longitude === null) {
+  if (mode !== "here" || !hasLocation || latitude === null || longitude === null) {
     return null;
   }
 
   const destination: NavigationDestination = {
     id: point.id,
-    name: typeof point.title === 'string' ? point.title : point.title[language as keyof typeof point.title] || point.title.es,
+    name:
+      typeof point.title === "string"
+        ? point.title
+        : point.title[language as keyof typeof point.title] || point.title.es,
     lat: point.location.lat,
     lng: point.location.lng,
-    type: 'route-point',
+    type: "route-point",
   };
 
   const distanceResult = calculateDistanceTo(latitude, longitude, destination);
@@ -564,7 +557,9 @@ function NavigationSection({ point }: { point: RoutePoint }) {
         </div>
         <div>
           <h3 className="font-semibold text-foreground">{texts.howToGet[language as keyof typeof texts.howToGet]}</h3>
-          <p className="text-xs text-muted-foreground">{texts.fromYourLocation[language as keyof typeof texts.fromYourLocation]}</p>
+          <p className="text-xs text-muted-foreground">
+            {texts.fromYourLocation[language as keyof typeof texts.fromYourLocation]}
+          </p>
         </div>
       </div>
 
@@ -586,11 +581,7 @@ function NavigationSection({ point }: { point: RoutePoint }) {
       </div>
 
       {/* Navigation button */}
-      <NavigationButton 
-        destination={destination} 
-        variant="primary"
-        className="w-full"
-      />
+      <NavigationButton destination={destination} variant="primary" className="w-full" />
     </motion.div>
   );
 }
