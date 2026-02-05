@@ -367,14 +367,6 @@ export function RoutesPage() {
               <ChevronUp className="w-5 h-5" aria-hidden="true" />
             )}
           </button>
-          <style>
-
-            .panel-lateral {
-                appearance: none;
-                scrollbar-width: none;
-            }
-            
-          </style>
 
           <div id="routes-panel" className="panel-lateral">
             {exploringRoute ? (
