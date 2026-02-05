@@ -368,7 +368,7 @@ export function RoutesPage() {
             )}
           </button>
 
-            <div id="routes-panel" style={{ overflowY: 'scroll', WebkitAppearance: 'none', scrollbarWidth: 'none' }}>
+          <div id="routes-panel" style="overflow-y: scroll; appearance: none; scrollbar-width: none;">
             {exploringRoute ? (
               <RouteExplorerView
                 route={exploringRoute}
