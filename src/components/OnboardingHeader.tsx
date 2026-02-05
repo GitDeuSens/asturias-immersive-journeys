@@ -48,7 +48,23 @@ export function OnboardingHeader() {
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-lg"></div>
+          <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-lg">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-house w-8 h-8 text-white"
+            >
+              <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path>
+              <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            </svg>
+          </div>
           <div className="hidden sm:block">
             <span className="font-bold text-lg text-white drop-shadow-md">Asturias</span>
             <span className="text-primary font-semibold text-sm ml-1 uppercase tracking-wider drop-shadow-md">
