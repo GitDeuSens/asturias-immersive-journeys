@@ -128,10 +128,10 @@ export function VRExperiencesPage() {
       <SEOHead title={t("vr.title")} description={t("vr.subtitle")} />
       <AppHeader variant="light" />
 
-      <main id="main-content" className="pt-20 pb-12">
+      <main id="main-content" className="pt-20">
         {/* Hero section */}
         <div className="bg-gradient-to-r from-accent to-accent/80 py-12 mb-8">
-          <div className="pb-5 container mx-auto px-4 max-w-6xl">
+          <div className="container mx-auto px-4 max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -146,7 +146,7 @@ export function VRExperiencesPage() {
           </div>
         </div>
 
-        <div className="pb-5 container mx-auto px-4 max-w-6xl">
+        <div className="container mx-auto px-4 max-w-6xl">
           {/* Experiences grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {vrExperiences.map((exp, index) => (

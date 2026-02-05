@@ -74,10 +74,10 @@ export function ARExperiencesPage() {
 
       <AppHeader variant="light" />
 
-      <main className="pt-20 pb-12">
+      <main className="pt-20">
         {/* Hero section */}
         <div className="bg-gradient-to-r from-primary to-asturias-forest py-12 mb-8">
-          <div className="pb-5 container mx-auto px-4 max-w-6xl">
+          <div className="container mx-auto px-4 max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -92,7 +92,7 @@ export function ARExperiencesPage() {
           </div>
         </div>
 
-        <div className="pb-5 container mx-auto px-4 max-w-6xl">
+        <div className="container mx-auto px-4 max-w-6xl">
           {/* Filters */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
