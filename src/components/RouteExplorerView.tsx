@@ -229,13 +229,13 @@ function PointCard({ point, index, isVisited, isSelected, isLast, isNearest, dis
   const { t, i18n } = useTranslation();
   const lang = i18n.language as 'es' | 'en' | 'fr';
   const content = point.content;
+  
   // Determine what content types are available
   const hasAR = !!content.arExperience;
   const has360 = !!content.tour360;
   const hasVideo = !!content.video;
   const hasAudio = !!content.audioGuide;
   const hasPDF = !!content.pdf;
-  const hasImage = !!content.image;
 
   // Get primary content type for styling
   const getPrimaryType = () => {
@@ -245,24 +245,33 @@ function PointCard({ point, index, isVisited, isSelected, isLast, isNearest, dis
   };
 
   const primaryType = getPrimaryType();
-  const borderColors = {
-    ar: 'border-warm',
-    '360': 'border-primary',
-    info: 'border-accent',
+  const typeColors = {
+    ar: { bg: 'bg-warm', text: 'text-warm', border: 'border-warm' },
+    '360': { bg: 'bg-primary', text: 'text-primary', border: 'border-primary' },
+    info: { bg: 'bg-accent', text: 'text-accent', border: 'border-accent' },
   };
-  const bgColors = {
-    ar: 'bg-warm',
-    '360': 'bg-primary',
-    info: 'bg-accent',
-  };
+  const colors = typeColors[primaryType];
 
   return (
-    <div className="relative">
-      {/* Connecting line */}
-      {!isLast && (
-        <div className="absolute left-7 top-16 bottom-0 w-0.5 bg-border" style={{ height: 'calc(100% - 3rem)' }} />
-      )}
+    <div className="relative flex">
+      {/* Timeline connector */}
+      <div className="flex flex-col items-center mr-3 flex-shrink-0">
+        {/* Number badge */}
+        <div 
+          className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-md z-10 ${
+            isVisited ? 'bg-primary' : colors.bg
+          }`}
+        >
+          {isVisited ? <Check className="w-4 h-4" /> : index + 1}
+        </div>
+        
+        {/* Connecting line */}
+        {!isLast && (
+          <div className="w-0.5 flex-1 bg-border mt-2" />
+        )}
+      </div>
 
+      {/* Card content */}
       <motion.button
         initial={{ opacity: 0, x: -8 }}
         animate={{ opacity: 1, x: 0 }}
@@ -272,76 +281,71 @@ function PointCard({ point, index, isVisited, isSelected, isLast, isNearest, dis
           ease: [0.25, 0.46, 0.45, 0.94]
         }}
         onClick={onClick}
-        className={`w-full flex items-start gap-3 p-3 rounded-xl transition-all text-left ${
+        className={`flex-1 mb-3 rounded-xl overflow-hidden transition-all text-left border ${
           isSelected 
-            ? 'bg-primary/20 border-2 border-primary' 
+            ? 'border-primary bg-primary/10 shadow-md' 
             : isNearest
-            ? 'bg-accent/20 border-2 border-accent'
+            ? 'border-accent bg-accent/10 shadow-md'
             : isVisited
-            ? 'bg-muted/30 border border-primary/30'
-            : 'bg-muted/30 hover:bg-muted/50 border border-transparent'
+            ? 'border-primary/40 bg-card/80'
+            : 'border-border bg-card hover:bg-muted/50 hover:border-muted-foreground/30'
         }`}
       >
-        {/* Thumbnail / Badge */}
-        <div className="relative flex-shrink-0">
-          {point.coverImage ? (
-            <div 
-              className={`w-14 h-14 rounded-xl bg-cover bg-center border-2 ${borderColors[primaryType]}`}
-              style={{ backgroundImage: `url(${point.coverImage})` }}
-            />
-          ) : (
-            <div className={`w-14 h-14 rounded-xl ${bgColors[primaryType]}/20 border-2 ${borderColors[primaryType]} flex items-center justify-center`}>
-              {hasAR && <Smartphone className="w-6 h-6 text-warm" />}
-              {has360 && !hasAR && <Camera className="w-6 h-6 text-primary" />}
-              {!hasAR && !has360 && <Info className="w-6 h-6 text-accent" />}
-            </div>
-          )}
-          
-          {/* Order number */}
-          <div className={`absolute -top-2 -left-2 w-7 h-7 ${bgColors[primaryType]} rounded-full flex items-center justify-center text-xs font-bold text-white border-2 border-white shadow-md`}>
-            {isVisited ? <Check className="w-4 h-4" /> : index + 1}
-          </div>
-        </div>
+        {/* Thumbnail header */}
+        {point.coverImage && (
+          <div 
+            className="w-full h-24 bg-cover bg-center"
+            style={{ backgroundImage: `url(${point.coverImage})` }}
+          />
+        )}
         
-        {/* Content */}
-        <div className="flex-1 min-w-0 py-1">
-          <h4 className="font-semibold text-foreground truncate">
+        {/* Card body */}
+        <div className="p-3">
+          {/* Title */}
+          <h4 className="font-semibold text-foreground line-clamp-1">
             {point.title[lang]}
           </h4>
-          <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
+          
+          {/* Description */}
+          <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
             {point.shortDescription[lang]}
           </p>
           
-          {/* Content type indicators + distance */}
-          <div className="flex items-center gap-2 mt-2 flex-wrap">
-            {hasAR && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-warm/20 text-warm text-[10px] font-bold border border-warm/30">
-                <Smartphone className="w-3 h-3" />
-                AR
-              </span>
-            )}
-            {has360 && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/20 text-primary text-[10px] font-bold border border-primary/30">
-                <Camera className="w-3 h-3" />
-                360°
-              </span>
-            )}
-            {hasVideo && <Play className="w-4 h-4 text-muted-foreground" />}
-            {hasAudio && <Headphones className="w-4 h-4 text-muted-foreground" />}
-            {hasPDF && <FileText className="w-4 h-4 text-muted-foreground" />}
-            {hasImage && !hasAR && !has360 && <Info className="w-4 h-4 text-accent" />}
+          {/* Footer: badges and distance */}
+          <div className="flex items-center justify-between mt-3 pt-2 border-t border-border/50">
+            <div className="flex items-center gap-1.5">
+              {hasAR && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-warm/15 text-warm text-[10px] font-bold">
+                  <Smartphone className="w-3 h-3" />
+                  AR
+                </span>
+              )}
+              {has360 && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/15 text-primary text-[10px] font-bold">
+                  <Camera className="w-3 h-3" />
+                  360°
+                </span>
+              )}
+              {!hasAR && !has360 && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-accent/15 text-accent text-[10px] font-bold">
+                  <Info className="w-3 h-3" />
+                  INFO
+                </span>
+              )}
+              {hasVideo && <Play className="w-3.5 h-3.5 text-muted-foreground" />}
+              {hasAudio && <Headphones className="w-3.5 h-3.5 text-muted-foreground" />}
+              {hasPDF && <FileText className="w-3.5 h-3.5 text-muted-foreground" />}
+            </div>
             
-            {/* Distance indicator */}
+            {/* Distance */}
             {distanceInfo && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-muted-foreground text-[10px] font-medium ml-auto">
+              <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground font-medium">
                 <MapPin className="w-3 h-3" />
                 {distanceInfo.distance}
               </span>
             )}
           </div>
         </div>
-
-        <ChevronRight className="w-5 h-5 text-muted-foreground mt-4 flex-shrink-0" />
       </motion.button>
     </div>
   );
