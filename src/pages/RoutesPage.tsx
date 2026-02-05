@@ -368,7 +368,7 @@ export function RoutesPage() {
             )}
           </button>
 
-          <div id="routes-panel" className="panel-lateral">
+          <div id="routes-panel" className="overflow-y-scroll">
             {exploringRoute ? (
               <RouteExplorerView
                 route={exploringRoute}
@@ -377,7 +377,7 @@ export function RoutesPage() {
                 selectedPoint={selectedPoint}
               />
             ) : (
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <div className="flex-1 p-4 space-y-4">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-serif font-bold text-foreground">{t("routes.title")}</h2>
