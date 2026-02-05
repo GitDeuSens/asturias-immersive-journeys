@@ -25,7 +25,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import "leaflet/dist/leaflet.css";
-import "../../App.css";
 
 // Create route bubble marker with name label
 const createRouteMarkerIcon = (route: ImmersiveRoute, routeName: string) => {
@@ -368,6 +367,15 @@ export function RoutesPage() {
               <ChevronUp className="w-5 h-5" aria-hidden="true" />
             )}
           </button>
+          <style>
+
+            .panel-lateral {
+                overflow-y: scroll;
+                appearance: none;
+                scrollbar-width: none;
+            }
+            
+          </style>
 
           <div id="routes-panel" className="panel-lateral">
             {exploringRoute ? (
