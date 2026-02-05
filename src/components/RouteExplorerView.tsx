@@ -145,7 +145,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
       </div>
 
       {/* Points timeline/list */}
-      <ScrollArea className="flex-1" hideScrollbar>
+      <ScrollArea className="flex-1">
         <div className="p-4 space-y-2">
           {/* Nearest point suggestion (only in "here" mode) */}
           {nearestPoint && mode === 'here' && (
