@@ -29,7 +29,9 @@ function openInNewTab(url: string) {
   a.href = url;
   a.target = '_blank';
   a.rel = 'noopener noreferrer';
+  document.body.appendChild(a);
   a.click();
+  a.remove();
 }
 
 /**

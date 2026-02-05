@@ -18,7 +18,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { ImmersiveRoute, RoutePoint } from '@/data/immersiveRoutes';
 import { getCategoryById } from '@/data/mockData';
-import { calculateRouteDistance, formatDistance, openNavigation } from '@/lib/mapUtils';
+import { calculateRouteDistance, formatDistance } from '@/lib/mapUtils';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ShareButtons } from '@/components/ShareButtons';
@@ -43,12 +43,16 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
     hard: 'bg-destructive/20 text-destructive border-destructive',
   };
 
-  const handleNavigateToStart = () => {
-    if (route.polyline.length > 0) {
-      const start = route.polyline[0];
-      openNavigation(start.lat, start.lng, route.title[lang]);
-    }
-  };
+  const routeStartDirectionsUrl = (() => {
+    if (route.polyline.length === 0) return null;
+    const start = route.polyline[0];
+
+    const encodedName = encodeURIComponent(route.title[lang]);
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    return isIOS
+      ? `maps://maps.apple.com/?daddr=${start.lat},${start.lng}&dirflg=d&q=${encodedName}`
+      : `https://www.google.com/maps/dir/?api=1&destination=${start.lat},${start.lng}&travelmode=driving`;
+  })();
 
   return (
     <AnimatePresence mode="wait">
@@ -170,18 +174,16 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
               </p>
             </div>
 
-            {/* Navigation button - NEW */}
-            {route.polyline.length > 0 && (
-              <Button
-                variant="outline"
-                className="w-full justify-between"
-                onClick={handleNavigateToStart}
-              >
-                <span className="flex items-center gap-2">
-                  <Navigation className="w-4 h-4" aria-hidden="true" />
-                  {t('routes.howToGet')}
-                </span>
-                <ChevronRight className="w-4 h-4" aria-hidden="true" />
+            {/* Navigation button */}
+            {routeStartDirectionsUrl && (
+              <Button asChild variant="outline" className="w-full justify-between">
+                <a href={routeStartDirectionsUrl} target="_blank" rel="noopener noreferrer">
+                  <span className="flex items-center gap-2">
+                    <Navigation className="w-4 h-4" aria-hidden="true" />
+                    {t('routes.howToGet')}
+                  </span>
+                  <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                </a>
               </Button>
             )}
 
