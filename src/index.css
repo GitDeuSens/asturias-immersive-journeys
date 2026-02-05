@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -17,7 +17,7 @@
     outline: 3px solid hsl(79, 100%, 36%);
     outline-offset: 2px;
   }
-  
+
   /* Reduced motion preference */
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -29,7 +29,7 @@
       scroll-behavior: auto !important;
     }
   }
-  
+
   /* High contrast mode support */
   @media (prefers-contrast: high) {
     :root {
@@ -88,7 +88,7 @@
     --asturias-stone: 30 20% 55%;
     --asturias-cream: 45 30% 97%;
     --asturias-forest: 140 35% 25%;
-    
+
     /* Gradients */
     --gradient-hero: linear-gradient(180deg, hsla(0, 0%, 0%, 0.2) 0%, hsla(0, 0%, 0%, 0.7) 100%);
     --gradient-green: linear-gradient(135deg, hsl(79, 100%, 36%) 0%, hsl(140, 60%, 30%) 100%);
@@ -155,17 +155,22 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Montserrat', system-ui, sans-serif;
+    font-family: "Montserrat", system-ui, sans-serif;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Montserrat', system-ui, sans-serif;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Montserrat", system-ui, sans-serif;
     @apply font-bold tracking-tight;
   }
 
   /* font-display now uses Montserrat for consistency */
   .font-display {
-    font-family: 'Montserrat', system-ui, sans-serif;
+    font-family: "Montserrat", system-ui, sans-serif;
     @apply font-semibold;
   }
 }
@@ -331,13 +336,17 @@
   }
 
   .nav-link::after {
-    content: '';
+    content: "";
     @apply absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300;
   }
 
   .nav-link:hover::after {
     @apply w-full;
   }
+}
+
+* {
+  scrollbar-width: none;
 }
 
 @layer utilities {
@@ -374,7 +383,8 @@
   }
 
   @keyframes pulse-gentle {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
     }
     50% {
@@ -398,11 +408,21 @@
     animation: pulse-gentle 2s ease-in-out infinite;
   }
 
-  .animation-delay-100 { animation-delay: 100ms; }
-  .animation-delay-200 { animation-delay: 200ms; }
-  .animation-delay-300 { animation-delay: 300ms; }
-  .animation-delay-400 { animation-delay: 400ms; }
-  .animation-delay-500 { animation-delay: 500ms; }
+  .animation-delay-100 {
+    animation-delay: 100ms;
+  }
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+  .animation-delay-500 {
+    animation-delay: 500ms;
+  }
 
   /* Text gradients */
   .text-gradient-green {
