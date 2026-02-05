@@ -368,7 +368,7 @@ export function RoutesPage() {
             )}
           </button>
 
-          <div id="routes-panel" style="overflow-y: scroll; appearance: none; scrollbar-width: none;">
+          <div id="routes-panel" className="flex-1 overflow-y-auto scrollbar-hide">
             {exploringRoute ? (
               <RouteExplorerView
                 route={exploringRoute}
