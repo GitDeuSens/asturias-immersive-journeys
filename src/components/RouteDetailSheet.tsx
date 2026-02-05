@@ -105,16 +105,16 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
           </span>
 
           {/* Bottom info */}
-          <div className="absolute bottom-4 left-4 right-4">
-            <h1 id="route-detail-title" className="text-2xl font-serif font-bold text-white drop-shadow-lg mb-1">
-              {route.title[lang]}
-            </h1>
-            <p className="text-white/90 text-sm font-medium">{route.theme[lang]}</p>
-          </div>
         </div>
 
         {/* Scrollable content */}
         <ScrollArea className="flex-1">
+          <div className="pt-3 pl-3">
+            <h1 id="route-detail-title" className="text-2xl font-serif font-bold mb-1">
+              {route.title[lang]}
+            </h1>
+            <p className="text-sm font-medium">{route.theme[lang]}</p>
+          </div>
           <div className="p-6 space-y-6">
             {/* Quick info badges */}
             <div className="flex flex-wrap gap-2">
