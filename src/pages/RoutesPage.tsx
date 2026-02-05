@@ -25,6 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import "leaflet/dist/leaflet.css";
+import "../../App.css";
 
 // Create route bubble marker with name label
 const createRouteMarkerIcon = (route: ImmersiveRoute, routeName: string) => {
