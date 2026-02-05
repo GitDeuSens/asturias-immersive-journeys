@@ -156,13 +156,13 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
             )}
 
             {/* Bottom info */}
-            <div className="absolute bottom-4 left-4 right-4">
-              <h1 className="text-2xl font-serif font-bold text-white drop-shadow-lg">{t(point.title)}</h1>
-            </div>
           </div>
 
           {/* Scrollable content */}
           <ScrollArea className="flex-1">
+            <div className="pl-6 pt-3">
+              <h1 className="text-2xl font-serif font-bold">{t(point.title)}</h1>
+            </div>
             <div className="p-6 space-y-6">
               {/* Description */}
               <p className="text-muted-foreground leading-relaxed text-base">{t(point.shortDescription)}</p>
