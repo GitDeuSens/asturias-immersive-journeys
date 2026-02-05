@@ -107,13 +107,13 @@ export function openNavigationTo(destination: NavigationDestination): void {
   if (isIOS) {
     // Apple Maps - walking mode
     const url = `maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=w&q=${encodedName}`;
-    const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-    if (!newWindow) openInNewTab(url);
+    // Avoid window.open inside iframes; prefer a real link click to new tab
+    openInNewTab(url);
   } else {
     // Google Maps - walking mode
     const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking`;
-    const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-    if (!newWindow) openInNewTab(url);
+    // Avoid window.open inside iframes; prefer a real link click to new tab
+    openInNewTab(url);
   }
 }
 
@@ -128,12 +128,12 @@ export function openDrivingNavigationTo(destination: NavigationDestination): voi
   
   if (isIOS) {
     const url = `maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d&q=${encodedName}`;
-    const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-    if (!newWindow) openInNewTab(url);
+    // Avoid window.open inside iframes; prefer a real link click to new tab
+    openInNewTab(url);
   } else {
     const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
-    const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-    if (!newWindow) openInNewTab(url);
+    // Avoid window.open inside iframes; prefer a real link click to new tab
+    openInNewTab(url);
   }
 }
 
