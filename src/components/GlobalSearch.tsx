@@ -1,10 +1,10 @@
 // ============ GLOBAL SEARCH COMPONENT ============
-// Real-time search with categorized results
+// Real-time search with categorized results or local filtering
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, MapPin, Route, Sparkles, Building2 } from "lucide-react";
+import { Search, X, MapPin, Route, Sparkles, Building2, View } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -12,15 +12,29 @@ import { searchContent } from "@/lib/api/directus-client";
 import { trackSearch } from "@/lib/analytics";
 import type { Language, SearchResults } from "@/lib/types";
 
+// Generic item for local filtering
+export interface LocalSearchItem {
+  id: string;
+  title: Record<Language, string> | string;
+  subtitle?: string;
+  image?: string;
+  type?: string;
+}
+
 interface GlobalSearchProps {
   locale?: Language;
   placeholder?: string;
   onClose?: () => void;
   isOpen?: boolean;
+  // Local filtering mode
+  localData?: LocalSearchItem[];
+  onLocalSelect?: (item: LocalSearchItem) => void;
+  localIcon?: React.ReactNode;
 }
 
 const texts = {
   placeholder: { es: "Buscar experiencias...", en: "Search experiences...", fr: "Rechercher des expériences..." },
+  placeholderLocal: { es: "Buscar...", en: "Search...", fr: "Rechercher..." },
   museums: { es: "Museos", en: "Museums", fr: "Musées" },
   routes: { es: "Rutas", en: "Routes", fr: "Itinéraires" },
   ar: { es: "Experiencias AR", en: "AR Experiences", fr: "Expériences AR" },
@@ -28,11 +42,21 @@ const texts = {
   noResults: { es: "No se encontraron resultados", en: "No results found", fr: "Aucun résultat trouvé" },
   viewAll: { es: "Ver todos los resultados", en: "View all results", fr: "Voir tous les résultats" },
   recentSearches: { es: "Búsquedas recientes", en: "Recent searches", fr: "Recherches récentes" },
+  results: { es: "Resultados", en: "Results", fr: "Résultats" },
 };
 
-export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = true }: GlobalSearchProps) {
+export function GlobalSearch({ 
+  locale = "es", 
+  placeholder, 
+  onClose, 
+  isOpen = true,
+  localData,
+  onLocalSelect,
+  localIcon
+}: GlobalSearchProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResults | null>(null);
+  const [localResults, setLocalResults] = useState<LocalSearchItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -43,8 +67,11 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
   const navigate = useNavigate();
   const debouncedQuery = useDebounce(query, 300);
 
+  const isLocalMode = !!localData;
+
   // Load recent searches from localStorage
   useEffect(() => {
+    if (isLocalMode) return;
     const saved = localStorage.getItem("asturias-recent-searches");
     if (saved) {
       try {
@@ -53,7 +80,7 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
         // Invalid JSON
       }
     }
-  }, []);
+  }, [isLocalMode]);
 
   // Focus input when opened
   useEffect(() => {
@@ -62,15 +89,47 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
     }
   }, [isOpen]);
 
-  // Perform search
+  // Perform search (API or local)
   useEffect(() => {
-    if (debouncedQuery.length >= 2) {
-      performSearch(debouncedQuery);
+    if (isLocalMode) {
+      // Local filtering
+      if (debouncedQuery.length >= 1) {
+        performLocalSearch(debouncedQuery);
+      } else {
+        setLocalResults([]);
+        setShowDropdown(false);
+      }
     } else {
-      setResults(null);
-      setShowDropdown(false);
+      // API search
+      if (debouncedQuery.length >= 2) {
+        performSearch(debouncedQuery);
+      } else {
+        setResults(null);
+        setShowDropdown(false);
+      }
     }
-  }, [debouncedQuery, locale]);
+  }, [debouncedQuery, locale, isLocalMode, localData]);
+
+  const getItemTitle = (item: LocalSearchItem): string => {
+    if (typeof item.title === 'string') return item.title;
+    return item.title[locale] || item.title.es || '';
+  };
+
+  const performLocalSearch = (searchQuery: string) => {
+    if (!localData) return;
+    
+    const normalizedQuery = searchQuery.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    
+    const filtered = localData.filter(item => {
+      const title = getItemTitle(item).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const subtitle = (item.subtitle || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      return title.includes(normalizedQuery) || subtitle.includes(normalizedQuery);
+    });
+    
+    setLocalResults(filtered);
+    setShowDropdown(true);
+    setSelectedIndex(-1);
+  };
 
   const performSearch = async (searchQuery: string) => {
     setIsLoading(true);
@@ -108,6 +167,35 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
       ...results.pois.map((p) => ({ type: "poi", data: p })),
     ];
   }, [results]);
+
+  const handleLocalKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      switch (e.key) {
+        case "ArrowDown":
+          e.preventDefault();
+          setSelectedIndex((prev) => Math.min(prev + 1, localResults.length - 1));
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          setSelectedIndex((prev) => Math.max(prev - 1, -1));
+          break;
+        case "Enter":
+          e.preventDefault();
+          if (selectedIndex >= 0 && localResults[selectedIndex]) {
+            onLocalSelect?.(localResults[selectedIndex]);
+            setShowDropdown(false);
+            setQuery("");
+          }
+          break;
+        case "Escape":
+          setShowDropdown(false);
+          inputRef.current?.blur();
+          onClose?.();
+          break;
+      }
+    },
+    [localResults, selectedIndex, onLocalSelect, onClose],
+  );
 
   const navigateToResult = useCallback(
     (result: { type: string; data: any }) => {
@@ -194,6 +282,10 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
     console.log(" que es ?? ", event);
   };
 
+  const defaultPlaceholder = isLocalMode 
+    ? texts.placeholderLocal[locale] 
+    : texts.placeholder[locale];
+
   return (
     <div className="relative w-full">
       {/* Search input */}
@@ -204,9 +296,12 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onFocus={() => query.length >= 2 && setShowDropdown(true)}
-          placeholder={placeholder || texts.placeholder[locale]}
+          onKeyDown={isLocalMode ? handleLocalKeyDown : handleKeyDown}
+          onFocus={() => {
+            if (isLocalMode && query.length >= 1) setShowDropdown(true);
+            else if (!isLocalMode && query.length >= 2) setShowDropdown(true);
+          }}
+          placeholder={placeholder || defaultPlaceholder}
           className="pl-10 pr-10 h-12 text-base bg-background border-border"
         />
         {query && (
@@ -216,6 +311,7 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
             onClick={() => {
               setQuery("");
               setResults(null);
+              setLocalResults([]);
               setShowDropdown(false);
             }}
             className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
@@ -240,7 +336,48 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
             exit={{ opacity: 0, y: -10 }}
             className="absolute z-50 w-full mt-2 bg-popover border border-border rounded-xl shadow-lg overflow-hidden max-h-[70vh] overflow-y-auto"
           >
-            {results && results.total > 0 ? (
+            {/* Local mode results */}
+            {isLocalMode && localResults.length > 0 && (
+              <div className="p-2">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-2 mb-2">
+                  {texts.results[locale]} ({localResults.length})
+                </p>
+                {localResults.map((item, idx) => (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      onLocalSelect?.(item);
+                      setShowDropdown(false);
+                      setQuery("");
+                    }}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-left ${
+                      selectedIndex === idx ? "bg-accent text-accent-foreground" : "hover:bg-muted"
+                    }`}
+                  >
+                    {localIcon || <View className="w-4 h-4 text-muted-foreground flex-shrink-0" />}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-foreground truncate">
+                        {highlightMatch(getItemTitle(item), query)}
+                      </p>
+                      {item.subtitle && (
+                        <p className="text-xs text-muted-foreground truncate">{item.subtitle}</p>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Local mode no results */}
+            {isLocalMode && localResults.length === 0 && query.length >= 1 && (
+              <div className="p-8 text-center">
+                <p className="text-muted-foreground">{texts.noResults[locale]}</p>
+                <p className="text-sm text-muted-foreground/60 mt-1">"{query}"</p>
+              </div>
+            )}
+
+            {/* API mode results */}
+            {!isLocalMode && results && results.total > 0 ? (
               <div className="p-2">
                 {/* Museums */}
                 {results.museums.length > 0 && (
@@ -322,12 +459,12 @@ export function GlobalSearch({ locale = "es", placeholder, onClose, isOpen = tru
                   </div>
                 )}
               </div>
-            ) : results && results.total === 0 ? (
+            ) : !isLocalMode && results && results.total === 0 ? (
               <div className="p-8 text-center">
                 <p className="text-muted-foreground">{texts.noResults[locale]}</p>
                 <p className="text-sm text-muted-foreground/60 mt-1">"{query}"</p>
               </div>
-            ) : recentSearches.length > 0 && !query ? (
+            ) : !isLocalMode && recentSearches.length > 0 && !query ? (
               <div className="p-2">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-2 mb-2">
                   {texts.recentSearches[locale]}

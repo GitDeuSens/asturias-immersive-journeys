@@ -4,7 +4,7 @@ import { View, ChevronRight, X, Filter, Search } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { CategoryChips } from "@/components/CategoryChips";
 import { KuulaTourEmbed } from "@/components/KuulaTourEmbed";
-import { GlobalSearch } from "@/components/GlobalSearch";
+import { GlobalSearch, LocalSearchItem } from "@/components/GlobalSearch";
 import { Footer } from "@/components/Footer";
 import { tours360, categories, Tour360 } from "@/data/mockData";
 import { getVirtualTours } from "@/lib/api/directus-client";
@@ -47,6 +47,19 @@ export function Tours360Page() {
     return tours360.filter((tour) => tour.categoryIds.some((catId) => selectedCategories.includes(catId)));
   }, [selectedCategories]);
 
+  // Prepare local search data from filtered tours
+  const localSearchData: LocalSearchItem[] = useMemo(() => {
+    return filteredTours.map(tour => ({
+      id: tour.id,
+      title: tour.title,
+      subtitle: tour.categoryIds
+        .map(catId => categories.find(c => c.id === catId))
+        .filter(Boolean)
+        .map(cat => t(cat!.label))
+        .join(', '),
+    }));
+  }, [filteredTours, t]);
+
   const toggleCategory = (catId: string) => {
     setSelectedCategories((prev) => (prev.includes(catId) ? prev.filter((id) => id !== catId) : [...prev, catId]));
   };
@@ -74,6 +87,14 @@ export function Tours360Page() {
   const closeTour = () => {
     setActiveTour(null);
     setActiveTourData(null);
+  };
+
+  const handleLocalSearchSelect = (item: LocalSearchItem) => {
+    const tour = tours360.find(t => t.id === item.id);
+    if (tour) {
+      handleTourClick(tour);
+      setShowSearch(false);
+    }
   };
 
   return (
@@ -117,7 +138,13 @@ export function Tours360Page() {
                 exit={{ opacity: 0, height: 0 }}
                 className="mb-6 overflow-hidden"
               >
-                <GlobalSearch locale={language as Language} />
+                <GlobalSearch 
+                  locale={language as Language}
+                  localData={localSearchData}
+                  onLocalSelect={handleLocalSearchSelect}
+                  localIcon={<View className="w-4 h-4 text-muted-foreground flex-shrink-0" />}
+                  placeholder={t(texts.searchPlaceholder)}
+                />
               </motion.div>
             )}
           </AnimatePresence>
