@@ -1,74 +1,74 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Home, MapPin, Navigation, Loader2 } from 'lucide-react';
-import { useLanguage } from '@/hooks/useLanguage';
-import { useGeolocation } from '@/hooks/useGeolocation';
-import { GeolocationErrorAlert } from '@/components/GeolocationErrorAlert';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Home, MapPin, Navigation, Loader2 } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
+import { useGeolocation } from "@/hooks/useGeolocation";
+import { GeolocationErrorAlert } from "@/components/GeolocationErrorAlert";
 
 interface ModeSelectorProps {
-  onSelect: (mode: 'home' | 'here') => void;
+  onSelect: (mode: "home" | "here") => void;
 }
 
 const texts = {
-  title: { 
-    es: '¿Cómo quieres explorar Asturias?', 
-    en: 'How do you want to explore Asturias?', 
-    fr: 'Comment voulez-vous explorer les Asturies?' 
+  title: {
+    es: "¿Cómo quieres explorar Asturias?",
+    en: "How do you want to explore Asturias?",
+    fr: "Comment voulez-vous explorer les Asturies?",
   },
-  homeTitle: { 
-    es: 'Descubriendo desde casa', 
-    en: 'Discovering from home', 
-    fr: 'Découvrir depuis chez vous' 
+  homeTitle: {
+    es: "Descubriendo desde casa",
+    en: "Discovering from home",
+    fr: "Découvrir depuis chez vous",
   },
-  homeDescription: { 
-    es: 'Planifica tu viaje con tours virtuales 360° y rutas inmersivas. Explora Asturias sin moverte del sofá.', 
-    en: 'Plan your trip with 360° virtual tours and immersive routes. Explore Asturias from your couch.', 
-    fr: 'Planifiez votre voyage avec des visites virtuelles 360° et des itinéraires immersifs. Explorez les Asturies depuis chez vous.' 
+  homeDescription: {
+    es: "Planifica tu viaje con tours virtuales 360° y rutas inmersivas. Explora Asturias sin moverte del sofá.",
+    en: "Plan your trip with 360° virtual tours and immersive routes. Explore Asturias from your couch.",
+    fr: "Planifiez votre voyage avec des visites virtuelles 360° et des itinéraires immersifs. Explorez les Asturies depuis chez vous.",
   },
-  hereTitle: { 
-    es: 'Ya estoy en Asturias', 
-    en: "I'm already in Asturias", 
-    fr: 'Je suis déjà dans les Asturies' 
+  hereTitle: {
+    es: "Ya estoy en Asturias",
+    en: "I'm already in Asturias",
+    fr: "Je suis déjà dans les Asturies",
   },
-  hereDescription: { 
-    es: 'Activa tu ubicación para descubrir qué tienes cerca: experiencias de realidad aumentada, rutas y puntos de interés.', 
-    en: 'Enable your location to discover what\'s nearby: AR experiences, routes and points of interest.', 
-    fr: 'Activez votre localisation pour découvrir ce qui est proche: expériences AR, itinéraires et points d\'intérêt.' 
+  hereDescription: {
+    es: "Activa tu ubicación para descubrir qué tienes cerca: experiencias de realidad aumentada, rutas y puntos de interés.",
+    en: "Enable your location to discover what's nearby: AR experiences, routes and points of interest.",
+    fr: "Activez votre localisation pour découvrir ce qui est proche: expériences AR, itinéraires et points d'intérêt.",
   },
   locationHint: {
-    es: 'Se solicitará acceso a tu ubicación',
-    en: 'Location access will be requested',
-    fr: 'L\'accès à la localisation sera demandé'
+    es: "Se solicitará acceso a tu ubicación",
+    en: "Location access will be requested",
+    fr: "L'accès à la localisation sera demandé",
   },
   gettingLocation: {
-    es: 'Obteniendo ubicación...',
-    en: 'Getting location...',
-    fr: 'Obtention de la localisation...'
-  }
+    es: "Obteniendo ubicación...",
+    en: "Getting location...",
+    fr: "Obtention de la localisation...",
+  },
 };
 
 export function ModeSelector({ onSelect }: ModeSelectorProps) {
   const { t } = useLanguage();
   const { requestLocation, loading, error, clearLocation } = useGeolocation();
-  const [selectedMode, setSelectedMode] = useState<'home' | 'here' | null>(null);
+  const [selectedMode, setSelectedMode] = useState<"home" | "here" | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
 
   const handleHomeSelect = () => {
-    setSelectedMode('home');
-    onSelect('home');
+    setSelectedMode("home");
+    onSelect("home");
   };
 
   const handleHereSelect = async () => {
-    setSelectedMode('here');
+    setSelectedMode("here");
     setGeoError(null);
     const success = await requestLocation();
-    
+
     if (!success && error) {
       setGeoError(error);
     }
-    
+
     // Continue anyway - user can still explore without location
-    onSelect('here');
+    onSelect("here");
   };
 
   const handleRetryLocation = async () => {
@@ -87,11 +87,7 @@ export function ModeSelector({ onSelect }: ModeSelectorProps) {
   return (
     <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 pt-20 pb-10">
       {/* Geolocation Error Alert */}
-      <GeolocationErrorAlert 
-        error={geoError} 
-        onDismiss={handleDismissError}
-        onRetry={handleRetryLocation}
-      />
+      <GeolocationErrorAlert error={geoError} onDismiss={handleDismissError} onRetry={handleRetryLocation} />
 
       {/* Title */}
       <motion.h1
@@ -120,12 +116,8 @@ export function ModeSelector({ onSelect }: ModeSelectorProps) {
           </div>
 
           {/* Content */}
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 drop-shadow-md">
-            {t(texts.homeTitle)}
-          </h2>
-          <p className="text-white/80 text-base md:text-lg leading-relaxed">
-            {t(texts.homeDescription)}
-          </p>
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 drop-shadow-md">{t(texts.homeTitle)}</h2>
+          <p className="text-white/80 text-base md:text-lg leading-relaxed">{t(texts.homeDescription)}</p>
 
           {/* Decorative gradient */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
@@ -142,7 +134,7 @@ export function ModeSelector({ onSelect }: ModeSelectorProps) {
         >
           {/* Icon */}
           <div className="w-16 h-16 rounded-xl bg-accent flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
-            {loading && selectedMode === 'here' ? (
+            {loading && selectedMode === "here" ? (
               <Loader2 className="w-8 h-8 text-white animate-spin" />
             ) : (
               <MapPin className="w-8 h-8 text-white" />
@@ -150,33 +142,19 @@ export function ModeSelector({ onSelect }: ModeSelectorProps) {
           </div>
 
           {/* Content */}
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 drop-shadow-md">
-            {t(texts.hereTitle)}
-          </h2>
-          <p className="text-white/80 text-base md:text-lg leading-relaxed mb-4">
-            {t(texts.hereDescription)}
-          </p>
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 drop-shadow-md">{t(texts.hereTitle)}</h2>
+          <p className="text-white/80 text-base md:text-lg leading-relaxed mb-4">{t(texts.hereDescription)}</p>
 
           {/* Location hint */}
           <div className="flex items-center gap-2 text-white/60 text-sm">
             <Navigation className="w-4 h-4" />
-            <span>{loading && selectedMode === 'here' ? t(texts.gettingLocation) : t(texts.locationHint)}</span>
+            <span>{loading && selectedMode === "here" ? t(texts.gettingLocation) : t(texts.locationHint)}</span>
           </div>
 
           {/* Decorative gradient */}
           <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
         </motion.button>
       </div>
-
-      {/* Bottom branding */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1, duration: 0.5 }}
-        className="mt-12 text-white/40 text-sm"
-      >
-        Inspirado en turismoasturias.es
-      </motion.p>
     </div>
   );
 }
