@@ -101,19 +101,19 @@ export function RouteCard({ route, onClick }: RouteCardProps) {
               {t(difficultyLabels[route.difficulty])}
             </span>
           )}
-        </div>
-        <div>
-          {/* Categories */}
-          {route.categoryIds.slice(0, 2).map((catId) => {
-            const cat = getCategoryById(catId);
-            return cat ? (
-              <span key={catId} className="category-chip text-[10px]">
-                {t(cat.label)}
-              </span>
-            ) : null;
-          })}
 
-          <ChevronRight className="w-4 h-4 text-muted-foreground ml-auto group-hover:text-primary transition-colors" />
+          <div>
+            {route.categoryIds.slice(0, 2).map((catId) => {
+              const cat = getCategoryById(catId);
+              return cat ? (
+                <span key={catId} className="category-chip text-[10px]">
+                  {t(cat.label)}
+                </span>
+              ) : null;
+            })}
+
+            <ChevronRight className="w-4 h-4 text-muted-foreground ml-auto group-hover:text-primary transition-colors" />
+          </div>
         </div>
       </div>
     </motion.button>
