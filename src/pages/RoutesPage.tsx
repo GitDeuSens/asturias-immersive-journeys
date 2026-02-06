@@ -354,7 +354,7 @@ export function RoutesPage() {
           {/* Mobile handle */}
           <button
             onClick={() => setPanelExpanded(!panelExpanded)}
-            className="w-full p-4 flex items-center justify-between border-b border-border/50 md:hidden"
+            className="w-full p-4 flex items-center justify-end border-b border-border/50 md:hidden"
             aria-expanded={panelExpanded}
             aria-controls="routes-panel"
           >
@@ -362,9 +362,9 @@ export function RoutesPage() {
               {exploringRoute ? exploringRoute.title[lang] : t("routes.title")}
             </span>
             {panelExpanded ? (
-              <ChevronDown className="w-5 h-5" aria-hidden="true" />
+              <ChevronDown className="w-8 h-8" aria-hidden="true" />
             ) : (
-              <ChevronUp className="w-5 h-5" aria-hidden="true" />
+              <ChevronUp className="w-8 h-8" aria-hidden="true" />
             )}
           </button>
 
