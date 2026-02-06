@@ -127,7 +127,7 @@ export const RouteCard = forwardRef<HTMLButtonElement, RouteCardProps>(function 
               {route.categoryIds.slice(0, 2).map((catId) => {
                 const cat = getCategoryById(catId);
                 return cat ? (
-                  <span key={catId} className="category-chip text-[10px]">
+                  <span key={catId} className="category-chip text-[10px] w-32 text-base">
                     {cat.label[lang]}
                   </span>
                 ) : null;
