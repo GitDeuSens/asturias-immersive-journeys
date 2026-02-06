@@ -121,17 +121,20 @@ export const RouteCard = forwardRef<HTMLButtonElement, RouteCardProps>(
               </span>
             )}
 
-            {/* Categories */}
-            {route.categoryIds.slice(0, 2).map(catId => {
-              const cat = getCategoryById(catId);
-              return cat ? (
-                <span key={catId} className="category-chip text-[10px]">
-                  {cat.label[lang]}
-                </span>
-              ) : null;
-            })}
-
-            <ChevronRight className="w-4 h-4 text-muted-foreground ml-auto group-hover:text-primary transition-colors" aria-hidden="true" />
+            {/* Categories + Chevron container */}
+            <div className="flex items-center gap-2 ml-auto">
+              <div className="flex gap-1">
+                {route.categoryIds.slice(0, 2).map(catId => {
+                  const cat = getCategoryById(catId);
+                  return cat ? (
+                    <span key={catId} className="category-chip text-[10px]">
+                      {cat.label[lang]}
+                    </span>
+                  ) : null;
+                })}
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" aria-hidden="true" />
+            </div>
           </div>
         </div>
       </motion.button>
