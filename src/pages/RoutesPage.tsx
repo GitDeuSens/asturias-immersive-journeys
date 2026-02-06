@@ -131,7 +131,13 @@ export function RoutesPage() {
       attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://osm.org/">OpenStreetMap</a>',
     }).addTo(mapRef.current);
 
-    L.control.zoom({ position: "bottomright" }).addTo(mapRef.current);
+    const zoomControl = L.control.zoom({ position: "bottomright" }).addTo(mapRef.current);
+    
+    // Move zoom control higher to avoid panel overlap
+    const zoomContainer = zoomControl.getContainer();
+    if (zoomContainer) {
+      zoomContainer.style.marginBottom = "280px";
+    }
 
     // Initialize cluster group
     clusterGroupRef.current = createClusterGroup();
