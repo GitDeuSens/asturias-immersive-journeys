@@ -92,7 +92,7 @@ export const RouteCard = forwardRef<HTMLButtonElement, RouteCardProps>(function 
         <div className="flex flex-wrap items-center gap-2">
           {/* Duration */}
           {route.duration && (
-            <span className="flex items-center gap-1 text-sm text-muted-foreground font-medium">
+            <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
               <Clock className="w-3 h-3" aria-hidden="true" />
               {route.duration[lang]}
             </span>
@@ -100,14 +100,14 @@ export const RouteCard = forwardRef<HTMLButtonElement, RouteCardProps>(function 
 
           {/* Distance - NEW */}
           {distance > 0 && (
-            <span className="flex items-center gap-1 text-sm text-muted-foreground font-medium">
+            <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
               <Ruler className="w-3 h-3" aria-hidden="true" />
               {formatDistance(distance)}
             </span>
           )}
 
           {/* Points count */}
-          <span className="flex items-center gap-1 text-sm text-muted-foreground font-medium">
+          <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
             <MapPin className="w-3 h-3" aria-hidden="true" />
             {route.points.length} {t("routes.points")}
           </span>
@@ -115,7 +115,7 @@ export const RouteCard = forwardRef<HTMLButtonElement, RouteCardProps>(function 
           {/* Difficulty */}
           {route.difficulty && (
             <span
-              className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${difficultyColors[route.difficulty]}`}
+              className={`px-2 py-0.5 rounded-md text-sm text-[10px] font-bold border ${difficultyColors[route.difficulty]}`}
             >
               {t(`difficulty.${route.difficulty}`)}
             </span>
