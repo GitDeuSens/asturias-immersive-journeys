@@ -23,6 +23,17 @@ export interface DistanceResult {
 const WALKING_SPEED_KMH = 5;
 const DRIVING_SPEED_KMH = 50;
 
+function openInNewTab(url: string) {
+  // Prefer an anchor click (less likely to navigate the current iframe)
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
 /**
  * Calculate distance from user position to a destination
  */
@@ -97,16 +108,14 @@ export function openNavigationTo(destination: NavigationDestination): void {
   
   if (isIOS) {
     // Apple Maps - walking mode
-    window.open(
-      `maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=w&q=${encodedName}`,
-      '_blank'
-    );
+    const url = `maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=w&q=${encodedName}`;
+    // Avoid window.open inside iframes; prefer a real link click to new tab
+    openInNewTab(url);
   } else {
     // Google Maps - walking mode
-    window.open(
-      `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking`,
-      '_blank'
-    );
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking`;
+    // Avoid window.open inside iframes; prefer a real link click to new tab
+    openInNewTab(url);
   }
 }
 
@@ -120,15 +129,13 @@ export function openDrivingNavigationTo(destination: NavigationDestination): voi
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   
   if (isIOS) {
-    window.open(
-      `maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d&q=${encodedName}`,
-      '_blank'
-    );
+    const url = `maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d&q=${encodedName}`;
+    // Avoid window.open inside iframes; prefer a real link click to new tab
+    openInNewTab(url);
   } else {
-    window.open(
-      `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`,
-      '_blank'
-    );
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
+    // Avoid window.open inside iframes; prefer a real link click to new tab
+    openInNewTab(url);
   }
 }
 
