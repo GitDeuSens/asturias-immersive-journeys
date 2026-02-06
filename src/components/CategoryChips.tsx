@@ -1,6 +1,6 @@
-import { useLanguage } from '@/hooks/useLanguage';
-import { Category } from '@/data/mockData';
-import { Mountain, Landmark, Compass, UtensilsCrossed, BookOpen, Tag } from 'lucide-react';
+import { useLanguage } from "@/hooks/useLanguage";
+import { Category } from "@/data/mockData";
+import { Mountain, Landmark, Compass, UtensilsCrossed, BookOpen, Tag } from "lucide-react";
 
 interface CategoryChipsProps {
   categories: Category[];
@@ -18,20 +18,20 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Tag,
 };
 
-export function CategoryChips({ categories, selectedIds, onToggle, className = '' }: CategoryChipsProps) {
+export function CategoryChips({ categories, selectedIds, onToggle, className = "" }: CategoryChipsProps) {
   const { t } = useLanguage();
 
   return (
     <div className={`flex flex-wrap gap-2 ${className}`}>
-      {categories.map(category => {
+      {categories.map((category) => {
         const isSelected = selectedIds.includes(category.id);
         const IconComponent = iconMap[category.icon] || Tag;
-        
+
         return (
           <button
             key={category.id}
             onClick={() => onToggle(category.id)}
-            className={`category-chip flex items-center gap-2 ${isSelected ? 'active' : ''}`}
+            className={`category-chip flex items-center gap-2 mb-4 w-50 ${isSelected ? "active" : ""}`}
           >
             <IconComponent className="w-4 h-4" />
             <span>{t(category.label)}</span>
