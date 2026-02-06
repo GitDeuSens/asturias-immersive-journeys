@@ -112,6 +112,7 @@ export function RouteCard({ route, onClick }: RouteCardProps) {
               </span>
             ) : null;
           })}
+
           <ChevronRight className="w-4 h-4 text-muted-foreground ml-auto group-hover:text-primary transition-colors" />
         </div>
       </div>
