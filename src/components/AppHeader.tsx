@@ -65,16 +65,16 @@ export function AppHeader({ showRestart = true, variant = "light" }: AppHeaderPr
             </div>
 
             {/* Separator */}
-            <div className="hidden sm:block h-10 w-px bg-border" />
+            <div className="h-10 w-px bg-border" />
 
             {/* Brand text */}
-            <div className="hidden sm:flex items-center gap-3">
+            <div className="flex items-center gap-3">
               <div>
                 <span className="font-bold text-xl text-foreground block leading-tight">Asturias</span>
                 <span className="text-primary font-semibold text-xs uppercase tracking-widest">Inmersivo</span>
               </div>
-              <div className="h-8 w-px bg-border" />
-              <span className="text-muted-foreground text-sm max-w-[180px] leading-tight">
+              <div className="hidden sm:block h-8 w-px bg-border" />
+              <span className="hidden sm:block text-muted-foreground text-sm max-w-[180px] leading-tight">
                 {t("common.tagline", "Experiencias turísticas inmersivas")}
               </span>
             </div>
