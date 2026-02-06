@@ -136,7 +136,7 @@ export function RoutesPage() {
     // Move zoom control higher to avoid panel overlap
     const zoomContainer = zoomControl.getContainer();
     if (zoomContainer) {
-      zoomContainer.style.marginBottom = "280px";
+      zoomContainer.style.marginBottom = "50px";
     }
 
     // Initialize cluster group
