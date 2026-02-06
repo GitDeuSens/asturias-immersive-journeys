@@ -64,7 +64,6 @@ export function SettingsDropdown({ variant = "light" }: SettingsDropdownProps) {
         aria-haspopup="menu"
       >
         <span className="text-xs font-bold">{currentLang.label}</span>
-        {isDark ? <Moon className="w-4 h-4" aria-hidden="true" /> : <Sun className="w-4 h-4" aria-hidden="true" />}
         <ChevronDown
           className={`w-4 h-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
           aria-hidden="true"
