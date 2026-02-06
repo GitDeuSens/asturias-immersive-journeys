@@ -67,7 +67,7 @@ export function RouteCard({ route, onClick }: RouteCardProps) {
       {/* Content */}
       <div className="p-4">
         {/* Title */}
-        <h3 className="font-sans font-bold text-foreground text-lg group-hover:text-primary transition-colors mb-1 line-clamp-1">
+        <h3 className="font-sans font-bold text-base text-foreground text-lg group-hover:text-primary transition-colors mb-1 line-clamp-1">
           {t(route.title)}
         </h3>
 

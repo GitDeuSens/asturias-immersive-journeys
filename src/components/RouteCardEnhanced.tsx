@@ -78,7 +78,7 @@ export const RouteCard = forwardRef<HTMLButtonElement, RouteCardProps>(function 
       {/* Content */}
       <div className="p-4">
         {/* Title */}
-        <h3 className="font-sans font-bold text-foreground text-lg group-hover:text-primary transition-colors mb-1 line-clamp-1">
+        <h3 className="font-sans font-bold text-base text-foreground text-lg group-hover:text-primary transition-colors mb-1 line-clamp-1">
           {route.title[lang]}
         </h3>
 
@@ -115,7 +115,7 @@ export const RouteCard = forwardRef<HTMLButtonElement, RouteCardProps>(function 
           {/* Difficulty */}
           {route.difficulty && (
             <span
-              className={`px-2 py-0.5 rounded-md text-sm text-[10px] font-bold border ${difficultyColors[route.difficulty]}`}
+              className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${difficultyColors[route.difficulty]}`}
             >
               {t(`difficulty.${route.difficulty}`)}
             </span>
