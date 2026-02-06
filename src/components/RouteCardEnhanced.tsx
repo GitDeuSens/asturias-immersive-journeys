@@ -122,7 +122,7 @@ export const RouteCard = forwardRef<HTMLButtonElement, RouteCardProps>(function 
           )}
 
           {/* Categories + Chevron container */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ml-auto">
             <div className="flex gap-1">
               {route.categoryIds.slice(0, 2).map((catId) => {
                 const cat = getCategoryById(catId);
@@ -134,7 +134,7 @@ export const RouteCard = forwardRef<HTMLButtonElement, RouteCardProps>(function 
               })}
             </div>
             <ChevronRight
-              className=" ml-auto w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors"
+              className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors"
               aria-hidden="true"
             />
           </div>
