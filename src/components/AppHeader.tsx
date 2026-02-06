@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { RotateCcw, Mountain, Facebook, Twitter } from "lucide-react";
+import { RotateCcw, House, Facebook, Twitter } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SettingsDropdown } from "@/components/SettingsDropdown";
 import { useTheme } from "@/hooks/useTheme";
@@ -61,7 +61,7 @@ export function AppHeader({ showRestart = true, variant = "light" }: AppHeaderPr
           <Link to="/experience" className="flex items-center gap-4 group" aria-label="Asturias Inmersivo - Inicio">
             {/* Coat of arms style icon */}
             <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform shadow-md">
-              <Mountain className="w-7 h-7 text-primary-foreground" aria-hidden="true" />
+              <House className="w-7 h-7 text-primary-foreground" aria-hidden="true" />
             </div>
 
             {/* Separator */}
