@@ -1,9 +1,9 @@
 import { forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Clock, RotateCw, ChevronRight, Ruler } from 'lucide-react';
-import { ImmersiveRoute } from '@/data/immersiveRoutes';
+import type { ImmersiveRoute } from '@/data/types';
 import { useTranslation } from 'react-i18next';
-import { getCategoryById } from '@/data/mockData';
+import { useDirectusCategories } from '@/hooks/useDirectusData';
 import { calculateRouteDistance, formatDistance } from '@/lib/mapUtils';
 
 interface RouteCardProps {
@@ -15,6 +15,7 @@ export const RouteCard = forwardRef<HTMLButtonElement, RouteCardProps>(
   function RouteCard({ route, onClick }, ref) {
     const { t, i18n } = useTranslation();
     const lang = i18n.language as 'es' | 'en' | 'fr';
+    const { getCategoryById } = useDirectusCategories(lang);
 
     const difficultyColors = {
       easy: 'bg-primary/20 text-primary border-primary/30',

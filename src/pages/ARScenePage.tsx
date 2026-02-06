@@ -291,9 +291,23 @@ export function ARScenePage() {
           <div className="grid md:grid-cols-3 gap-8">
             {/* Main content */}
             <div className="md:col-span-2 space-y-8">
-              {/* AR Viewer */}
+              {/* AR Viewer — use deployed dist iframe if build_path is set */}
               <section>
-                <NeedleARViewer scene={scene} locale={locale as Language} />
+                {scene.build_path ? (
+                  <div className="relative rounded-xl overflow-hidden border border-border bg-black" style={{ minHeight: '500px' }}>
+                    <iframe
+                      src={scene.build_path}
+                      className="w-full h-full absolute inset-0"
+                      style={{ minHeight: '500px' }}
+                      allowFullScreen
+                      sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                      allow="camera; gyroscope; accelerometer; xr-spatial-tracking; fullscreen"
+                      title={scene.title[locale as Language] || scene.title.es}
+                    />
+                  </div>
+                ) : (
+                  <NeedleARViewer scene={scene} locale={locale as Language} />
+                )}
               </section>
 
               {/* Instructions */}

@@ -16,8 +16,8 @@ import {
   Navigation
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { ImmersiveRoute, RoutePoint } from '@/data/immersiveRoutes';
-import { getCategoryById } from '@/data/mockData';
+import type { ImmersiveRoute, RoutePoint } from '@/data/types';
+import { useDirectusCategories } from '@/hooks/useDirectusData';
 import { calculateRouteDistance, formatDistance, openNavigation } from '@/lib/mapUtils';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -32,6 +32,7 @@ interface RouteDetailSheetProps {
 export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSheetProps) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as 'es' | 'en' | 'fr';
+  const { getCategoryById } = useDirectusCategories(lang);
 
   if (!route) return null;
 

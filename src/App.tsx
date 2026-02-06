@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams } from "react-router-dom";
 import { SkipToContent } from '@/components/SkipToContent';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { NetworkStatusAlert } from '@/components/NetworkStatusAlert';
@@ -50,6 +50,12 @@ function AnalyticsTracker() {
   return null;
 }
 
+// Redirect helper for /tours/ar/:slug -> /ar/:slug
+function RedirectToAR() {
+  const { slug } = useParams();
+  return <Navigate to={`/ar/${slug}`} replace />;
+}
+
 const queryClient = new QueryClient();
 
 // Lazy load CookieConsent
@@ -71,10 +77,13 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/experience" element={<Index />} />
                 <Route path="/tours" element={<Tours360Page />} />
+                <Route path="/tours/:slug" element={<Tours360Page />} />
                 <Route path="/routes" element={<RoutesPage />} />
                 <Route path="/vr" element={<VRExperiencesPage />} />
                 <Route path="/ar" element={<ARExperiencesPage />} />
                 <Route path="/ar/:slug" element={<ARScenePage />} />
+                {/* Redirects for relative navigation from /tours/:slug */}
+                <Route path="/tours/ar/:slug" element={<RedirectToAR />} />
                 <Route path="/accessibility" element={<AccessibilityPage />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/cookies" element={<CookiesPage />} />

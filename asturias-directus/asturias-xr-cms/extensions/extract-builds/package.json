@@ -1,0 +1,15 @@
+{
+  "name": "directus-extension-extract-builds",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Auto-extract 3DVista and Needle builds from ZIP files",
+  "directus:extension": {
+    "type": "hook",
+    "path": "index.js",
+    "source": "index.js",
+    "host": "^10.0.0"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.10"
+  }
+}

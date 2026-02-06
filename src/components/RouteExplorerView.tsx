@@ -18,7 +18,7 @@ import {
   Footprints
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { ImmersiveRoute, RoutePoint } from '@/data/immersiveRoutes';
+import type { ImmersiveRoute, RoutePoint } from '@/data/types';
 import { useExplorationMode } from '@/hooks/useLanguage';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { Button } from '@/components/ui/button';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { RichTextBlock } from '@/data/mockData';
+import type { RichTextBlock } from '@/data/types';
 import { Quote, Lightbulb } from 'lucide-react';
 
 interface RichTextRendererProps {

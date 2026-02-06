@@ -1,0 +1,16 @@
+{
+  "name": "asturias-directus-schema",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "init": "node create-schema.js",
+    "seed": "node seed-data.js",
+    "migrate": "node migrate-all-data.js",
+    "verify": "node verify-sync.js",
+    "reset": "node reset-schema.js"
+  },
+  "dependencies": {
+    "@directus/sdk": "^17.0.0",
+    "dotenv": "^16.4.1"
+  }
+}

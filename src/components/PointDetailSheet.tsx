@@ -25,7 +25,7 @@ import {
   Car
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { RoutePoint } from '@/data/immersiveRoutes';
+import type { RoutePoint } from '@/data/types';
 import { useLanguage, useExplorationMode } from '@/hooks/useLanguage';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useGeolocation } from '@/hooks/useGeolocation';
@@ -69,13 +69,6 @@ const texts = {
   driving: { es: 'en coche', en: 'by car', fr: 'en voiture' },
 };
 
-// Placeholder gallery images for demo
-const placeholderGallery = [
-  '/placeholder.svg',
-  '/placeholder.svg',
-  '/placeholder.svg',
-  '/placeholder.svg',
-];
 
 export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
   const { t, language } = useLanguage();
@@ -365,23 +358,23 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
               )}
 
               {/* Image Gallery - shown for non-AR POIs */}
-              {!hasAR && (
+              {!hasAR && (content.gallery?.length || content.image?.url) && (
                 <div className="space-y-3">
                   <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2">
                     <ImageIcon className="w-4 h-4 text-primary" />
                     {t(texts.gallery)}
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
-                    {placeholderGallery.map((img, index) => (
+                    {(content.gallery || (content.image ? [content.image] : [])).map((img, index) => (
                       <motion.button
                         key={index}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => setSelectedGalleryImage(img)}
+                        onClick={() => setSelectedGalleryImage(img.url)}
                         className="relative aspect-[4/3] rounded-xl overflow-hidden bg-muted border border-border/50 hover:border-primary/50 transition-colors group"
                       >
                         <img 
-                          src={img} 
+                          src={img.url} 
                           alt={`Gallery ${index + 1}`}
                           className="w-full h-full object-cover"
                         />

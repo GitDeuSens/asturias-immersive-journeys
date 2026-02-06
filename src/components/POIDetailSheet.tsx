@@ -5,7 +5,8 @@ import {
   Info, Image, Link2, Headphones, Maximize2, QrCode
 } from 'lucide-react';
 import { useState, useRef } from 'react';
-import { POI, categories } from '@/data/mockData';
+import type { POI } from '@/data/types';
+import { useDirectusCategories } from '@/hooks/useDirectusData';
 import { useLanguage, Language } from '@/hooks/useLanguage';
 import { QRCodeSVG } from 'qrcode.react';
 import RichTextRenderer from '@/components/poi/RichTextRenderer';
@@ -54,6 +55,7 @@ const texts = {
 
 export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
   const { t, language } = useLanguage();
+  const { categories } = useDirectusCategories(language as 'es' | 'en' | 'fr');
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedAudioLang, setSelectedAudioLang] = useState<Language>(language);
   const [show360Modal, setShow360Modal] = useState(false);

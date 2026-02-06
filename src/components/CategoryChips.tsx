@@ -1,5 +1,5 @@
 import { useLanguage } from '@/hooks/useLanguage';
-import { Category } from '@/data/mockData';
+import type { Category } from '@/data/types';
 import { Mountain, Landmark, Compass, UtensilsCrossed, BookOpen, Tag } from 'lucide-react';
 
 interface CategoryChipsProps {

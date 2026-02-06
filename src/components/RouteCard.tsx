@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
 import { MapPin, Clock, ChevronRight, RotateCw, Mountain, Utensils, Landmark } from 'lucide-react';
-import { ImmersiveRoute } from '@/data/immersiveRoutes';
+import type { ImmersiveRoute } from '@/data/types';
 import { useLanguage } from '@/hooks/useLanguage';
-import { getCategoryById } from '@/data/mockData';
+import { useDirectusCategories } from '@/hooks/useDirectusData';
 
 interface RouteCardProps {
   route: ImmersiveRoute;
@@ -10,7 +10,8 @@ interface RouteCardProps {
 }
 
 export function RouteCard({ route, onClick }: RouteCardProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { getCategoryById } = useDirectusCategories(language as 'es' | 'en' | 'fr');
 
   const difficultyColors = {
     easy: 'bg-primary/20 text-primary border-primary/30',

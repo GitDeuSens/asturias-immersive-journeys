@@ -44,24 +44,8 @@ export function KuulaTourEmbed({
   const startTimeRef = useRef<number>(0);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // Build Kuula embed URL with parameters
-  const buildEmbedUrl = () => {
-    const baseUrl = tour.kuula_embed_url;
-    const params = new URLSearchParams({
-      logo: '0', // Hide Kuula logo for branding
-      info: '1',
-      fs: '1', // Allow fullscreen
-      vr: '1', // Enable VR mode
-      sd: '1', // Start direction
-      thumbs: '1',
-      autorotate: autoPlay ? '0.05' : '0',
-      ...(isMuted ? { mute: '1' } : {}),
-    });
-    
-    // Check if URL already has params
-    const separator = baseUrl.includes('?') ? '&' : '?';
-    return `${baseUrl}${separator}${params.toString()}`;
-  };
+  // build_path points to deployed 3DVista dist in public/tours-builds/
+  const embedUrl = tour.kuula_embed_url || null;
 
   useEffect(() => {
     // Track tour started
@@ -119,7 +103,7 @@ export function KuulaTourEmbed({
   const TourViewer = () => (
     <div className="relative w-full h-full bg-black">
       {/* Loading overlay */}
-      {isLoading && (
+      {isLoading && embedUrl && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/80">
           <div className="text-center">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
@@ -143,17 +127,31 @@ export function KuulaTourEmbed({
         </div>
       )}
 
-      {/* Kuula iframe */}
-      <iframe
-        ref={iframeRef}
-        src={buildEmbedUrl()}
-        className="w-full h-full"
-        allowFullScreen
-        allow="xr-spatial-tracking; gyroscope; accelerometer; fullscreen"
-        title={tour.title[locale] || tour.title.es}
-        onLoad={handleIframeLoad}
-        onError={handleIframeError}
-      />
+      {/* 3DVista / Tour iframe */}
+      {embedUrl ? (
+        <iframe
+          ref={iframeRef}
+          src={embedUrl}
+          className="w-full h-full"
+          allowFullScreen
+          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+          allow="xr-spatial-tracking; gyroscope; accelerometer; fullscreen"
+          title={tour.title[locale] || tour.title.es}
+          onLoad={handleIframeLoad}
+          onError={handleIframeError}
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center bg-black/80">
+          <div className="text-center p-8">
+            <p className="text-lg font-semibold text-white/80 mb-2">
+              {locale === 'es' ? 'Tour no disponible' : locale === 'fr' ? 'Visite non disponible' : 'Tour not available'}
+            </p>
+            <p className="text-sm text-white/50">
+              {locale === 'es' ? 'El archivo del tour aún no ha sido desplegado' : locale === 'fr' ? 'Le fichier de la visite n\'a pas encore été déployé' : 'Tour files have not been deployed yet'}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -208,7 +206,12 @@ export function KuulaTourEmbed({
     );
   }
 
-  // Regular embedded view
+  // When showControls is false, render just the viewer (used inside modal)
+  if (!showControls) {
+    return <div className="w-full h-full"><TourViewer /></div>;
+  }
+
+  // Regular embedded view with controls
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}

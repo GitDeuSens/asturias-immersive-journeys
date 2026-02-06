@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Smartphone, Camera, Info, Share2 } from 'lucide-react';
-import { POI, categories } from '@/data/mockData';
+import type { POI } from '@/data/types';
+import { useDirectusCategories } from '@/hooks/useDirectusData';
 import { useLanguage } from '@/hooks/useLanguage';
 
 interface POIPreviewSheetProps {
@@ -15,7 +16,8 @@ const texts = {
 };
 
 export function POIPreviewSheet({ poi, onClose, onViewDetails }: POIPreviewSheetProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { categories } = useDirectusCategories(language as 'es' | 'en' | 'fr');
 
   if (!poi) return null;
   const getButtonStyle = () => {

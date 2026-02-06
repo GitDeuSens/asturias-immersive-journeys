@@ -8,9 +8,11 @@ export type Language = 'es' | 'en' | 'fr';
 
 export interface KuulaTour {
   id: string;
+  slug?: string;
   title: Record<Language, string>;
   description: Record<Language, string>;
   kuula_embed_url: string;
+  build_zip_url?: string;
   museum_id?: string;
   thumbnail_url: string;
   duration_minutes?: number;
@@ -44,6 +46,7 @@ export interface ARScene {
   // Needle Engine data
   needle_scene_url: string;
   needle_type: ARType;
+  build_path?: string;
   
   // For image tracking
   tracking_image_url?: string;
@@ -88,18 +91,24 @@ export interface AudioTrack {
 
 export interface Museum {
   id: string;
+  slug: string;
   name: Record<Language, string>;
+  short_description?: Record<Language, string>;
   description: Record<Language, string>;
   address: string;
   lat: number;
   lng: number;
   image_url: string;
+  gallery_urls?: string[];
   website?: string;
   phone?: string;
   email?: string;
   opening_hours?: Record<Language, string>;
   prices?: Record<Language, string>;
+  accessibility?: Record<Language, string>;
+  museum_type?: string;
   municipality: string;
+  featured?: boolean;
   published: boolean;
 }
 

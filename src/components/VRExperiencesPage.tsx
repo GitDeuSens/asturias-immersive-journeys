@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Glasses, 
@@ -18,121 +18,31 @@ import { SEOHead } from '@/components/SEOHead';
 import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
-// VR Experiences data
-const vrExperiences = [
-  {
-    id: 'mina-sotón',
-    title: {
-      es: 'Mina Sotón VR',
-      en: 'Sotón Mine VR',
-      fr: 'Mine Sotón VR',
-    },
-    description: {
-      es: 'Desciende 600 metros bajo tierra y recorre las galerías reales del Pozo Sotón',
-      en: 'Descend 600 meters underground and explore the real galleries of Pozo Sotón',
-      fr: 'Descendez à 600 mètres sous terre et parcourez les galeries réelles du Puits Sotón',
-    },
-    fullDescription: {
-      es: 'Una experiencia VR inmersiva que te transporta al corazón de la minería asturiana. Baja en la jaula minera, recorre las galerías iluminadas por tu lámpara y descubre la vida de los mineros.',
-      en: 'An immersive VR experience that transports you to the heart of Asturian mining. Go down in the mining cage, explore the galleries lit by your lamp and discover the life of the miners.',
-      fr: 'Une expérience VR immersive qui vous transporte au cœur de l\'industrie minière asturienne. Descendez dans la cage minière, explorez les galeries éclairées par votre lampe et découvrez la vie des mineurs.',
-    },
-    coverImage: '/placeholder.svg',
-    duration: '15-20 min',
-    difficulty: 'easy',
-    compatible: ['Quest 2', 'Quest 3', 'Pico 4'],
-    apkUrl: 'https://example.com/mina-soton.apk',
-    previewVideo: 'https://youtube.com/watch?v=example',
-    screenshots: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
-  },
-  {
-    id: 'camino-real',
-    title: {
-      es: 'Camino Real VR',
-      en: 'Royal Path VR',
-      fr: 'Chemin Royal VR',
-    },
-    description: {
-      es: 'Recorre el antiguo camino de los peregrinos hacia Covadonga',
-      en: 'Walk the ancient pilgrims path to Covadonga',
-      fr: 'Parcourez l\'ancien chemin des pèlerins vers Covadonga',
-    },
-    fullDescription: {
-      es: 'Viaja en el tiempo y recorre el Camino Real que conectaba las villas asturianas con el santuario de Covadonga. Experimenta el paisaje tal como lo veían los peregrinos medievales.',
-      en: 'Travel back in time and walk the Royal Path that connected Asturian towns with the sanctuary of Covadonga. Experience the landscape as medieval pilgrims saw it.',
-      fr: 'Voyagez dans le temps et parcourez le Chemin Royal qui reliait les villes asturiennes au sanctuaire de Covadonga.',
-    },
-    coverImage: '/placeholder.svg',
-    duration: '25-30 min',
-    difficulty: 'medium',
-    compatible: ['Quest 2', 'Quest 3', 'Pico 4'],
-    apkUrl: 'https://example.com/camino-real.apk',
-    previewVideo: 'https://youtube.com/watch?v=example2',
-    screenshots: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
-  },
-  {
-    id: 'sidra-experience',
-    title: {
-      es: 'Sidra Experience VR',
-      en: 'Cider Experience VR',
-      fr: 'Expérience Cidre VR',
-    },
-    description: {
-      es: 'Aprende el arte del escanciado y visita un llagar tradicional',
-      en: 'Learn the art of cider pouring and visit a traditional cider house',
-      fr: 'Apprenez l\'art du service du cidre et visitez une cidrerie traditionnelle',
-    },
-    fullDescription: {
-      es: 'Sumérgete en la cultura sidrera asturiana. Visita un llagar tradicional, participa en la cosecha de manzanas y aprende la técnica del escanciado con realidad virtual.',
-      en: 'Immerse yourself in Asturian cider culture. Visit a traditional cider house, participate in the apple harvest and learn the pouring technique with virtual reality.',
-      fr: 'Plongez dans la culture cidricole asturienne. Visitez une cidrerie traditionnelle et apprenez la technique de service.',
-    },
-    coverImage: '/placeholder.svg',
-    duration: '10-15 min',
-    difficulty: 'easy',
-    compatible: ['Quest 2', 'Quest 3', 'Pico 4'],
-    apkUrl: 'https://example.com/sidra.apk',
-    previewVideo: 'https://youtube.com/watch?v=example3',
-    screenshots: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
-  },
-  {
-    id: 'prehistoria-astur',
-    title: {
-      es: 'Prehistoria Astur VR',
-      en: 'Asturian Prehistory VR',
-      fr: 'Préhistoire Asturienne VR',
-    },
-    description: {
-      es: 'Viaja 20.000 años atrás a las cuevas prehistóricas',
-      en: 'Travel 20,000 years back to prehistoric caves',
-      fr: 'Voyagez 20 000 ans en arrière dans les grottes préhistoriques',
-    },
-    fullDescription: {
-      es: 'Una aventura en el tiempo que te lleva a las cuevas de Tito Bustillo. Observa las pinturas rupestres en su contexto original y conoce a los primeros habitantes de Asturias.',
-      en: 'A time adventure that takes you to the caves of Tito Bustillo. Observe the cave paintings in their original context and meet the first inhabitants of Asturias.',
-      fr: 'Une aventure dans le temps qui vous emmène aux grottes de Tito Bustillo. Observez les peintures rupestres dans leur contexte original.',
-    },
-    coverImage: '/placeholder.svg',
-    duration: '20-25 min',
-    difficulty: 'easy',
-    compatible: ['Quest 2', 'Quest 3', 'Pico 4'],
-    apkUrl: 'https://example.com/prehistoria.apk',
-    previewVideo: 'https://youtube.com/watch?v=example4',
-    screenshots: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
-  },
-];
-
-const difficultyColors = {
-  easy: 'bg-primary/20 text-primary',
-  medium: 'bg-warm/20 text-warm',
-  hard: 'bg-destructive/20 text-destructive',
-};
+import { getVRExperiences } from '@/lib/api/directus-client';
+import type { VRExperience, Language } from '@/lib/types';
 
 export function VRExperiencesPage() {
   const { t, i18n } = useTranslation();
-  const lang = i18n.language as 'es' | 'en' | 'fr';
-  const [selectedExperience, setSelectedExperience] = useState<typeof vrExperiences[0] | null>(null);
+  const lang = (i18n.language || 'es') as Language;
+  const [vrExperiences, setVrExperiences] = useState<VRExperience[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedExperience, setSelectedExperience] = useState<VRExperience | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      setLoading(true);
+      try {
+        const data = await getVRExperiences(lang);
+        setVrExperiences(data);
+      } catch (err) {
+        console.error('[VRExperiencesPage] Error loading VR experiences:', err);
+        setVrExperiences([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [lang]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -166,6 +76,16 @@ export function VRExperiencesPage() {
 
         <div className="container mx-auto px-4 max-w-6xl">
           {/* Experiences grid */}
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : vrExperiences.length === 0 ? (
+            <div className="text-center py-16 text-muted-foreground">
+              <Glasses className="w-12 h-12 mx-auto mb-4 opacity-50" />
+              <p>{lang === 'es' ? 'No hay experiencias VR disponibles' : lang === 'fr' ? 'Aucune expérience VR disponible' : 'No VR experiences available'}</p>
+            </div>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {vrExperiences.map((exp, index) => (
               <motion.article
@@ -181,13 +101,19 @@ export function VRExperiencesPage() {
                 onKeyDown={(e) => e.key === 'Enter' && setSelectedExperience(exp)}
               >
                 {/* Cover image */}
-                <div className="relative aspect-video">
-                  <img
-                    src={exp.coverImage}
-                    alt={exp.title[lang]}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
+                <div className="relative aspect-video bg-muted">
+                  {exp.thumbnail_url ? (
+                    <img
+                      src={exp.thumbnail_url}
+                      alt={exp.title[lang]}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-accent/20 to-accent/5">
+                      <Glasses className="w-16 h-16 text-accent/40" />
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   
                   {/* VR badge */}
@@ -195,6 +121,13 @@ export function VRExperiencesPage() {
                     <Glasses className="w-4 h-4" aria-hidden="true" />
                     VR
                   </span>
+
+                  {/* Category badge */}
+                  {exp.category && (
+                    <span className="absolute top-3 right-3 px-2 py-1 rounded-md bg-black/50 text-white text-xs font-medium">
+                      {exp.category}
+                    </span>
+                  )}
 
                   {/* Play button overlay */}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -216,21 +149,12 @@ export function VRExperiencesPage() {
 
                   <div className="flex flex-wrap items-center gap-3">
                     {/* Duration */}
-                    <span className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <Clock className="w-4 h-4" aria-hidden="true" />
-                      {exp.duration}
-                    </span>
-
-                    {/* Difficulty */}
-                    <span className={`px-2 py-1 rounded-md text-xs font-bold ${difficultyColors[exp.difficulty as keyof typeof difficultyColors]}`}>
-                      {t(`difficulty.${exp.difficulty}`)}
-                    </span>
-
-                    {/* Compatible devices */}
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Glasses className="w-3 h-3" aria-hidden="true" />
-                      {exp.compatible.slice(0, 2).join(', ')}
-                    </span>
+                    {exp.duration_minutes && (
+                      <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <Clock className="w-4 h-4" aria-hidden="true" />
+                        {exp.duration_minutes} min
+                      </span>
+                    )}
 
                     <ChevronRight className="w-5 h-5 text-muted-foreground ml-auto group-hover:text-accent transition-colors" aria-hidden="true" />
                   </div>
@@ -238,6 +162,7 @@ export function VRExperiencesPage() {
               </motion.article>
             ))}
           </div>
+          )}
         </div>
 
         <Footer />
@@ -264,12 +189,18 @@ export function VRExperiencesPage() {
               onClick={e => e.stopPropagation()}
             >
               {/* Header image */}
-              <div className="relative aspect-video">
-                <img
-                  src={selectedExperience.coverImage}
-                  alt={selectedExperience.title[lang]}
-                  className="w-full h-full object-cover"
-                />
+              <div className="relative aspect-video bg-muted">
+                {selectedExperience.thumbnail_url ? (
+                  <img
+                    src={selectedExperience.thumbnail_url}
+                    alt={selectedExperience.title[lang]}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-accent/20 to-accent/5">
+                    <Glasses className="w-20 h-20 text-accent/40" />
+                  </div>
+                )}
                 <button
                   onClick={() => setSelectedExperience(null)}
                   className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
@@ -288,66 +219,39 @@ export function VRExperiencesPage() {
                 <div className="p-6 space-y-6">
                   {/* Metadata */}
                   <div className="flex flex-wrap gap-3">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground text-sm font-medium">
-                      <Clock className="w-4 h-4 text-primary" aria-hidden="true" />
-                      {selectedExperience.duration}
-                    </span>
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium ${difficultyColors[selectedExperience.difficulty as keyof typeof difficultyColors]}`}>
-                      <Star className="w-4 h-4" aria-hidden="true" />
-                      {t(`difficulty.${selectedExperience.difficulty}`)}
-                    </span>
+                    {selectedExperience.duration_minutes && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground text-sm font-medium">
+                        <Clock className="w-4 h-4 text-primary" aria-hidden="true" />
+                        {selectedExperience.duration_minutes} min
+                      </span>
+                    )}
+                    {selectedExperience.category && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent/10 text-accent text-sm font-medium">
+                        <Star className="w-4 h-4" aria-hidden="true" />
+                        {selectedExperience.category}
+                      </span>
+                    )}
                   </div>
 
                   {/* Description */}
                   <p className="text-muted-foreground leading-relaxed">
-                    {selectedExperience.fullDescription[lang]}
+                    {selectedExperience.description[lang]}
                   </p>
-
-                  {/* Compatible devices */}
-                  <div>
-                    <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
-                      <Glasses className="w-4 h-4 text-accent" aria-hidden="true" />
-                      {t('vr.compatible')}
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedExperience.compatible.map(device => (
-                        <span key={device} className="px-3 py-1 rounded-full bg-accent/10 text-accent text-sm font-medium border border-accent/30">
-                          {device}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Screenshots */}
-                  <div>
-                    <h3 className="text-sm font-semibold text-foreground mb-2">
-                      Screenshots
-                    </h3>
-                    <div className="grid grid-cols-3 gap-2">
-                      {selectedExperience.screenshots.map((img, i) => (
-                        <img
-                          key={i}
-                          src={img}
-                          alt={`Screenshot ${i + 1}`}
-                          className="rounded-lg aspect-video object-cover"
-                          loading="lazy"
-                        />
-                      ))}
-                    </div>
-                  </div>
                 </div>
               </ScrollArea>
 
               {/* CTA Footer */}
-              <div className="p-4 border-t border-border">
-                <Button 
-                  className="w-full h-12 text-base font-bold bg-accent hover:bg-accent/90"
-                  onClick={() => window.open(selectedExperience.apkUrl, '_blank')}
-                >
-                  <Download className="w-5 h-5 mr-2" aria-hidden="true" />
-                  {t('vr.downloadAPK')}
-                </Button>
-              </div>
+              {selectedExperience.apk_url && (
+                <div className="p-4 border-t border-border">
+                  <Button 
+                    className="w-full h-12 text-base font-bold bg-accent hover:bg-accent/90"
+                    onClick={() => window.open(selectedExperience.apk_url, '_blank')}
+                  >
+                    <Download className="w-5 h-5 mr-2" aria-hidden="true" />
+                    {t('vr.downloadAPK')}
+                  </Button>
+                </div>
+              )}
             </motion.div>
           </motion.div>
         )}

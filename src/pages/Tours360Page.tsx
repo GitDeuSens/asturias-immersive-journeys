@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { View, ChevronRight, X, Filter, Search } from 'lucide-react';
 import { AppHeader } from '@/components/AppHeader';
@@ -6,9 +7,8 @@ import { CategoryChips } from '@/components/CategoryChips';
 import { KuulaTourEmbed } from '@/components/KuulaTourEmbed';
 import { GlobalSearch } from '@/components/GlobalSearch';
 import { Footer } from '@/components/Footer';
-import { tours360, categories, Tour360 } from '@/data/mockData';
-import { getVirtualTours } from '@/lib/api/directus-client';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useDirectusTours, useDirectusCategories } from '@/hooks/useDirectusData';
 import type { KuulaTour, Language } from '@/lib/types';
 
 const texts = {
@@ -23,27 +23,33 @@ const texts = {
 
 export function Tours360Page() {
   const { t, language } = useLanguage();
+  const { slug } = useParams<{ slug?: string }>();
+  const navigate = useNavigate();
+  const slugHandledRef = useRef<string | null>(null);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [activeTour, setActiveTour] = useState<Tour360 | null>(null);
+  const [activeTour, setActiveTour] = useState<KuulaTour | null>(null);
   const [activeTourData, setActiveTourData] = useState<KuulaTour | null>(null);
-  const [kuulaTours, setKuulaTours] = useState<KuulaTour[]>([]);
   const [showSearch, setShowSearch] = useState(false);
 
-  // Load tours from API
+  // Load tours and categories from Directus
+  const { tours: kuulaTours } = useDirectusTours(language as 'es' | 'en' | 'fr');
+  const { categories } = useDirectusCategories(language as 'es' | 'en' | 'fr');
+
+  // Auto-open tour when navigating to /tours/:slug (only once per slug)
   useEffect(() => {
-    async function loadTours() {
-      const tours = await getVirtualTours(language as Language);
-      setKuulaTours(tours);
+    if (slug && kuulaTours.length > 0 && slugHandledRef.current !== slug) {
+      const match = kuulaTours.find((tour: any) => tour.slug === slug || tour.id === slug);
+      if (match) {
+        slugHandledRef.current = slug;
+        setActiveTour(match);
+        setActiveTourData(match);
+      }
     }
-    loadTours();
-  }, [language]);
+  }, [slug, kuulaTours]);
 
   const filteredTours = useMemo(() => {
-    if (selectedCategories.length === 0) return tours360;
-    return tours360.filter(tour => 
-      tour.categoryIds.some(catId => selectedCategories.includes(catId))
-    );
-  }, [selectedCategories]);
+    return kuulaTours;
+  }, [kuulaTours]);
 
   const toggleCategory = (catId: string) => {
     setSelectedCategories(prev => 
@@ -53,29 +59,20 @@ export function Tours360Page() {
     );
   };
 
-  const handleTourClick = (tour: Tour360) => {
+  const handleTourClick = (tour: KuulaTour) => {
     setActiveTour(tour);
-    // Find matching Kuula tour data
-    const kuulaTour = kuulaTours.find(kt => kt.id === tour.id);
-    if (kuulaTour) {
-      setActiveTourData(kuulaTour);
-    } else {
-      // Create a mock KuulaTour from Tour360
-      setActiveTourData({
-        id: tour.id,
-        title: tour.title,
-        description: { es: '', en: '', fr: '' },
-        kuula_embed_url: `https://kuula.co/share/collection/${tour.id}?logo=1&info=1&fs=1&vr=0&sd=1&thumbs=1`,
-        thumbnail_url: tour.coverImage,
-        total_panoramas: tour.scenes.length,
-        published: true,
-      });
+    setActiveTourData(tour);
+    // Update URL to /tours/:slug
+    if (tour.slug) {
+      navigate(`/tours/${tour.slug}`, { replace: true });
     }
   };
 
   const closeTour = () => {
     setActiveTour(null);
     setActiveTourData(null);
+    slugHandledRef.current = null;
+    navigate('/tours', { replace: true });
   };
 
   return (
@@ -165,7 +162,7 @@ export function Tours360Page() {
                 <div className="relative">
                   <div 
                     className="aspect-[16/10] bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-                    style={{ backgroundImage: `url(${tour.coverImage})` }}
+                    style={{ backgroundImage: tour.thumbnail_url ? `url(${tour.thumbnail_url})` : undefined }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   
@@ -189,21 +186,10 @@ export function Tours360Page() {
                   <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
                     {t(tour.title)}
                   </h3>
-                  
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {tour.categoryIds.map(catId => {
-                      const cat = categories.find(c => c.id === catId);
-                      return cat ? (
-                        <span key={catId} className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-                          {t(cat.label)}
-                        </span>
-                      ) : null;
-                    })}
-                  </div>
 
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">
-                      {tour.scenes.length} {t(texts.scenes)}
+                      {tour.total_panoramas || 0} {t(texts.scenes)}
                     </span>
                     <span className="text-primary font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
                       {t(texts.startTour)}
@@ -219,23 +205,24 @@ export function Tours360Page() {
         <Footer />
       </main>
 
-      {/* Tour Viewer Modal - Now using KuulaTourEmbed */}
+      {/* Tour Viewer Modal */}
       <AnimatePresence>
-        {activeTour && activeTourData && (
+        {activeTourData && (
           <motion.div
+            key="tour-modal"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/95 flex flex-col"
+            className="fixed inset-0 z-50 bg-black flex flex-col"
           >
             {/* Viewer header */}
-            <div className="flex items-center justify-between p-4 border-b border-white/10">
+            <div className="flex items-center justify-between p-3 border-b border-white/10 bg-black/90 shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-                  <View className="w-5 h-5 text-white" />
+                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                  <View className="w-4 h-4 text-white" />
                 </div>
-                <h2 className="text-xl font-bold text-white">
-                  {t(activeTour.title)}
+                <h2 className="text-lg font-bold text-white">
+                  {t(activeTourData.title)}
                 </h2>
               </div>
               <button
@@ -247,16 +234,14 @@ export function Tours360Page() {
               </button>
             </div>
 
-            {/* Kuula Tour Embed */}
-            <div className="flex-1 p-4 overflow-auto">
-              <div className="max-w-5xl mx-auto h-full">
-                <KuulaTourEmbed 
-                  tour={activeTourData} 
-                  locale={language as Language}
-                  showControls={false}
-                  onClose={closeTour}
-                />
-              </div>
+            {/* 3DVista Tour — full height iframe */}
+            <div className="flex-1 min-h-0">
+              <KuulaTourEmbed 
+                tour={activeTourData} 
+                locale={language as Language}
+                showControls={false}
+                onClose={closeTour}
+              />
             </div>
           </motion.div>
         )}

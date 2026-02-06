@@ -1,7 +1,8 @@
 // ============ DIRECTUS API CLIENT ============
-// 🗄️ Centralized client for Directus CMS integration
-// Currently returns mock data, ready to swap for real API calls
+// Centralized client for Directus CMS integration
+// Uses translations system — all queries include deep translations
 
+import { createDirectus, rest, staticToken, readItems, readItem } from '@directus/sdk';
 import type { 
   KuulaTour, 
   ARScene, 
@@ -10,307 +11,581 @@ import type {
   VRExperience,
   Language 
 } from '@/lib/types';
-import { tours360 } from '@/data/mockData';
-import { immersiveRoutes } from '@/data/immersiveRoutes';
+import type {
+  DirectusSchema,
+  DirectusMuseum,
+  DirectusTour360,
+  DirectusARScene,
+  DirectusRoute,
+  DirectusPOI,
+  DirectusVRExperience,
+} from '@/lib/directus-types';
+import { toMultilingual } from '@/lib/directus-types';
 
 // Configuration
 const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'http://localhost:8055';
 const DIRECTUS_TOKEN = import.meta.env.VITE_DIRECTUS_TOKEN;
 
-// Map tour IDs to Kuula embed URLs
-const KUULA_EMBEDS: Record<string, string> = {
-  'tour-ecomuseo-samuno': 'https://kuula.co/share/collection/samuno?logo=1&info=1&fs=1&vr=0&sd=1&thumbs=1',
-  'tour-meiq': 'https://kuula.co/share/collection/meiq?logo=1&info=1&fs=1&vr=0&sd=1&thumbs=1',
-  'tour-mina-arnao': 'https://kuula.co/share/collection/arnao?logo=1&info=1&fs=1&vr=0&sd=1&thumbs=1',
-  'tour-mumi': 'https://kuula.co/share/collection/mumi?logo=1&info=1&fs=1&vr=0&sd=1&thumbs=1',
-  'tour-siderurgia': 'https://kuula.co/share/collection/musi?logo=1&info=1&fs=1&vr=0&sd=1&thumbs=1',
-  'tour-ferrocarril': 'https://kuula.co/share/collection/ferrocarril?logo=1&info=1&fs=1&vr=0&sd=1&thumbs=1',
-  'tour-prehistoria': 'https://kuula.co/share/collection/prehistoria?logo=1&info=1&fs=1&vr=0&sd=1&thumbs=1',
-  'tour-artes-populares': 'https://kuula.co/share/collection/artes?logo=1&info=1&fs=1&vr=0&sd=1&thumbs=1',
-  'tour-faro-lastres': 'https://kuula.co/share/collection/lastres?logo=1&info=1&fs=1&vr=0&sd=1&thumbs=1',
-};
+// Create Directus client instance (with optional static token for public access)
+const directusClient = DIRECTUS_TOKEN
+  ? createDirectus<DirectusSchema>(DIRECTUS_URL).with(staticToken(DIRECTUS_TOKEN)).with(rest())
+  : createDirectus<DirectusSchema>(DIRECTUS_URL).with(rest());
 
-// ============ MOCK DATA ============
+// Fields pattern: always include translations
+// Cast as any[] to satisfy Directus SDK strict field typing with deep relations
+const TRANSLATIONS_DEEP: any[] = ['translations.*'];
 
-const MOCK_AR_SCENES: ARScene[] = [
-  {
-    id: 'ar-covadonga',
-    slug: 'lagos-covadonga',
-    title: { 
-      es: 'Fauna de los Lagos de Covadonga', 
-      en: 'Wildlife of Covadonga Lakes', 
-      fr: 'Faune des Lacs de Covadonga' 
-    },
-    description: {
-      es: 'Descubre la fauna protegida del Parque Nacional en realidad aumentada',
-      en: 'Discover the protected wildlife of the National Park in augmented reality',
-      fr: 'Découvrez la faune protégée du Parc National en réalité augmentée'
-    },
-    needle_scene_url: 'https://engine.needle.tools/demos/covadonga',
-    needle_type: 'slam',
-    preview_image: '/assets/covadonga.jpg',
-    difficulty: 'easy',
-    duration_minutes: 10,
-    requires_outdoors: true,
-    poi_id: 'covadonga',
-    published: true,
-  },
-  {
-    id: 'ar-mumi',
-    slug: 'mina-virtual-mumi',
-    title: {
-      es: 'Mina Virtual MUMI',
-      en: 'MUMI Virtual Mine',
-      fr: 'Mine Virtuelle MUMI'
-    },
-    description: {
-      es: 'Explora una galería minera en AR dentro del museo',
-      en: 'Explore a mining gallery in AR inside the museum',
-      fr: 'Explorez une galerie minière en RA dans le musée'
-    },
-    needle_scene_url: 'https://engine.needle.tools/demos/mumi',
-    needle_type: 'image-tracking',
-    tracking_image_url: '/markers/mumi-marker.png',
-    tracking_image_physical_size: 20,
-    preview_image: '/assets/mumi.jpg',
-    difficulty: 'easy',
-    duration_minutes: 15,
-    requires_outdoors: false,
-    published: true,
-  },
-  {
-    id: 'ar-termas-valduno',
-    slug: 'termas-romanas-valduno',
-    title: {
-      es: 'Termas Romanas de Valduno',
-      en: 'Roman Baths of Valduno',
-      fr: 'Thermes Romains de Valduno'
-    },
-    description: {
-      es: 'Reconstrucción virtual de las antiguas termas romanas',
-      en: 'Virtual reconstruction of the ancient Roman baths',
-      fr: 'Reconstruction virtuelle des anciens thermes romains'
-    },
-    needle_scene_url: 'https://engine.needle.tools/demos/valduno',
-    needle_type: 'geo',
-    location: {
-      lat: 43.4167,
-      lng: -6.0833,
-      radius_meters: 50,
-    },
-    preview_image: '/assets/termas-valduno.webp',
-    difficulty: 'moderate',
-    duration_minutes: 20,
-    requires_outdoors: true,
-    route_id: 'AR-24',
-    published: true,
-  },
-];
+// ============ UTILITY FUNCTIONS ============
 
-const MOCK_MUSEUMS: Museum[] = [
-  {
-    id: 'mumi',
-    name: { es: 'MUMI - Museo de la Minería', en: 'MUMI - Mining Museum', fr: 'MUMI - Musée de la Mine' },
-    description: { 
-      es: 'El museo más importante sobre la minería del carbón en España',
-      en: 'The most important coal mining museum in Spain',
-      fr: 'Le musée le plus important sur l\'exploitation minière du charbon en Espagne'
-    },
-    address: 'El Entrego, San Martín del Rey Aurelio',
-    lat: 43.243,
-    lng: -5.665,
-    image_url: '/assets/mumi.jpg',
-    website: 'https://mumi.es',
-    phone: '+34 985 662 562',
-    municipality: 'San Martín del Rey Aurelio',
-    published: true,
-  },
-  {
-    id: 'muja',
-    name: { es: 'MUJA - Museo Jurásico', en: 'MUJA - Jurassic Museum', fr: 'MUJA - Musée Jurassique' },
-    description: {
-      es: 'Museo dedicado a los dinosaurios de la costa asturiana',
-      en: 'Museum dedicated to dinosaurs of the Asturian coast',
-      fr: 'Musée dédié aux dinosaures de la côte asturienne'
-    },
-    address: 'Colunga, Asturias',
-    lat: 43.4886,
-    lng: -5.2652,
-    image_url: '/assets/muja.jpg',
-    website: 'https://museojurasico.com',
-    municipality: 'Colunga',
-    published: true,
-  },
-];
+function getFileUrl(fileId: string | undefined): string {
+  if (!fileId) return '';
+  return `${DIRECTUS_URL}/assets/${fileId}`;
+}
+
+// ============ DATA TRANSFORMATION FUNCTIONS ============
+
+function transformMuseum(museum: DirectusMuseum): Museum {
+  return {
+    id: museum.id,
+    slug: museum.slug,
+    name: toMultilingual(museum.translations, 'name'),
+    short_description: toMultilingual(museum.translations, 'short_description'),
+    description: toMultilingual(museum.translations, 'description'),
+    address: museum.address || '',
+    lat: museum.lat,
+    lng: museum.lng,
+    image_url: getFileUrl(museum.cover_image),
+    gallery_urls: (museum as any).gallery?.map((g: any) => getFileUrl(g.directus_files_id)) || [],
+    website: museum.website,
+    phone: museum.phone,
+    email: museum.email,
+    opening_hours: toMultilingual(museum.translations, 'opening_hours'),
+    prices: toMultilingual(museum.translations, 'prices'),
+    accessibility: toMultilingual(museum.translations, 'accessibility'),
+    museum_type: museum.museum_type,
+    municipality: museum.municipality,
+    featured: museum.featured,
+    published: museum.status === 'published',
+  };
+}
+
+function transformTour360(tour: DirectusTour360): KuulaTour {
+  // build_path = URL to deployed 3DVista dist (index.html)
+  // build_zip = UUID of ZIP file in directus_files (backup/source)
+  // If build_path is set, use it directly as iframe src
+  // If only build_zip exists, construct Directus asset URL (ZIP download, not embeddable)
+  const embedUrl = tour.build_path || '';
+  const buildZipUrl = (tour as any).build_zip ? getFileUrl((tour as any).build_zip) : '';
+
+  return {
+    id: tour.id,
+    slug: (tour as any).slug,
+    title: toMultilingual(tour.translations, 'title'),
+    description: toMultilingual(tour.translations, 'description'),
+    kuula_embed_url: embedUrl,
+    build_zip_url: buildZipUrl,
+    museum_id: tour.museum_id,
+    thumbnail_url: getFileUrl(tour.thumbnail),
+    duration_minutes: tour.duration_minutes,
+    total_panoramas: tour.total_panoramas || 0,
+    published: tour.status === 'published',
+  };
+}
+
+function transformARScene(scene: DirectusARScene): ARScene {
+  return {
+    id: scene.id,
+    slug: scene.slug,
+    title: toMultilingual(scene.translations, 'title'),
+    description: toMultilingual(scene.translations, 'description'),
+    needle_scene_url: scene.build_path || '',
+    needle_type: scene.ar_type,
+    build_path: scene.build_path || undefined,
+    preview_image: getFileUrl(scene.preview_image),
+    difficulty: scene.difficulty,
+    duration_minutes: scene.duration_minutes,
+    requires_outdoors: scene.requires_outdoors,
+    location: scene.location_lat && scene.location_lng ? {
+      lat: scene.location_lat,
+      lng: scene.location_lng,
+      radius_meters: scene.location_radius_meters || 50,
+    } : undefined,
+    published: scene.status === 'published',
+  };
+}
+
+function transformVRExperience(vr: DirectusVRExperience): VRExperience {
+  return {
+    id: vr.id,
+    title: toMultilingual(vr.translations, 'title'),
+    description: toMultilingual(vr.translations, 'description'),
+    thumbnail_url: getFileUrl(vr.thumbnail),
+    apk_url: getFileUrl(vr.apk_file),
+    duration_minutes: vr.duration_minutes,
+    category: vr.category || '',
+    published: vr.status === 'published',
+  };
+}
+
+function extractCategoryIds(categories: any): string[] {
+  if (!categories || !Array.isArray(categories)) return [];
+  return categories
+    .map((c: any) => {
+      if (typeof c === 'string') return c;
+      const catObj = c.categories_id;
+      if (!catObj) return null;
+      if (typeof catObj === 'string') return catObj;
+      return catObj.slug || catObj.id || null;
+    })
+    .filter(Boolean) as string[];
+}
+
+function transformRoute(route: DirectusRoute) {
+  return {
+    ...route,
+    title: toMultilingual(route.translations, 'title'),
+    short_description: toMultilingual(route.translations, 'short_description'),
+    description: toMultilingual(route.translations, 'description'),
+    theme: toMultilingual(route.translations, 'theme'),
+    duration: toMultilingual(route.translations, 'duration'),
+    cover_image_url: getFileUrl(route.cover_image),
+    category_ids: extractCategoryIds((route as any).categories),
+  };
+}
+
+function transformPOI(poi: DirectusPOI) {
+  return {
+    ...poi,
+    title: toMultilingual(poi.translations, 'title'),
+    short_description: toMultilingual(poi.translations, 'short_description'),
+    description: toMultilingual(poi.translations, 'description'),
+    how_to_get: toMultilingual(poi.translations, 'how_to_get'),
+    accessibility: toMultilingual(poi.translations, 'accessibility'),
+    parking: toMultilingual(poi.translations, 'parking'),
+    opening_hours: toMultilingual(poi.translations, 'opening_hours'),
+    prices: toMultilingual(poi.translations, 'prices'),
+    recommended_duration: toMultilingual(poi.translations, 'recommended_duration'),
+    cover_image_url: getFileUrl(poi.cover_image),
+    category_ids: extractCategoryIds((poi as any).categories),
+  };
+}
 
 // ============ DIRECTUS CLIENT CLASS ============
 
-interface DirectusConfig {
-  url: string;
-  token?: string;
-}
-
-class DirectusClient {
-  private baseUrl: string;
-  private token?: string;
-
-  constructor(config: DirectusConfig) {
-    this.baseUrl = config.url;
-    this.token = config.token;
+class DirectusApiClient {
+  private getClient() {
+    return directusClient;
   }
 
-  private async request<T>(endpoint: string, _options?: RequestInit): Promise<T> {
-    // 🗄️ TODO: Enable when Directus is connected
-    // const headers: HeadersInit = {
-    //   'Content-Type': 'application/json',
-    //   ...(this.token && { Authorization: `Bearer ${this.token}` })
-    // };
-    //
-    // const response = await fetch(`${this.baseUrl}${endpoint}`, {
-    //   ...options,
-    //   headers: {
-    //     ...headers,
-    //     ...options?.headers
-    //   }
-    // });
-    //
-    // if (!response.ok) {
-    //   throw new Error(`Directus API error: ${response.statusText}`);
-    // }
-    //
-    // const data = await response.json();
-    // return data.data;
+  // ============ TOURS 360 ============
 
-    console.log(`[DirectusClient] Mock request to: ${endpoint}`);
-    throw new Error('Not implemented - using mock data');
+  async getTours360(_locale: Language = 'es'): Promise<KuulaTour[]> {
+    try {
+      const tours = await this.getClient().request(
+        readItems('tours_360', {
+          filter: { status: { _in: ['published', 'draft'] } },
+          fields: ['*', ...TRANSLATIONS_DEEP],
+        })
+      );
+      return (tours as unknown as DirectusTour360[]).map(transformTour360);
+    } catch (error) {
+      console.error('[DirectusClient] Error fetching tours 360:', error);
+      return [];
+    }
   }
 
-  // ============ VIRTUAL TOURS ============
-
-  async getVirtualTours(_locale: Language = 'es'): Promise<KuulaTour[]> {
-    // 🗄️ TODO: Replace with Directus API
-    // return this.request(`/items/virtual_tours?locale=${locale}`);
-    
-    return tours360.map(tour => ({
-      id: tour.id,
-      title: tour.title,
-      description: { es: '', en: '', fr: '' },
-      kuula_embed_url: KUULA_EMBEDS[tour.id] || 'https://kuula.co/share/collection/default',
-      thumbnail_url: tour.coverImage,
-      total_panoramas: tour.scenes.length,
-      published: true,
-    }));
-  }
-
-  async getVirtualTourById(id: string, _locale: Language = 'es'): Promise<KuulaTour | null> {
-    const tours = await this.getVirtualTours(_locale);
-    return tours.find(t => t.id === id) || null;
+  async getTour360ById(id: string, _locale: Language = 'es'): Promise<KuulaTour | null> {
+    try {
+      const tour = await this.getClient().request(
+        readItem('tours_360', id, {
+          fields: ['*', ...TRANSLATIONS_DEEP],
+        })
+      );
+      return transformTour360(tour as unknown as DirectusTour360);
+    } catch (error) {
+      console.error(`[DirectusClient] Error fetching tour 360 ${id}:`, error);
+      return null;
+    }
   }
 
   // ============ AR SCENES ============
 
   async getARScenes(_locale: Language = 'es'): Promise<ARScene[]> {
-    // 🗄️ TODO: Replace with Directus API
-    // return this.request(`/items/ar_scenes?filter[published][_eq]=true&locale=${locale}`);
-    
-    return MOCK_AR_SCENES;
+    try {
+      const scenes = await this.getClient().request(
+        readItems('ar_scenes', {
+          filter: { status: { _in: ['published', 'draft'] } },
+          fields: ['*', ...TRANSLATIONS_DEEP],
+        })
+      );
+      return (scenes as unknown as DirectusARScene[]).map(transformARScene);
+    } catch (error) {
+      console.error('[DirectusClient] Error fetching AR scenes:', error);
+      return [];
+    }
   }
 
-  async getARSceneBySlug(slug: string, locale: Language = 'es'): Promise<ARScene | null> {
-    const scenes = await this.getARScenes(locale);
-    return scenes.find(s => s.slug === slug) || null;
+  async getARSceneBySlug(slug: string, _locale: Language = 'es'): Promise<ARScene | null> {
+    try {
+      const scenes = await this.getClient().request(
+        readItems('ar_scenes', {
+          filter: { slug: { _eq: slug }, status: { _in: ['published', 'draft'] } },
+          fields: ['*', ...TRANSLATIONS_DEEP],
+          limit: 1,
+        })
+      );
+      if ((scenes as any[]).length === 0) return null;
+      return transformARScene((scenes as unknown as DirectusARScene[])[0]);
+    } catch (error) {
+      console.error(`[DirectusClient] Error fetching AR scene ${slug}:`, error);
+      return null;
+    }
   }
 
-  async getARScenesByPOI(poiId: string, locale: Language = 'es'): Promise<ARScene[]> {
-    const scenes = await this.getARScenes(locale);
-    return scenes.filter(s => s.poi_id === poiId);
+  async getARScenesByPOI(poiId: string, _locale: Language = 'es'): Promise<ARScene[]> {
+    try {
+      const pois = await this.getClient().request(
+        readItems('pois', {
+          filter: { id: { _eq: poiId }, status: { _in: ['published', 'draft'] } },
+          fields: ['ar_scene_id'],
+        })
+      );
+      const poi = (pois as any[])[0];
+      if (!poi?.ar_scene_id) return [];
+
+      const scenes = await this.getClient().request(
+        readItems('ar_scenes', {
+          filter: { id: { _eq: poi.ar_scene_id }, status: { _in: ['published', 'draft'] } },
+          fields: ['*', ...TRANSLATIONS_DEEP],
+        })
+      );
+      return (scenes as unknown as DirectusARScene[]).map(transformARScene);
+    } catch (error) {
+      console.error(`[DirectusClient] Error fetching AR scenes for POI ${poiId}:`, error);
+      return [];
+    }
   }
 
-  async getARScenesByRoute(routeId: string, locale: Language = 'es'): Promise<ARScene[]> {
-    const scenes = await this.getARScenes(locale);
-    return scenes.filter(s => s.route_id === routeId);
+  async getARScenesByRoute(routeId: string, _locale: Language = 'es'): Promise<ARScene[]> {
+    try {
+      const pois = await this.getClient().request(
+        readItems('pois', {
+          filter: { route_id: { _eq: routeId }, status: { _in: ['published', 'draft'] } },
+          fields: ['ar_scene_id'],
+        })
+      );
+      const sceneIds = (pois as any[]).map(p => p.ar_scene_id).filter(Boolean) as string[];
+      if (sceneIds.length === 0) return [];
+
+      const scenes = await this.getClient().request(
+        readItems('ar_scenes', {
+          filter: { id: { _in: sceneIds }, status: { _in: ['published', 'draft'] } },
+          fields: ['*', ...TRANSLATIONS_DEEP],
+        })
+      );
+      return (scenes as unknown as DirectusARScene[]).map(transformARScene);
+    } catch (error) {
+      console.error(`[DirectusClient] Error fetching AR scenes for route ${routeId}:`, error);
+      return [];
+    }
   }
 
   // ============ ROUTES ============
 
   async getRoutes(_locale: Language = 'es') {
-    // 🗄️ TODO: Replace with Directus API
-    return immersiveRoutes;
+    try {
+      const routes = await this.getClient().request(
+        readItems('routes', {
+          filter: { status: { _in: ['published', 'draft'] } },
+          fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.slug', 'categories.categories_id.translations.*'],
+        })
+      );
+      return (routes as unknown as DirectusRoute[]).map(transformRoute);
+    } catch (error) {
+      console.error('[DirectusClient] Error fetching routes:', error);
+      return [];
+    }
   }
 
-  async getRouteBySlug(slug: string, locale: Language = 'es') {
-    const routes = await this.getRoutes(locale);
-    return routes.find(r => r.id === slug) || null;
+  async getRouteBySlug(slug: string, _locale: Language = 'es') {
+    try {
+      const routes = await this.getClient().request(
+        readItems('routes', {
+          filter: { slug: { _eq: slug }, status: { _in: ['published', 'draft'] } },
+          fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.*', 'categories.categories_id.translations.*', 'points.*', 'points.translations.*'],
+          limit: 1,
+        })
+      );
+      if ((routes as any[]).length === 0) return null;
+      return transformRoute((routes as unknown as DirectusRoute[])[0]);
+    } catch (error) {
+      console.error(`[DirectusClient] Error fetching route ${slug}:`, error);
+      return null;
+    }
+  }
+
+  async getRouteByCode(code: string, _locale: Language = 'es') {
+    try {
+      const routes = await this.getClient().request(
+        readItems('routes', {
+          filter: { route_code: { _eq: code }, status: { _in: ['published', 'draft'] } },
+          fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.*', 'categories.categories_id.translations.*', 'points.*', 'points.translations.*'],
+          limit: 1,
+        })
+      );
+      if ((routes as any[]).length === 0) return null;
+      return transformRoute((routes as unknown as DirectusRoute[])[0]);
+    } catch (error) {
+      console.error(`[DirectusClient] Error fetching route ${code}:`, error);
+      return null;
+    }
   }
 
   // ============ MUSEUMS ============
 
   async getMuseums(_locale: Language = 'es'): Promise<Museum[]> {
-    // 🗄️ TODO: Replace with Directus API
-    return MOCK_MUSEUMS;
+    try {
+      const museums = await this.getClient().request(
+        readItems('museums', {
+          filter: { status: { _in: ['published', 'draft'] } },
+          fields: ['*', ...TRANSLATIONS_DEEP, 'gallery.directus_files_id'],
+        })
+      );
+      return (museums as unknown as DirectusMuseum[]).map(transformMuseum);
+    } catch (error) {
+      console.error('[DirectusClient] Error fetching museums:', error);
+      return [];
+    }
   }
 
-  async getMuseumById(id: string, locale: Language = 'es'): Promise<Museum | null> {
-    const museums = await this.getMuseums(locale);
-    return museums.find(m => m.id === id) || null;
+  async getMuseumById(id: string, _locale: Language = 'es'): Promise<Museum | null> {
+    try {
+      const museum = await this.getClient().request(
+        readItem('museums', id, {
+          fields: ['*', ...TRANSLATIONS_DEEP, 'gallery.directus_files_id'],
+        })
+      );
+      return transformMuseum(museum as unknown as DirectusMuseum);
+    } catch (error) {
+      console.error(`[DirectusClient] Error fetching museum ${id}:`, error);
+      return null;
+    }
+  }
+
+  async getMuseumBySlug(slug: string, _locale: Language = 'es'): Promise<Museum | null> {
+    try {
+      const museums = await this.getClient().request(
+        readItems('museums', {
+          filter: { slug: { _eq: slug }, status: { _in: ['published', 'draft'] } },
+          fields: ['*', ...TRANSLATIONS_DEEP, 'gallery.directus_files_id'],
+          limit: 1,
+        })
+      );
+      if ((museums as any[]).length === 0) return null;
+      return transformMuseum((museums as unknown as DirectusMuseum[])[0]);
+    } catch (error) {
+      console.error(`[DirectusClient] Error fetching museum ${slug}:`, error);
+      return null;
+    }
   }
 
   // ============ VR EXPERIENCES ============
 
   async getVRExperiences(_locale: Language = 'es'): Promise<VRExperience[]> {
-    // 🗄️ TODO: Replace with Directus API
-    return [];
+    try {
+      const experiences = await this.getClient().request(
+        readItems('vr_experiences', {
+          filter: { status: { _in: ['published', 'draft'] } },
+          fields: ['*', ...TRANSLATIONS_DEEP],
+        })
+      );
+      return (experiences as unknown as DirectusVRExperience[]).map(transformVRExperience);
+    } catch (error) {
+      console.error('[DirectusClient] Error fetching VR experiences:', error);
+      return [];
+    }
+  }
+
+  // ============ POIs ============
+
+  async getPOIs(_locale: Language = 'es') {
+    try {
+      const pois = await this.getClient().request(
+        readItems('pois', {
+          filter: { status: { _in: ['published', 'draft'] } },
+          fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.slug'],
+        })
+      );
+      return (pois as unknown as DirectusPOI[]).map(transformPOI);
+    } catch (error) {
+      console.error('[DirectusClient] Error fetching POIs:', error);
+      return [];
+    }
+  }
+
+  async getPOIById(id: string, _locale: Language = 'es') {
+    try {
+      const poi = await this.getClient().request(
+        readItem('pois', id, {
+          fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.*', 'categories.categories_id.translations.*'],
+        })
+      );
+      return transformPOI(poi as unknown as DirectusPOI);
+    } catch (error) {
+      console.error(`[DirectusClient] Error fetching POI ${id}:`, error);
+      return null;
+    }
+  }
+
+  async getPOIBySlug(slug: string, _locale: Language = 'es') {
+    try {
+      const pois = await this.getClient().request(
+        readItems('pois', {
+          filter: { slug: { _eq: slug }, status: { _in: ['published', 'draft'] } },
+          fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.*', 'categories.categories_id.translations.*'],
+          limit: 1,
+        })
+      );
+      if ((pois as any[]).length === 0) return null;
+      return transformPOI((pois as unknown as DirectusPOI[])[0]);
+    } catch (error) {
+      console.error(`[DirectusClient] Error fetching POI ${slug}:`, error);
+      return null;
+    }
+  }
+
+  // ============ ROUTE POINTS (POIs of a route, ordered) ============
+
+  async getRoutePoints(routeId: string, _locale: Language = 'es') {
+    try {
+      const pois = await this.getClient().request(
+        readItems('pois', {
+          filter: { route_id: { _eq: routeId }, status: { _in: ['published', 'draft'] } },
+          fields: ['*', ...TRANSLATIONS_DEEP],
+          sort: ['order'],
+        })
+      );
+      return (pois as unknown as DirectusPOI[]).map(transformPOI);
+    } catch (error) {
+      console.error(`[DirectusClient] Error fetching route points for ${routeId}:`, error);
+      return [];
+    }
+  }
+
+  // ============ CATEGORIES ============
+
+  async getCategories(_locale: Language = 'es') {
+    try {
+      const cats = await this.getClient().request(
+        readItems('categories', {
+          filter: { status: { _in: ['published', 'draft'] } },
+          fields: ['*', ...TRANSLATIONS_DEEP],
+          sort: ['order'],
+        })
+      );
+      return (cats as any[]).map(c => ({
+        ...c,
+        name: toMultilingual(c.translations, 'name'),
+        description: toMultilingual(c.translations, 'description'),
+      }));
+    } catch (error) {
+      console.error('[DirectusClient] Error fetching categories:', error);
+      return [];
+    }
   }
 
   // ============ SEARCH ============
 
   async search(query: string, locale: Language = 'es'): Promise<SearchResults> {
-    const lowerQuery = query.toLowerCase();
+    try {
+      const lowerQuery = query.toLowerCase();
 
-    const [museums, routes, arScenes] = await Promise.all([
-      this.getMuseums(locale),
-      this.getRoutes(locale),
-      this.getARScenes(locale),
-    ]);
+      const [museums, routes, arScenes, pois] = await Promise.all([
+        this.getMuseums(locale),
+        this.getRoutes(locale),
+        this.getARScenes(locale),
+        this.getPOIs(locale),
+      ]);
 
-    const filteredMuseums = museums.filter(m => 
-      m.name[locale]?.toLowerCase().includes(lowerQuery)
-    );
+      const filteredMuseums = museums.filter(m =>
+        m.name[locale]?.toLowerCase().includes(lowerQuery) ||
+        m.description[locale]?.toLowerCase().includes(lowerQuery)
+      );
 
-    const filteredRoutes = routes.filter(r =>
-      r.title[locale]?.toLowerCase().includes(lowerQuery)
-    );
+      const filteredRoutes = routes.filter((r: any) =>
+        r.title[locale]?.toLowerCase().includes(lowerQuery) ||
+        r.short_description?.[locale]?.toLowerCase().includes(lowerQuery)
+      );
 
-    const filteredARScenes = arScenes.filter(s =>
-      s.title[locale]?.toLowerCase().includes(lowerQuery)
-    );
+      const filteredARScenes = arScenes.filter(s =>
+        s.title[locale]?.toLowerCase().includes(lowerQuery) ||
+        s.description[locale]?.toLowerCase().includes(lowerQuery)
+      );
 
-    return {
-      museums: filteredMuseums,
-      routes: filteredRoutes,
-      pois: [],
-      ar_scenes: filteredARScenes,
-      total: filteredMuseums.length + filteredRoutes.length + filteredARScenes.length,
-    };
+      const filteredPOIs = pois.filter((p: any) =>
+        p.title[locale]?.toLowerCase().includes(lowerQuery) ||
+        p.short_description?.[locale]?.toLowerCase().includes(lowerQuery)
+      );
+
+      return {
+        museums: filteredMuseums,
+        routes: filteredRoutes,
+        pois: filteredPOIs,
+        ar_scenes: filteredARScenes,
+        total: filteredMuseums.length + filteredRoutes.length + filteredARScenes.length + filteredPOIs.length,
+      };
+    } catch (error) {
+      console.error('[DirectusClient] Error searching:', error);
+      return { museums: [], routes: [], pois: [], ar_scenes: [], total: 0 };
+    }
+  }
+
+  // ============ ANALYTICS ============
+
+  async trackEvent(eventData: {
+    event_type: string;
+    session_id?: string;
+    device_type?: string;
+    language?: string;
+    resource_id?: string;
+    resource_type?: string;
+    duration_seconds?: number;
+    municipality?: string;
+    extra_data?: Record<string, any>;
+  }) {
+    try {
+      console.log('[DirectusClient] Track event:', eventData);
+      // TODO: enable when public endpoint is configured
+      // await this.getClient().request(createItem('analytics_events', eventData));
+    } catch (error) {
+      console.error('[DirectusClient] Error tracking event:', error);
+    }
   }
 }
 
 // ============ SINGLETON INSTANCE ============
 
-export const directus = new DirectusClient({
-  url: DIRECTUS_URL,
-  token: DIRECTUS_TOKEN,
-});
+export const directus = new DirectusApiClient();
 
 // ============ CONVENIENCE FUNCTIONS ============
 
-export const getVirtualTours = (locale?: Language) => directus.getVirtualTours(locale);
-export const getVirtualTourById = (id: string, locale?: Language) => directus.getVirtualTourById(id, locale);
+export const getVirtualTours = (locale?: Language) => directus.getTours360(locale);
+export const getVirtualTourById = (id: string, locale?: Language) => directus.getTour360ById(id, locale);
 export const getARScenes = (locale?: Language) => directus.getARScenes(locale);
 export const getARSceneBySlug = (slug: string, locale?: Language) => directus.getARSceneBySlug(slug, locale);
+export const getARScenesByPOI = (poiId: string, locale?: Language) => directus.getARScenesByPOI(poiId, locale);
+export const getARScenesByRoute = (routeId: string, locale?: Language) => directus.getARScenesByRoute(routeId, locale);
 export const getRoutes = (locale?: Language) => directus.getRoutes(locale);
 export const getRouteBySlug = (slug: string, locale?: Language) => directus.getRouteBySlug(slug, locale);
+export const getRouteByCode = (code: string, locale?: Language) => directus.getRouteByCode(code, locale);
+export const getRoutePoints = (routeId: string, locale?: Language) => directus.getRoutePoints(routeId, locale);
 export const getMuseums = (locale?: Language) => directus.getMuseums(locale);
 export const getMuseumById = (id: string, locale?: Language) => directus.getMuseumById(id, locale);
+export const getMuseumBySlug = (slug: string, locale?: Language) => directus.getMuseumBySlug(slug, locale);
+export const getPOIs = (locale?: Language) => directus.getPOIs(locale);
+export const getPOIById = (id: string, locale?: Language) => directus.getPOIById(id, locale);
+export const getPOIBySlug = (slug: string, locale?: Language) => directus.getPOIBySlug(slug, locale);
 export const getVRExperiences = (locale?: Language) => directus.getVRExperiences(locale);
+export const getCategories = (locale?: Language) => directus.getCategories(locale);
 export const searchContent = (query: string, locale?: Language) => directus.search(query, locale);
+export const trackEvent = (eventData: any) => directus.trackEvent(eventData);

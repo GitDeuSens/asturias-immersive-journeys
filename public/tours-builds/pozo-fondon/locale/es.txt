@@ -1,0 +1,13 @@
+#: locale=es
+
+## Media
+
+### Título
+panorama_389460B3_3363_2731_41A2_CD0863E6B168.label = timothy-oldfield-luufnHoChRU-unsplash
+
+## Tour
+
+### Descripción
+
+### Título
+tour.name = Sin Título 2

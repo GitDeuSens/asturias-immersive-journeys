@@ -18,8 +18,8 @@ import { RouteExplorerView } from '@/components/RouteExplorerView';
 import { PointDetailSheet } from '@/components/PointDetailSheet';
 import { SEOHead } from '@/components/SEOHead';
 import { Footer } from '@/components/Footer';
-import { immersiveRoutes, ImmersiveRoute, RoutePoint } from '@/data/immersiveRoutes';
-import { categories } from '@/data/mockData';
+import type { ImmersiveRoute, RoutePoint } from '@/data/types';
+import { useImmersiveRoutes, useDirectusCategories } from '@/hooks/useDirectusData';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { 
   createUserPositionMarker, 
@@ -91,6 +91,10 @@ export function RoutesPage() {
   const userMarkerRef = useRef<L.Marker | null>(null);
   const clusterGroupRef = useRef<L.MarkerClusterGroup | null>(null);
   
+  // Load routes and categories from Directus
+  const { routes: immersiveRoutes, loading: routesLoading } = useImmersiveRoutes(lang);
+  const { categories } = useDirectusCategories(lang);
+
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRoute, setSelectedRoute] = useState<ImmersiveRoute | null>(null);
@@ -168,13 +172,13 @@ export function RoutesPage() {
   const filteredRoutes = useMemo(() => {
     return immersiveRoutes.filter(route => {
       const matchesSearch = searchQuery === '' || 
-        route.title[lang].toLowerCase().includes(searchQuery.toLowerCase()) ||
-        route.theme[lang].toLowerCase().includes(searchQuery.toLowerCase());
+        route.title[lang]?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        route.theme[lang]?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = selectedCategories.length === 0 || 
         route.categoryIds.some(id => selectedCategories.includes(id));
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, selectedCategories, lang]);
+  }, [immersiveRoutes, searchQuery, selectedCategories, lang]);
 
   const getPanelOffset = useCallback(() => {
     if (typeof window !== 'undefined' && window.innerWidth >= 768) {
