@@ -31,7 +31,7 @@ export function CategoryChips({ categories, selectedIds, onToggle, className = "
           <button
             key={category.id}
             onClick={() => onToggle(category.id)}
-            className={`category-chip flex items-center gap-2 mb-4 w-40 ${isSelected ? "active" : ""}`}
+            className={`category-chip flex items-center gap-2 mb-4 w-40 text-base ${isSelected ? "active" : ""}`}
           >
             <IconComponent className="w-4 h-4" />
             <span>{t(category.label)}</span>
