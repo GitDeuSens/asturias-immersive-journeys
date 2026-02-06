@@ -102,7 +102,7 @@ export function RouteCard({ route, onClick }: RouteCardProps) {
             </span>
           )}
 
-          <div>
+          <div className="flex items-center gap-1 ml-auto">
             {route.categoryIds.slice(0, 2).map((catId) => {
               const cat = getCategoryById(catId);
               return cat ? (
@@ -111,8 +111,7 @@ export function RouteCard({ route, onClick }: RouteCardProps) {
                 </span>
               ) : null;
             })}
-
-            <ChevronRight className="w-4 h-4 text-muted-foreground ml-auto group-hover:text-primary transition-colors" />
+            <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
           </div>
         </div>
       </div>
