@@ -358,7 +358,7 @@ export function RoutesPage() {
             aria-expanded={panelExpanded}
             aria-controls="routes-panel"
           >
-            <span className="font-serif font-bold text-foreground">
+            <span className="hidden font-serif font-bold text-foreground">
               {exploringRoute ? exploringRoute.title[lang] : t("routes.title")}
             </span>
             {panelExpanded ? (
