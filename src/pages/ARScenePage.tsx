@@ -375,7 +375,7 @@ export function ARScenePage() {
                       variant="outline"
                       onClick={() => {
                         window.open(
-                          `https://www.google.com/maps/dir/?api=1&destination=${scene.location!.lat},${scene.location!.lng}`,
+                          `https://www.google.com/maps/dir/?api=1&destination=${scene.location?.lat ?? 43.36},${scene.location?.lng ?? -5.85}`,
                           "_blank",
                         );
                       }}

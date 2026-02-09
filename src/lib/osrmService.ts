@@ -1,6 +1,8 @@
 // OSRM (Open Source Routing Machine) Service for turn-by-turn navigation
 // Uses the public OSRM demo server - for production, consider self-hosting
 
+import { isValidCoordinates } from '@/types/api';
+
 export interface Coordinate {
   lat: number;
   lng: number;
@@ -26,6 +28,7 @@ export interface OSRMRoute {
   duration: number; // total seconds
   geometry: Coordinate[];
   steps: RouteStep[];
+  coordinates?: [number, number][]; // Raw OSRM coordinates
 }
 
 export interface OSRMResponse {
@@ -79,23 +82,32 @@ async function getRoute(
     
     const data = await response.json();
     
-    if (data.code !== 'Ok' || !data.routes || data.routes.length === 0) {
+    if (!data || data.code !== 'Ok' || !Array.isArray(data.routes) || data.routes.length === 0) {
       return {
         success: false,
-        error: data.message || 'No route found',
+        error: data?.message || 'No route found',
       };
     }
     
     const route = data.routes[0];
     const legs = route.legs[0];
     
-    // Parse geometry (GeoJSON LineString)
-    const geometry: Coordinate[] = route.geometry.coordinates.map(
-      (coord: [number, number]) => ({
-        lat: coord[1],
-        lng: coord[0],
-      })
-    );
+    // Parse geometry (GeoJSON LineString) with validation
+    const geometry: Coordinate[] = Array.isArray(route.geometry?.coordinates) 
+      ? route.geometry.coordinates
+          .filter((coord: any) => 
+            Array.isArray(coord) && 
+            coord.length === 2 && 
+            typeof coord[0] === 'number' && 
+            typeof coord[1] === 'number' &&
+            !isNaN(coord[0]) && 
+            !isNaN(coord[1])
+          )
+          .map((coord: [number, number]) => ({
+            lat: coord[1],
+            lng: coord[0],
+          }))
+      : [];
     
     // Parse steps with human-readable instructions
     const steps: RouteStep[] = legs.steps.map((step: any) => ({
@@ -123,6 +135,7 @@ async function getRoute(
         duration: route.duration,
         geometry,
         steps,
+        coordinates: route.geometry?.coordinates,
       },
     };
   } catch (error) {
