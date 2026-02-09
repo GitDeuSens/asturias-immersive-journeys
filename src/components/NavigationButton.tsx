@@ -15,6 +15,7 @@ import {
 } from '@/lib/navigationService';
 import { Button } from '@/components/ui/button';
 import { NavigationView } from './NavigationView';
+import { trackNavigationStarted } from '@/lib/analytics';
 
 interface NavigationButtonProps {
   destination: NavigationDestination;
@@ -38,16 +39,19 @@ export function NavigationButton({
     : null;
 
   const handleInAppNavigation = () => {
+    trackNavigationStarted(destination.id, destination.name, 'walking');
     setShowOptions(false);
     setShowNavigation(true);
   };
 
   const handleExternalWalking = () => {
+    trackNavigationStarted(destination.id, destination.name, 'walking');
     openNavigationTo(destination);
     setShowOptions(false);
   };
 
   const handleExternalDriving = () => {
+    trackNavigationStarted(destination.id, destination.name, 'driving');
     openDrivingNavigationTo(destination);
     setShowOptions(false);
   };

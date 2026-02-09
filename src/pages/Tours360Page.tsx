@@ -8,6 +8,7 @@ import { GlobalSearch, LocalSearchItem } from "@/components/GlobalSearch";
 import { Footer } from "@/components/Footer";
 import { useDirectusTours, useDirectusCategories } from "@/hooks/useDirectusData";
 import { useLanguage } from "@/hooks/useLanguage";
+import { trackTourViewed } from "@/lib/analytics";
 import type { KuulaTour, Language } from "@/lib/types";
 
 const texts = {
@@ -53,6 +54,10 @@ export function Tours360Page() {
   };
 
   const handleTourClick = (tour: KuulaTour) => {
+    // Track tour view
+    const tourTitle = typeof tour.title === 'string' ? tour.title : tour.title[language] || tour.title.es;
+    trackTourViewed(tour.id, tourTitle, language, 'desktop'); // device_type can be dynamic
+    
     setActiveTour(tour);
   };
 

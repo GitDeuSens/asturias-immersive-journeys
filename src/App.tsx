@@ -8,7 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams } from "
 import { SkipToContent } from '@/components/SkipToContent';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { NetworkStatusAlert } from '@/components/NetworkStatusAlert';
-import { initGA, trackPageView } from '@/lib/analytics';
+import { initGA, trackPageView, initSessionTracking } from '@/lib/analytics';
 
 // Lazy load pages for performance
 const Index = lazy(() => import("./pages/Index"));
@@ -42,6 +42,7 @@ function AnalyticsTracker() {
 
   useEffect(() => {
     initGA();
+    initSessionTracking();
   }, []);
 
   useEffect(() => {

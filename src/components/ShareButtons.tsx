@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Share2, Link, Check, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
+import { trackShare } from '@/lib/analytics';
 
 // Social icons as SVG
 const WhatsAppIcon = () => (
@@ -73,6 +74,7 @@ export function ShareButtons({
   };
 
   const handleShare = (platform: keyof typeof shareLinks) => {
+    trackShare(platform, 'content', url || window.location.pathname);
     window.open(shareLinks[platform], '_blank', 'width=600,height=400');
   };
 

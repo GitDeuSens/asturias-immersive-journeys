@@ -606,6 +606,15 @@ class DirectusApiClient {
     duration_seconds?: number;
     completion_percentage?: number;
     municipality?: string;
+    experience_type?: string;
+    access_location?: string;
+    page_url?: string;
+    referrer?: string;
+    screen_resolution?: string;
+    browser?: string;
+    os?: string;
+    country?: string;
+    is_returning?: boolean;
     extra_data?: Record<string, any>;
   }) {
     try {

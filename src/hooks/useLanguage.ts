@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { setAccessMode } from '@/lib/analytics';
 
 export type Language = 'es' | 'en' | 'fr';
 
@@ -41,6 +42,7 @@ export function useExplorationMode() {
   const setMode = useCallback((m: 'home' | 'here') => {
     setModeState(m);
     localStorage.setItem('asturias-mode', m);
+    setAccessMode(m === 'here' ? 'on_location' : 'home');
   }, []);
 
   const clearMode = useCallback(() => {
