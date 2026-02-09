@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import L from "leaflet";
 import { MapPin, Search, ChevronUp, ChevronDown, Maximize2, Locate } from "lucide-react";
@@ -75,7 +75,7 @@ const createPointMarkerIcon = (point: RoutePoint, index: number, pointName: stri
   });
 };
 
-export function RoutesPage() {
+export const RoutesPage = React.memo(function RoutesPage() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as "es" | "en" | "fr";
   const mapRef = useRef<L.Map | null>(null);
@@ -460,4 +460,4 @@ export function RoutesPage() {
       {selectedPoint && <PointDetailSheet point={selectedPoint} onClose={() => setSelectedPoint(null)} />}
     </div>
   );
-}
+});

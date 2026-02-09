@@ -86,8 +86,21 @@ export default defineConfig(({ mode }) => {
           assetFileNames: 'assets/[name]-[hash][extname]',
           chunkFileNames: 'assets/[name]-[hash].js',
           entryFileNames: 'assets/[name]-[hash].js',
+          // Manual chunk splitting for better performance
+          manualChunks: {
+            // Vendor chunks
+            vendor: ['react', 'react-dom', 'react-router-dom'],
+            ui: ['@radix-ui/react-dialog', '@radix-ui/react-scroll-area', '@radix-ui/react-tooltip', 'framer-motion'],
+            maps: ['leaflet'],
+            icons: ['lucide-react'],
+            // Heavy pages
+            analytics: ['recharts'],
+            // Directus SDK
+            directus: ['@directus/sdk'],
+          },
         },
       },
+      chunkSizeWarningLimit: 300, // Lower warning threshold
     },
   };
 });

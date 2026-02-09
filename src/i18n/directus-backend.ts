@@ -27,24 +27,24 @@ interface UITranslation {
  * Uses localStorage cache to avoid re-fetching on every page load.
  */
 export async function loadDirectusTranslations(): Promise<void> {
-  console.log('[i18n] Loading Directus translations...');
+  // Loading Directus translations
   try {
     // Check cache first
     const cached = getCachedTranslations();
     if (cached) {
-      console.log('[i18n] Using cached translations');
+      // Using cached translations
       mergeTranslations(cached);
-      console.log('[i18n] Test translation from cache:', i18n.t('a11y.closeMenu'));
+      // Test translation from cache
       // Still refresh in background
       fetchAndCache().catch(() => {});
       return;
     }
 
-    console.log('[i18n] No cache, fetching from API');
+    // No cache, fetching from API
     await fetchAndCache();
   } catch (err) {
-    console.warn('[i18n] Failed to load translations from Directus, using bundled fallback:', err);
-    console.log('[i18n] Test translation from fallback:', i18n.t('a11y.closeMenu'));
+    // Failed to load translations from Directus, using bundled fallback
+    // Test translation from fallback
   }
 }
 
@@ -53,13 +53,13 @@ async function fetchAndCache(): Promise<void> {
   let res: Response;
   
   try {
-    console.log('[i18n] Fetching translations from:', BASE_URL);
+    // Fetching translations from BASE_URL
     res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
   } catch (error) {
-    console.warn('[i18n] Primary URL failed, trying fallback:', error);
+    // Primary URL failed, trying fallback
     url = `${FALLBACK_URL}/items/ui_translations?fields=key,translations.*&filter[status][_eq]=published&limit=-1`;
-    console.log('[i18n] Fetching translations from fallback:', FALLBACK_URL);
+    // Fetching translations from fallback
     res = await fetch(url);
     if (!res.ok) throw new Error(`Fallback HTTP ${res.status}`);
   }
@@ -67,9 +67,9 @@ async function fetchAndCache(): Promise<void> {
   const json = await res.json();
   const items: UITranslation[] = json.data || [];
   
-  console.log(`[i18n] API response: ${items.length} items`);
+  // API response
   if (items.length > 0) {
-    console.log('[i18n] Sample item:', items[0]);
+    // Sample item
   }
 
   if (items.length === 0) return;
@@ -93,24 +93,24 @@ async function fetchAndCache(): Promise<void> {
     localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: byLang }));
   } catch { /* quota exceeded */ }
 
-  console.log('[i18n] Merged translations:', Object.keys(byLang).map(lang => `${lang}: ${Object.keys(byLang[lang]).length} keys`));
+  // Merged translations
   mergeTranslations(byLang);
-  console.log(`[i18n] Loaded ${items.length} translations from Directus`);
-  console.log('[i18n] Test translation after merge:', i18n.t('a11y.closeMenu'));
+  // Loaded translations from Directus
+  // Test translation after merge
 }
 
 function mergeTranslations(byLang: Record<string, Record<string, string>>): void {
-  console.log('[i18n] Merging translations for languages:', Object.keys(byLang));
+  // Merging translations for languages
   for (const [lang, translations] of Object.entries(byLang)) {
     const translationCount = Object.keys(translations).length;
-    console.log(`[i18n] Merging ${translationCount} translations for ${lang}`);
+    // Merging translations
     if (translationCount > 0) {
-      console.log(`[i18n] Sample translations for ${lang}:`, Object.entries(translations).slice(0, 3));
+      // Sample translations
       i18n.addResourceBundle(lang, 'translation', translations, true, true);
-      console.log(`[i18n] Added bundle for ${lang}, test:`, i18n.t('a11y.closeMenu', { lng: lang }));
+      // Added bundle for lang
     }
   }
-  console.log('[i18n] All languages after merge:', Object.keys(i18n.options.resources || {}));
+  // All languages after merge
 }
 
 function getCachedTranslations(): Record<string, Record<string, string>> | null {

@@ -17,20 +17,16 @@ import {
   useFontOptimization
 } from '@/components/PerformanceOptimizer';
 import { BFCacheOptimizer as WebSocketBFCacheOptimizer, useJSOptimization } from '@/components/WebSocketManager';
+import { useServiceWorker } from '@/hooks/useServiceWorker';
 
 // Lazy load pages for performance
 const Index = lazy(() => import("./pages/Index"));
-const Tours360Page = lazy(() => import("./pages/Tours360Page").then(m => ({ default: m.Tours360Page })));
-const RoutesPage = lazy(() => import("./pages/RoutesPage").then(m => ({ default: m.RoutesPage })));
-const VRExperiencesPage = lazy(() => import("./components/VRExperiencesPage").then(m => ({ default: m.VRExperiencesPage })));
 const ARScenePage = lazy(() => import("./pages/ARScenePage").then(m => ({ default: m.ARScenePage })));
-const ARExperiencesPage = lazy(() => import("./pages/ARExperiencesPage").then(m => ({ default: m.ARExperiencesPage })));
 const AccessibilityPage = lazy(() => import("./pages/AccessibilityPage"));
 const PrivacyPage = lazy(() => import("./pages/PrivacyPage"));
 const CookiesPage = lazy(() => import("./pages/CookiesPage"));
 const LegalPage = lazy(() => import("./pages/LegalPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const AnalyticsDashboard = lazy(() => import("./pages/AnalyticsDashboard"));
 
 // Loading fallback
 function PageLoader() {
@@ -68,11 +64,17 @@ function RedirectToAR() {
 
 const queryClient = new QueryClient();
 
-// Lazy load CookieConsent
+// Lazy load heavy components
 const CookieConsent = lazy(() => import("./components/CookieConsent").then(m => ({ default: m.CookieConsent })));
+const AnalyticsDashboard = lazy(() => import("./pages/AnalyticsDashboard").then(m => ({ default: m.AnalyticsDashboard })));
+const ARExperiencesPage = lazy(() => import("./pages/ARExperiencesPage").then(m => ({ default: m.ARExperiencesPage })));
+const VRExperiencesPage = lazy(() => import("./components/VRExperiencesPage").then(m => ({ default: m.VRExperiencesPage })));
+const Tours360Page = lazy(() => import("./pages/Tours360Page").then(m => ({ default: m.Tours360Page })));
+const RoutesPage = lazy(() => import("./pages/RoutesPage").then(m => ({ default: m.RoutesPage })));
 
 // Internal component for performance optimizations
 function AppWithOptimizations() {
+  useServiceWorker();
   useResourceHints();
   useBFCacheOptimization();
   useFontOptimization();
@@ -87,7 +89,7 @@ function AppWithOptimizations() {
       <NetworkStatusAlert />
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AnalyticsTracker />
         <Suspense fallback={<PageLoader />}>
           <Routes>

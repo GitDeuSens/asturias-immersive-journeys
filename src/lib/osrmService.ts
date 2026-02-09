@@ -126,7 +126,6 @@ async function getRoute(
       },
     };
   } catch (error) {
-    console.error('OSRM routing error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',

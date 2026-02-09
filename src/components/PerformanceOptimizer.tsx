@@ -70,13 +70,13 @@ export function PerformanceMonitor() {
     const observer = new PerformanceObserver((list) => {
       list.getEntries().forEach((entry) => {
         if (entry.entryType === 'largest-contentful-paint') {
-          console.log('LCP:', entry.startTime);
+          // LCP metric
         }
         if (entry.entryType === 'layout-shift') {
-          console.log('CLS:', (entry as any).value);
+          // CLS metric
         }
         if (entry.entryType === 'first-input') {
-          console.log('FID:', entry.startTime);
+          // FID metric
         }
       });
     });
