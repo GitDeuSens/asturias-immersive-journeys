@@ -16,75 +16,115 @@ function getFileUrl(fileId: string | undefined): string {
 
 // ============ Transform Directus route → ImmersiveRoute ============
 
+// Check if a coordinate is valid (non-zero and within reasonable bounds for Asturias region)
+function isValidCoord(lat: number, lng: number): boolean {
+  // Asturias approximate bounding box with generous margin
+  return (
+    lat !== 0 && lng !== 0 &&
+    isFinite(lat) && isFinite(lng) &&
+    lat >= 42.0 && lat <= 44.5 &&
+    lng >= -8.5 && lng <= -3.0
+  );
+}
+
 function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
-  const routePoints: RoutePoint[] = points.map((poi: any, idx: number) => {
-    const content: RoutePointContent = {};
+  // Sort points by order field, then map
+  const sortedPoints = [...points].sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 
-    // Map AR scene if linked
-    if (poi.ar_scene_id) {
-      content.arExperience = {
-        launchUrl: poi.ar_launch_url || '',
-        qrValue: poi.ar_qr_value || '',
-        iframe3dUrl: poi.ar_iframe_url,
+  const routePoints: RoutePoint[] = sortedPoints
+    .map((poi: any, idx: number) => {
+      const content: RoutePointContent = {};
+
+      // Map AR scene if linked
+      if (poi.ar_scene_id) {
+        content.arExperience = {
+          launchUrl: poi.ar_launch_url || '',
+          qrValue: poi.ar_qr_value || '',
+          iframe3dUrl: poi.ar_iframe_url,
+        };
+      }
+
+      // Map 360 tour if linked
+      if (poi.tour_360_id) {
+        content.tour360 = {
+          iframe360Url: poi.tour_360_url || '',
+          allowFullscreen: true,
+        };
+      }
+
+      // Map practical info
+      if (poi.phone || poi.email || poi.website || poi.opening_hours || poi.prices) {
+        content.practicalInfo = {
+          phone: poi.phone,
+          email: poi.email,
+          website: poi.website,
+          schedule: poi.opening_hours,
+          prices: poi.prices,
+        };
+      }
+
+      // Map cover image
+      if (poi.cover_image_url) {
+        content.image = { url: poi.cover_image_url };
+      }
+
+      const lat = Number(poi.lat) || 0;
+      const lng = Number(poi.lng) || 0;
+
+      return {
+        id: poi.id || poi.slug || `point-${idx}`,
+        order: poi.order ?? idx + 1,
+        title: poi.title || { es: '', en: '', fr: '' },
+        shortDescription: poi.short_description || { es: '', en: '', fr: '' },
+        location: {
+          lat,
+          lng,
+          address: poi.address,
+        },
+        coverImage: poi.cover_image_url || '',
+        content,
+        tags: poi.tags || [],
       };
-    }
+    })
+    // Filter out points with invalid coordinates — they can't be shown on the map
+    .filter(p => isValidCoord(p.location.lat, p.location.lng));
 
-    // Map 360 tour if linked
-    if (poi.tour_360_id) {
-      content.tour360 = {
-        iframe360Url: poi.tour_360_url || '',
-        allowFullscreen: true,
-      };
-    }
-
-    // Map practical info
-    if (poi.phone || poi.email || poi.website || poi.opening_hours || poi.prices) {
-      content.practicalInfo = {
-        phone: poi.phone,
-        email: poi.email,
-        website: poi.website,
-        schedule: poi.opening_hours,
-        prices: poi.prices,
-      };
-    }
-
-    // Map cover image
-    if (poi.cover_image_url) {
-      content.image = { url: poi.cover_image_url };
-    }
-
-    return {
-      id: poi.id || poi.slug || `point-${idx}`,
-      order: poi.order ?? idx + 1,
-      title: poi.title || { es: '', en: '', fr: '' },
-      shortDescription: poi.short_description || { es: '', en: '', fr: '' },
-      location: {
-        lat: poi.lat || 0,
-        lng: poi.lng || 0,
-        address: poi.address,
-      },
-      coverImage: poi.cover_image_url || '',
-      content,
-      tags: poi.tags || [],
-    };
-  });
-
-  // Build polyline from route data or from points
+  // Build polyline: prefer DB polyline if valid, otherwise generate from POI points
   let polyline: { lat: number; lng: number }[] = [];
-  if (route.polyline && Array.isArray(route.polyline)) {
-    polyline = route.polyline;
-  } else if (routePoints.length > 0) {
-    polyline = routePoints
-      .filter(p => p.location.lat && p.location.lng)
-      .map(p => ({ lat: p.location.lat, lng: p.location.lng }));
+
+  if (route.polyline && Array.isArray(route.polyline) && route.polyline.length >= 2) {
+    // Validate that DB polyline coordinates are within Asturias bounds
+    const validDbPolyline = route.polyline.filter(
+      (p: any) => isValidCoord(Number(p.lat), Number(p.lng))
+    );
+    if (validDbPolyline.length >= 2) {
+      polyline = validDbPolyline.map((p: any) => ({ lat: Number(p.lat), lng: Number(p.lng) }));
+    }
   }
 
-  // Calculate center from polyline or points
+  // Fallback: generate polyline from valid POI points (in order)
+  if (polyline.length < 2 && routePoints.length >= 2) {
+    polyline = routePoints.map(p => ({ lat: p.location.lat, lng: p.location.lng }));
+  }
+
+  // If only 1 point or 0 points, polyline stays empty — no line will be drawn
+  if (polyline.length < 2) {
+    polyline = [];
+  }
+
+  // Calculate center: prefer DB center_lat/center_lng, then polyline, then POI points
   let center = { lat: 43.36, lng: -5.85 }; // Default: Asturias center
-  if (polyline.length > 0) {
-    const sumLat = polyline.reduce((s, p) => s + p.lat, 0);
-    const sumLng = polyline.reduce((s, p) => s + p.lng, 0);
-    center = { lat: sumLat / polyline.length, lng: sumLng / polyline.length };
+  const dbCenterLat = Number(route.center_lat);
+  const dbCenterLng = Number(route.center_lng);
+  if (isValidCoord(dbCenterLat, dbCenterLng)) {
+    center = { lat: dbCenterLat, lng: dbCenterLng };
+  } else {
+    const coordsForCenter = polyline.length > 0 ? polyline : routePoints.map(p => p.location);
+    if (coordsForCenter.length > 0) {
+      const sumLat = coordsForCenter.reduce((s, p) => s + p.lat, 0);
+      const sumLng = coordsForCenter.reduce((s, p) => s + p.lng, 0);
+      center = { lat: sumLat / coordsForCenter.length, lng: sumLng / coordsForCenter.length };
+    }
   }
 
   return {
@@ -99,7 +139,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
     difficulty: route.difficulty || 'easy',
     isCircular: route.is_circular ?? false,
     center,
-    maxPoints: routePoints.length || 10,
+    maxPoints: routePoints.length,
     points: routePoints,
     tour360: route.tour_360_id ? { available: true } : undefined,
     polyline,

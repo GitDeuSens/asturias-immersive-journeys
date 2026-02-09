@@ -5,6 +5,7 @@ import type { ImmersiveRoute } from "@/data/types";
 import { useTranslation } from "react-i18next";
 import { useDirectusCategories } from "@/hooks/useDirectusData";
 import { calculateRouteDistance, formatDistance } from "@/lib/mapUtils";
+import { OptimizedImage } from "./OptimizedImage";
 
 interface RouteCardProps {
   route: ImmersiveRoute;
@@ -40,16 +41,14 @@ export const RouteCard = forwardRef<HTMLButtonElement, RouteCardProps>(function 
       aria-label={`${t("common.viewDetails")}: ${route.title[lang]}`}
     >
       {/* Cover image */}
-      <div
-        className="w-full h-36 bg-cover bg-center relative"
-        style={{
-          backgroundImage: route.coverImage
-            ? `url(${route.coverImage})`
-            : "linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted-foreground)/0.2) 100%)",
-        }}
-        role="img"
-        aria-label={route.title[lang]}
-      >
+      <div className="w-full h-36 relative">
+        <OptimizedImage
+          src={route.coverImage || '/placeholder-route.jpg'}
+          alt={route.title[lang]}
+          className="w-full h-full"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          aspectRatio="aspect-[16/9]"
+        />
         {/* Route ID badge */}
         <span className="absolute top-2 left-2 px-2 py-1 rounded-md bg-black/60 backdrop-blur-sm text-white text-xs font-bold">
           {route.id}

@@ -184,10 +184,15 @@ export function RoutesPage() {
   const fitToRoute = useCallback(
     (route: ImmersiveRoute) => {
       if (!mapRef.current) return;
-      const positions = route.polyline.map((p) => [p.lat, p.lng] as [number, number]);
-      if (positions.length > 0) {
+      // Collect all valid positions: polyline + point locations
+      const polyPositions = route.polyline.map((p) => [p.lat, p.lng] as [number, number]);
+      const pointPositions = route.points
+        .filter((p) => p.location.lat !== 0 && p.location.lng !== 0)
+        .map((p) => [p.location.lat, p.location.lng] as [number, number]);
+      const allPositions = polyPositions.length > 0 ? polyPositions : pointPositions;
+      if (allPositions.length > 0) {
         const offset = getPanelOffset();
-        mapRef.current.fitBounds(positions, {
+        mapRef.current.fitBounds(allPositions, {
           paddingTopLeft: [offset.left, offset.top],
           paddingBottomRight: [offset.right, offset.bottom],
           maxZoom: 13,
@@ -230,26 +235,30 @@ export function RoutesPage() {
     }
 
     if (exploringRoute) {
-      // Show route polyline and point markers
+      // Show route polyline only if we have at least 2 valid points
       let positions = exploringRoute.polyline.map((p) => [p.lat, p.lng] as [number, number]);
-      if (exploringRoute.isCircular && positions.length > 2) {
-        const first = positions[0];
-        const last = positions[positions.length - 1];
-        if (first[0] !== last[0] || first[1] !== last[1]) {
-          positions = [...positions, first];
+      if (positions.length >= 2) {
+        if (exploringRoute.isCircular && positions.length > 2) {
+          const first = positions[0];
+          const last = positions[positions.length - 1];
+          if (first[0] !== last[0] || first[1] !== last[1]) {
+            positions = [...positions, first];
+          }
         }
+
+        polylineRef.current = L.polyline(positions, {
+          color: "hsl(0, 0%, 25%)",
+          weight: 5,
+          opacity: 0.9,
+          dashArray: "12, 8",
+          lineCap: "round",
+          lineJoin: "round",
+        }).addTo(mapRef.current);
       }
 
-      polylineRef.current = L.polyline(positions, {
-        color: "hsl(0, 0%, 25%)",
-        weight: 5,
-        opacity: 0.9,
-        dashArray: "12, 8",
-        lineCap: "round",
-        lineJoin: "round",
-      }).addTo(mapRef.current);
-
+      // Only place markers for points with valid coordinates
       exploringRoute.points.forEach((point, idx) => {
+        if (point.location.lat === 0 && point.location.lng === 0) return;
         const pointName = point.title[lang];
         const marker = L.marker([point.location.lat, point.location.lng], {
           icon: createPointMarkerIcon(point, idx, pointName),

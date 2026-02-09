@@ -28,6 +28,8 @@ import { QRCodeSVG } from 'qrcode.react';
 import type { RoutePoint } from '@/data/types';
 import { useLanguage, useExplorationMode } from '@/hooks/useLanguage';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { NeedleARViewer } from '@/components/NeedleARViewer';
+import type { ARScene, Language } from '@/lib/types';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -75,6 +77,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
   const { t, language } = useLanguage();
   const isMobile = useIsMobile();
   const [showARFullscreen, setShowARFullscreen] = useState(false);
+  const [showARViewer, setShowARViewer] = useState(false);
   const [selectedGalleryImage, setSelectedGalleryImage] = useState<string | null>(null);
   const poiStartTime = useRef<number>(Date.now());
 
@@ -101,10 +104,36 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
   const hasPDF = !!content.pdf;
 
   const handleLaunchAR = () => {
-    if (content.arExperience?.launchUrl) {
+    if (isMobile && content.arExperience?.iframe3dUrl) {
+      // On mobile, launch AR viewer directly with iframe URL
+      setShowARViewer(true);
+    } else if (content.arExperience?.launchUrl) {
+      // On desktop or fallback, open URL
       window.open(content.arExperience.launchUrl, '_blank');
     }
   };
+
+  // Create AR scene data from POI AR experience
+  const arScene: ARScene | null = useMemo(() => {
+    if (!content.arExperience?.iframe3dUrl) return null;
+    
+    return {
+      id: point.id,
+      slug: `poi-${point.id}`,
+      title: typeof point.title === 'string' 
+        ? { es: point.title, en: point.title, fr: point.title }
+        : point.title,
+      description: point.shortDescription || { es: '', en: '', fr: '' },
+      needle_scene_url: content.arExperience.iframe3dUrl,
+      needle_type: 'slam' as const,
+      build_path: undefined,
+      preview_image: point.coverImage || '',
+      difficulty: 'easy' as const,
+      duration_minutes: 5,
+      requires_outdoors: false,
+      published: true,
+    };
+  }, [point, content.arExperience]);
 
   return (
     <>
@@ -531,6 +560,34 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                 <X className="w-5 h-5" />
               </button>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* AR Viewer Modal for Mobile */}
+      <AnimatePresence>
+        {showARViewer && arScene && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[70] bg-black"
+          >
+            <NeedleARViewer 
+              scene={arScene} 
+              locale={language as Language}
+              onStart={() => console.log('AR started')}
+              onError={(error) => {
+                console.error('AR error:', error);
+                setShowARViewer(false);
+              }}
+            />
+            <button
+              onClick={() => setShowARViewer(false)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors z-[80]"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </motion.div>
         )}
       </AnimatePresence>

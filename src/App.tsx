@@ -9,6 +9,14 @@ import { SkipToContent } from '@/components/SkipToContent';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { NetworkStatusAlert } from '@/components/NetworkStatusAlert';
 import { initGA, trackPageView, initSessionTracking } from '@/lib/analytics';
+import { 
+  PerformanceMonitor, 
+  useResourceHints, 
+  useBFCacheOptimization, 
+  ScriptOptimizer,
+  useFontOptimization
+} from '@/components/PerformanceOptimizer';
+import { BFCacheOptimizer as WebSocketBFCacheOptimizer, useJSOptimization } from '@/components/WebSocketManager';
 
 // Lazy load pages for performance
 const Index = lazy(() => import("./pages/Index"));
@@ -63,42 +71,59 @@ const queryClient = new QueryClient();
 // Lazy load CookieConsent
 const CookieConsent = lazy(() => import("./components/CookieConsent").then(m => ({ default: m.CookieConsent })));
 
+// Internal component for performance optimizations
+function AppWithOptimizations() {
+  useResourceHints();
+  useBFCacheOptimization();
+  useFontOptimization();
+  useJSOptimization();
+  
+  return (
+    <>
+      <PerformanceMonitor />
+      <ScriptOptimizer />
+      <WebSocketBFCacheOptimizer />
+      <SkipToContent />
+      <NetworkStatusAlert />
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <AnalyticsTracker />
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/experience" element={<Index />} />
+            <Route path="/tours" element={<Tours360Page />} />
+            <Route path="/tours/:slug" element={<Tours360Page />} />
+            <Route path="/routes" element={<RoutesPage />} />
+            <Route path="/vr" element={<VRExperiencesPage />} />
+            <Route path="/ar" element={<ARExperiencesPage />} />
+            <Route path="/ar/:slug" element={<ARScenePage />} />
+            {/* Redirects for relative navigation from /tours/:slug */}
+            <Route path="/tours/ar/:slug" element={<RedirectToAR />} />
+            <Route path="/accessibility" element={<AccessibilityPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/cookies" element={<CookiesPage />} />
+            <Route path="/legal" element={<LegalPage />} />
+            <Route path="/analytics" element={<AnalyticsDashboard />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+        {/* Cookie Consent Banner */}
+        <Suspense fallback={null}>
+          <CookieConsent />
+        </Suspense>
+      </BrowserRouter>
+    </>
+  );
+}
+
 const App = () => (
   <ErrorBoundary>
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <SkipToContent />
-          <NetworkStatusAlert />
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AnalyticsTracker />
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/experience" element={<Index />} />
-                <Route path="/tours" element={<Tours360Page />} />
-                <Route path="/tours/:slug" element={<Tours360Page />} />
-                <Route path="/routes" element={<RoutesPage />} />
-                <Route path="/vr" element={<VRExperiencesPage />} />
-                <Route path="/ar" element={<ARExperiencesPage />} />
-                <Route path="/ar/:slug" element={<ARScenePage />} />
-                {/* Redirects for relative navigation from /tours/:slug */}
-                <Route path="/tours/ar/:slug" element={<RedirectToAR />} />
-                <Route path="/accessibility" element={<AccessibilityPage />} />
-                <Route path="/privacy" element={<PrivacyPage />} />
-                <Route path="/cookies" element={<CookiesPage />} />
-                <Route path="/legal" element={<LegalPage />} />
-                <Route path="/analytics" element={<AnalyticsDashboard />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-            {/* Cookie Consent Banner */}
-            <Suspense fallback={null}>
-              <CookieConsent />
-            </Suspense>
-          </BrowserRouter>
+          <AppWithOptimizations />
         </TooltipProvider>
       </QueryClientProvider>
     </HelmetProvider>
