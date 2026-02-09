@@ -93,7 +93,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
           mass: 0.9,
           opacity: { duration: 0.2, ease: 'easeOut' }
         }}
-        className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-background z-50 shadow-2xl flex flex-col overflow-hidden md:rounded-l-3xl"
+        className="fixed right-0 top-0 bottom-0 left-0 w-100 max-w-lg bg-background z-50 shadow-2xl flex flex-col overflow-hidden md:rounded-l-3xl"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -122,19 +122,20 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
             {route.id}
           </span>
 
-          {/* Bottom info */}
-          <div className="absolute bottom-4 left-4 right-4">
-            <h1 id="route-detail-title" className="text-2xl font-serif font-bold text-white drop-shadow-lg mb-1">
-              {route.title[lang]}
-            </h1>
-            <p className="text-white/90 text-sm font-medium">
-              {route.theme[lang]}
-            </p>
-          </div>
+          
         </div>
 
         {/* Scrollable content */}
         <ScrollArea className="flex-1">
+          {/* Bottom info */}
+          <div className="pl-6 pt-3">
+            <h1 id="route-detail-title" className="text-2xl font-serif font-bold mb-1">
+              {route.title[lang]}
+            </h1>
+            <p className="text-sm font-medium">
+              {route.theme[lang]}
+            </p>
+          </div>
           <div className="p-6 space-y-6">
             {/* Quick info badges */}
             <div className="flex flex-wrap gap-2">
@@ -210,7 +211,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
             {route.polyline.length > 0 && (
               <Button
                 variant="outline"
-                className="w-full justify-between"
+                className="w-100 justify-between"
                 onClick={handleNavigateToStart}
               >
                 <span className="flex items-center gap-2">
@@ -249,7 +250,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
                 <h3 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">
                   {t('routes.points')} ({route.points.length})
                 </h3>
-                <div className="space-y-2">
+                <div className="space-y-4">
                   {route.points.slice(0, 3).map((point, idx) => (
                     <PointPreviewCard key={point.id} point={point} index={idx} lang={lang} />
                   ))}
@@ -291,7 +292,7 @@ function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: nu
   const hasPDF = !!content.pdf;
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50">
+    <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50" style={{width: '300px'}}>
       {/* Thumbnail */}
       <div className="relative flex-shrink-0">
         <div 
@@ -307,7 +308,7 @@ function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: nu
       
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-foreground text-sm truncate">{point.title[lang]}</p>
+        <p className="font-medium text-foreground text-sm">{point.title[lang]}</p>
         <div className="flex items-center gap-1.5 mt-1">
           {hasAR && <Smartphone className="w-3.5 h-3.5 text-warm" aria-label="AR" />}
           {has360 && <Camera className="w-3.5 h-3.5 text-primary" aria-label="360°" />}

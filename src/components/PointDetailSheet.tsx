@@ -1,8 +1,8 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  X, 
-  MapPin, 
+import {
+  X,
+  MapPin,
   Camera,
   Play,
   FileText,
@@ -33,10 +33,10 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import FullscreenModal from '@/components/poi/FullscreenModal';
 import { NavigationButton } from '@/components/NavigationButton';
-import { 
-  calculateDistanceTo, 
+import {
+  calculateDistanceTo,
   formatTime,
-  type NavigationDestination 
+  type NavigationDestination
 } from '@/lib/navigationService';
 import { trackPOITimeSpent } from '@/lib/analytics';
 
@@ -122,9 +122,9 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
           initial={{ x: '100%', opacity: 0.8 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: '100%', opacity: 0.8 }}
-          transition={{ 
-            type: 'spring', 
-            damping: 28, 
+          transition={{
+            type: 'spring',
+            damping: 28,
             stiffness: 200,
             mass: 0.9,
             opacity: { duration: 0.2, ease: 'easeOut' }
@@ -133,14 +133,14 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
           onClick={(e) => e.stopPropagation()}
         >
           {/* Hero image */}
-          <div 
+          <div
             className="relative h-56 bg-cover bg-center flex-shrink-0"
             style={{ backgroundImage: point.coverImage ? `url(${point.coverImage})` : undefined }}
           >
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-            
+
             {/* Close button */}
-            <button 
+            <button
               onClick={onClose}
               className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
             >
@@ -149,7 +149,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
 
             {/* AR badge */}
             {hasAR && (
-              <motion.span 
+              <motion.span
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-warm text-warm-foreground text-sm font-bold shadow-lg"
@@ -160,16 +160,17 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
               </motion.span>
             )}
 
-            {/* Bottom info */}
-            <div className="absolute bottom-4 left-4 right-4">
-              <h1 className="text-2xl font-serif font-bold text-white drop-shadow-lg">
-                {point.title[language]}
-              </h1>
-            </div>
+
           </div>
 
           {/* Scrollable content */}
           <ScrollArea className="flex-1">
+            {/* Bottom info */}
+            <div className="pl-6 pt-3">
+              <h1 className="text-2xl font-serif font-bold">
+                {point.title[language]}
+              </h1>
+            </div>
             <div className="p-6 space-y-6">
               {/* Description */}
               <p className="text-muted-foreground leading-relaxed text-base">
@@ -192,7 +193,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
 
               {/* AR Experience Section - HERO SECTION */}
               {hasAR && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
@@ -214,7 +215,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      <Button 
+                      <Button
                         onClick={handleLaunchAR}
                         className="w-full h-16 text-lg font-bold bg-gradient-to-r from-warm to-amber-500 hover:from-warm/90 hover:to-amber-500/90 text-warm-foreground shadow-lg shadow-warm/25 border-0"
                       >
@@ -235,7 +236,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                         <div className="relative">
                           <div className="absolute inset-0 bg-warm/20 rounded-2xl blur-xl" />
                           <div className="relative p-5 bg-white rounded-2xl shadow-xl border-4 border-warm/30">
-                            <QRCodeSVG 
+                            <QRCodeSVG
                               value={content.arExperience!.qrValue}
                               size={200}
                               level="H"
@@ -245,7 +246,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                             />
                           </div>
                           {/* Scan indicator */}
-                          <motion.div 
+                          <motion.div
                             className="absolute inset-0 flex items-center justify-center pointer-events-none"
                             initial={{ opacity: 0.5 }}
                             animate={{ opacity: [0.3, 0.7, 0.3] }}
@@ -254,7 +255,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                             <ScanLine className="w-16 h-16 text-warm/40" />
                           </motion.div>
                         </div>
-                        
+
                         {/* Instructions */}
                         <div className="space-y-2">
                           <p className="font-semibold text-foreground text-lg flex items-center justify-center gap-2">
@@ -271,7 +272,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                           <p className="text-xs text-muted-foreground mb-3">
                             {t(texts.arRecommendation)}
                           </p>
-                          <Button 
+                          <Button
                             variant="outline"
                             onClick={() => setShowARFullscreen(true)}
                             className="w-full border-warm/30 text-warm hover:bg-warm/10 hover:text-warm"
@@ -286,7 +287,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
 
                   {/* AR Instructions */}
                   {content.arExperience?.instructions && (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.4 }}
@@ -311,7 +312,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                     <Camera className="w-4 h-4 text-primary" />
                     Tour 360°
                   </h3>
-                  <Button 
+                  <Button
                     variant="outline"
                     className="w-full justify-between"
                     onClick={() => window.open(content.tour360!.iframe360Url, '_blank')}
@@ -330,7 +331,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                   </h3>
                   <div className="space-y-2">
                     {hasVideo && (
-                      <Button 
+                      <Button
                         variant="outline"
                         className="w-full justify-between"
                         onClick={() => window.open(content.video!.url, '_blank')}
@@ -343,7 +344,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                       </Button>
                     )}
                     {hasAudio && content.audioGuide?.[language as keyof typeof content.audioGuide] && (
-                      <Button 
+                      <Button
                         variant="outline"
                         className="w-full justify-between"
                         onClick={() => window.open(content.audioGuide![language as keyof typeof content.audioGuide]!.url, '_blank')}
@@ -356,7 +357,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                       </Button>
                     )}
                     {hasPDF && (
-                      <Button 
+                      <Button
                         variant="outline"
                         className="w-full justify-between"
                         onClick={() => window.open(content.pdf!.url, '_blank')}
@@ -388,8 +389,8 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                         onClick={() => setSelectedGalleryImage(img.url)}
                         className="relative aspect-[4/3] rounded-xl overflow-hidden bg-muted border border-border/50 hover:border-primary/50 transition-colors group"
                       >
-                        <img 
-                          src={img.url} 
+                        <img
+                          src={img.url}
                           alt={`Gallery ${index + 1}`}
                           className="w-full h-full object-cover"
                         />
@@ -421,7 +422,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                     {(content.practicalInfo?.phone || content.practicalInfo?.email || content.practicalInfo?.website) && (
                       <div className="space-y-2">
                         {content.practicalInfo?.phone && (
-                          <a 
+                          <a
                             href={`tel:${content.practicalInfo.phone}`}
                             className="flex items-center gap-3 text-sm text-foreground hover:text-primary transition-colors"
                           >
@@ -430,7 +431,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                           </a>
                         )}
                         {content.practicalInfo?.email && (
-                          <a 
+                          <a
                             href={`mailto:${content.practicalInfo.email}`}
                             className="flex items-center gap-3 text-sm text-foreground hover:text-primary transition-colors"
                           >
@@ -439,7 +440,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                           </a>
                         )}
                         {content.practicalInfo?.website && (
-                          <a 
+                          <a
                             href={content.practicalInfo.website}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -451,7 +452,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                         )}
                       </div>
                     )}
-                    
+
                     {/* Schedule */}
                     {content.practicalInfo?.schedule && (
                       <div className="pt-2 border-t border-border/50">
@@ -468,7 +469,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                         </div>
                       </div>
                     )}
-                    
+
                     {/* Prices */}
                     {content.practicalInfo?.prices && (
                       <div className="pt-2 border-t border-border/50">
@@ -519,8 +520,8 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
               exit={{ scale: 0.9, opacity: 0 }}
               className="relative max-w-4xl max-h-[80vh] w-full"
             >
-              <img 
-                src={selectedGalleryImage} 
+              <img
+                src={selectedGalleryImage}
                 alt="Gallery fullscreen"
                 className="w-full h-full object-contain rounded-lg"
               />
@@ -594,8 +595,8 @@ function NavigationSection({ point }: { point: RoutePoint }) {
       </div>
 
       {/* Navigation button */}
-      <NavigationButton 
-        destination={destination} 
+      <NavigationButton
+        destination={destination}
         variant="primary"
         className="w-full"
       />
