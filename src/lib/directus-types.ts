@@ -318,7 +318,15 @@ export function toMultilingual(
   const result: Record<string, string> = { es: '', en: '', fr: '' };
   if (!translations) return result as Record<Language, string>;
   for (const t of translations) {
-    result[t.languages_code] = (t as any)[field] || '';
+    let value = (t as any)[field] || '';
+    // Remove HTML tags and decode entities (e.g., <p>D&eacute;couvrez</p> → Découvrez)
+    if (value && typeof value === 'string') {
+      // Create a temporary div element to strip HTML and decode entities
+      const div = document.createElement('div');
+      div.innerHTML = value;
+      value = div.textContent || div.innerText || '';
+    }
+    result[t.languages_code] = value;
   }
   return result as Record<Language, string>;
 }

@@ -1,6 +1,9 @@
 // ============ ANALYTICS INTEGRATION ============
-// 🗄️ GA4 tracking for user interactions and events
-// Respects user cookie consent preferences
+// Dual tracking: GA4 + Directus analytics_events collection
+// Respects user cookie consent preferences for GA4
+// Directus tracking is always active (first-party, no cookies)
+
+import { directus } from '@/lib/api/directus-client';
 
 declare global {
   interface Window {
@@ -12,7 +15,32 @@ declare global {
 const GA4_ID = import.meta.env.VITE_GA4_ID;
 const CONSENT_KEY = 'asturias-inmersivo-cookie-consent';
 
-// Check if analytics cookies are allowed
+// ============ SESSION & DEVICE UTILS ============
+
+let _sessionId: string | null = null;
+
+function getSessionId(): string {
+  if (!_sessionId) {
+    _sessionId = sessionStorage.getItem('analytics_session_id') 
+      || `s_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    sessionStorage.setItem('analytics_session_id', _sessionId);
+  }
+  return _sessionId;
+}
+
+function getDeviceType(): 'mobile' | 'tablet' | 'desktop' {
+  const w = window.innerWidth;
+  if (w < 768) return 'mobile';
+  if (w < 1024) return 'tablet';
+  return 'desktop';
+}
+
+function getCurrentLanguage(): string {
+  return document.documentElement.lang || 'es';
+}
+
+// ============ GA4 CONSENT ============
+
 export const hasAnalyticsConsent = (): boolean => {
   try {
     const consent = localStorage.getItem(CONSENT_KEY);
@@ -28,7 +56,7 @@ export const hasAnalyticsConsent = (): boolean => {
 // Initialize GA4 (only if consent given)
 export const initGA = () => {
   if (!GA4_ID) {
-    console.warn('[Analytics] GA4_ID not configured - analytics disabled');
+    console.warn('[Analytics] GA4_ID not configured - GA4 disabled');
     return;
   }
 
@@ -57,31 +85,47 @@ export const initGA = () => {
   console.log('[Analytics] GA4 initialized with consent');
 };
 
+// ============ CORE TRACKING ============
+
 // Track page view
 export const trackPageView = (url: string) => {
-  if (!window.gtag || !hasAnalyticsConsent()) return;
+  // GA4
+  if (window.gtag && hasAnalyticsConsent()) {
+    window.gtag('config', GA4_ID, { page_path: url });
+  }
 
-  window.gtag('config', GA4_ID, {
-    page_path: url,
+  // Directus (always)
+  directus.trackEvent({
+    event_type: 'page_view',
+    session_id: getSessionId(),
+    device_type: getDeviceType(),
+    language: getCurrentLanguage(),
+    extra_data: { url },
   });
 };
 
-// Track custom event
+// Track custom event — sends to both GA4 and Directus
 export const trackEvent = (
   eventName: string, 
   params?: Record<string, string | number | boolean>
 ) => {
-  if (!hasAnalyticsConsent()) {
-    console.log('[Analytics] Event blocked (no consent):', eventName);
-    return;
-  }
-  
-  if (!window.gtag) {
-    console.log('[Analytics] Event (dev):', eventName, params);
-    return;
+  // GA4 (consent required)
+  if (hasAnalyticsConsent() && window.gtag) {
+    window.gtag('event', eventName, params);
   }
 
-  window.gtag('event', eventName, params);
+  // Directus (always — first-party analytics, no cookies)
+  directus.trackEvent({
+    event_type: eventName,
+    session_id: getSessionId(),
+    device_type: getDeviceType(),
+    language: getCurrentLanguage(),
+    resource_id: (params?.tour_id || params?.ar_id || params?.route_id || params?.content_id || '') as string,
+    resource_type: (params?.content_type || params?.ar_type || '') as string,
+    duration_seconds: params?.time_spent_sec as number || params?.duration_sec as number || undefined,
+    completion_percentage: params?.completion_rate as number || undefined,
+    extra_data: params as Record<string, any>,
+  });
 };
 
 // ============ PREDEFINED EVENTS ============
@@ -149,6 +193,22 @@ export const trackRouteViewed = (
     route_id: routeId,
     route_name: routeName,
     num_pois: numPois,
+  });
+};
+
+export const trackRouteStarted = (routeId: string, routeName: string) => {
+  trackEvent('route_started', {
+    route_id: routeId,
+    route_name: routeName,
+  });
+};
+
+export const trackPOIViewed = (poiId: string, poiName: string, routeId?: string) => {
+  trackEvent('poi_viewed', {
+    content_id: poiId,
+    content_type: 'poi',
+    poi_name: poiName,
+    ...(routeId ? { route_id: routeId } : {}),
   });
 };
 
@@ -220,12 +280,28 @@ export const trackThemeChanged = (theme: string) => {
   });
 };
 
+export const trackVRExperienceViewed = (vrId: string, vrTitle: string) => {
+  trackEvent('vr_viewed', {
+    content_id: vrId,
+    content_type: 'vr',
+    vr_title: vrTitle,
+  });
+};
+
 export const trackCookieConsent = (status: string, preferences: Record<string, boolean>) => {
   // This event is allowed even without full consent as it tracks the consent itself
-  if (!window.gtag) return;
-  
-  window.gtag('event', 'cookie_consent', {
-    consent_status: status,
-    ...preferences,
+  if (window.gtag) {
+    window.gtag('event', 'cookie_consent', {
+      consent_status: status,
+      ...preferences,
+    });
+  }
+
+  // Also track in Directus
+  directus.trackEvent({
+    event_type: 'cookie_consent',
+    session_id: getSessionId(),
+    device_type: getDeviceType(),
+    extra_data: { status, ...preferences },
   });
 };

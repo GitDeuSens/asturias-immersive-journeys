@@ -148,7 +148,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
             {/* Bottom info */}
             <div className="absolute bottom-4 left-4 right-4">
               <h1 className="text-2xl font-serif font-bold text-white drop-shadow-lg">
-                {t(point.title)}
+                {point.title[language]}
               </h1>
             </div>
           </div>
@@ -158,7 +158,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
             <div className="p-6 space-y-6">
               {/* Description */}
               <p className="text-muted-foreground leading-relaxed text-base">
-                {t(point.shortDescription)}
+                {point.shortDescription[language]}
               </p>
 
               {/* Navigation Section - Priority for "here" mode */}

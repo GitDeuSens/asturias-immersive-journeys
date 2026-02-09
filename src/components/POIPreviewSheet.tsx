@@ -65,7 +65,7 @@ export function POIPreviewSheet({ poi, onClose, onViewDetails }: POIPreviewSheet
       try {
         await navigator.share({
           title: t(poi.title),
-          text: t(poi.shortDescription),
+          text: poi.shortDescription[language],
           url: window.location.href,
         });
       } catch (e) {

@@ -22,6 +22,7 @@ const PrivacyPage = lazy(() => import("./pages/PrivacyPage"));
 const CookiesPage = lazy(() => import("./pages/CookiesPage"));
 const LegalPage = lazy(() => import("./pages/LegalPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const AnalyticsDashboard = lazy(() => import("./pages/AnalyticsDashboard"));
 
 // Loading fallback
 function PageLoader() {
@@ -88,6 +89,7 @@ const App = () => (
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/cookies" element={<CookiesPage />} />
                 <Route path="/legal" element={<LegalPage />} />
+                <Route path="/analytics" element={<AnalyticsDashboard />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

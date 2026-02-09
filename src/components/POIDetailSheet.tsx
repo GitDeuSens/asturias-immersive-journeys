@@ -91,7 +91,7 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
   const handleShare = async () => {
     if (navigator.share) {
       try {
-        await navigator.share({ title: t(poi.title), text: t(poi.shortDescription), url: poi.share.shareUrl });
+        await navigator.share({ title: t(poi.title), text: poi.shortDescription[language], url: poi.share.shareUrl });
       } catch (e) {}
     }
   };

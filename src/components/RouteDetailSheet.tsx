@@ -13,7 +13,8 @@ import {
   Smartphone,
   Info,
   Ruler,
-  Navigation
+  Navigation,
+  Footprints
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { ImmersiveRoute, RoutePoint } from '@/data/types';
@@ -36,7 +37,15 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
 
   if (!route) return null;
 
-  const distance = calculateRouteDistance(route.polyline);
+  const calculatedDistance = calculateRouteDistance(route.polyline);
+  const distance = route.distanceKm || calculatedDistance;
+
+  const surfaceLabels: Record<string, Record<string, string>> = {
+    paved: { es: 'Asfaltado', en: 'Paved', fr: 'Asphalté' },
+    gravel: { es: 'Grava', en: 'Gravel', fr: 'Gravier' },
+    dirt: { es: 'Tierra', en: 'Dirt', fr: 'Terre' },
+    mixed: { es: 'Mixto', en: 'Mixed', fr: 'Mixte' },
+  };
 
   const difficultyColors = {
     easy: 'bg-primary/20 text-primary border-primary',
@@ -127,11 +136,27 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
                 </span>
               )}
               
-              {/* Distance - NEW */}
+              {/* Distance */}
               {distance > 0 && (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
                   <Ruler className="w-4 h-4 text-primary" aria-hidden="true" />
-                  {formatDistance(distance)}
+                  {route.distanceKm ? `${route.distanceKm} km` : formatDistance(distance)}
+                </span>
+              )}
+
+              {/* Elevation */}
+              {route.elevationGainMeters && route.elevationGainMeters > 0 && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
+                  <Mountain className="w-4 h-4 text-primary" aria-hidden="true" />
+                  ↑ {route.elevationGainMeters} m
+                </span>
+              )}
+
+              {/* Surface type */}
+              {route.surfaceType && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
+                  <Footprints className="w-4 h-4 text-primary" aria-hidden="true" />
+                  {surfaceLabels[route.surfaceType]?.[lang] || route.surfaceType}
                 </span>
               )}
               

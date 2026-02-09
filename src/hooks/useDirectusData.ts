@@ -103,6 +103,9 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
     points: routePoints,
     tour360: route.tour_360_id ? { available: true } : undefined,
     polyline,
+    distanceKm: route.distance_km,
+    elevationGainMeters: route.elevation_gain_meters,
+    surfaceType: route.surface_type,
   };
 }
 

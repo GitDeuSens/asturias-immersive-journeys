@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Clock, RotateCw, ChevronRight, Ruler } from 'lucide-react';
+import { MapPin, Clock, RotateCw, ChevronRight, Ruler, Mountain } from 'lucide-react';
 import type { ImmersiveRoute } from '@/data/types';
 import { useTranslation } from 'react-i18next';
 import { useDirectusCategories } from '@/hooks/useDirectusData';
@@ -23,8 +23,9 @@ export const RouteCard = forwardRef<HTMLButtonElement, RouteCardProps>(
       hard: 'bg-destructive/20 text-destructive border-destructive/30',
     };
 
-    // Calculate route distance
-    const distance = calculateRouteDistance(route.polyline);
+    // Use distance from DB, fallback to calculated from polyline
+    const calculatedDistance = calculateRouteDistance(route.polyline);
+    const distance = route.distanceKm || calculatedDistance;
 
     return (
       <motion.button
@@ -101,11 +102,19 @@ export const RouteCard = forwardRef<HTMLButtonElement, RouteCardProps>(
               </span>
             )}
             
-            {/* Distance - NEW */}
+            {/* Distance */}
             {distance > 0 && (
               <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
                 <Ruler className="w-3 h-3" aria-hidden="true" />
-                {formatDistance(distance)}
+                {route.distanceKm ? `${route.distanceKm} km` : formatDistance(distance)}
+              </span>
+            )}
+
+            {/* Elevation */}
+            {route.elevationGainMeters && route.elevationGainMeters > 0 && (
+              <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
+                <Mountain className="w-3 h-3" aria-hidden="true" />
+                {route.elevationGainMeters} m
               </span>
             )}
             

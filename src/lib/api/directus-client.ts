@@ -2,7 +2,7 @@
 // Centralized client for Directus CMS integration
 // Uses translations system — all queries include deep translations
 
-import { createDirectus, rest, staticToken, readItems, readItem } from '@directus/sdk';
+import { createDirectus, rest, staticToken, readItems, readItem, createItem } from '@directus/sdk';
 import type { 
   KuulaTour, 
   ARScene, 
@@ -40,6 +40,15 @@ const TRANSLATIONS_DEEP: any[] = ['translations.*'];
 function getFileUrl(fileId: string | undefined): string {
   if (!fileId) return '';
   return `${DIRECTUS_URL}/assets/${fileId}`;
+}
+
+// Remove HTML tags and decode entities (e.g., <p>D&eacute;couvrez</p> → Découvrez)
+function stripHtmlAndDecode(text: string): string {
+  if (!text) return text;
+  // Create a temporary div element to strip HTML and decode entities
+  const div = document.createElement('div');
+  div.innerHTML = text;
+  return div.textContent || div.innerText || '';
 }
 
 // ============ DATA TRANSFORMATION FUNCTIONS ============
@@ -154,6 +163,50 @@ function transformRoute(route: DirectusRoute) {
 }
 
 function transformPOI(poi: DirectusPOI) {
+  // Decode richText blocks if present
+  let richText = poi.rich_text;
+  if (richText && richText.blocks) {
+    richText = {
+      ...richText,
+      blocks: richText.blocks.map(block => {
+        const decodedBlock = { ...block };
+        // Decode text fields in each block type
+        if (decodedBlock.text && typeof decodedBlock.text === 'object') {
+          decodedBlock.text = Object.fromEntries(
+            Object.entries(decodedBlock.text).map(([lang, value]) => [
+              lang,
+              stripHtmlAndDecode(value as string)
+            ])
+          );
+        }
+        // Decode items in bullets
+        if (decodedBlock.items && Array.isArray(decodedBlock.items)) {
+          decodedBlock.items = decodedBlock.items.map(item => {
+            if (typeof item === 'object') {
+              return Object.fromEntries(
+                Object.entries(item).map(([lang, value]) => [
+                  lang,
+                  stripHtmlAndDecode(value as string)
+                ])
+              );
+            }
+            return item;
+          });
+        }
+        // Decode author in quotes
+        if (decodedBlock.author && typeof decodedBlock.author === 'object') {
+          decodedBlock.author = Object.fromEntries(
+            Object.entries(decodedBlock.author).map(([lang, value]) => [
+              lang,
+              stripHtmlAndDecode(value as string)
+            ])
+          );
+        }
+        return decodedBlock;
+      })
+    };
+  }
+
   return {
     ...poi,
     title: toMultilingual(poi.translations, 'title'),
@@ -165,6 +218,7 @@ function transformPOI(poi: DirectusPOI) {
     opening_hours: toMultilingual(poi.translations, 'opening_hours'),
     prices: toMultilingual(poi.translations, 'prices'),
     recommended_duration: toMultilingual(poi.translations, 'recommended_duration'),
+    richText,
     cover_image_url: getFileUrl(poi.cover_image),
     category_ids: extractCategoryIds((poi as any).categories),
   };
@@ -550,15 +604,48 @@ class DirectusApiClient {
     resource_id?: string;
     resource_type?: string;
     duration_seconds?: number;
+    completion_percentage?: number;
     municipality?: string;
     extra_data?: Record<string, any>;
   }) {
     try {
-      console.log('[DirectusClient] Track event:', eventData);
-      // TODO: enable when public endpoint is configured
-      // await this.getClient().request(createItem('analytics_events', eventData));
+      const id = crypto.randomUUID();
+      await this.getClient().request(
+        createItem('analytics_events' as any, {
+          id,
+          ...eventData,
+          created_at: new Date().toISOString(),
+        })
+      );
     } catch (error) {
-      console.error('[DirectusClient] Error tracking event:', error);
+      // Silently fail analytics - don't break user experience
+      console.warn('[DirectusClient] Analytics tracking failed:', error);
+    }
+  }
+
+  async getAnalyticsEvents(filters?: {
+    event_type?: string;
+    resource_type?: string;
+    since?: string;
+    limit?: number;
+  }) {
+    try {
+      // Use direct fetch instead of SDK for reliability
+      const params = new URLSearchParams();
+      params.set('limit', String(filters?.limit || 1000));
+      params.set('sort', '-created_at');
+      if (filters?.event_type) params.set('filter[event_type][_eq]', filters.event_type);
+      if (filters?.resource_type) params.set('filter[resource_type][_eq]', filters.resource_type);
+      if (filters?.since) params.set('filter[created_at][_gte]', filters.since);
+
+      const url = `${DIRECTUS_URL}/items/analytics_events?${params.toString()}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      return (json.data || []) as any[];
+    } catch (error) {
+      console.error('[DirectusClient] Error fetching analytics:', error);
+      return [];
     }
   }
 }

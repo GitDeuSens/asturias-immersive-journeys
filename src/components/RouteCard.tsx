@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { MapPin, Clock, ChevronRight, RotateCw, Mountain, Utensils, Landmark } from 'lucide-react';
+import { MapPin, Clock, ChevronRight, RotateCw, Mountain, Utensils, Landmark, Ruler } from 'lucide-react';
 import type { ImmersiveRoute } from '@/data/types';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useDirectusCategories } from '@/hooks/useDirectusData';
@@ -69,17 +69,17 @@ export function RouteCard({ route, onClick }: RouteCardProps) {
       <div className="p-4">
         {/* Title */}
         <h3 className="font-sans font-bold text-foreground text-lg group-hover:text-primary transition-colors mb-1 line-clamp-1">
-          {t(route.title)}
+          {route.title[language]}
         </h3>
 
         {/* Theme */}
         <p className="text-xs text-primary font-medium mb-2">
-          {t(route.theme)}
+          {route.theme[language]}
         </p>
 
         {/* Description */}
         <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-          {t(route.shortDescription)}
+          {route.shortDescription[language]}
         </p>
 
         {/* Footer metadata */}
@@ -88,7 +88,23 @@ export function RouteCard({ route, onClick }: RouteCardProps) {
           {route.duration && (
             <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
               <Clock className="w-3 h-3" />
-              {t(route.duration)}
+              {route.duration[language]}
+            </span>
+          )}
+
+          {/* Distance */}
+          {route.distanceKm && route.distanceKm > 0 && (
+            <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
+              <Ruler className="w-3 h-3" />
+              {route.distanceKm} km
+            </span>
+          )}
+
+          {/* Elevation */}
+          {route.elevationGainMeters && route.elevationGainMeters > 0 && (
+            <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
+              <Mountain className="w-3 h-3" />
+              ↑{route.elevationGainMeters} m
             </span>
           )}
           

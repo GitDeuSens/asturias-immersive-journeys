@@ -183,4 +183,7 @@ export interface ImmersiveRoute {
     iframe360Url?: string;
   };
   polyline: { lat: number; lng: number }[];
+  distanceKm?: number;
+  elevationGainMeters?: number;
+  surfaceType?: 'paved' | 'gravel' | 'dirt' | 'mixed';
 }
