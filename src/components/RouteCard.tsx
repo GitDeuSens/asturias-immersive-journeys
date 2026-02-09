@@ -1,8 +1,8 @@
-import { motion } from 'framer-motion';
-import { MapPin, Clock, ChevronRight, RotateCw, Mountain, Utensils, Landmark, Ruler } from 'lucide-react';
-import type { ImmersiveRoute } from '@/data/types';
-import { useLanguage } from '@/hooks/useLanguage';
-import { useDirectusCategories } from '@/hooks/useDirectusData';
+import { motion } from "framer-motion";
+import { MapPin, Clock, ChevronRight, RotateCw, Mountain, Utensils, Landmark, Ruler } from "lucide-react";
+import type { ImmersiveRoute } from "@/data/types";
+import { useLanguage } from "@/hooks/useLanguage";
+import { useDirectusCategories } from "@/hooks/useDirectusData";
 
 interface RouteCardProps {
   route: ImmersiveRoute;
@@ -11,18 +11,18 @@ interface RouteCardProps {
 
 export function RouteCard({ route, onClick }: RouteCardProps) {
   const { t, language } = useLanguage();
-  const { getCategoryById } = useDirectusCategories(language as 'es' | 'en' | 'fr');
+  const { getCategoryById } = useDirectusCategories(language as "es" | "en" | "fr");
 
   const difficultyColors = {
-    easy: 'bg-primary/20 text-primary border-primary/30',
-    medium: 'bg-warm/20 text-warm border-warm/30',
-    hard: 'bg-destructive/20 text-destructive border-destructive/30',
+    easy: "bg-primary/20 text-primary border-primary/30",
+    medium: "bg-warm/20 text-warm border-warm/30",
+    hard: "bg-destructive/20 text-destructive border-destructive/30",
   };
 
   const difficultyLabels = {
-    easy: { es: 'Fácil', en: 'Easy', fr: 'Facile' },
-    medium: { es: 'Media', en: 'Medium', fr: 'Moyenne' },
-    hard: { es: 'Difícil', en: 'Hard', fr: 'Difficile' },
+    easy: { es: "Fácil", en: "Easy", fr: "Facile" },
+    medium: { es: "Media", en: "Medium", fr: "Moyenne" },
+    hard: { es: "Difícil", en: "Hard", fr: "Difficile" },
   };
 
   return (
@@ -33,12 +33,12 @@ export function RouteCard({ route, onClick }: RouteCardProps) {
       className="w-full text-left rounded-xl bg-card/50 border border-border/50 hover:border-primary/50 hover:bg-card/80 transition-all group overflow-hidden"
     >
       {/* Cover image */}
-      <div 
+      <div
         className="w-full h-36 bg-cover bg-center relative"
-        style={{ 
-          backgroundImage: route.coverImage 
-            ? `url(${route.coverImage})` 
-            : 'linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted-foreground)/0.2) 100%)'
+        style={{
+          backgroundImage: route.coverImage
+            ? `url(${route.coverImage})`
+            : "linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--muted-foreground)/0.2) 100%)",
         }}
       >
         {/* Route ID badge */}
@@ -60,7 +60,7 @@ export function RouteCard({ route, onClick }: RouteCardProps) {
             360°
           </span>
         )}
-        
+
         {/* Gradient overlay */}
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
       </div>
@@ -73,14 +73,10 @@ export function RouteCard({ route, onClick }: RouteCardProps) {
         </h3>
 
         {/* Theme */}
-        <p className="text-xs text-primary font-medium mb-2">
-          {route.theme[language]}
-        </p>
+        <p className="text-xs text-primary font-medium mb-2">{route.theme[language]}</p>
 
         {/* Description */}
-        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-          {route.shortDescription[language]}
-        </p>
+        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{route.shortDescription[language]}</p>
 
         {/* Footer metadata */}
         <div className="flex flex-wrap items-center gap-2">
@@ -103,11 +99,10 @@ export function RouteCard({ route, onClick }: RouteCardProps) {
           {/* Elevation */}
           {route.elevationGainMeters && route.elevationGainMeters > 0 && (
             <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
-              <Mountain className="w-3 h-3" />
-              ↑{route.elevationGainMeters} m
+              <Mountain className="w-3 h-3" />↑{route.elevationGainMeters} m
             </span>
           )}
-          
+
           {/* Points count */}
           <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
             <MapPin className="w-3 h-3" />
@@ -116,13 +111,15 @@ export function RouteCard({ route, onClick }: RouteCardProps) {
 
           {/* Difficulty */}
           {route.difficulty && (
-            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${difficultyColors[route.difficulty]}`}>
+            <span
+              className={`px-2 py-0.5 rounded-md text-sm text-[10px] font-bold border ${difficultyColors[route.difficulty]}`}
+            >
               {t(difficultyLabels[route.difficulty])}
             </span>
           )}
 
           {/* Categories */}
-          {route.categoryIds.slice(0, 2).map(catId => {
+          {route.categoryIds.slice(0, 2).map((catId) => {
             const cat = getCategoryById(catId);
             return cat ? (
               <span key={catId} className="category-chip text-[10px]">
