@@ -5,6 +5,7 @@ import { OnboardingHeader } from '@/components/OnboardingHeader';
 import { ModeSelector } from '@/components/ModeSelector';
 import { ExperienceSelector } from '@/components/ExperienceSelector';
 import { useExplorationMode } from '@/hooks/useLanguage';
+import { LCPOptimizer, useLCPOptimization, ResourceOptimizer } from '@/components/LCPOptimizer';
 
 type FlowStep = 'mode' | 'experience';
 
@@ -12,6 +13,9 @@ const Index = () => {
   const navigate = useNavigate();
   const { setMode } = useExplorationMode();
   const [step, setStep] = useState<FlowStep>('mode');
+  
+  // Optimize LCP
+  useLCPOptimization();
 
   const handleModeSelect = (selectedMode: 'home' | 'here') => {
     setMode(selectedMode);
@@ -31,17 +35,21 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Dynamic blurred background */}
-      <DynamicBackground blur={10} interval={8000} />
-      
-      {/* Header with language selector */}
-      <OnboardingHeader />
-      
-      {/* Content */}
-      {step === 'mode' && <ModeSelector onSelect={handleModeSelect} />}
-      {step === 'experience' && <ExperienceSelector onSelect={handleExperienceSelect} onBack={handleBack} />}
-    </div>
+    <>
+      <LCPOptimizer />
+      <ResourceOptimizer />
+      <div className="min-h-screen bg-background">
+        {/* Dynamic blurred background */}
+        <DynamicBackground blur={10} interval={8000} />
+        
+        {/* Header with language selector */}
+        <OnboardingHeader />
+        
+        {/* Content */}
+        {step === 'mode' && <ModeSelector onSelect={handleModeSelect} />}
+        {step === 'experience' && <ExperienceSelector onSelect={handleExperienceSelect} onBack={handleBack} />}
+      </div>
+    </>
   );
 };
 

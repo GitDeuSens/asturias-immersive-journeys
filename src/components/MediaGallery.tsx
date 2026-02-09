@@ -2,6 +2,7 @@ import { useState, useCallback, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download, Maximize2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { OptimizedImage, CriticalImage } from './OptimizedImage';
 
 interface GalleryImage {
   url: string;
@@ -120,11 +121,11 @@ export function MediaGallery({ images, className = '' }: MediaGalleryProps) {
             className="relative aspect-[4/3] rounded-lg overflow-hidden bg-muted border border-border/50 hover:border-primary/50 transition-colors group focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
             aria-label={`${t('a11y.imageGallery')}: ${image.caption?.[lang] || `Imagen ${index + 1}`}`}
           >
-            <img 
+            <OptimizedImage 
               src={image.url} 
               alt={image.alt || image.caption?.[lang] || `Gallery image ${index + 1}`}
-              className="w-full h-full object-cover"
-              loading="lazy"
+              className="w-full h-full"
+              sizes="(max-width: 768px) 50vw, 33vw"
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
               <Maximize2 className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" aria-hidden="true" />
@@ -205,18 +206,16 @@ export function MediaGallery({ images, className = '' }: MediaGalleryProps) {
               onTouchEnd={handleTouchEnd}
               style={{ cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
             >
-              <motion.img
+              <CriticalImage
                 key={selectedIndex}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
                 src={images[selectedIndex].url}
                 alt={images[selectedIndex].alt || images[selectedIndex].caption?.[lang] || ''}
                 className="max-w-full max-h-full object-contain select-none"
+                sizes="100vw"
                 style={{
                   transform: `scale(${zoom}) translate(${position.x / zoom}px, ${position.y / zoom}px)`,
                   transition: isDragging ? 'none' : 'transform 0.2s ease',
                 }}
-                draggable={false}
               />
 
               {/* Navigation arrows */}
