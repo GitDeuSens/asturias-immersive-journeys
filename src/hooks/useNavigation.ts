@@ -106,7 +106,7 @@ export function useNavigation() {
       route = await getCachedRoute(origin, dest, mode);
       if (route) {
         offlineMode = true;
-        console.log('[Navigation] Using cached route (offline)');
+        // Using cached route (offline)
       } else {
         setState(prev => ({ 
           ...prev, 
@@ -126,7 +126,7 @@ export function useNavigation() {
         route = await getCachedRoute(origin, dest, mode);
         if (route) {
           offlineMode = true;
-          console.log('[Navigation] Using cached route (API failed)');
+          // Using cached route (API failed)
         } else {
           setState(prev => ({ 
             ...prev, 
@@ -225,7 +225,7 @@ export function useNavigation() {
         updateNavigationProgress(newLat, newLng);
       },
       (error) => {
-        console.error('Position tracking error:', error);
+        // Position tracking error
       },
       {
         enableHighAccuracy: true,

@@ -71,7 +71,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
   };
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence>
       <motion.div
         key="backdrop"
         initial={{ opacity: 0 }}

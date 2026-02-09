@@ -58,7 +58,7 @@ export function ARExperiencesPage() {
         const data = await getARScenes(locale);
         setScenes(data);
       } catch (error) {
-        console.error("Error loading AR scenes:", error);
+        // Silently fail AR scenes loading
       } finally {
         setIsLoading(false);
       }

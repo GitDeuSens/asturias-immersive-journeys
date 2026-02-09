@@ -121,13 +121,7 @@ export const hasAnalyticsConsent = (): boolean => {
 
 // Initialize GA4 (only if consent given)
 export const initGA = () => {
-  if (!GA4_ID) {
-    console.warn('[Analytics] GA4_ID not configured - GA4 disabled');
-    return;
-  }
-
-  if (!hasAnalyticsConsent()) {
-    console.log('[Analytics] User has not consented to analytics cookies');
+  if (!GA4_ID || !hasAnalyticsConsent()) {
     return;
   }
 
@@ -148,7 +142,7 @@ export const initGA = () => {
     anonymize_ip: true, // GDPR compliance
   });
   
-  console.log('[Analytics] GA4 initialized with consent');
+  // GA4 initialized
 };
 
 // ============ ENRICHED DIRECTUS TRACKING ============

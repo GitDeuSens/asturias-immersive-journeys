@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import L from "leaflet";
 import { MapPin, Search, ChevronUp, ChevronDown, Maximize2, Locate } from "lucide-react";
@@ -25,6 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { trackRouteStarted } from "@/lib/analytics";
+import { BREAKPOINTS, MAP_PANEL_OFFSETS, ASTURIAS_BOUNDS, DEFAULT_COORDINATES } from "@/constants/breakpoints";
 import "leaflet/dist/leaflet.css";
 
 // Create route bubble marker with name label
@@ -75,7 +76,7 @@ const createPointMarkerIcon = (point: RoutePoint, index: number, pointName: stri
   });
 };
 
-export function RoutesPage() {
+export const RoutesPage = React.memo(function RoutesPage() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as "es" | "en" | "fr";
   const mapRef = useRef<L.Map | null>(null);
@@ -99,12 +100,11 @@ export function RoutesPage() {
 
   // Geolocation
   const { latitude, longitude, error: geoError, requestLocation, hasLocation } = useGeolocation();
-  const userPosition = hasLocation ? { lat: latitude!, lng: longitude! } : null;
+  const userPosition = hasLocation && latitude != null && longitude != null 
+    ? { lat: latitude, lng: longitude } 
+    : null;
 
-  const ASTURIAS_BOUNDS: L.LatLngBoundsExpression = [
-    [42.7, -7.8],
-    [43.9, -4.0],
-  ];
+  // Use constants instead of magic numbers
 
   // Inject map styles on mount
   useEffect(() => {
@@ -116,7 +116,7 @@ export function RoutesPage() {
     if (!mapContainerRef.current || mapRef.current) return;
 
     mapRef.current = L.map(mapContainerRef.current, {
-      center: [43.36, -5.85],
+      center: [DEFAULT_COORDINATES.ASTURIAS_CENTER.lat, DEFAULT_COORDINATES.ASTURIAS_CENTER.lng],
       zoom: 9,
       zoomControl: false,
       maxBounds: ASTURIAS_BOUNDS,
@@ -163,23 +163,35 @@ export function RoutesPage() {
   }, [userPosition]);
 
   const filteredRoutes = useMemo(() => {
+    // Early return for empty routes
+    if (!immersiveRoutes.length) return [];
+    
+    // Pre-compute search query for performance
+    const searchLower = searchQuery.toLowerCase();
+    
     return immersiveRoutes.filter((route) => {
-      const matchesSearch =
-        searchQuery === "" ||
-        route.title[lang]?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        route.theme[lang]?.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory =
-        selectedCategories.length === 0 || route.categoryIds.some((id) => selectedCategories.includes(id));
+      // Search filter
+      const matchesSearch = searchQuery === "" || 
+        route.title[lang]?.toLowerCase().includes(searchLower) ||
+        route.theme[lang]?.toLowerCase().includes(searchLower);
+      
+      // Category filter - use Set for O(1) lookup
+      const matchesCategory = selectedCategories.length === 0 || 
+        selectedCategoriesSet.has(route.categoryIds?.[0] || '');
+      
       return matchesSearch && matchesCategory;
     });
   }, [immersiveRoutes, searchQuery, selectedCategories, lang]);
 
+  // Create Set for faster category lookup
+  const selectedCategoriesSet = useMemo(() => new Set(selectedCategories), [selectedCategories]);
+
   const getPanelOffset = useCallback(() => {
-    if (typeof window !== "undefined" && window.innerWidth >= 768) {
-      return { left: 60, right: 460, top: 80, bottom: 60 };
+    if (typeof window !== "undefined" && window.innerWidth >= BREAKPOINTS.MOBILE) {
+      return MAP_PANEL_OFFSETS.DESKTOP;
     }
-    return { left: 40, right: 40, top: 80, bottom: 200 };
-  }, []);
+    return MAP_PANEL_OFFSETS.MOBILE;
+  }, [BREAKPOINTS.MOBILE, MAP_PANEL_OFFSETS.DESKTOP, MAP_PANEL_OFFSETS.MOBILE]);
 
   const fitToRoute = useCallback(
     (route: ImmersiveRoute) => {
@@ -280,7 +292,7 @@ export function RoutesPage() {
           setShowRouteDetail(true);
         });
 
-        clusterGroupRef.current!.addLayer(marker);
+        clusterGroupRef.current?.addLayer(marker);
         markersRef.current.push(marker);
       });
     }
@@ -292,6 +304,26 @@ export function RoutesPage() {
     const timer = setTimeout(() => fitToAllRoutes(), 100);
     return () => clearTimeout(timer);
   }, [selectedCategories, searchQuery, fitToAllRoutes, exploringRoute]);
+
+  // Cleanup map on unmount
+  useEffect(() => {
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+      if (userMarkerRef.current) {
+        userMarkerRef.current.remove();
+        userMarkerRef.current = null;
+      }
+      if (polylineRef.current) {
+        polylineRef.current.remove();
+        polylineRef.current = null;
+      }
+      markersRef.current.forEach(marker => marker.remove());
+      markersRef.current = [];
+    };
+  }, []);
 
   const toggleCategory = (catId: string) => {
     setSelectedCategories((prev) => (prev.includes(catId) ? prev.filter((id) => id !== catId) : [...prev, catId]));
@@ -460,4 +492,4 @@ export function RoutesPage() {
       {selectedPoint && <PointDetailSheet point={selectedPoint} onClose={() => setSelectedPoint(null)} />}
     </div>
   );
-}
+});

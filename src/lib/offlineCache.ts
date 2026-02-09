@@ -95,9 +95,9 @@ export async function cacheRoute(
     });
     
     db.close();
-    console.log('[OfflineCache] Route cached:', cachedRoute.id);
+    // Route cached
   } catch (error) {
-    console.error('[OfflineCache] Failed to cache route:', error);
+    // Failed to cache route
   }
 }
 
@@ -123,10 +123,10 @@ export async function getCachedRoute(
         db.close();
         
         if (cached && cached.expiresAt > Date.now()) {
-          console.log('[OfflineCache] Cache hit:', key);
+          // Cache hit
           resolve(cached.route);
         } else {
-          console.log('[OfflineCache] Cache miss or expired:', key);
+          // Cache miss or expired
           resolve(null);
         }
       };
@@ -136,7 +136,7 @@ export async function getCachedRoute(
       };
     });
   } catch (error) {
-    console.error('[OfflineCache] Failed to get cached route:', error);
+    // Failed to get cached route
     return null;
   }
 }
@@ -160,7 +160,7 @@ export async function clearExpiredCache(): Promise<void> {
         const cached = cursor.value as CachedRoute;
         if (cached.expiresAt < now) {
           cursor.delete();
-          console.log('[OfflineCache] Deleted expired entry:', cached.id);
+          // Deleted expired entry
         }
         cursor.continue();
       }
@@ -173,7 +173,7 @@ export async function clearExpiredCache(): Promise<void> {
     
     db.close();
   } catch (error) {
-    console.error('[OfflineCache] Failed to clear expired cache:', error);
+    // Failed to clear expired cache
   }
 }
 
@@ -201,7 +201,7 @@ export async function getAllCachedRoutes(): Promise<CachedRoute[]> {
       };
     });
   } catch (error) {
-    console.error('[OfflineCache] Failed to get all cached routes:', error);
+    // Failed to get all cached routes
     return [];
   }
 }
@@ -216,9 +216,9 @@ export function cacheImmersiveRoutes(routes: any[]): void {
       timestamp: Date.now(),
       expiresAt: Date.now() + ROUTE_CACHE_DURATION,
     }));
-    console.log('[OfflineCache] Immersive routes cached');
+    // Immersive routes cached
   } catch (error) {
-    console.error('[OfflineCache] Failed to cache immersive routes:', error);
+    // Failed to cache immersive routes
   }
 }
 
@@ -238,7 +238,7 @@ export function getCachedImmersiveRoutes(): any[] | null {
     localStorage.removeItem('asturias-immersive-routes');
     return null;
   } catch (error) {
-    console.error('[OfflineCache] Failed to get cached immersive routes:', error);
+    // Failed to get cached immersive routes
     return null;
   }
 }

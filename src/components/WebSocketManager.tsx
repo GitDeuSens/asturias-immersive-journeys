@@ -144,9 +144,7 @@ export function useJSOptimization() {
       document.head.appendChild(link);
     };
 
-    // Preload critical CSS
-    const criticalCSS = ['/index.css'];
-    criticalCSS.forEach(href => addPreload(href, 'style'));
+    // CSS is already loaded via import statements, no need to preload
 
     // Preload critical fonts
     const criticalFonts = ['/fonts/inter-var.woff2'];

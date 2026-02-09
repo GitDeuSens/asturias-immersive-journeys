@@ -21,6 +21,7 @@ import type {
   DirectusVRExperience,
 } from '@/lib/directus-types';
 import { toMultilingual } from '@/lib/directus-types';
+import { logger } from '@/lib/logger';
 
 // Configuration
 const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'http://localhost:8055';
@@ -243,7 +244,7 @@ class DirectusApiClient {
       );
       return (tours as unknown as DirectusTour360[]).map(transformTour360);
     } catch (error) {
-      console.error('[DirectusClient] Error fetching tours 360:', error);
+      logger.error('[DirectusClient] Error fetching tours 360:', error);
       return [];
     }
   }
@@ -257,7 +258,7 @@ class DirectusApiClient {
       );
       return transformTour360(tour as unknown as DirectusTour360);
     } catch (error) {
-      console.error(`[DirectusClient] Error fetching tour 360 ${id}:`, error);
+      logger.error(`[DirectusClient] Error fetching tour 360 ${id}:`, error);
       return null;
     }
   }
@@ -274,7 +275,7 @@ class DirectusApiClient {
       );
       return (scenes as unknown as DirectusARScene[]).map(transformARScene);
     } catch (error) {
-      console.error('[DirectusClient] Error fetching AR scenes:', error);
+      logger.error('[DirectusClient] Error fetching AR scenes:', error);
       return [];
     }
   }
@@ -291,7 +292,7 @@ class DirectusApiClient {
       if ((scenes as any[]).length === 0) return null;
       return transformARScene((scenes as unknown as DirectusARScene[])[0]);
     } catch (error) {
-      console.error(`[DirectusClient] Error fetching AR scene ${slug}:`, error);
+      logger.error(`[DirectusClient] Error fetching AR scene ${slug}:`, error);
       return null;
     }
   }
@@ -315,7 +316,7 @@ class DirectusApiClient {
       );
       return (scenes as unknown as DirectusARScene[]).map(transformARScene);
     } catch (error) {
-      console.error(`[DirectusClient] Error fetching AR scenes for POI ${poiId}:`, error);
+      logger.error(`[DirectusClient] Error fetching AR scenes for POI ${poiId}:`, error);
       return [];
     }
   }
@@ -339,7 +340,7 @@ class DirectusApiClient {
       );
       return (scenes as unknown as DirectusARScene[]).map(transformARScene);
     } catch (error) {
-      console.error(`[DirectusClient] Error fetching AR scenes for route ${routeId}:`, error);
+      logger.error(`[DirectusClient] Error fetching AR scenes for route ${routeId}:`, error);
       return [];
     }
   }
@@ -356,7 +357,7 @@ class DirectusApiClient {
       );
       return (routes as unknown as DirectusRoute[]).map(transformRoute);
     } catch (error) {
-      console.error('[DirectusClient] Error fetching routes:', error);
+      logger.error('[DirectusClient] Error fetching routes:', error);
       return [];
     }
   }
@@ -373,7 +374,7 @@ class DirectusApiClient {
       if ((routes as any[]).length === 0) return null;
       return transformRoute((routes as unknown as DirectusRoute[])[0]);
     } catch (error) {
-      console.error(`[DirectusClient] Error fetching route ${slug}:`, error);
+      logger.error(`[DirectusClient] Error fetching route ${slug}:`, error);
       return null;
     }
   }
@@ -390,7 +391,7 @@ class DirectusApiClient {
       if ((routes as any[]).length === 0) return null;
       return transformRoute((routes as unknown as DirectusRoute[])[0]);
     } catch (error) {
-      console.error(`[DirectusClient] Error fetching route ${code}:`, error);
+      logger.error(`[DirectusClient] Error fetching route ${code}:`, error);
       return null;
     }
   }
@@ -407,7 +408,7 @@ class DirectusApiClient {
       );
       return (museums as unknown as DirectusMuseum[]).map(transformMuseum);
     } catch (error) {
-      console.error('[DirectusClient] Error fetching museums:', error);
+      logger.error('[DirectusClient] Error fetching museums:', error);
       return [];
     }
   }
@@ -421,7 +422,7 @@ class DirectusApiClient {
       );
       return transformMuseum(museum as unknown as DirectusMuseum);
     } catch (error) {
-      console.error(`[DirectusClient] Error fetching museum ${id}:`, error);
+      logger.error(`[DirectusClient] Error fetching museum ${id}:`, error);
       return null;
     }
   }
@@ -438,7 +439,7 @@ class DirectusApiClient {
       if ((museums as any[]).length === 0) return null;
       return transformMuseum((museums as unknown as DirectusMuseum[])[0]);
     } catch (error) {
-      console.error(`[DirectusClient] Error fetching museum ${slug}:`, error);
+      logger.error(`[DirectusClient] Error fetching museum ${slug}:`, error);
       return null;
     }
   }
@@ -455,7 +456,7 @@ class DirectusApiClient {
       );
       return (experiences as unknown as DirectusVRExperience[]).map(transformVRExperience);
     } catch (error) {
-      console.error('[DirectusClient] Error fetching VR experiences:', error);
+      logger.error('[DirectusClient] Error fetching VR experiences:', error);
       return [];
     }
   }
@@ -472,7 +473,7 @@ class DirectusApiClient {
       );
       return (pois as unknown as DirectusPOI[]).map(transformPOI);
     } catch (error) {
-      console.error('[DirectusClient] Error fetching POIs:', error);
+      logger.error('[DirectusClient] Error fetching POIs:', error);
       return [];
     }
   }
@@ -486,7 +487,7 @@ class DirectusApiClient {
       );
       return transformPOI(poi as unknown as DirectusPOI);
     } catch (error) {
-      console.error(`[DirectusClient] Error fetching POI ${id}:`, error);
+      logger.error(`[DirectusClient] Error fetching POI ${id}:`, error);
       return null;
     }
   }
@@ -503,7 +504,7 @@ class DirectusApiClient {
       if ((pois as any[]).length === 0) return null;
       return transformPOI((pois as unknown as DirectusPOI[])[0]);
     } catch (error) {
-      console.error(`[DirectusClient] Error fetching POI ${slug}:`, error);
+      logger.error(`[DirectusClient] Error fetching POI ${slug}:`, error);
       return null;
     }
   }
@@ -521,7 +522,7 @@ class DirectusApiClient {
       );
       return (pois as unknown as DirectusPOI[]).map(transformPOI);
     } catch (error) {
-      console.error(`[DirectusClient] Error fetching route points for ${routeId}:`, error);
+      logger.error(`[DirectusClient] Error fetching route points for ${routeId}:`, error);
       return [];
     }
   }
@@ -543,7 +544,7 @@ class DirectusApiClient {
         description: toMultilingual(c.translations, 'description'),
       }));
     } catch (error) {
-      console.error('[DirectusClient] Error fetching categories:', error);
+      logger.error('[DirectusClient] Error fetching categories:', error);
       return [];
     }
   }
@@ -589,7 +590,7 @@ class DirectusApiClient {
         total: filteredMuseums.length + filteredRoutes.length + filteredARScenes.length + filteredPOIs.length,
       };
     } catch (error) {
-      console.error('[DirectusClient] Error searching:', error);
+      logger.error('[DirectusClient] Error searching:', error);
       return { museums: [], routes: [], pois: [], ar_scenes: [], total: 0 };
     }
   }
@@ -628,7 +629,7 @@ class DirectusApiClient {
       );
     } catch (error) {
       // Silently fail analytics - don't break user experience
-      console.warn('[DirectusClient] Analytics tracking failed:', error);
+      logger.warn('[DirectusClient] Analytics tracking failed:', error);
     }
   }
 
@@ -653,7 +654,7 @@ class DirectusApiClient {
       );
       return events as any[];
     } catch (error) {
-      console.error('[DirectusClient] Error fetching analytics:', error);
+      logger.error('[DirectusClient] Error fetching analytics:', error);
       return [];
     }
   }

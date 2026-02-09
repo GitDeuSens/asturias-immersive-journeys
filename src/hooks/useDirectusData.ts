@@ -177,7 +177,7 @@ export function useImmersiveRoutes(language: Language = 'es') {
 
       setRoutes(immersiveRoutes);
     } catch (err: any) {
-      console.error('[useImmersiveRoutes] Error:', err);
+      // Error loading routes
       setError(err?.message || 'Failed to load routes');
       setRoutes([]);
     } finally {
@@ -203,7 +203,7 @@ export function useDirectusTours(language: Language = 'es') {
         const data = await getVirtualTours(language as ApiLanguage);
         setTours(data);
       } catch (err) {
-        console.error('[useDirectusTours] Error:', err);
+        // Error loading tours
         setTours([]);
       } finally {
         setLoading(false);
@@ -235,7 +235,7 @@ export function useDirectusCategories(language: Language = 'es') {
         }));
         setCategories(mapped);
       } catch (err) {
-        console.error('[useDirectusCategories] Error:', err);
+        // Error loading categories
         setCategories([]);
       } finally {
         setLoading(false);
@@ -262,7 +262,7 @@ export function useDirectusPOIs(language: Language = 'es') {
         const data = await getPOIs(language as ApiLanguage);
         setPois(data);
       } catch (err) {
-        console.error('[useDirectusPOIs] Error:', err);
+        // Error loading POIs
         setPois([]);
       } finally {
         setLoading(false);
@@ -294,7 +294,7 @@ export function useAnalyticsEvents(since?: string) {
       const json = await res.json();
       setEvents(json.data || []);
     } catch (err: any) {
-      console.error('[useAnalyticsEvents] Error:', err);
+      // Error loading analytics
       setError(err?.message || 'Failed to load analytics');
       setEvents([]);
     } finally {

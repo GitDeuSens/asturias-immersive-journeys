@@ -577,9 +577,9 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
             <NeedleARViewer 
               scene={arScene} 
               locale={language as Language}
-              onStart={() => console.log('AR started')}
+              // AR started
               onError={(error) => {
-                console.error('AR error:', error);
+                // AR error
                 setShowARViewer(false);
               }}
             />

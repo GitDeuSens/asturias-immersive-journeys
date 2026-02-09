@@ -152,7 +152,7 @@ export function GlobalSearch({
 
     try {
       const data = await searchContent(searchQuery, locale);
-      console.log(" datos ", data);
+      // Search data
       setResults(data);
       setShowDropdown(true);
 
@@ -162,7 +162,7 @@ export function GlobalSearch({
       // Save to recent searches
       saveRecentSearch(searchQuery);
     } catch (error) {
-      console.error("Search error:", error);
+      // Search error
     } finally {
       setIsLoading(false);
     }
@@ -295,7 +295,7 @@ export function GlobalSearch({
   };
 
   const search = (event: any) => {
-    console.log(" que es ?? ", event);
+    // Debug search event
   };
 
   const defaultPlaceholder = isLocalMode ? texts.placeholderLocal[locale] : texts.placeholder[locale];

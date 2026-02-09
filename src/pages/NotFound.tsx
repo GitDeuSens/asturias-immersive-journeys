@@ -11,7 +11,7 @@ const NotFound = () => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
   useEffect(() => {
-    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
+    // Track 404 error silently
 
     // Generate suggestions based on current path
     const path = location.pathname.toLowerCase();

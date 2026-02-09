@@ -126,7 +126,7 @@ export function OptimizedImage({
               isLoaded ? 'opacity-100' : 'opacity-0'
             }`}
             loading={priority ? 'eager' : 'lazy'}
-            fetchPriority={priority ? 'high' : 'auto'}
+            {...(priority && { fetchpriority: 'high' })}
             decoding="async"
             onLoad={handleLoad}
             onError={handleError}

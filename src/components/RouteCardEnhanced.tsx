@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import React, { forwardRef, memo } from "react";
 import { motion } from "framer-motion";
 import { MapPin, Clock, RotateCw, ChevronRight, Ruler, Mountain } from "lucide-react";
 import type { ImmersiveRoute } from "@/data/types";
@@ -12,7 +12,7 @@ interface RouteCardProps {
   onClick: () => void;
 }
 
-export const RouteCard = forwardRef<HTMLButtonElement, RouteCardProps>(function RouteCard({ route, onClick }, ref) {
+const RouteCardComponent = forwardRef<HTMLButtonElement, RouteCardProps>(function RouteCard({ route, onClick }, ref) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as "es" | "en" | "fr";
   const { getCategoryById } = useDirectusCategories(lang);
@@ -152,3 +152,6 @@ export const RouteCard = forwardRef<HTMLButtonElement, RouteCardProps>(function 
     </motion.button>
   );
 });
+
+export const RouteCard = memo(RouteCardComponent);
+RouteCard.displayName = 'RouteCard';
