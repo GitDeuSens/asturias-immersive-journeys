@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect } from 'react';
 import { 
   X, 
   MapPin, 
@@ -23,6 +24,7 @@ import { calculateRouteDistance, formatDistance, openNavigation } from '@/lib/ma
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ShareButtons } from '@/components/ShareButtons';
+import { trackRouteViewed } from '@/lib/analytics';
 
 interface RouteDetailSheetProps {
   route: ImmersiveRoute | null;
@@ -34,6 +36,14 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
   const { t, i18n } = useTranslation();
   const lang = i18n.language as 'es' | 'en' | 'fr';
   const { getCategoryById } = useDirectusCategories(lang);
+
+  // Track route view when details are opened
+  useEffect(() => {
+    if (route) {
+      const routeName = typeof route.title === 'string' ? route.title : route.title[lang] || route.title.es;
+      trackRouteViewed(route.id, routeName, route.points.length);
+    }
+  }, [route, lang]);
 
   if (!route) return null;
 

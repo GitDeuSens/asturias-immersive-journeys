@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ChevronLeft, 
@@ -23,6 +23,7 @@ import { useExplorationMode } from '@/hooks/useLanguage';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { trackPOIViewed, trackRouteCompleted } from '@/lib/analytics';
 import { Progress } from '@/components/ui/progress';
 import { 
   calculateDistanceTo, 
@@ -43,6 +44,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   const { mode } = useExplorationMode();
   const { latitude, longitude, hasLocation } = useGeolocation();
   const [visitedPoints, setVisitedPoints] = useState<Set<string>>(new Set());
+  const [routeStartTime] = useState(Date.now());
   
   const progress = route.points.length > 0 
     ? Math.round((visitedPoints.size / route.points.length) * 100) 
@@ -89,9 +91,31 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   }, [pointDistances, route.points]);
 
   const handlePointClick = (point: RoutePoint) => {
+    // Track POI view if not already visited
+    if (!visitedPoints.has(point.id)) {
+      const poiName = typeof point.title === 'string' ? point.title : point.title[lang] || point.title.es;
+      trackPOIViewed(point.id, poiName, route.id);
+    }
+    
     setVisitedPoints(prev => new Set([...prev, point.id]));
     onSelectPoint(point);
   };
+
+  // Track route completion when all points are visited
+  useEffect(() => {
+    if (visitedPoints.size === route.points.length && route.points.length > 0) {
+      const durationSec = Math.round((Date.now() - routeStartTime) / 1000);
+      const routeName = typeof route.title === 'string' ? route.title : route.title[lang] || route.title.es;
+      
+      trackRouteCompleted(
+        route.id,
+        routeName,
+        durationSec,
+        visitedPoints.size,
+        route.points.length
+      );
+    }
+  }, [visitedPoints, route.points.length, route.id, route.title, routeStartTime, lang]);
 
   return (
     <div className="flex flex-col h-full">

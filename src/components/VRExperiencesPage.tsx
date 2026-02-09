@@ -19,6 +19,7 @@ import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { getVRExperiences } from '@/lib/api/directus-client';
+import { trackVRStarted, trackVRExperienceViewed } from '@/lib/analytics';
 import type { VRExperience, Language } from '@/lib/types';
 
 export function VRExperiencesPage() {
@@ -94,7 +95,10 @@ export function VRExperiencesPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 * index }}
                 className="group cursor-pointer bg-card rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-border hover:border-accent"
-                onClick={() => setSelectedExperience(exp)}
+                onClick={() => {
+                  trackVRExperienceViewed(exp.id, exp.title[lang]);
+                  setSelectedExperience(exp);
+                }}
                 tabIndex={0}
                 role="button"
                 aria-label={`${t('common.viewDetails')}: ${exp.title[lang]}`}
@@ -245,7 +249,10 @@ export function VRExperiencesPage() {
                 <div className="p-4 border-t border-border">
                   <Button 
                     className="w-full h-12 text-base font-bold bg-accent hover:bg-accent/90"
-                    onClick={() => window.open(selectedExperience.apk_url, '_blank')}
+                    onClick={() => {
+                  trackVRStarted(selectedExperience.id, selectedExperience.title[lang]);
+                  window.open(selectedExperience.apk_url, '_blank');
+                }}
                   >
                     <Download className="w-5 h-5 mr-2" aria-hidden="true" />
                     {t('vr.downloadAPK')}

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, AlertTriangle, RefreshCw, Smartphone, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { trackEvent, trackARStarted, trackARError } from '@/lib/analytics';
+import { trackEvent, trackARStarted, trackARCompleted, trackARError } from '@/lib/analytics';
 import type { ARScene, Language } from '@/lib/types';
 
 interface NeedleARViewerProps {
@@ -129,9 +129,11 @@ export function NeedleARViewer({
         setARActive(false);
         setIsLoading(false);
 
-        // Track time spent
+        // Track AR completion with time spent
         const timeSpent = Math.round((Date.now() - startTimeRef.current) / 1000);
-        trackEvent('ar_completed', { ar_id: scene.id, time_spent: timeSpent });
+        if (timeSpent > 2) { // Only track if meaningful interaction
+          trackARCompleted(scene.id, timeSpent);
+        }
       };
 
       document.body.appendChild(iframe);

@@ -24,6 +24,7 @@ import {
 } from "@/lib/mapUtils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { trackRouteStarted } from "@/lib/analytics";
 import "leaflet/dist/leaflet.css";
 
 // Create route bubble marker with name label
@@ -288,6 +289,10 @@ export function RoutesPage() {
   };
 
   const handleEnterRoute = (route: ImmersiveRoute) => {
+    // Track route start
+    const routeName = typeof route.title === 'string' ? route.title : route.title[i18n.language as keyof typeof route.title] || route.title.es;
+    trackRouteStarted(route.id, routeName);
+    
     setShowRouteDetail(false);
     setExploringRoute(route);
     setSelectedPoint(null);

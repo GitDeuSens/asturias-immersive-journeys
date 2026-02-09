@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, 
@@ -38,6 +38,7 @@ import {
   formatTime,
   type NavigationDestination 
 } from '@/lib/navigationService';
+import { trackPOITimeSpent } from '@/lib/analytics';
 
 interface PointDetailSheetProps {
   point: RoutePoint | null;
@@ -75,6 +76,20 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
   const isMobile = useIsMobile();
   const [showARFullscreen, setShowARFullscreen] = useState(false);
   const [selectedGalleryImage, setSelectedGalleryImage] = useState<string | null>(null);
+  const poiStartTime = useRef<number>(Date.now());
+
+  // Track POI time spent on unmount
+  useEffect(() => {
+    return () => {
+      if (point) {
+        const durationSec = Math.round((Date.now() - poiStartTime.current) / 1000);
+        if (durationSec > 2) { // Only track if spent more than 2 seconds
+          const poiName = typeof point.title === 'string' ? point.title : point.title[language as keyof typeof point.title] || point.title.es;
+          trackPOITimeSpent(point.id, poiName, durationSec);
+        }
+      }
+    };
+  }, [point, language]);
 
   if (!point) return null;
 
