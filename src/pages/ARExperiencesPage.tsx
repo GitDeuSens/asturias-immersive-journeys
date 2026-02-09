@@ -76,7 +76,7 @@ export function ARExperiencesPage() {
 
       <main className="pt-20">
         {/* Hero section */}
-        <div className="bg-gradient-to-r from-primary to-asturias-forest py-12 mb-8">
+        <div className="bg-primary py-12 mb-8">
           <div className="container mx-auto px-4 pb-5 max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}

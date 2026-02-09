@@ -441,3 +441,8 @@
     border-top: 4px solid hsl(var(--primary));
   }
 }
+
+/* Leaflet zoom controls positioning */
+.leaflet-control-zoom {
+  margin-bottom: 50px !important;
+}
