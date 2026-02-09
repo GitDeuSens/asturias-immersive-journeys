@@ -233,3 +233,36 @@ export function useDirectusPOIs(language: Language = 'es') {
 
   return { pois, loading };
 }
+
+// ============ ANALYTICS EVENTS ============
+
+export function useAnalyticsEvents(since?: string) {
+  const [events, setEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams({ limit: '5000', sort: '-created_at' });
+      if (since) params.set('filter[created_at][_gte]', since);
+      // In dev, use Vite proxy to avoid cross-origin issues; in prod, use Directus URL directly
+      const baseUrl = import.meta.env.DEV ? '/directus-api' : DIRECTUS_URL;
+      const res = await fetch(`${baseUrl}/items/analytics_events?${params}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      setEvents(json.data || []);
+    } catch (err: any) {
+      console.error('[useAnalyticsEvents] Error:', err);
+      setError(err?.message || 'Failed to load analytics');
+      setEvents([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [since]);
+
+  useEffect(() => { load(); }, [load]);
+
+  return { events, loading, error, reload: load };
+}

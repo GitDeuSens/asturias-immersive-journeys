@@ -38,6 +38,7 @@ import {
   Legend,
 } from 'recharts';
 import { Button } from '@/components/ui/button';
+import { useAnalyticsEvents } from '@/hooks/useDirectusData';
 import { useNavigate } from 'react-router-dom';
 
 // ============ TYPES ============
@@ -189,44 +190,10 @@ function EventTypeLabel(type: string): string {
 
 export function AnalyticsDashboard() {
   const navigate = useNavigate();
-  const [events, setEvents] = useState<AnalyticsEvent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState<TimeRange>('7d');
-
-  const loadEvents = async () => {
-    setLoading(true);
-    try {
-      const since = getSinceDate(timeRange);
-      const params = new URLSearchParams();
-      params.set('limit', '5000');
-      params.set('sort', '-created_at');
-      if (since) params.set('filter[created_at][_gte]', since);
-
-      const directusUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://localhost:8055';
-      const url = `${directusUrl}/items/analytics_events?${params.toString()}`;
-      console.log('[Dashboard] Fetching:', url);
-      
-      const res = await fetch(url);
-      console.log('[Dashboard] Response status:', res.status);
-      
-      if (!res.ok) {
-        const text = await res.text();
-        console.error('[Dashboard] Error response:', text);
-        return;
-      }
-      
-      const json = await res.json();
-      const data = json.data || [];
-      console.log('[Dashboard] Loaded events:', data.length);
-      setEvents(data as AnalyticsEvent[]);
-    } catch (err) {
-      console.error('[Dashboard] Error loading analytics:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { loadEvents(); }, [timeRange]);
+  const [timeRange, setTimeRange] = useState<TimeRange>('all');
+  const since = useMemo(() => getSinceDate(timeRange), [timeRange]);
+  const { events: rawEvents, loading, error, reload: loadEvents } = useAnalyticsEvents(since);
+  const events = rawEvents as AnalyticsEvent[];
 
   // ============ COMPUTED DATA ============
 
@@ -354,6 +321,14 @@ export function AnalyticsDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        {/* Status */}
+        {(error || loading) && (
+          <div className="bg-muted/50 border border-border rounded-xl p-4 text-xs font-mono space-y-1">
+            <p>Estado: {loading ? '⏳ Cargando...' : '✅ Cargado'} | Eventos: <strong>{events.length}</strong></p>
+            {error && <p className="text-destructive">❌ {error}</p>}
+          </div>
+        )}
+
         {/* KPI Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <MetricCard 

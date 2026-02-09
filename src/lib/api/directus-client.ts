@@ -630,19 +630,19 @@ class DirectusApiClient {
     limit?: number;
   }) {
     try {
-      // Use direct fetch instead of SDK for reliability
-      const params = new URLSearchParams();
-      params.set('limit', String(filters?.limit || 1000));
-      params.set('sort', '-created_at');
-      if (filters?.event_type) params.set('filter[event_type][_eq]', filters.event_type);
-      if (filters?.resource_type) params.set('filter[resource_type][_eq]', filters.resource_type);
-      if (filters?.since) params.set('filter[created_at][_gte]', filters.since);
+      const filter: any = {};
+      if (filters?.event_type) filter.event_type = { _eq: filters.event_type };
+      if (filters?.resource_type) filter.resource_type = { _eq: filters.resource_type };
+      if (filters?.since) filter.created_at = { _gte: filters.since };
 
-      const url = `${DIRECTUS_URL}/items/analytics_events?${params.toString()}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      return (json.data || []) as any[];
+      const events = await this.getClient().request(
+        readItems('analytics_events' as any, {
+          filter,
+          sort: ['-created_at'] as any,
+          limit: filters?.limit || 5000,
+        })
+      );
+      return events as any[];
     } catch (error) {
       console.error('[DirectusClient] Error fetching analytics:', error);
       return [];

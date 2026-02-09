@@ -690,4 +690,5 @@ i18n
     },
   });
 
+export { loadDirectusTranslations } from './directus-backend';
 export default i18n;

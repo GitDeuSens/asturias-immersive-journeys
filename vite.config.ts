@@ -21,6 +21,13 @@ export default defineConfig(({ mode }) => {
       hmr: {
         overlay: false,
       },
+      proxy: {
+        '/directus-api': {
+          target: env.VITE_DIRECTUS_URL || 'http://localhost:8055',
+          changeOrigin: true,
+          rewrite: (p: string) => p.replace(/^\/directus-api/, ''),
+        },
+      },
     },
     plugins: [
       // Serve /tours-builds/ as static files BEFORE SPA fallback
