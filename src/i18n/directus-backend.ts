@@ -11,7 +11,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 interface TranslationRow {
   languages_code: string;
-  value: string;
+  name: string;
 }
 
 interface UITranslation {
@@ -41,7 +41,7 @@ export async function loadDirectusTranslations(): Promise<void> {
 }
 
 async function fetchAndCache(): Promise<void> {
-  const url = `${BASE_URL}/items/ui_translations?fields=key,translations.languages_code,translations.value&filter[status][_eq]=published&limit=-1`;
+  const url = `${BASE_URL}/items/ui_translations?fields=key,translations.languages_code,translations.name&filter[status][_eq]=published&limit=-1`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const json = await res.json();
@@ -55,10 +55,10 @@ async function fetchAndCache(): Promise<void> {
   for (const item of items) {
     if (!item.translations) continue;
     for (const t of item.translations) {
-      if (t.languages_code && t.value != null) {
+      if (t.languages_code && t.name != null) {
         const lang = t.languages_code;
         if (!byLang[lang]) byLang[lang] = {};
-        byLang[lang][item.key] = t.value;
+        byLang[lang][item.key] = t.name;
       }
     }
   }
