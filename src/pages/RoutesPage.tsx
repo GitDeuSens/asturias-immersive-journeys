@@ -369,7 +369,7 @@ export function RoutesPage() {
             )}
           </button>
 
-          <div id="routes-panel">
+          <div id="routes-panel" className="overflow-y-scroll">
             {exploringRoute ? (
               <RouteExplorerView
                 route={exploringRoute}
