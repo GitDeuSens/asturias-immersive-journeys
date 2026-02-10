@@ -40,10 +40,6 @@ export function OptimizedImage({
   const [bestFormat, setBestFormat] = useState(() => getBestImageFormat(imageFormats));
   
   const observerRef = useRef<HTMLDivElement>(null);
-  const { isIntersecting } = useIntersectionObserver(observerRef, {
-    threshold: 0.01,
-    rootMargin: '50px',
-  });
   const [isInView, setIsInView] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 

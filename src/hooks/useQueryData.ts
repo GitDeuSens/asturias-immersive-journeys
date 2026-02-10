@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getRoutes, getVirtualTours, getCategories, getPOIs } from '@/lib/api/directus-client';
-import type { ImmersiveRoute, KuulaTour, Category, POI } from '@/data/types';
+import type { ImmersiveRoute, Category, POI } from '@/data/types';
+import type { KuulaTour } from '@/lib/types';
 import type { Language } from '@/lib/directus-types';
 
 // Query keys for cache invalidation
