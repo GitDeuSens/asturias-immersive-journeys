@@ -2,10 +2,20 @@
 // React hooks for loading data from Directus CMS
 // These replace all static mock data imports
 
-import { useState, useEffect, useCallback } from 'react';
-import type { ImmersiveRoute, RoutePoint, RoutePointContent, Language, Category } from '@/data/types';
-import type { KuulaTour, Language as ApiLanguage } from '@/lib/types';
-import { getRoutes, getRoutePoints, getVirtualTours, getPOIs, getCategories } from '@/lib/api/directus-client';
+import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
+import type { ImmersiveRoute, RoutePoint, KuulaTour, Category, POI, AnalyticsEvent } from "@/data/types";
+import { 
+  getRoutes, 
+  getRoutePoints, 
+  getVirtualTours, 
+  getCategories, 
+  getPOIs,
+  getAnalyticsEvents
+} from "@/lib/api/directus-client";
+import { directusRouteToImmersive } from "./useDirectusData";
+import { logger } from "@/lib/logger";
+import { dataCache } from "./useCachedData";
 
 const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'http://localhost:8055';
 
@@ -28,8 +38,8 @@ function isValidCoord(lat: number, lng: number): boolean {
 }
 
 function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
-  // Sort points by order field, then map
-  const sortedPoints = [...points].sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+  // Points are already sorted by API order field, no need to re-sort
+  const sortedPoints = points;
 
   const routePoints: RoutePoint[] = sortedPoints
     .map((poi: any, idx: number) => {
@@ -159,23 +169,29 @@ export function useImmersiveRoutes(language: Language = 'es') {
   const loadRoutes = useCallback(async () => {
     setLoading(true);
     setError(null);
+    
+    // Check cache first
+    const cacheKey = `routes_${language}`;
+    const cached = dataCache.get<ImmersiveRoute[]>(cacheKey);
+    if (cached) {
+      setRoutes(cached);
+      setLoading(false);
+      return;
+    }
+    
     try {
       const directusRoutes = await getRoutes(language as ApiLanguage);
       
-      // For each route, load its points
-      const immersiveRoutes: ImmersiveRoute[] = await Promise.all(
-        (directusRoutes as any[]).map(async (route: any) => {
-          let points: any[] = [];
-          try {
-            points = await getRoutePoints(route.id, language as ApiLanguage);
-          } catch {
-            // Route may have no points
-          }
-          return directusRouteToImmersive(route, points);
-        })
-      );
+      // Points are now loaded with deep relations, no need for separate requests
+      const immersiveRoutes: ImmersiveRoute[] = directusRoutes.map((route: any) => {
+        // Points are already included in the route data
+        const points = route.points || [];
+        return directusRouteToImmersive(route, points);
+      });
 
       setRoutes(immersiveRoutes);
+      // Cache for 5 minutes
+      dataCache.set(cacheKey, immersiveRoutes, 5 * 60 * 1000);
     } catch (err: any) {
       // Error loading routes
       setError(err?.message || 'Failed to load routes');

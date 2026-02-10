@@ -245,20 +245,27 @@ export function VRExperiencesPage() {
               </ScrollArea>
 
               {/* CTA Footer */}
-              {selectedExperience.apk_url && (
-                <div className="p-4 border-t border-border">
+              <div className="p-4 border-t border-border">
+                {selectedExperience.apk_url ? (
                   <Button 
                     className="w-full h-12 text-base font-bold bg-accent hover:bg-accent/90"
                     onClick={() => {
-                  trackVRStarted(selectedExperience.id, selectedExperience.title[lang]);
-                  window.open(selectedExperience.apk_url, '_blank');
-                }}
+                      trackVRStarted(selectedExperience.id, selectedExperience.title[lang]);
+                      window.open(selectedExperience.apk_url, '_blank');
+                    }}
                   >
                     <Download className="w-5 h-5 mr-2" aria-hidden="true" />
                     {t('vr.downloadAPK')}
                   </Button>
-                </div>
-              )}
+                ) : (
+                  <div className="flex items-center justify-center p-4 bg-muted/50 rounded-lg border border-border">
+                    <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                      <Info className="w-4 h-4" />
+                      {t('vr.apkNotAvailable')}
+                    </div>
+                  </div>
+                )}
+              </div>
             </motion.div>
           </motion.div>
         )}

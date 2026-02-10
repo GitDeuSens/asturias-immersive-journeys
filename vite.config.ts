@@ -1,8 +1,10 @@
-import { defineConfig, loadEnv } from "vite";
-import react from "@vitejs/plugin-react-swc";
-import path from "path";
-import fs from "fs";
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react-swc';
+import imagemin from 'vite-plugin-imagemin';
+import { resolve } from 'path';
 import { componentTagger } from "lovable-tagger";
+import fs from 'fs';
+import path from 'path';
 
 // https://vitejs.dev/config/
 // BASE_PATH configuration:
@@ -30,6 +32,20 @@ export default defineConfig(({ mode }) => {
       },
     },
     plugins: [
+      // Image optimization
+      imagemin({
+        gifsicle: { optimizationLevel: 7 },
+        mozjpeg: { quality: 85, progressive: true },
+        pngquant: { quality: [0.65, 0.8], speed: 4 },
+        optipng: { optimizationLevel: 7 },
+        svgo: {
+          plugins: [
+            { name: 'removeViewBox', active: false },
+            { name: 'removeEmptyAttrs', active: false },
+          ],
+        },
+      }),
+      
       // Serve /tours-builds/ as static files BEFORE SPA fallback
       {
         name: 'serve-tours-builds',
@@ -86,17 +102,20 @@ export default defineConfig(({ mode }) => {
           assetFileNames: 'assets/[name]-[hash][extname]',
           chunkFileNames: 'assets/[name]-[hash].js',
           entryFileNames: 'assets/[name]-[hash].js',
-          // Manual chunk splitting for better performance
+          // Enhanced manual chunk splitting for better performance
           manualChunks: {
             // Vendor chunks
-            vendor: ['react', 'react-dom', 'react-router-dom'],
-            ui: ['@radix-ui/react-dialog', '@radix-ui/react-scroll-area', '@radix-ui/react-tooltip', 'framer-motion'],
+            vendor: ['react', 'react-dom'],
+            router: ['react-router-dom'],
+            ui: ['@radix-ui/react-dialog', '@radix-ui/react-scroll-area', '@radix-ui/react-tooltip'],
             maps: ['leaflet'],
             icons: ['lucide-react'],
-            // Heavy pages
+            animations: ['framer-motion'],
+            i18n: ['react-i18next'],
+            // Heavy libraries
             analytics: ['recharts'],
-            // Directus SDK
             directus: ['@directus/sdk'],
+            query: ['@tanstack/react-query'],
           },
         },
       },

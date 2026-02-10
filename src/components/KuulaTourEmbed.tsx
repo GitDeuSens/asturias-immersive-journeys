@@ -3,7 +3,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Maximize2, Minimize2, Share2, Volume2, VolumeX, X } from 'lucide-react';
+import { Maximize2, Minimize2, Share2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
@@ -40,8 +40,7 @@ export function KuulaTourEmbed({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-  const startTimeRef = useRef<number>(0);
+    const startTimeRef = useRef<number>(0);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // build_path points to deployed 3DVista dist in public/tours-builds/
@@ -176,14 +175,6 @@ export function KuulaTourEmbed({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setIsMuted(!isMuted)}
-                className="text-white hover:bg-white/20"
-              >
-                {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
                 onClick={handleShare}
                 className="text-white hover:bg-white/20"
               >
@@ -230,14 +221,6 @@ export function KuulaTourEmbed({
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsMuted(!isMuted)}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-            </Button>
             <Button
               variant="ghost"
               size="icon"

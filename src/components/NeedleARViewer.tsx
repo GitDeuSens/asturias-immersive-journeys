@@ -56,28 +56,47 @@ export function NeedleARViewer({
   onStart,
   onError 
 }: NeedleARViewerProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [arSupported, setARSupported] = useState<boolean | null>(null);
-  const [arActive, setARActive] = useState(false);
+  const [isARSupported, setIsARSupported] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [arActive, setARActive] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const startTimeRef = useRef<number>(0);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const closeBtnRef = useRef<HTMLButtonElement | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Check WebXR AR support
   useEffect(() => {
     const checkARSupport = async () => {
       if ('xr' in navigator) {
         try {
           const supported = await (navigator as any).xr?.isSessionSupported('immersive-ar');
-          setARSupported(supported || false);
+          setIsARSupported(supported || false);
         } catch {
-          setARSupported(false);
+          setIsARSupported(false);
         }
       } else {
-        setARSupported(false);
+        setIsARSupported(false);
       }
     };
 
     checkARSupport();
+    
+    // Cleanup on unmount
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      if (iframeRef.current) {
+        iframeRef.current.remove();
+        iframeRef.current = null;
+      }
+      if (closeBtnRef.current) {
+        closeBtnRef.current.remove();
+        closeBtnRef.current = null;
+      }
+    };
   }, []);
 
   const launchAR = useCallback(async () => {
@@ -106,6 +125,9 @@ export function NeedleARViewer({
       iframe.allow = 'camera; xr-spatial-tracking; gyroscope; accelerometer; magnetometer';
       iframe.allowFullscreen = true;
 
+      // Store references for cleanup
+      iframeRef.current = iframe;
+
       // Add close button
       const closeBtn = document.createElement('button');
       closeBtn.innerHTML = '✕';
@@ -123,12 +145,27 @@ export function NeedleARViewer({
         font-size: 24px;
         cursor: pointer;
       `;
-      closeBtn.onclick = () => {
-        iframe.remove();
-        closeBtn.remove();
+      
+      const cleanup = () => {
+        if (iframeRef.current) {
+          iframeRef.current.remove();
+          iframeRef.current = null;
+        }
+        if (closeBtnRef.current) {
+          closeBtnRef.current.remove();
+          closeBtnRef.current = null;
+        }
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
+        }
         setARActive(false);
         setIsLoading(false);
+      };
 
+      closeBtn.onclick = () => {
+        cleanup();
+        
         // Track AR completion with time spent
         const timeSpent = Math.round((Date.now() - startTimeRef.current) / 1000);
         if (timeSpent > 2) { // Only track if meaningful interaction
@@ -136,21 +173,51 @@ export function NeedleARViewer({
         }
       };
 
+      closeBtnRef.current = closeBtn;
       document.body.appendChild(iframe);
       document.body.appendChild(closeBtn);
 
+      // Set timeout for loading
+      timeoutRef.current = setTimeout(() => {
+        if (isLoading) {
+          cleanup();
+          const errorMsg = 'AR scene loading timeout';
+          trackARError(scene.id, errorMsg);
+          onError?.(errorMsg);
+        }
+      }, 15000); // 15 second timeout
+
+      // Enhanced error handling
       iframe.onload = () => {
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
+        }
         setIsLoading(false);
       };
 
-      iframe.onerror = () => {
-        iframe.remove();
-        closeBtn.remove();
-        setARActive(false);
-        setIsLoading(false);
+      // Use multiple error detection methods
+      const handleError = () => {
+        cleanup();
         const errorMsg = 'Failed to load AR scene';
         trackARError(scene.id, errorMsg);
         onError?.(errorMsg);
+      };
+
+      iframe.onerror = handleError;
+      
+      // Additional error detection via message listener
+      const messageListener = (event: MessageEvent) => {
+        if (event.data?.type === 'error' && event.data?.source === 'needle-engine') {
+          handleError();
+        }
+      };
+      window.addEventListener('message', messageListener);
+
+      // Cleanup message listener on unmount
+      return () => {
+        window.removeEventListener('message', messageListener);
+        cleanup();
       };
     } catch (error) {
       setIsLoading(false);
@@ -173,7 +240,7 @@ export function NeedleARViewer({
   }, [scene]);
 
   // Loading state
-  if (arSupported === null) {
+  if (isARSupported === null) {
     return (
       <div className="flex items-center justify-center p-8 bg-muted/50 rounded-xl">
         <div className="flex items-center gap-3 text-muted-foreground">
@@ -185,7 +252,7 @@ export function NeedleARViewer({
   }
 
   // AR not supported
-  if (arSupported === false) {
+  if (isARSupported === false) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
