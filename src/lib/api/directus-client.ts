@@ -21,7 +21,8 @@ import type {
   DirectusVRExperience,
 } from '@/lib/directus-types';
 import { toMultilingual } from '@/lib/directus-types';
-import { logger } from '@/lib/logger';
+import { logger } from "@/lib/logger";
+import { API_CONFIG } from "@/constants/api";
 
 // Configuration
 const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'http://localhost:8055';
@@ -234,12 +235,15 @@ class DirectusApiClient {
 
   // ============ TOURS 360 ============
 
-  async getTours360(_locale: Language = 'es'): Promise<KuulaTour[]> {
+  async getTours360(_locale: Language = 'es', page = 1, limit = 20): Promise<KuulaTour[]> {
     try {
       const tours = await this.getClient().request(
         readItems('tours_360', {
-          filter: { status: { _in: ['published', 'draft'] } },
+          filter: { status: { _in: API_CONFIG.getStatusFilter() } },
           fields: ['*', ...TRANSLATIONS_DEEP],
+          limit,
+          offset: (page - 1) * limit,
+          sort: ['-created_at'],
         })
       );
       return (tours as unknown as DirectusTour360[]).map(transformTour360);
@@ -265,12 +269,15 @@ class DirectusApiClient {
 
   // ============ AR SCENES ============
 
-  async getARScenes(_locale: Language = 'es'): Promise<ARScene[]> {
+  async getARScenes(_locale: Language = 'es', page = 1, limit = 20): Promise<ARScene[]> {
     try {
       const scenes = await this.getClient().request(
         readItems('ar_scenes', {
-          filter: { status: { _in: ['published', 'draft'] } },
+          filter: { status: { _in: API_CONFIG.getStatusFilter() } },
           fields: ['*', ...TRANSLATIONS_DEEP],
+          limit,
+          offset: (page - 1) * limit,
+          sort: ['-created_at'],
         })
       );
       return (scenes as unknown as DirectusARScene[]).map(transformARScene);
@@ -351,8 +358,17 @@ class DirectusApiClient {
     try {
       const routes = await this.getClient().request(
         readItems('routes', {
-          filter: { status: { _in: ['published', 'draft'] } },
-          fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.slug', 'categories.categories_id.translations.*'],
+          filter: { status: { _in: API_CONFIG.getStatusFilter() } },
+          fields: [
+            '*', 
+            ...TRANSLATIONS_DEEP, 
+            'categories.categories_id.*', 
+            'categories.categories_id.translations.*',
+            'points.*',
+            'points.translations.*',
+            'points.content.ar_scene_id.*',
+            'points.content.tour360_id.*'
+          ],
         })
       );
       return (routes as unknown as DirectusRoute[]).map(transformRoute);
@@ -402,7 +418,7 @@ class DirectusApiClient {
     try {
       const museums = await this.getClient().request(
         readItems('museums', {
-          filter: { status: { _in: ['published', 'draft'] } },
+          filter: { status: { _in: API_CONFIG.getStatusFilter() } },
           fields: ['*', ...TRANSLATIONS_DEEP, 'gallery.directus_files_id'],
         })
       );
@@ -446,12 +462,15 @@ class DirectusApiClient {
 
   // ============ VR EXPERIENCES ============
 
-  async getVRExperiences(_locale: Language = 'es'): Promise<VRExperience[]> {
+  async getVRExperiences(_locale: Language = 'es', page = 1, limit = 20): Promise<VRExperience[]> {
     try {
       const experiences = await this.getClient().request(
         readItems('vr_experiences', {
-          filter: { status: { _in: ['published', 'draft'] } },
+          filter: { status: { _in: API_CONFIG.getStatusFilter() } },
           fields: ['*', ...TRANSLATIONS_DEEP],
+          limit,
+          offset: (page - 1) * limit,
+          sort: ['-created_at'],
         })
       );
       return (experiences as unknown as DirectusVRExperience[]).map(transformVRExperience);
@@ -467,7 +486,7 @@ class DirectusApiClient {
     try {
       const pois = await this.getClient().request(
         readItems('pois', {
-          filter: { status: { _in: ['published', 'draft'] } },
+          filter: { status: { _in: API_CONFIG.getStatusFilter() } },
           fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.slug'],
         })
       );
@@ -533,7 +552,7 @@ class DirectusApiClient {
     try {
       const cats = await this.getClient().request(
         readItems('categories', {
-          filter: { status: { _in: ['published', 'draft'] } },
+          filter: { status: { _in: API_CONFIG.getStatusFilter() } },
           fields: ['*', ...TRANSLATIONS_DEEP],
           sort: ['order'],
         })

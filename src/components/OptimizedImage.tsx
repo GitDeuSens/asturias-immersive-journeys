@@ -1,5 +1,13 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { 
+  generateImageFormats, 
+  getBestImageFormat, 
+  generateSrcSet, 
+  preloadImage,
+  type ImageFormats 
+} from '@/lib/imageOptimization';
 
 interface OptimizedImageProps {
   src: string;
@@ -28,6 +36,14 @@ export function OptimizedImage({
 }: OptimizedImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [imageFormats] = useState<ImageFormats>(() => generateImageFormats(src));
+  const [bestFormat, setBestFormat] = useState(() => getBestImageFormat(imageFormats));
+  
+  const observerRef = useRef<HTMLDivElement>(null);
+  const { isIntersecting } = useIntersectionObserver(observerRef, {
+    threshold: 0.01,
+    rootMargin: '50px',
+  });
   const [isInView, setIsInView] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 

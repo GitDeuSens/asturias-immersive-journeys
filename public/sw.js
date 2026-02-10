@@ -1,7 +1,8 @@
-// Service Worker for offline caching and performance
-const CACHE_NAME = 'asturias-v1';
-const STATIC_CACHE = 'asturias-static-v1';
-const RUNTIME_CACHE = 'asturias-runtime-v1';
+// Enhanced Service Worker for offline caching and performance
+const CACHE_NAME = 'asturias-v2';
+const STATIC_CACHE = 'asturias-static-v2';
+const RUNTIME_CACHE = 'asturias-runtime-v2';
+const API_CACHE = 'asturias-api-v2';
 
 // Static assets to cache on install
 const STATIC_ASSETS = [
@@ -12,7 +13,20 @@ const STATIC_ASSETS = [
   '/assets/llastres-tOR0wO6q.jpg',
   '/assets/picos-BfaS7STt.jpg',
   '/assets/cares-CeXANorh.jpg',
-  '/assets/covadonga-BubZKFDZ.jpg'
+  '/assets/covadonga-BubZKFDZ.jpg',
+  '/assets/nextgen-eu-Dt9X_OTM.png',
+  '/assets/ministerio-turismo-BgR0-Eya.png',
+  '/assets/principado-asturias-BNMpUPxL.png',
+  '/assets/plan-recuperacion-pqe1Pdoh.png'
+];
+
+// API endpoints to cache for offline
+const API_ENDPOINTS = [
+  '/items/routes',
+  '/items/pois',
+  '/items/categories',
+  '/items/tours_360',
+  '/items/ar_scenes'
 ];
 
 // Install event - cache static assets
@@ -37,18 +51,38 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch event - serve from cache with network fallback
+// Fetch event - enhanced caching strategy
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   
   // Skip non-GET requests
   if (request.method !== 'GET') return;
   
-  // Skip Directus API requests
-  if (request.url.includes('/directus-api/') || request.url.includes('/items/')) return;
+  // Handle API requests with network-first strategy
+  if (API_ENDPOINTS.some(endpoint => request.url.includes(endpoint))) {
+    event.respondWith(
+      fetch(request)
+        .then(networkResponse => {
+          if (networkResponse.ok) {
+            const responseClone = networkResponse.clone();
+            caches.open(API_CACHE).then(cache => {
+              cache.put(request, responseClone);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          // Fallback to cache if network fails
+          return caches.match(request);
+        })
+    );
+    return;
+  }
   
-  // Skip external requests
-  if (!request.url.startsWith(self.location.origin)) return;
+  // Skip external requests (except images for optimization)
+  if (!request.url.startsWith(self.location.origin) && 
+      !request.url.includes('directus') && 
+      request.destination !== 'image') return;
   
   event.respondWith(
     caches.match(request)
@@ -88,4 +122,27 @@ self.addEventListener('fetch', (event) => {
         return fetch(request);
       })
   );
+});
+
+// Background sync for offline actions
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'background-sync') {
+    event.waitUntil(
+      // Sync any queued requests
+      caches.open(API_CACHE).then(cache => {
+        return cache.keys().then(keys => {
+          return Promise.all(
+            keys.map(key => {
+              // Attempt to re-fetch and update cache
+              return fetch(key.url).then(response => {
+                if (response.ok) {
+                  return cache.put(key, response);
+                }
+              });
+            })
+          );
+        });
+      })
+    );
+  }
 });
