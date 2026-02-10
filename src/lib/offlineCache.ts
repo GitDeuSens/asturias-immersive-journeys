@@ -209,7 +209,7 @@ export async function getAllCachedRoutes(): Promise<CachedRoute[]> {
 /**
  * Cache immersive routes data for offline access
  */
-export function cacheImmersiveRoutes(routes: any[]): void {
+/*export function cacheImmersiveRoutes(routes: any[]): void {
   try {
     localStorage.setItem('asturias-immersive-routes', JSON.stringify({
       data: routes,
@@ -220,7 +220,7 @@ export function cacheImmersiveRoutes(routes: any[]): void {
   } catch (error) {
     // Failed to cache immersive routes
   }
-}
+}*/
 
 /**
  * Get cached immersive routes

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { trackEvent, trackTourStarted, trackTourCompleted } from '@/lib/analytics';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useTranslation } from 'react-i18next';
 import type { KuulaTour, Language } from '@/lib/types';
 
 interface KuulaTourEmbedProps {
@@ -27,6 +27,7 @@ const texts = {
   panoramas: { es: 'panoramas', en: 'panoramas', fr: 'panoramas' },
   loading: { es: 'Cargando tour virtual...', en: 'Loading virtual tour...', fr: 'Chargement de la visite virtuelle...' },
   error: { es: 'No se pudo cargar el tour', en: 'Could not load tour', fr: 'Impossible de charger la visite' },
+  retry: { es: 'Reintentar', en: 'Retry', fr: 'Réessayer'}
 };
 
 export function KuulaTourEmbed({ 
@@ -36,7 +37,6 @@ export function KuulaTourEmbed({
   showControls = true,
   onClose 
 }: KuulaTourEmbedProps) {
-  const { t } = useLanguage();
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -46,7 +46,7 @@ export function KuulaTourEmbed({
 
   // build_path points to deployed 3DVista dist in public/tours-builds/
   const embedUrl = tour.kuula_embed_url || null;
-
+  const { t, i18n } = useTranslation();
   useEffect(() => {
     // Track tour started
     trackTourStarted(tour.id, tour.title[locale] || tour.title.es);
@@ -121,7 +121,7 @@ export function KuulaTourEmbed({
               variant="outline" 
               onClick={() => { setHasError(false); setIsLoading(true); }}
             >
-              Reintentar
+              {texts.retry[locale]}
             </Button>
           </div>
         </div>

@@ -38,7 +38,7 @@ const TRANSLATIONS_DEEP: any[] = ['translations.*'];
 
 // ============ UTILITY FUNCTIONS ============
 
-function getFileUrl(fileId: string | undefined): string {
+function getDirectusFileUrl(fileId: string | undefined): string {
   if (!fileId) return '';
   return `${DIRECTUS_URL}/assets/${fileId}`;
 }
@@ -64,8 +64,8 @@ function transformMuseum(museum: DirectusMuseum): Museum {
     address: museum.address || '',
     lat: museum.lat,
     lng: museum.lng,
-    image_url: getFileUrl(museum.cover_image),
-    gallery_urls: (museum as any).gallery?.map((g: any) => getFileUrl(g.directus_files_id)) || [],
+    image_url: getDirectusFileUrl(museum.cover_image),
+    gallery_urls: (museum as any).gallery?.map((g: any) => getDirectusFileUrl(g.directus_files_id)) || [],
     website: museum.website,
     phone: museum.phone,
     email: museum.email,
@@ -85,7 +85,7 @@ function transformTour360(tour: DirectusTour360): KuulaTour {
   // If build_path is set, use it directly as iframe src
   // If only build_zip exists, construct Directus asset URL (ZIP download, not embeddable)
   const embedUrl = tour.build_path || '';
-  const buildZipUrl = (tour as any).build_zip ? getFileUrl((tour as any).build_zip) : '';
+  const buildZipUrl = (tour as any).build_zip ? getDirectusFileUrl((tour as any).build_zip) : '';
 
   return {
     id: tour.id,
@@ -95,7 +95,7 @@ function transformTour360(tour: DirectusTour360): KuulaTour {
     kuula_embed_url: embedUrl,
     build_zip_url: buildZipUrl,
     museum_id: tour.museum_id,
-    thumbnail_url: getFileUrl(tour.thumbnail),
+    thumbnail_url: getDirectusFileUrl(tour.thumbnail),
     duration_minutes: tour.duration_minutes,
     total_panoramas: tour.total_panoramas || 0,
     published: tour.status === 'published',
@@ -111,7 +111,7 @@ function transformARScene(scene: DirectusARScene): ARScene {
     needle_scene_url: scene.build_path || '',
     needle_type: scene.ar_type,
     build_path: scene.build_path || undefined,
-    preview_image: getFileUrl(scene.preview_image),
+    preview_image: getDirectusFileUrl(scene.preview_image),
     difficulty: scene.difficulty,
     duration_minutes: scene.duration_minutes,
     requires_outdoors: scene.requires_outdoors,
@@ -129,8 +129,8 @@ function transformVRExperience(vr: DirectusVRExperience): VRExperience {
     id: vr.id,
     title: toMultilingual(vr.translations, 'title'),
     description: toMultilingual(vr.translations, 'description'),
-    thumbnail_url: getFileUrl(vr.thumbnail),
-    apk_url: getFileUrl(vr.apk_file),
+    thumbnail_url: getDirectusFileUrl(vr.thumbnail),
+    apk_url: getDirectusFileUrl(vr.apk_file),
     duration_minutes: vr.duration_minutes,
     category: vr.category || '',
     published: vr.status === 'published',
@@ -158,7 +158,7 @@ function transformRoute(route: DirectusRoute) {
     description: toMultilingual(route.translations, 'description'),
     theme: toMultilingual(route.translations, 'theme'),
     duration: toMultilingual(route.translations, 'duration'),
-    cover_image_url: getFileUrl(route.cover_image),
+    cover_image_url: getDirectusFileUrl(route.cover_image),
     category_ids: extractCategoryIds((route as any).categories),
   };
 }
@@ -220,7 +220,7 @@ function transformPOI(poi: DirectusPOI) {
     prices: toMultilingual(poi.translations, 'prices'),
     recommended_duration: toMultilingual(poi.translations, 'recommended_duration'),
     richText,
-    cover_image_url: getFileUrl(poi.cover_image),
+    cover_image_url: getDirectusFileUrl(poi.cover_image),
     category_ids: extractCategoryIds((poi as any).categories),
   };
 }
@@ -597,7 +597,7 @@ class DirectusApiClient {
 
   // ============ ANALYTICS ============
 
-  async trackEvent(eventData: {
+  async trackAnalyticsEvent(eventData: {
     event_type: string;
     session_id?: string;
     device_type?: string;
@@ -685,4 +685,4 @@ export const getPOIBySlug = (slug: string, locale?: Language) => directus.getPOI
 export const getVRExperiences = (locale?: Language) => directus.getVRExperiences(locale);
 export const getCategories = (locale?: Language) => directus.getCategories(locale);
 export const searchContent = (query: string, locale?: Language) => directus.search(query, locale);
-export const trackEvent = (eventData: any) => directus.trackEvent(eventData);
+export const trackAnalyticsEvent = (eventData: any) => directus.trackAnalyticsEvent(eventData);

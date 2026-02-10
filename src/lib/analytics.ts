@@ -174,7 +174,7 @@ export const trackPageView = (url: string) => {
   }
 
   // Directus (always)
-  directus.trackEvent({
+  directus.trackAnalyticsEvent({
     event_type: 'page_view',
     ...getCommonFields(),
     page_url: url,
@@ -194,7 +194,7 @@ export const trackEvent = (
   }
 
   // Directus (always — first-party analytics, no cookies)
-  directus.trackEvent({
+  directus.trackAnalyticsEvent({
     event_type: eventName,
     ...getCommonFields(),
     resource_id: (params?.tour_id || params?.ar_id || params?.route_id || params?.content_id || '') as string,
@@ -211,7 +211,7 @@ export const trackEvent = (
 /** Track session start — call once on app mount */
 export const trackSessionStart = () => {
   _sessionStartTime = Date.now();
-  directus.trackEvent({
+  directus.trackAnalyticsEvent({
     event_type: 'session_start',
     ...getCommonFields(),
     extra_data: {
@@ -482,7 +482,7 @@ export const trackCookieConsent = (status: string, preferences: Record<string, b
   }
 
   // Also track in Directus
-  directus.trackEvent({
+  directus.trackAnalyticsEvent({
     event_type: 'cookie_consent',
     ...getCommonFields(),
     extra_data: { status, ...preferences },

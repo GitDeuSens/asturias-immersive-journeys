@@ -97,7 +97,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
   const [exploringRoute, setExploringRoute] = useState<ImmersiveRoute | null>(null);
   const [selectedPoint, setSelectedPoint] = useState<RoutePoint | null>(null);
   const [panelExpanded, setPanelExpanded] = useState(true);
-
+  const selectedCategoriesSet = useMemo(() => new Set(selectedCategories), [selectedCategories]);
   // Geolocation
   const { latitude, longitude, error: geoError, requestLocation, hasLocation } = useGeolocation();
   const userPosition = hasLocation && latitude != null && longitude != null 
@@ -184,7 +184,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
   }, [immersiveRoutes, searchQuery, selectedCategories, lang]);
 
   // Create Set for faster category lookup
-  const selectedCategoriesSet = useMemo(() => new Set(selectedCategories), [selectedCategories]);
+  
 
   const getPanelOffset = useCallback(() => {
     if (typeof window !== "undefined" && window.innerWidth >= BREAKPOINTS.MOBILE) {
