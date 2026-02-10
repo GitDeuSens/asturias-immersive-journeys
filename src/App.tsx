@@ -89,7 +89,7 @@ function AppWithOptimizations() {
       <NetworkStatusAlert />
       <Toaster />
       <Sonner />
-      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <>
         <AnalyticsTracker />
         <Suspense fallback={<PageLoader />}>
           <Routes>
@@ -115,7 +115,7 @@ function AppWithOptimizations() {
         <Suspense fallback={null}>
           <CookieConsent />
         </Suspense>
-      </BrowserRouter>
+      </>
     </>
   );
 }
