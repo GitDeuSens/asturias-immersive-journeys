@@ -1,0 +1,64 @@
+Category,Key/ID,Value/Data,File,Notes
+===== COORDINATES =====,,,,
+Default Coords,ASTURIAS_CENTER,"lat: 43.36, lng: -5.85",src/constants/breakpoints.ts,Default map center
+Default Coords,OVIEDO,"lat: 43.36, lng: -5.84",src/constants/breakpoints.ts,Oviedo fallback
+Region Bounds,ASTURIAS_BOUNDS,"SW: [42.7, -7.8] NE: [43.9, -4.0]",src/constants/breakpoints.ts,Map bounding box
+Coord Validation,isValidCoord,"lat: 42.0–44.5, lng: -8.5 to -3.0",src/hooks/useDirectusData.ts,Asturias validation range
+Fallback Center,directusRouteToImmersive,"lat: 43.36, lng: -5.85",src/hooks/useDirectusData.ts,Route center fallback
+SEO GeoCoords,SEOHead,"latitude: 43.36, longitude: -5.85",src/components/SEOHead.tsx,Schema.org coords
+===== LAYOUT CONSTANTS =====,,,,
+Breakpoint,MOBILE,768,src/constants/breakpoints.ts,px
+Breakpoint,TABLET,1024,src/constants/breakpoints.ts,px
+Breakpoint,DESKTOP,1280,src/constants/breakpoints.ts,px
+Map Panel,DESKTOP offsets,"left:60 right:460 top:80 bottom:60",src/constants/breakpoints.ts,px
+Map Panel,MOBILE offsets,"left:40 right:40 top:80 bottom:200",src/constants/breakpoints.ts,px
+===== API CONFIG =====,,,,
+Status Filter,DEVELOPMENT,"published, draft",src/constants/api.ts,Dev shows drafts
+Status Filter,PRODUCTION,published,src/constants/api.ts,Prod only published
+Directus URL,VITE_DIRECTUS_URL,http://localhost:8055 (fallback),src/hooks/useDirectusData.ts,env var override
+i18n Fallback,FALLBACK_URL,http://localhost:8055,src/i18n/directus-backend.ts,Translation fallback
+i18n Cache,CACHE_TTL,300000 (5 min),src/i18n/directus-backend.ts,ms
+i18n Cache,CACHE_KEY,asturias-ui-translations,src/i18n/directus-backend.ts,localStorage key
+Geolocation,CACHE_KEY,asturias-geolocation,src/hooks/useGeolocation.ts,localStorage key
+===== SEO / BRANDING =====,,,,
+SEO,Default OG Image,https://turismoasturias.es/documents/asturias-og.jpg,src/components/SEOHead.tsx,External URL
+SEO,Base Title,Asturias Inmersivo,src/components/SEOHead.tsx,
+SEO,Default Description,"Descubre Asturias con experiencias inmersivas: tours virtuales 360°, rutas con realidad aumentada...",src/components/SEOHead.tsx,Truncated
+SEO,Default URL,https://asturias-inmersivo.es,src/components/SEOHead.tsx,Canonical fallback
+SEO,Schema.org Type,TouristDestination,src/components/SEOHead.tsx,JSON-LD
+SEO,Author,Principado de Asturias,src/components/SEOHead.tsx,meta author
+SEO,Keywords,"Asturias, turismo, tours virtuales, realidad aumentada, AR, VR, 360, patrimonio minero, sidra, naturaleza, Picos de Europa, museos",src/components/SEOHead.tsx,
+===== IMAGES (src/assets) =====,,,,
+Background,hero-mountains.jpg,Hero/landing background,src/components/DynamicBackground.tsx,Imported
+Background,covadonga.jpg,Background carousel,src/components/DynamicBackground.tsx,Imported
+Background,picos.jpg,Background carousel,src/components/DynamicBackground.tsx,Imported
+Background,cares.jpg,Background carousel,src/components/DynamicBackground.tsx,Imported
+Background,llastres.jpg,Background carousel,src/components/DynamicBackground.tsx,Imported
+Orphan Asset,ar-hiking.jpg,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,cimavilla.jpg,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,ecomuseo-samuno.jpg,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,horreo.jpg,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,jardin-botanico.jpg,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,laboral.jpg,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,muja.jpg,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,mumi.jpg,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,museo-ferrocarril.jpg,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,museo-sidra.jpg,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,musi.jpg,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,narzana.jpg,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,playa-griega.jpg,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,preromanico.jpg,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,ruta-sidra-cover.jpg,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,soto-barco-cover.jpg,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,termas-valduno.webp,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,torazu.jpg,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,valdedios.jpg,Not imported in code,src/assets/,Potentially unused
+Orphan Asset,vr-experience.jpg,Not imported in code,src/assets/,Potentially unused
+===== LOGOS (src/assets/logos) =====,,,,
+Logo,nextgen-eu.png,Next Generation EU,src/components/Footer.tsx,Imported
+Logo,plan-recuperacion.png,Plan de Recuperación,src/components/Footer.tsx,Imported
+Logo,ministerio-turismo.png,Ministerio de Turismo,src/components/Footer.tsx,Imported
+Logo,principado-asturias.png,Principado de Asturias,src/components/Footer.tsx,Imported
+===== EXTERNAL LINKS =====,,,,
+Footer Link,Principado,https://www.asturias.es/,src/components/Footer.tsx,
+Placeholder,Route cover fallback,/placeholder-route.jpg,src/components/RouteCardEnhanced.tsx,If no coverImage
