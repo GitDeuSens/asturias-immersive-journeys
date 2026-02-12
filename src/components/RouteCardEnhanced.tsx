@@ -131,7 +131,7 @@ const RouteCardComponent = forwardRef<HTMLButtonElement, RouteCardProps>(functio
           )}
 
           {/* Categories */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between" style={{width: '100%'}}>
             <div className="flex gap-3 w-64">
               {route.categoryIds.slice(0, 2).map((catId) => {
                 const cat = getCategoryById(catId);
