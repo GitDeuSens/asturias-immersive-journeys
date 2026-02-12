@@ -4,16 +4,16 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import type { ImmersiveRoute, RoutePoint, KuulaTour, Category, POI, AnalyticsEvent } from "@/data/types";
+import type { ImmersiveRoute, RoutePoint, RoutePointContent, Category, POI } from "@/data/types";
+import type { Language } from "@/data/types";
+import type { KuulaTour } from "@/lib/types";
 import { 
   getRoutes, 
   getRoutePoints, 
   getVirtualTours, 
   getCategories, 
   getPOIs,
-  getAnalyticsEvents
 } from "@/lib/api/directus-client";
-import { directusRouteToImmersive } from "./useDirectusData";
 import { logger } from "@/lib/logger";
 import { dataCache } from "./useCachedData";
 
@@ -161,6 +161,8 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
 
 // ============ HOOKS ============
 
+export { directusRouteToImmersive };
+
 export function useImmersiveRoutes(language: Language = 'es') {
   const [routes, setRoutes] = useState<ImmersiveRoute[]>([]);
   const [loading, setLoading] = useState(true);
@@ -180,7 +182,7 @@ export function useImmersiveRoutes(language: Language = 'es') {
     }
     
     try {
-      const directusRoutes = await getRoutes(language as ApiLanguage);
+      const directusRoutes = await getRoutes(language);
       
       // Points are now loaded with deep relations, no need for separate requests
       const immersiveRoutes: ImmersiveRoute[] = directusRoutes.map((route: any) => {
@@ -216,7 +218,7 @@ export function useDirectusTours(language: Language = 'es') {
     async function load() {
       setLoading(true);
       try {
-        const data = await getVirtualTours(language as ApiLanguage);
+        const data = await getVirtualTours(language);
         setTours(data);
       } catch (err) {
         // Error loading tours
@@ -239,7 +241,7 @@ export function useDirectusCategories(language: Language = 'es') {
     async function load() {
       setLoading(true);
       try {
-        const data = await getCategories(language as ApiLanguage);
+        const data = await getCategories(language);
         // Map Directus categories to frontend Category type
         // Directus: { id (uuid), slug, icon, color, name: {es,en,fr} }
         // Frontend: { id (slug), label: {es,en,fr}, icon, color }
@@ -275,7 +277,7 @@ export function useDirectusPOIs(language: Language = 'es') {
     async function load() {
       setLoading(true);
       try {
-        const data = await getPOIs(language as ApiLanguage);
+        const data = await getPOIs(language);
         setPois(data);
       } catch (err) {
         // Error loading POIs
