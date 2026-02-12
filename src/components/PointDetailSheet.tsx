@@ -403,7 +403,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
               )}
 
               {/* Image Gallery - shown for non-AR POIs */}
-              {!hasAR && (content.gallery?.length || content.image?.url) && (
+              {hasAR === false && (
                 <div className="space-y-3">
                   <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2">
                     <ImageIcon className="w-4 h-4 text-primary" />

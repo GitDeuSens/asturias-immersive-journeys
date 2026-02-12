@@ -40,7 +40,6 @@ function isValidCoord(lat: number, lng: number): boolean {
 function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
   // Points are already sorted by API order field, no need to re-sort
   const sortedPoints = points;
-
   const routePoints: RoutePoint[] = sortedPoints
     .map((poi: any, idx: number) => {
       const content: RoutePointContent = {};
