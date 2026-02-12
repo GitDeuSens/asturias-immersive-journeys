@@ -3,7 +3,6 @@ import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams } from "react-router-dom";
 import { SkipToContent } from '@/components/SkipToContent';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -62,7 +61,6 @@ function RedirectToAR() {
   return <Navigate to={`/ar/${slug}`} replace />;
 }
 
-const queryClient = new QueryClient();
 
 // Lazy load heavy components
 const CookieConsent = lazy(() => import("./components/CookieConsent").then(m => ({ default: m.CookieConsent })));
@@ -123,11 +121,9 @@ function AppWithOptimizations() {
 const App = () => (
   <ErrorBoundary>
     <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <AppWithOptimizations />
-        </TooltipProvider>
-      </QueryClientProvider>
+      <TooltipProvider>
+        <AppWithOptimizations />
+      </TooltipProvider>
     </HelmetProvider>
   </ErrorBoundary>
 );

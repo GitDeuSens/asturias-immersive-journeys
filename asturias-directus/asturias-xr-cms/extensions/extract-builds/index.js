@@ -41,30 +41,39 @@ export default ({ action }, { services, logger }) => {
   // TRIGGER: Обновление tours_360 / ar_scenes
   // ============================================
   action('items.update', async ({ payload, keys, collection }, context) => {
-    if (collection === 'tours_360' && payload.build_zip) {
-      const itemsService = new ItemsService(collection, { schema: context.schema, accountability: context.accountability });
-      for (const id of keys) {
-        const item = await itemsService.readOne(id);
+    const configs = {
+      tours_360:  { buildSubdir: 'tours-builds', logPrefix: 'EXTRACT-TOUR' },
+      ar_scenes:  { buildSubdir: 'ar-builds',    logPrefix: 'EXTRACT-AR' },
+    };
+
+    const config = configs[collection];
+    if (!config) return;
+    if (!('build_zip' in payload)) return; // field not touched
+
+    const itemsService = new ItemsService(collection, { schema: context.schema, accountability: context.accountability });
+
+    for (const id of keys) {
+      const item = await itemsService.readOne(id);
+      const merged = { ...item, ...payload };
+
+      if (merged.build_zip) {
+        // New ZIP uploaded → extract it
         await extractBuild({
-          item: { ...item, ...payload },
+          item: merged,
           collection,
-          buildSubdir: 'tours-builds',
-          logPrefix: 'EXTRACT-TOUR',
+          buildSubdir: config.buildSubdir,
+          logPrefix: config.logPrefix,
           context,
           logger,
           services,
         });
-      }
-    }
-    if (collection === 'ar_scenes' && payload.build_zip) {
-      const itemsService = new ItemsService(collection, { schema: context.schema, accountability: context.accountability });
-      for (const id of keys) {
-        const item = await itemsService.readOne(id);
-        await extractBuild({
-          item: { ...item, ...payload },
+      } else {
+        // build_zip cleared → remove old build and clear build_path
+        await cleanupBuild({
+          item,
           collection,
-          buildSubdir: 'ar-builds',
-          logPrefix: 'EXTRACT-AR',
+          buildSubdir: config.buildSubdir,
+          logPrefix: config.logPrefix,
           context,
           logger,
           services,
@@ -163,6 +172,33 @@ async function extractBuild({ item, collection, buildSubdir, logPrefix, context,
     logger.error(`[${logPrefix}] ❌ ERROR for "${item.slug}": ${error.message}`);
     logger.error(error.stack);
     // Не бросаем ошибку — сохранение элемента не должно блокироваться
+  }
+}
+
+// ============================================
+// CLEANUP: remove old build when build_zip is cleared
+// ============================================
+async function cleanupBuild({ item, collection, buildSubdir, logPrefix, context, logger, services }) {
+  const { ItemsService } = services;
+  const { schema, accountability } = context;
+  const itemsService = new ItemsService(collection, { schema, accountability });
+
+  try {
+    if (!item.slug) return;
+
+    const extractPath = path.join(BUILDS_ROOT, buildSubdir, item.slug);
+
+    if (existsSync(extractPath)) {
+      logger.info(`[${logPrefix}] build_zip cleared → removing build: ${extractPath}`);
+      await fs.rm(extractPath, { recursive: true, force: true });
+    }
+
+    // Clear build_path so frontend doesn't try to load stale content
+    await itemsService.updateOne(item.id, { build_path: null });
+    logger.info(`[${logPrefix}] ✅ Cleaned up build for "${item.slug}"`);
+
+  } catch (error) {
+    logger.error(`[${logPrefix}] ❌ Cleanup error for "${item.slug}": ${error.message}`);
   }
 }
 

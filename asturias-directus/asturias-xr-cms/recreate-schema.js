@@ -205,7 +205,7 @@ const COLLECTIONS = [
 
       // Media divider
       { field: 'media_divider', type: 'alias', meta: { interface: 'presentation-divider', special: ['alias', 'no-data'], options: { title: 'Media', icon: 'image' } } },
-      { field: 'cover_image', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file-image', note: 'Imagen principal (16:9)' } },
+      { field: 'cover_image', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file-image', special: ['file'], note: 'Imagen principal (16:9)' } },
       { field: 'gallery', type: 'alias', meta: { interface: 'files', special: ['files'] } },
 
       // Contact divider
@@ -268,12 +268,12 @@ const COLLECTIONS = [
 
       // 3DVista Build
       { field: 'build_divider', type: 'alias', meta: { interface: 'presentation-divider', special: ['alias', 'no-data'], options: { title: 'Build 3DVista', icon: 'panorama' } } },
-      { field: 'build_zip', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', required: true, note: 'ZIP con build de 3DVista (index.html + assets)' } },
+      { field: 'build_zip', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', special: ['file'], required: true, note: 'ZIP con build de 3DVista (index.html + assets)' } },
       { field: 'build_path', type: 'string', meta: { interface: 'input', readonly: true, note: 'Auto-generado por hook: /tours-builds/{slug}/' } },
 
       // Preview
-      { field: 'thumbnail', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file-image', note: 'Preview image (16:9)' } },
-      { field: 'preview_video', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', note: 'Video teaser (opcional)' } },
+      { field: 'thumbnail', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file-image', special: ['file'], note: 'Preview image (16:9)' } },
+      { field: 'preview_video', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', special: ['file'], note: 'Video teaser (opcional)' } },
 
       // Relations
       { field: 'museum_id', type: 'uuid', schema: { foreign_key_table: 'museums' }, meta: { interface: 'select-dropdown-m2o', display_template: '{{slug}}', note: 'Museo asociado' } },
@@ -325,7 +325,7 @@ const COLLECTIONS = [
 
       // Needle Build
       { field: 'build_divider', type: 'alias', meta: { interface: 'presentation-divider', special: ['alias', 'no-data'], options: { title: 'Build Needle Engine', icon: 'view_in_ar' } } },
-      { field: 'build_zip', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', required: true, note: 'ZIP con build de Needle Engine' } },
+      { field: 'build_zip', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', special: ['file'], required: true, note: 'ZIP con build de Needle Engine' } },
       { field: 'build_path', type: 'string', meta: { interface: 'input', readonly: true, note: 'Auto-generado por hook' } },
 
       // AR Type
@@ -347,13 +347,13 @@ const COLLECTIONS = [
       { field: 'location_radius_meters', type: 'integer', schema: { default_value: 50 }, meta: { interface: 'input', width: 'half', note: 'Radio de activación (metros)' } },
 
       // Image Tracking
-      { field: 'tracking_marker', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file-image', note: 'Marcador para imprimir (A4)' } },
+      { field: 'tracking_marker', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file-image', special: ['file'], note: 'Marcador para imprimir (A4)' } },
       { field: 'marker_size_cm', type: 'integer', meta: { interface: 'input', width: 'half', note: 'Tamaño del marcador impreso (cm)' } },
 
       // Media
       { field: 'media_divider', type: 'alias', meta: { interface: 'presentation-divider', special: ['alias', 'no-data'], options: { title: 'Media', icon: 'image' } } },
-      { field: 'preview_image', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file-image', required: true, note: 'Hero image' } },
-      { field: 'preview_video', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', note: 'Video demo' } },
+      { field: 'preview_image', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file-image', special: ['file'], required: true, note: 'Hero image' } },
+      { field: 'preview_video', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', special: ['file'], note: 'Video demo' } },
 
       // Metadata
       { field: 'duration_minutes', type: 'integer', schema: { default_value: 10 }, meta: { interface: 'input', width: 'half' } },
@@ -412,14 +412,14 @@ const COLLECTIONS = [
 
       // Files
       { field: 'files_divider', type: 'alias', meta: { interface: 'presentation-divider', special: ['alias', 'no-data'], options: { title: 'Archivos', icon: 'folder' } } },
-      { field: 'apk_file', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', required: true, note: 'APK para Pico 4 / Quest (hasta 500MB)' } },
+      { field: 'apk_file', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', special: ['file'], required: true, note: 'APK para Pico 4 / Quest (hasta 500MB)' } },
       { field: 'apk_version', type: 'string', meta: { interface: 'input', width: 'half', note: 'Versión (1.0.0)' } },
       { field: 'apk_size_mb', type: 'float', meta: { interface: 'input', readonly: true, width: 'half', note: 'Tamaño en MB' } },
 
       // Media
       { field: 'media_divider', type: 'alias', meta: { interface: 'presentation-divider', special: ['alias', 'no-data'], options: { title: 'Media', icon: 'image' } } },
-      { field: 'thumbnail', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file-image', required: true } },
-      { field: 'preview_video', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', note: 'Teaser video' } },
+      { field: 'thumbnail', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file-image', special: ['file'], required: true } },
+      { field: 'preview_video', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', special: ['file'], note: 'Teaser video' } },
       { field: 'screenshots', type: 'alias', meta: { interface: 'files', special: ['files'], note: 'Screenshots de la experiencia' } },
 
       // Metadata
@@ -479,7 +479,7 @@ const COLLECTIONS = [
 
       // Media
       { field: 'media_divider', type: 'alias', meta: { interface: 'presentation-divider', special: ['alias', 'no-data'], options: { title: 'Media', icon: 'image' } } },
-      { field: 'cover_image', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file-image', required: true } },
+      { field: 'cover_image', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file-image', special: ['file'], required: true } },
       { field: 'gallery', type: 'alias', meta: { interface: 'files', special: ['files'] } },
 
       // Route Data
@@ -505,7 +505,7 @@ const COLLECTIONS = [
       { field: 'center_lat', type: 'float', meta: { interface: 'input', width: 'half', note: 'Centro del mapa' } },
       { field: 'center_lng', type: 'float', meta: { interface: 'input', width: 'half' } },
       { field: 'polyline', type: 'json', meta: { interface: 'input-code', options: { language: 'json' }, note: 'Array de {lat, lng}' } },
-      { field: 'gpx_file', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', note: 'GPX track' } },
+      { field: 'gpx_file', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', special: ['file'], note: 'GPX track' } },
 
       // Flags
       { field: 'featured', type: 'boolean', schema: { default_value: false }, meta: { interface: 'boolean', width: 'half' } },
@@ -587,14 +587,14 @@ const COLLECTIONS = [
 
       // Media
       { field: 'media_divider', type: 'alias', meta: { interface: 'presentation-divider', special: ['alias', 'no-data'], options: { title: 'Media', icon: 'image' } } },
-      { field: 'cover_image', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file-image' } },
+      { field: 'cover_image', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file-image', special: ['file'] } },
       { field: 'gallery', type: 'alias', meta: { interface: 'files', special: ['files'] } },
 
       // Audio guides
       { field: 'audio_divider', type: 'alias', meta: { interface: 'presentation-divider', special: ['alias', 'no-data'], options: { title: 'Audioguías', icon: 'headphones' } } },
-      { field: 'audio_es', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', width: 'third', note: 'MP3 español' } },
-      { field: 'audio_en', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', width: 'third', note: 'MP3 inglés' } },
-      { field: 'audio_fr', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', width: 'third', note: 'MP3 francés' } },
+      { field: 'audio_es', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', special: ['file'], width: 'third', note: 'MP3 español' } },
+      { field: 'audio_en', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', special: ['file'], width: 'third', note: 'MP3 inglés' } },
+      { field: 'audio_fr', type: 'uuid', schema: { foreign_key_table: 'directus_files' }, meta: { interface: 'file', special: ['file'], width: 'third', note: 'MP3 francés' } },
       { field: 'audio_duration_seconds', type: 'integer', meta: { interface: 'input', readonly: true, width: 'half', note: 'Duración auto-detectada' } },
 
       // Video
