@@ -40,6 +40,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
   // Track route view when details are opened
   useEffect(() => {
     if (route) {
+      console.log(' esto es una ruta ', route);
       const routeName = typeof route.title === 'string' ? route.title : route.title[lang] || route.title.es;
       trackRouteViewed(route.id, routeName, route.points.length);
     }
@@ -106,7 +107,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
           role="img"
           aria-label={route.title[lang]}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" aria-hidden="true" />
+          <div className="absolute inset-0 from-background via-background/20 to-transparent" aria-hidden="true" />
           
           {/* Close button */}
           <button 
@@ -213,6 +214,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
                 variant="outline"
                 className="w-100 justify-between"
                 onClick={handleNavigateToStart}
+                style={{width: '100%'}}
               >
                 <span className="flex items-center gap-2">
                   <Navigation className="w-4 h-4" aria-hidden="true" />
@@ -251,7 +253,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
                   {t('routes.points')} ({route.points.length})
                 </h3>
                 <div className="space-y-4">
-                  {route.points.slice(0, 3).map((point, idx) => (
+                  {route.points.map((point, idx) => (
                     <PointPreviewCard key={point.id} point={point} index={idx} lang={lang} />
                   ))}
                   {route.points.length > 3 && (
@@ -281,25 +283,25 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
 }
 
 // Small point preview card
-function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: number; lang: 'es' | 'en' | 'fr' }) {
+function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: number; lang: any }) {
   const content = point.content;
-  
+  console.log(' contenido ', point);
   // Determine what content types are available
   const hasAR = !!content.arExperience;
   const has360 = !!content.tour360;
   const hasVideo = !!content.video;
   const hasAudio = !!content.audioGuide;
   const hasPDF = !!content.pdf;
-
+  const pointTitle = point.title;
   return (
-    <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50" style={{width: '300px'}}>
+    <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50" style={{width: '100%'}}>
       {/* Thumbnail */}
       <div className="relative flex-shrink-0">
         <div 
           className="w-12 h-12 rounded-lg bg-cover bg-center border-2 border-primary/30"
-          style={{ backgroundImage: point.coverImage ? `url(${point.coverImage})` : undefined }}
+          style={{ backgroundImage: point.coverImage ? `url(http://192.168.12.71:8055/assets/${point.coverImage})` : undefined }}
           role="img"
-          aria-label={point.title[lang]}
+          aria-label={point.title as any}
         />
         <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center text-xs font-bold text-white border-2 border-white shadow-sm">
           {index + 1}
@@ -308,7 +310,7 @@ function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: nu
       
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-foreground text-sm">{point.title[lang]}</p>
+        <p className="font-medium text-foreground text-sm">{point.title as any}</p>
         <div className="flex items-center gap-1.5 mt-1">
           {hasAR && <Smartphone className="w-3.5 h-3.5 text-warm" aria-label="AR" />}
           {has360 && <Camera className="w-3.5 h-3.5 text-primary" aria-label="360°" />}

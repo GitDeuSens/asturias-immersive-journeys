@@ -56,6 +56,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
 
       // Map 360 tour if linked
       if (poi.tour_360_id) {
+        console.log(' debes entrar 2 veces ', poi);
         content.tour360 = {
           iframe360Url: poi.tour_360_url || '',
           allowFullscreen: true,
@@ -75,7 +76,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
 
       // Map cover image
       if (poi.cover_image_url) {
-        content.image = { url: poi.cover_image_url };
+        content.image = { url: poi.cover_image };
       }
 
       const lat = Number(poi.lat) || 0;
@@ -84,20 +85,20 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       return {
         id: poi.id || poi.slug || `point-${idx}`,
         order: poi.order ?? idx + 1,
-        title: poi.title || { es: '', en: '', fr: '' },
-        shortDescription: poi.short_description || { es: '', en: '', fr: '' },
+        title: poi.translations[0].title || { es: '', en: '', fr: '' },
+        shortDescription: poi.translations[0].short_description || { es: '', en: '', fr: '' },
         location: {
           lat,
           lng,
           address: poi.address,
         },
-        coverImage: poi.cover_image_url || '',
+        coverImage: poi.cover_image || '',
         content,
         tags: poi.tags || [],
       };
-    })
+    });
     // Filter out points with invalid coordinates — they can't be shown on the map
-    .filter(p => isValidCoord(p.location.lat, p.location.lng));
+   // .filter(p => isValidCoord(p.location.lat, p.location.lng));
 
   // Build polyline: prefer DB polyline if valid, otherwise generate from POI points
   let polyline: { lat: number; lng: number }[] = [];
@@ -137,6 +138,8 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
     }
   }
 
+  console.log(' puntos de ruta ', routePoints, points);
+
   return {
     id: route.route_code || route.id,
     title: route.title || { es: '', en: '', fr: '' },
@@ -149,7 +152,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
     difficulty: route.difficulty || 'easy',
     isCircular: route.is_circular ?? false,
     center,
-    maxPoints: routePoints.length,
+    maxPoints: points.length,
     points: routePoints,
     tour360: route.tour_360_id ? { available: true } : undefined,
     polyline,

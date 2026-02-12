@@ -5,6 +5,7 @@ import { resolve } from 'path';
 import { componentTagger } from "lovable-tagger";
 import fs from 'fs';
 import path from 'path';
+import mkcert from 'vite-plugin-mkcert';
 
 // https://vitejs.dev/config/
 // BASE_PATH configuration:
@@ -14,7 +15,6 @@ import path from 'path';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const basePath = env.VITE_BASE_PATH || '/';
-  
   return {
     base: basePath,
     server: {
@@ -32,6 +32,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     plugins: [
+      mkcert(),
       // Image optimization
       imagemin({
         gifsicle: { optimizationLevel: 7 },

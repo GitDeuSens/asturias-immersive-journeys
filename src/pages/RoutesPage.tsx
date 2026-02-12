@@ -108,6 +108,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
 
   // Inject map styles on mount
   useEffect(() => {
+    console.log(' esto es una ruta ?? ', immersiveRoutes);
     injectMapStyles();
   }, []);
 
@@ -271,7 +272,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
       // Only place markers for points with valid coordinates
       exploringRoute.points.forEach((point, idx) => {
         if (point.location.lat === 0 && point.location.lng === 0) return;
-        const pointName = point.title[lang];
+        const pointName = point.title as any;
         const marker = L.marker([point.location.lat, point.location.lng], {
           icon: createPointMarkerIcon(point, idx, pointName),
         })
@@ -284,7 +285,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
     } else {
       // Add all routes to cluster group
       filteredRoutes.forEach((route) => {
-        const routeName = route.title[lang];
+        const routeName = route.title as any;
         const marker = L.marker([route.center.lat, route.center.lng], {
           icon: createRouteMarkerIcon(route, routeName),
         }).on("click", () => {

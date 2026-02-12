@@ -164,9 +164,9 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
           {/* Hero image */}
           <div
             className="relative h-56 bg-cover bg-center flex-shrink-0"
-            style={{ backgroundImage: point.coverImage ? `url(${point.coverImage})` : undefined }}
+            style={{ backgroundImage: point.coverImage ? `url(http://192.168.12.71:8055/assets/${point.coverImage})` : undefined }}
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+            <div className="absolute inset-0 from-background via-background/40 to-transparent" />
 
             {/* Close button */}
             <button
@@ -197,13 +197,13 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
             {/* Bottom info */}
             <div className="pl-6 pt-3">
               <h1 className="text-2xl font-serif font-bold">
-                {point.title[language]}
+                {point.title as any}
               </h1>
             </div>
             <div className="p-6 space-y-6">
               {/* Description */}
               <p className="text-muted-foreground leading-relaxed text-base">
-                {point.shortDescription[language]}
+                {point.shortDescription as any}
               </p>
 
               {/* Navigation Section - Priority for "here" mode */}
