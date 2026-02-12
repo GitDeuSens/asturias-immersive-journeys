@@ -40,7 +40,6 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
   // Track route view when details are opened
   useEffect(() => {
     if (route) {
-      console.log(' esto es una ruta ', route);
       const routeName = typeof route.title === 'string' ? route.title : route.title[lang] || route.title.es;
       trackRouteViewed(route.id, routeName, route.points.length);
     }
@@ -285,7 +284,6 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
 // Small point preview card
 function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: number; lang: any }) {
   const content = point.content;
-  console.log(' contenido ', point);
   // Determine what content types are available
   const hasAR = !!content.arExperience;
   const has360 = !!content.tour360;

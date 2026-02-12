@@ -108,14 +108,12 @@ export const RoutesPage = React.memo(function RoutesPage() {
 
   // Inject map styles on mount
   useEffect(() => {
-    console.log(' esto es una ruta ?? ', immersiveRoutes);
     injectMapStyles();
   }, []);
 
   // Initialize map
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
-
     mapRef.current = L.map(mapContainerRef.current, {
       center: [DEFAULT_COORDINATES.ASTURIAS_CENTER.lat, DEFAULT_COORDINATES.ASTURIAS_CENTER.lng],
       zoom: 9,
@@ -184,6 +182,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
     });
   }, [immersiveRoutes, searchQuery, selectedCategories, lang]);
 
+  filteredRoutes.sort((a: any, b: any) => a.id.split('-')[1] - b.id.split('-')[1]);
   // Create Set for faster category lookup
   
 

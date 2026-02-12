@@ -10,7 +10,6 @@ interface RouteCardProps {
 }
 
 export function RouteCard({ route, onClick }: RouteCardProps) {
-  console.log(' ruta ', route);
   const { t, language } = useLanguage();
   const { getCategoryById } = useDirectusCategories(language as "es" | "en" | "fr");
 

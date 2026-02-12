@@ -56,7 +56,6 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
 
       // Map 360 tour if linked
       if (poi.tour_360_id) {
-        console.log(' debes entrar 2 veces ', poi);
         content.tour360 = {
           iframe360Url: poi.tour_360_url || '',
           allowFullscreen: true,
@@ -137,8 +136,6 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       center = { lat: sumLat / coordsForCenter.length, lng: sumLng / coordsForCenter.length };
     }
   }
-
-  console.log(' puntos de ruta ', routePoints, points);
 
   return {
     id: route.route_code || route.id,
