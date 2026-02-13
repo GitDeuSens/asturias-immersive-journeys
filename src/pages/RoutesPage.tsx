@@ -284,7 +284,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
     } else {
       // Add all routes to cluster group
       filteredRoutes.forEach((route) => {
-        const routeName = route.title as any;
+        const routeName = route.title[lang] as any;
         const marker = L.marker([route.center.lat, route.center.lng], {
           icon: createRouteMarkerIcon(route, routeName),
         }).on("click", () => {
