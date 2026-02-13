@@ -4,7 +4,7 @@ import { resolve } from 'path';
 import { componentTagger } from "lovable-tagger";
 import fs from 'fs';
 import path from 'path';
-
+import mkcert from 'vite-plugin-mkcert';
 
 // https://vitejs.dev/config/
 // BASE_PATH configuration:
@@ -31,6 +31,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     plugins: [
+      mkcert(),
       
       // Serve /tours-builds/ as static files BEFORE SPA fallback
       {
