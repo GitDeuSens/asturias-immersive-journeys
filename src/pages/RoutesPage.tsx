@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import L from "leaflet";
 import { MapPin, Search, ChevronUp, ChevronDown, Maximize2, Locate } from "lucide-react";
@@ -26,7 +25,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { trackRouteStarted } from "@/lib/analytics";
-import { matchesSlug } from "@/lib/slugify";
 import { BREAKPOINTS, MAP_PANEL_OFFSETS, ASTURIAS_BOUNDS, DEFAULT_COORDINATES } from "@/constants/breakpoints";
 import "leaflet/dist/leaflet.css";
 
@@ -79,7 +77,6 @@ const createPointMarkerIcon = (point: RoutePoint, index: number, pointName: stri
 };
 
 export const RoutesPage = React.memo(function RoutesPage() {
-  const { slug } = useParams<{ slug?: string }>();
   const { t, i18n } = useTranslation();
   const lang = i18n.language as "es" | "en" | "fr";
   const mapRef = useRef<L.Map | null>(null);
@@ -101,22 +98,6 @@ export const RoutesPage = React.memo(function RoutesPage() {
   const [selectedPoint, setSelectedPoint] = useState<RoutePoint | null>(null);
   const [panelExpanded, setPanelExpanded] = useState(true);
   const selectedCategoriesSet = useMemo(() => new Set(selectedCategories), [selectedCategories]);
-
-  // Auto-open route from URL slug
-  const slugHandledRef = useRef(false);
-  useEffect(() => {
-    if (!slug || slugHandledRef.current || immersiveRoutes.length === 0) return;
-    const matched = immersiveRoutes.find(route => {
-      const title = route.title[lang] || route.title.es || '';
-      return matchesSlug(slug, title, route.id);
-    });
-    if (matched) {
-      setSelectedRoute(matched);
-      setShowRouteDetail(true);
-      slugHandledRef.current = true;
-    }
-  }, [slug, immersiveRoutes, lang]);
-
   // Geolocation
   const { latitude, longitude, error: geoError, requestLocation, hasLocation } = useGeolocation();
   const userPosition = hasLocation && latitude != null && longitude != null 

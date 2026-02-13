@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react-swc';
+import imagemin from 'vite-plugin-imagemin';
 import { resolve } from 'path';
 import { componentTagger } from "lovable-tagger";
 import fs from 'fs';
@@ -32,6 +33,19 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       mkcert(),
+      // Image optimization
+      imagemin({
+        gifsicle: { optimizationLevel: 7 },
+        mozjpeg: { quality: 85, progressive: true },
+        pngquant: { quality: [0.65, 0.8], speed: 4 },
+        optipng: { optimizationLevel: 7 },
+        svgo: {
+          plugins: [
+            { name: 'removeViewBox', active: false },
+            { name: 'removeEmptyAttrs', active: false },
+          ],
+        },
+      }),
       
       // Serve /tours-builds/ as static files BEFORE SPA fallback
       {
