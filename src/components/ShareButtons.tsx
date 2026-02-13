@@ -35,6 +35,7 @@ interface ShareButtonsProps {
   url?: string;
   title: string;
   description?: string;
+  routeCode?: string;
   hashtags?: string[];
   className?: string;
   variant?: 'inline' | 'modal';
@@ -44,6 +45,7 @@ export function ShareButtons({
   url, 
   title, 
   description = '', 
+  routeCode,
   hashtags = ['AsturiasParaisoNatural', 'AsturiasInmersivo'],
   className = '',
   variant = 'inline'
@@ -64,12 +66,22 @@ export function ShareButtons({
   };
 
   const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
+    if (routeCode) {
+      try {
+        await navigator.clipboard.writeText(shareUrl + `/${routeCode}`);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
     }
   };
 

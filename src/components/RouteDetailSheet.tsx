@@ -241,6 +241,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
               <ShareButtons 
                 title={route.title[lang]}
                 description={route.shortDescription[lang]}
+                routeCode={route.id}
                 hashtags={['AsturiasParaisoNatural', 'AsturiasInmersivo', route.id.replace('-', '')]}
               />
             </div>

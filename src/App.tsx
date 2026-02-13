@@ -96,6 +96,7 @@ function AppWithOptimizations() {
             <Route path="/tours" element={<Tours360Page />} />
             <Route path="/tours/:slug" element={<Tours360Page />} />
             <Route path="/routes" element={<RoutesPage />} />
+            <Route path="/routes/:routeCode" element={<RoutesPage />} />
             <Route path="/vr" element={<VRExperiencesPage />} />
             <Route path="/ar" element={<ARExperiencesPage />} />
             <Route path="/ar/:slug" element={<ARScenePage />} />
