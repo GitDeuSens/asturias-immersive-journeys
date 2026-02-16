@@ -93,7 +93,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
           mass: 0.9,
           opacity: { duration: 0.2, ease: 'easeOut' }
         }}
-        className="fixed right-0 top-0 bottom-0 left-0 w-100 max-w-lg bg-background z-50 shadow-2xl flex flex-col overflow-hidden md:rounded-l-3xl"
+        className="fixed right-0 top-0 bottom-0 w-100 max-w-lg bg-background z-50 shadow-2xl flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"

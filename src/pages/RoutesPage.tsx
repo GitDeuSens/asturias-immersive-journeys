@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import L from "leaflet";
 import { MapPin, Search, ChevronUp, ChevronDown, Maximize2, Locate } from "lucide-react";
@@ -27,7 +28,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { trackRouteStarted } from "@/lib/analytics";
 import { BREAKPOINTS, MAP_PANEL_OFFSETS, ASTURIAS_BOUNDS, DEFAULT_COORDINATES } from "@/constants/breakpoints";
 import "leaflet/dist/leaflet.css";
-
+import { matchesSlug } from "@/lib/slugify";
 // Create route bubble marker with name label
 const createRouteMarkerIcon = (route: ImmersiveRoute, routeName: string) => {
   const borderColor = route.isCircular ? "hsl(79, 100%, 36%)" : "hsl(203, 100%, 32%)";
@@ -77,6 +78,7 @@ const createPointMarkerIcon = (point: RoutePoint, index: number, pointName: stri
 };
 
 export const RoutesPage = React.memo(function RoutesPage() {
+  const { routeCode } = useParams<{ routeCode?: string }>();
   const { t, i18n } = useTranslation();
   const lang = i18n.language as "es" | "en" | "fr";
   const mapRef = useRef<L.Map | null>(null);
@@ -98,6 +100,21 @@ export const RoutesPage = React.memo(function RoutesPage() {
   const [selectedPoint, setSelectedPoint] = useState<RoutePoint | null>(null);
   const [panelExpanded, setPanelExpanded] = useState(true);
   const selectedCategoriesSet = useMemo(() => new Set(selectedCategories), [selectedCategories]);
+
+  const routeCodeHandledRef = useRef(false);
+  useEffect(() => {
+    if (!routeCode || routeCodeHandledRef.current || immersiveRoutes.length === 0) return;
+    const matched = immersiveRoutes.find(route => {
+      const title = route.title[lang] || route.title.es || '';
+      return matchesSlug(routeCode, title, route.id);
+    });
+    if (matched) {
+      setSelectedRoute(matched);
+      setShowRouteDetail(true);
+      routeCodeHandledRef.current = true;
+    }
+  }, [routeCode, immersiveRoutes, lang]);
+
   // Geolocation
   const { latitude, longitude, error: geoError, requestLocation, hasLocation } = useGeolocation();
   const userPosition = hasLocation && latitude != null && longitude != null 
