@@ -69,7 +69,7 @@ const ARExperiencesPage = lazy(() => import("./pages/ARExperiencesPage").then(m 
 const VRExperiencesPage = lazy(() => import("./components/VRExperiencesPage").then(m => ({ default: m.VRExperiencesPage })));
 const Tours360Page = lazy(() => import("./pages/Tours360Page").then(m => ({ default: m.Tours360Page })));
 const RoutesPage = lazy(() => import("./pages/RoutesPage").then(m => ({ default: m.RoutesPage })));
-
+const RouteDetailSheet = lazy(() => import("./components/CookieConsent").then(m => ({ default: m.CookieConsent })));
 // Internal component for performance optimizations
 function AppWithOptimizations() {
   useServiceWorker();
@@ -97,6 +97,7 @@ function AppWithOptimizations() {
             <Route path="/tours/:slug" element={<Tours360Page />} />
             <Route path="/routes" element={<RoutesPage />} />
             <Route path="/routes/:routeCode" element={<RoutesPage />} />
+            <Route path="/routes/:routeCode/:id" element={<RoutesPage />} />
             <Route path="/vr" element={<VRExperiencesPage />} />
             <Route path="/ar" element={<ARExperiencesPage />} />
             <Route path="/ar/:slug" element={<ARScenePage />} />

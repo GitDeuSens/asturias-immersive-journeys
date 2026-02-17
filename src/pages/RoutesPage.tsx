@@ -33,7 +33,7 @@ import { matchesSlug } from "@/lib/slugify";
 const createRouteMarkerIcon = (route: ImmersiveRoute, routeName: string) => {
   const borderColor = route.isCircular ? "hsl(79, 100%, 36%)" : "hsl(203, 100%, 32%)";
   const truncatedName = routeName.length > 18 ? routeName.substring(0, 16) + "..." : routeName;
-
+  
   return L.divIcon({
     className: "route-bubble-marker",
     html: `
@@ -44,7 +44,7 @@ const createRouteMarkerIcon = (route: ImmersiveRoute, routeName: string) => {
           </div>
           <div style="position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: ${borderColor}; box-shadow: 0 2px 8px rgba(0,0,0,0.25); font-family: 'Montserrat', sans-serif;">${route.maxPoints}</div>
         </div>
-        <div style="margin-top: 6px; background: white; color: hsl(0, 0%, 15%); font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 8px; white-space: nowrap; font-family: 'Montserrat', sans-serif; box-shadow: 0 2px 8px rgba(0,0,0,0.2); max-width: 120px; text-align: center; border: 1px solid ${borderColor};">${truncatedName}</div>
+        <div style="margin-top: 6px; background: white; color: hsl(0, 0%, 15%); font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 8px; white-space: nowrap; font-family: 'Montserrat', sans-serif; box-shadow: 0 2px 8px rgba(0,0,0,0.2); text-align: center; border: 1px solid ${borderColor};">${routeName}</div>
       </div>
     `,
     iconSize: [120, 90],
@@ -56,7 +56,7 @@ const createRouteMarkerIcon = (route: ImmersiveRoute, routeName: string) => {
 const createPointMarkerIcon = (point: RoutePoint, index: number, pointName: string) => {
   const hasAR = !!point.content.arExperience;
   const has360 = !!point.content.tour360;
-  const borderColor = hasAR ? "hsl(48, 100%, 50%)" : has360 ? "hsl(79, 100%, 36%)" : "hsl(203, 100%, 32%)";
+  const borderColor = hasAR ? "hsl(48, 100%, 50%)" : has360 ? "#C2634C" : "hsl(203, 100%, 32%)";
   const truncatedName = pointName.length > 20 ? pointName.substring(0, 18) + "..." : pointName;
 
   return L.divIcon({
@@ -69,7 +69,7 @@ const createPointMarkerIcon = (point: RoutePoint, index: number, pointName: stri
           </div>
           <div style="position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; background: ${borderColor}; border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: ${hasAR ? "#1a1a1a" : "white"}; box-shadow: 0 2px 8px rgba(0,0,0,0.25); font-family: 'Montserrat', sans-serif;">${index + 1}</div>
         </div>
-        <div style="margin-top: 6px; background: white; color: hsl(0, 0%, 15%); font-size: 9px; font-weight: 700; padding: 3px 6px; border-radius: 6px; white-space: nowrap; font-family: 'Montserrat', sans-serif; box-shadow: 0 2px 8px rgba(0,0,0,0.2); max-width: 100px; text-align: center; border: 1px solid ${borderColor};">${truncatedName}</div>
+        <div style="margin-top: 6px; background: white; color: hsl(0, 0%, 15%); font-size: 9px; font-weight: 700; padding: 3px 6px; border-radius: 6px; white-space: nowrap; font-family: 'Montserrat', sans-serif; box-shadow: 0 2px 8px rgba(0,0,0,0.2); text-align: center; border: 1px solid ${borderColor};">${pointName}</div>
       </div>
     `,
     iconSize: [100, 80],
@@ -416,7 +416,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
             mass: 0.9,
             opacity: { duration: 0.25, ease: "easeOut" },
           }}
-          className="absolute bottom-0 left-0 right-0 md:top-14 md:bottom-0 md:left-auto md:right-4 md:w-[400px] bg-card/95 backdrop-blur-md border border-border shadow-xl rounded-t-3xl md:rounded-3xl md:my-4 max-h-[75vh] md:max-h-none overflow-hidden flex flex-col z-20"
+          className="absolute bottom-0 left-0 right-0 md:top-[100px] md:bottom-0 md:left-auto md:right-4 md:w-[400px] bg-card/95 backdrop-blur-md border border-border shadow-xl rounded-t-3xl md:rounded-3xl md:my-4 max-h-[75vh] md:max-h-none overflow-hidden flex flex-col z-20"
         >
           {/* Mobile handle */}
           <button

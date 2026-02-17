@@ -25,6 +25,8 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ShareButtons } from '@/components/ShareButtons';
 import { trackRouteViewed } from '@/lib/analytics';
+import { useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 interface RouteDetailSheetProps {
   route: ImmersiveRoute | null;
@@ -36,6 +38,8 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
   const { t, i18n } = useTranslation();
   const lang = i18n.language as 'es' | 'en' | 'fr';
   const { getCategoryById } = useDirectusCategories(lang);
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Track route view when details are opened
   useEffect(() => {
@@ -49,6 +53,12 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
 
   const calculatedDistance = calculateRouteDistance(route.polyline);
   const distance = route.distanceKm || calculatedDistance;
+
+  const allFunctions = (route: ImmersiveRoute) => {
+    onEnterRoute(route);
+    onClose();
+    window.history.pushState({}, '', '/routes/' + route.id);
+  }
 
   const surfaceLabels: Record<string, Record<string, string>> = {
     paved: { es: 'Asfaltado', en: 'Paved', fr: 'Asphalté' },
@@ -270,7 +280,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
         {/* CTA Footer */}
         <div className="p-4 border-t border-border bg-background flex-shrink-0">
           <Button 
-            onClick={() => onEnterRoute(route)}
+            onClick={() => allFunctions(route) }
             className="w-full h-12 text-base font-bold bg-primary hover:bg-primary/90"
           >
             {t('routes.enterRoute')}
@@ -312,7 +322,7 @@ function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: nu
         <p className="font-medium text-foreground text-sm">{point.title as any}</p>
         <div className="flex items-center gap-1.5 mt-1">
           {hasAR && <Smartphone className="w-3.5 h-3.5 text-warm" aria-label="AR" />}
-          {has360 && <Camera className="w-3.5 h-3.5 text-primary" aria-label="360°" />}
+          {has360 && <Camera className="w-3.5 h-3.5 text-360" aria-label="360°" />}
           {hasVideo && <Play className="w-3.5 h-3.5 text-muted-foreground" aria-label="Video" />}
           {hasAudio && <Headphones className="w-3.5 h-3.5 text-muted-foreground" aria-label="Audio" />}
           {hasPDF && <FileText className="w-3.5 h-3.5 text-muted-foreground" aria-label="PDF" />}

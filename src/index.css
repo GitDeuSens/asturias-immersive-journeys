@@ -39,6 +39,14 @@
   }
 }
 
+.bg-360 {
+  background-color: #C2634C;
+}
+
+.text-360 {
+  color: #C2634C;
+}
+
 @layer base {
   :root {
     /* Core palette - Inspired by Turismo Asturias official branding */

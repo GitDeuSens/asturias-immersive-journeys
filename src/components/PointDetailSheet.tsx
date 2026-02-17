@@ -41,6 +41,7 @@ import {
   type NavigationDestination
 } from '@/lib/navigationService';
 import { trackPOITimeSpent } from '@/lib/analytics';
+import { openNavigation } from '@/lib/mapUtils';
 
 interface PointDetailSheetProps {
   point: RoutePoint | null;
@@ -113,6 +114,12 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
     }
   };
 
+  const handleNavigateToStart = () => {
+      if (point.location !== null) {
+        openNavigation(point.location.lat, point.location.lng, point.title as any);
+      }
+    };
+
   // Create AR scene data from POI AR experience
   const arScene: ARScene | null = useMemo(() => {
     if (!content.arExperience?.iframe3dUrl) return null;
@@ -170,7 +177,10 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
 
             {/* Close button */}
             <button
-              onClick={onClose}
+              onClick={() =>{
+                onClose();
+                window.history.pushState({}, '', '/routes/' + window.location.href.split("/")[4])
+              }}
               className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
             >
               <X className="w-5 h-5" />
@@ -211,7 +221,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
 
               {/* Location */}
               {point.location.address && (
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/30 border border-border/50">
+                <div className="cursor-pointer flex items-start gap-3 p-3 rounded-xl bg-muted/30 border border-border/50" onClick={handleNavigateToStart}>
                   <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-foreground">{t(texts.location)}</p>
