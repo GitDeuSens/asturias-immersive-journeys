@@ -1,0 +1,16 @@
+{
+  "allowHotReload": true,
+  "generator": "Unity 2022.3.58f1, Needle Engine Integration @4.12.5",
+  "gzip": false,
+  "developmentBuild": false,
+  "license": {
+    "team": "org_bs18c760dp65"
+  },
+  "facebookInstantGames": null,
+  "useRapier": true,
+  "needleEditor": null,
+  "sceneName": "Base Environment_Scene",
+  "meta": null,
+  "absolutePath": null,
+  "deployOnly": false
+}

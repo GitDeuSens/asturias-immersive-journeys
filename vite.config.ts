@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
       },
       proxy: {
         '/directus-api': {
-          target: env.VITE_DIRECTUS_URL || 'http://localhost:8055',
+          target: env.VITE_DIRECTUS_INTERNAL_URL || 'http://192.168.12.71:8055',
           changeOrigin: true,
           rewrite: (p: string) => p.replace(/^\/directus-api/, ''),
         },

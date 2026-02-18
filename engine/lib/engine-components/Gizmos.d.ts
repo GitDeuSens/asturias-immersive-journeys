@@ -1,0 +1,19 @@
+import { Color } from "three";
+import { Behaviour } from "./Component.js";
+/**
+ * BoxGizmo is a component that displays a box around the object in the scene. It can optionally expand to the object's bounds.
+ *
+ * @summary Display a box around the object
+ * @category Helpers
+ * @group Components
+ */
+export declare class BoxGizmo extends Behaviour {
+    objectBounds: boolean;
+    color?: Color;
+    isGizmo: boolean;
+    private _gizmoObject;
+    private _boxHelper;
+    onEnable(): void;
+    onDisable(): void;
+    private syncObjectBounds;
+}

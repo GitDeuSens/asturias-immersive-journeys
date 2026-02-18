@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { motion, AnimatePresence, color } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft,
   MapPin,
@@ -30,13 +30,20 @@ import {
   formatTime,
   type NavigationDestination
 } from '@/lib/navigationService';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 interface RouteExplorerViewProps {
   route: ImmersiveRoute;
   onBack: () => void;
   onSelectPoint: (point: RoutePoint) => void;
   selectedPoint: RoutePoint | null;
+}
+
+// Helper: safely get string from multilingual field or plain string
+function getText(value: any, lang: 'es' | 'en' | 'fr'): string {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  return value[lang] || value.es || value.en || '';
 }
 
 export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint }: RouteExplorerViewProps) {
@@ -52,17 +59,15 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
     ? Math.round((visitedPoints.size / route.points.length) * 100)
     : 0;
 
-  // Calculate distances for all points (only in "here" mode)
   const pointDistances = useMemo(() => {
     if (mode !== 'here' || !hasLocation || latitude === null || longitude === null) {
       return new Map<string, { distance: string; walkTime: number }>();
     }
-
     const distances = new Map<string, { distance: string; walkTime: number }>();
     route.points.forEach(point => {
       const dest: NavigationDestination = {
         id: point.id,
-        name: typeof point.title === 'string' ? point.title : point.title[lang] || point.title.es,
+        name: getText(point.title, lang),
         lat: point.location.lat,
         lng: point.location.lng,
         type: 'route-point',
@@ -76,12 +81,10 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
     return distances;
   }, [route.points, latitude, longitude, hasLocation, mode, lang]);
 
-  // Find nearest point
   const nearestPoint = useMemo(() => {
     if (pointDistances.size === 0) return null;
     let nearest: RoutePoint | null = null;
     let minDistance = Infinity;
-
     route.points.forEach(point => {
       const distData = pointDistances.get(point.id);
       if (distData && distData.walkTime < minDistance) {
@@ -93,25 +96,19 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   }, [pointDistances, route.points]);
 
   const handlePointClick = (point: RoutePoint) => {
-    // Track POI view if not already visited
     if (!visitedPoints.has(point.id)) {
-      const poiName = typeof point.title === 'string' ? point.title : point.title[lang] || point.title.es;
-      trackPOIViewed(point.id, poiName, route.id);
+      trackPOIViewed(point.id, getText(point.title, lang), route.id);
     }
-
     setVisitedPoints(prev => new Set([...prev, point.id]));
     onSelectPoint(point);
   };
 
-  // Track route completion when all points are visited
   useEffect(() => {
     if (visitedPoints.size === route.points.length && route.points.length > 0) {
       const durationSec = Math.round((Date.now() - routeStartTime) / 1000);
-      const routeName = typeof route.title === 'string' ? route.title : route.title[lang] || route.title.es;
-
       trackRouteCompleted(
         route.id,
-        routeName,
+        getText(route.title, lang),
         durationSec,
         visitedPoints.size,
         route.points.length
@@ -123,16 +120,14 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="p-4 border-b border-border/50 space-y-3">
-        {/* Back button */}
         <button
-          onClick={() => {onBack(); navigate('/routes');}}
+          onClick={() => { onBack(); navigate('/routes'); }}
           className="flex items-center gap-2 text-sm text-primary font-medium hover:text-primary/80 transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
           {t('routes.exitRoute')}
         </button>
 
-        {/* Route info */}
         <div className="flex items-start gap-3">
           <div
             className="w-14 h-14 rounded-xl bg-cover bg-center flex-shrink-0 border-2 border-primary/30"
@@ -143,7 +138,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
               {t('routes.exploring')}
             </span>
             <h2 className="font-sans font-bold text-foreground text-lg leading-tight truncate">
-              {route.title[lang]}
+              {getText(route.title, lang)}
             </h2>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-xs text-muted-foreground">
@@ -158,7 +153,6 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
           </div>
         </div>
 
-        {/* Progress bar */}
         {route.points.length > 0 && (
           <div className="space-y-1">
             <div className="flex items-center justify-between text-xs">
@@ -170,10 +164,10 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
         )}
       </div>
 
-      {/* Points timeline/list */}
+      {/* Points list */}
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-2">
-          {/* Nearest point suggestion (only in "here" mode) */}
+          {/* Nearest point suggestion */}
           {nearestPoint && mode === 'here' && (
             <motion.div
               initial={{ opacity: 0, y: -8 }}
@@ -189,7 +183,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-semibold text-foreground">{nearestPoint.title[lang]}</p>
+                  <p className="font-semibold text-foreground">{getText(nearestPoint.title, lang)}</p>
                   <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
                     <MapPin className="w-3 h-3" />
                     {pointDistances.get(nearestPoint.id)?.distance}
@@ -198,11 +192,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
                     {formatTime(pointDistances.get(nearestPoint.id)?.walkTime || 0)}
                   </p>
                 </div>
-                <Button
-                  size="sm"
-                  onClick={() => handlePointClick(nearestPoint)}
-                  className="text-xs"
-                >
+                <Button size="sm" onClick={() => handlePointClick(nearestPoint)} className="text-xs">
                   {t('navigation.startHere')}
                 </Button>
               </div>
@@ -215,6 +205,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
                 key={point.id}
                 point={point}
                 index={idx}
+                lang={lang}
                 isVisited={visitedPoints.has(point.id)}
                 isSelected={selectedPoint?.id === point.id}
                 isLast={idx === route.points.length - 1}
@@ -228,9 +219,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/50 flex items-center justify-center">
                 <MapPin className="w-8 h-8 text-muted-foreground/50" />
               </div>
-              <p className="text-sm text-muted-foreground">
-                {t('routes.noPoints')}
-              </p>
+              <p className="text-sm text-muted-foreground">{t('routes.noPoints')}</p>
             </div>
           )}
         </div>
@@ -239,10 +228,11 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   );
 }
 
-// Point card component (chapita)
+// ─── Point Card ───────────────────────────────────────────────────────────────
 interface PointCardProps {
   point: RoutePoint;
   index: number;
+  lang: 'es' | 'en' | 'fr';
   isVisited: boolean;
   isSelected: boolean;
   isLast: boolean;
@@ -251,25 +241,17 @@ interface PointCardProps {
   onClick: () => void;
 }
 
-function PointCard({ point, index, isVisited, isSelected, isLast, isNearest, distanceInfo, onClick }: PointCardProps) {
-  const { t, i18n } = useTranslation();
-  const lang = i18n.language as 'es' | 'en' | 'fr';
+function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNearest, distanceInfo, onClick }: PointCardProps) {
+  const { t } = useTranslation();
   const content = point.content;
-  // Determine what content types are available
+
   const hasAR = !!content.arExperience;
   const has360 = !!content.tour360;
   const hasVideo = !!content.video;
   const hasAudio = !!content.audioGuide;
   const hasPDF = !!content.pdf;
 
-  // Get primary content type for styling
-  const getPrimaryType = () => {
-    if (hasAR) return 'ar';
-    if (has360) return '360';
-    return 'info';
-  };
-
-  const primaryType = getPrimaryType();
+  const primaryType = hasAR ? 'ar' : has360 ? '360' : 'info';
   const typeColors = {
     ar: { bg: 'bg-warm', text: 'text-warm', border: 'border-warm' },
     '360': { bg: 'bg-360', text: 'text-primary', border: 'border-primary' },
@@ -277,54 +259,46 @@ function PointCard({ point, index, isVisited, isSelected, isLast, isNearest, dis
   };
   const colors = typeColors[primaryType];
 
+  const title = getText(point.title, lang);
+  const shortDescription = getText((point as any).shortDescription ?? (point as any).short_description, lang);
+
   return (
     <div className="relative flex">
       {/* Timeline connector */}
       <div className="flex flex-col items-center mr-3 flex-shrink-0">
-        {/* Number badge */}
-        <div
-          className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-md z-10 ${isVisited ? colors.bg : colors.bg
-            }`}
-        >
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-md z-10 ${colors.bg}`}>
           {index + 1}
         </div>
-        {/* Connecting line */}
-        {!isLast && (
-          <div className="w-0.5 flex-1 bg-border mt-2" />
-        )}
+        {!isLast && <div className="w-0.5 flex-1 bg-border mt-2" />}
       </div>
 
-      {/* Card content */}
-      <div style={{width: '100%'}}>
-        {isVisited ? <Check style={{
-          position: 'absolute',
-          right: '5px',
-          top: '5px',
-          padding: '5px'
-        }} className="w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-md z-10 bg-primary" /> : ''}
+      {/* Card */}
+      <div style={{ width: '100%' }}>
+        {isVisited && (
+          <Check
+            style={{ position: 'absolute', right: '5px', top: '5px', padding: '5px' }}
+            className="w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-md z-10 bg-primary"
+          />
+        )}
         <motion.button
           initial={{ opacity: 0, x: -8 }}
           animate={{ opacity: 1, x: 0 }}
-          style={{width: '100%'}}
-          transition={{
-            delay: index * 0.04,
-            duration: 0.3,
-            ease: [0.25, 0.46, 0.45, 0.94]
-          }}
+          style={{ width: '100%' }}
+          transition={{ delay: index * 0.04, duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
           onClick={() => {
-            onClick(); 
-            window.history.pushState({}, '', '/routes/' + window.location.href.split("/")[4] +  '/' + point.order);
+            onClick();
+            window.history.pushState({}, '', '/routes/' + window.location.href.split('/')[4] + '/' + point.order);
           }}
-          className={`flex-1 mb-3 rounded-xl overflow-hidden transition-all text-left border ${isSelected
-            ? 'border-primary bg-primary/10 shadow-md'
-            : isNearest
-              ? 'border-accent bg-accent/10 shadow-md'
-              : isVisited
-                ? 'border-primary/40 bg-card/80'
-                : 'border-border bg-card hover:bg-muted/50 hover:border-muted-foreground/30'
-            }`}
+          className={`flex-1 mb-3 rounded-xl overflow-hidden transition-all text-left border ${
+            isSelected
+              ? 'border-primary bg-primary/10 shadow-md'
+              : isNearest
+                ? 'border-accent bg-accent/10 shadow-md'
+                : isVisited
+                  ? 'border-primary/40 bg-card/80'
+                  : 'border-border bg-card hover:bg-muted/50 hover:border-muted-foreground/30'
+          }`}
         >
-          {/* Thumbnail header */}
           {point.coverImage && (
             <div
               className="w-full h-24 bg-cover bg-center"
@@ -332,37 +306,27 @@ function PointCard({ point, index, isVisited, isSelected, isLast, isNearest, dis
             />
           )}
 
-          {/* Card body */}
           <div className="p-3">
-            {/* Title */}
-            <h4 className="font-semibold text-foreground line-clamp-1">
-              {point.title as any}
-            </h4>
+            <h4 className="font-semibold text-foreground line-clamp-1">{title}</h4>
+            {shortDescription && (
+              <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{shortDescription}</p>
+            )}
 
-            {/* Description */}
-            <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
-              {point.shortDescription as any}
-            </p>
-
-            {/* Footer: badges and distance */}
             <div className="flex items-center justify-between mt-3 pt-2 border-t border-border/50">
               <div className="flex items-center gap-1.5">
                 {hasAR && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-warm/15 text-warm text-[10px] font-bold">
-                    <Smartphone className="w-3 h-3" />
-                    AR
+                    <Smartphone className="w-3 h-3" />AR
                   </span>
                 )}
                 {has360 && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-360 text-white text-[10px] font-bold">
-                    <Camera className="w-3 h-3" />
-                    360°
+                    <Camera className="w-3 h-3" />360°
                   </span>
                 )}
                 {!hasAR && !has360 && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-accent/15 text-accent text-[10px] font-bold">
-                    <Info className="w-3 h-3" />
-                    INFO
+                    <Info className="w-3 h-3" />INFO
                   </span>
                 )}
                 {hasVideo && <Play className="w-3.5 h-3.5 text-muted-foreground" />}
@@ -370,7 +334,6 @@ function PointCard({ point, index, isVisited, isSelected, isLast, isNearest, dis
                 {hasPDF && <FileText className="w-3.5 h-3.5 text-muted-foreground" />}
               </div>
 
-              {/* Distance */}
               {distanceInfo && (
                 <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground font-medium">
                   <MapPin className="w-3 h-3" />

@@ -1,0 +1,65 @@
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+import { MODULES } from "../../../engine/engine_modules.js";
+import { serializable } from "../../../engine/engine_serialization.js";
+import { PostProcessingEffect } from "../PostProcessingEffect.js";
+import { VolumeParameter } from "../VolumeParameter.js";
+import { registerCustomEffectType } from "../VolumeProfile.js";
+/**
+ * Vignette effect darkens the edges of the rendered scene to draw attention to the center.
+ * This effect simulates the natural vignetting that occurs in photography and cinematography, where the corners of an image are darker than the center.
+ * It can be used to enhance the visual focus on the main subject of the scene and create a more immersive viewing experience.
+ * @summary Vignette Post-Processing Effect
+ * @category Effects
+ * @group Components
+ */
+export class Vignette extends PostProcessingEffect {
+    get typeName() {
+        return "Vignette";
+    }
+    color = new VolumeParameter({ r: 0, g: 0, b: 0, a: 1 });
+    intensity = new VolumeParameter(0);
+    center = new VolumeParameter({ x: 0.5, y: 0.5 });
+    init() {
+        this.color.defaultValue = { r: 0, g: 0, b: 0, a: 1 };
+        this.intensity.defaultValue = 0;
+        this.center.defaultValue = { x: 0.5, y: 0.5 };
+    }
+    onCreateEffect() {
+        // https://github.com/pmndrs/postprocessing/blob/f8ed90635ee6710744cc0f38811fc00ce873a450/src/effects/VignetteEffect.js
+        const vignette = new MODULES.POSTPROCESSING.MODULE.VignetteEffect();
+        this.intensity.onValueChanged = v => {
+            vignette.offset = v;
+            this.updateDarkness(vignette);
+        };
+        this.color.onValueChanged = _ => {
+            this.updateDarkness(vignette);
+        };
+        // this.center.onValueChanged = v => {
+        //     console.log(v);
+        //     vignette.offset = v.x;
+        // };
+        return vignette;
+    }
+    updateDarkness(effect) {
+        // const col = this.color.value;
+        // const colval = 1 - (col.r + col.g + col.b + col.a) / 4;
+        const val = this.intensity.value;
+        effect.darkness = val;
+    }
+}
+__decorate([
+    serializable(VolumeParameter)
+], Vignette.prototype, "color", void 0);
+__decorate([
+    serializable(VolumeParameter)
+], Vignette.prototype, "intensity", void 0);
+__decorate([
+    serializable(VolumeParameter)
+], Vignette.prototype, "center", void 0);
+registerCustomEffectType("Vignette", Vignette);
+//# sourceMappingURL=Vignette.js.map

@@ -1,0 +1,79 @@
+import { type NeedleXREventArgs } from "../../engine/xr/api.js";
+import { Camera } from "../Camera.js";
+import { UIRootComponent } from "./BaseUIComponent.js";
+import type { ICanvas, ICanvasEventReceiver, ILayoutGroup, IRectTransform } from "./Interfaces.js";
+export declare enum RenderMode {
+    ScreenSpaceOverlay = 0,
+    ScreenSpaceCamera = 1,
+    WorldSpace = 2,
+    Undefined = -1
+}
+/**
+ * Canvas is the root component for all UI elements in a scene.
+ * It defines the area where UI elements are rendered and manages their layout and rendering settings.
+ * Canvases can be set to render in world space or screen space (overlay or camera).
+ * Multiple canvases can exist in a scene, each with its own settings and hierarchy of UI elements.
+ * @summary Root component for UI elements, managing layout and rendering settings
+ * @category User Interface
+ * @group Components
+ */
+export declare class Canvas extends UIRootComponent implements ICanvas {
+    get isCanvas(): boolean;
+    get screenspace(): any;
+    set renderOnTop(val: boolean);
+    get renderOnTop(): boolean;
+    private _renderOnTop;
+    set depthWrite(val: boolean);
+    get depthWrite(): boolean;
+    private _depthWrite;
+    set doubleSided(val: boolean);
+    get doubleSided(): boolean;
+    private _doubleSided;
+    set castShadows(val: boolean);
+    get castShadows(): boolean;
+    private _castShadows;
+    set receiveShadows(val: boolean);
+    get receiveShadows(): boolean;
+    private _receiveShadows;
+    get renderMode(): RenderMode;
+    set renderMode(val: RenderMode);
+    private _renderMode;
+    private _rootCanvas;
+    set rootCanvas(val: Canvas);
+    get rootCanvas(): Canvas;
+    private _scaleFactor;
+    get scaleFactor(): number;
+    private set scaleFactor(value);
+    worldCamera?: Camera;
+    planeDistance: number;
+    awake(): void;
+    start(): void;
+    onEnable(): void;
+    onDisable(): void;
+    private _boundRenderSettingsChanged;
+    private previousParent;
+    private _lastMatrixWorld;
+    private _rectTransforms;
+    registerTransform(rt: IRectTransform): void;
+    unregisterTransform(rt: IRectTransform): void;
+    private _layoutGroups;
+    registerLayoutGroup(group: ILayoutGroup): void;
+    unregisterLayoutGroup(group: ILayoutGroup): void;
+    private _receivers;
+    registerEventReceiver(receiver: ICanvasEventReceiver): void;
+    unregisterEventReceiver(receiver: ICanvasEventReceiver): void;
+    onEnterXR(args: NeedleXREventArgs): Promise<void>;
+    onLeaveXR(args: NeedleXREventArgs): void;
+    onBeforeRenderRoutine: () => void;
+    onAfterRenderRoutine: () => void;
+    private invokeBeforeRenderEvents;
+    private handleLayoutUpdates;
+    applyRenderSettings(): void;
+    private _updateRenderSettingsRoutine?;
+    private onRenderSettingsChanged;
+    private _updateRenderSettingsDelayed;
+    private _activeRenderMode;
+    private _lastWidth;
+    private _lastHeight;
+    private onUpdateRenderMode;
+}

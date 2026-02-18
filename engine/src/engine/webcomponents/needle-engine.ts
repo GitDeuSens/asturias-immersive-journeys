@@ -1,0 +1,1268 @@
+import { isDevEnvironment, showBalloonWarning } from "../debug/index.js";
+import { PUBLIC_KEY, VERSION } from "../engine_constants.js";
+import { ContextEvent, ContextRegistry } from "../engine_context_registry.js";
+import { registerLoader } from "../engine_gltf.js";
+import { hasCommercialLicense } from "../engine_license.js";
+import { onStart } from "../engine_lifecycle_api.js";
+import { setDracoDecoderPath, setDracoDecoderType, setKtx2TranscoderPath } from "../engine_loaders.gltf.js";
+import { NeedleLoader } from "../engine_loaders.js";
+import { Context, ContextCreateArgs } from "../engine_setup.js";
+import { nameToThreeTonemapping } from "../engine_tonemapping.js";
+import { type INeedleEngineComponent, type LoadedModel } from "../engine_types.js";
+import type { addAttributeChangeCallback } from "../engine_utils.js";
+import { getParam } from "../engine_utils.js";
+import { RGBAColor } from "../js-extensions/RGBAColor.js";
+import { ensureFonts } from "./fonts.js";
+import { arContainerClassName, AROverlayHandler } from "./needle-engine.ar-overlay.js";
+import type { registerObservableAttribute} from "./needle-engine.extras.js";
+import { calculateProgress01, EngineLoadingView, type ILoadingViewHandler } from "./needle-engine.loading.js";
+
+declare global {
+    interface HTMLElementTagNameMap {
+        "needle-engine": NeedleEngineWebComponent;
+    }
+}
+
+
+// registering loader here too to make sure it's imported when using engine via vanilla js
+registerLoader(NeedleLoader);
+
+const debug = getParam("debugwebcomponent");
+
+const htmlTagName = "needle-engine";
+const vrContainerClassName = "vr";
+const desktopContainerClassname = "desktop";
+const knownClasses = [arContainerClassName, vrContainerClassName, desktopContainerClassname];
+const arSessionActiveClassName = "ar-session-active";
+const desktopSessionActiveClassName = "desktop-session-active";
+
+type TonemappingAttributeOptions = "none" | "linear" | "neutral" | "agx";
+
+// #region Observables
+
+/** Keep in sync with the overloads and docs here:
+ * - {@link NeedleEngineWebComponent.setAttribute}
+ * - {@link NeedleEngineWebComponent.getAttribute} 
+ * - {@link NeedleEngineWebComponent.addEventListener} 
+ * - Docs in {@link [custom-elements.json](../../../custom-elements.json)}
+ * - {@link NeedleEngineWebComponent.attributeChangedCallback}  
+ * 
+ * Effectively, attributes used with these methods are also observable:
+ * -  {@link registerObservableAttribute} or 
+ * -  {@link addAttributeChangeCallback}
+ * */
+const observedAttributes = [
+    // MainAttributes
+    "src",
+    "hash",
+    "camera-controls",
+    "dracoDecoderPath",
+    "dracoDecoderType",
+    "ktx2DecoderPath",
+
+    // keep-alive: effectively observed because read when needed
+
+    // private
+    "public-key",
+    "version",
+
+    // RenderingAttributes
+    "tone-mapping",
+    "tone-mapping-exposure",
+    "background-blurriness",
+    "background-color",
+    "environment-intensity",
+    // background-image: registered in Skybox.ts
+    // environment-image: registered in Skybox.ts
+
+    // scene: registered in SceneSwitcher.ts
+    // clickthrough: registered in Clickthrough.ts
+    "focus-rect",
+
+    // Events
+    "loadstart",
+    "progress",
+    "loadfinished",
+]
+
+// https://developers.google.com/web/fundamentals/web-components/customelements
+
+/** 
+ * The `<needle-engine>` web component. See {@link NeedleEngineAttributes} attributes for supported attributes    
+ * The web component creates and manages a Needle Engine context, which is responsible for rendering a 3D scene using threejs.   
+ * The context is created when the `src` attribute is set, and disposed when the element is removed from the DOM. You can prevent cleanup by setting the `keep-alive` attribute to `true`.  
+ * The context is accessible from the `<needle-engine>` element: `document.querySelector("needle-engine").context`.
+ * See {@link https://engine.needle.tools/docs/reference/needle-engine-attributes}
+ *
+ * @example
+ * <needle-engine src="https://example.com/scene.glb"></needle-engine>
+ * @example
+ * <needle-engine src="https://example.com/scene.glb" camera-controls="false"></needle-engine>
+ */
+export class NeedleEngineWebComponent extends HTMLElement implements INeedleEngineComponent {
+
+    static get observedAttributes() {
+        return observedAttributes;
+    }
+
+    public get loadingProgress01(): number { return this._loadingProgress01; }
+    public get loadingFinished(): boolean { return this.loadingProgress01 > .999; }
+
+    /**
+     * If set to false the camera controls are disabled. Default is true.  
+     * @type {boolean | null}
+     * @memberof NeedleEngineAttributes
+     * @example
+     * <needle-engine camera-controls="false"></needle-engine>
+     * @example
+     * <needle-engine camera-controls="true"></needle-engine>
+     * @example
+     * <needle-engine camera-controls></needle-engine>
+     * @example
+     * <needle-engine></needle-engine>
+     * @returns {boolean | null} if the attribute is not set it returns null
+     */
+    get cameraControls(): boolean | null {
+        const attr = this.getAttribute("camera-controls") as string;
+        if (attr == null) return null;
+        if (attr === null || attr === "False" || attr === "false" || attr === "0" || attr === "none") return false;
+        return true;
+    }
+    set cameraControls(value: boolean | null) {
+        if (value === null) this.removeAttribute("camera-controls");
+        else this.setAttribute("camera-controls", value ? "true" : "false");
+    }
+
+    /**
+     * Get the current context for this web component instance. The context is created when the src attribute is set and the loading has finished.  
+     * The context is disposed when the needle engine is removed from the document (you can prevent this by setting the keep-alive attribute to true).  
+     * @returns a promise that resolves to the context when the loading has finished
+     */
+    public getContext(): Promise<Context> {
+        return new Promise((res, _rej) => {
+            if (this._context && this.loadingFinished) {
+                res(this._context);
+            }
+            else {
+                const cb = () => {
+                    this.removeEventListener("loadfinished", cb);
+                    if (this._context && this.loadingFinished) {
+                        res(this._context);
+                    }
+                };
+                this.addEventListener("loadfinished", cb);
+            }
+        });
+    }
+
+    /**
+     * Get the context that is created when the src attribute is set and the loading has finished.
+     */
+    public get context() { return this._context; }
+
+    private _context: Context;
+    private _overlay_ar: AROverlayHandler;
+    private _loadingProgress01: number = 0;
+    private _loadingView?: ILoadingViewHandler;
+    private _previousSrc: string | null | string[] = null;
+    /** @private set to true after <needle-engine> did load completely at least once. Set to false when < to false when <needle-engine> is removed from the document removed from the document */
+    private _didFullyLoad: boolean = false;
+
+    constructor() {
+        super();
+        this._overlay_ar = new AROverlayHandler();
+        // TODO: do we want to rename this event?
+        this.addEventListener("ready", this.onReady);
+
+        ensureFonts();
+
+        this.attachShadow({ mode: 'open' });
+        const template = document.createElement('template');
+        // #region CSS
+        template.innerHTML = `<style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
+
+    :host {
+        position: absolute;
+        display: block;
+        width: max(600px, 100%);
+        height: max(300px, 100%);
+        touch-action: none;
+
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    @media (max-width: 600px) {
+        :host {
+            width: 100%;
+        }
+    }
+    @media (max-height: 300px) {
+        :host {
+            height: 100%;
+        }
+    }
+
+    :host > div.canvas-wrapper {
+        width: 100%;
+        height: 100%;
+    }
+
+    :host canvas {   
+        position: absolute;
+        user-select: none;
+        -webkit-user-select: none;
+
+        /** allow touch panning but no pinch zoom **/
+        /** but this doesnt work yet: 
+         * touch-action: pan-x, pan-y;
+         **/
+        
+        -webkit-touch-callout: none;
+        -webkit-user-drag: none;
+        -webkit-user-modify: none;
+
+        left: 0;
+        top: 0;
+    }
+    :host .content {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        visibility: visible;
+        z-index: 500; /* < must be less than the webxr buttons element */
+        pointer-events: none;
+    }
+    :host .overlay-content {
+        position: absolute;
+        user-select: auto;
+        pointer-events: all;
+    }
+    :host slot[name="quit-ar"]:hover {
+        cursor: pointer;
+    }
+    :host .quit-ar-button {
+        position: absolute;
+        // top: env(titlebar-area-y); /** this doesnt work **/
+        top: 60px; /** camera access needs a bit more space **/
+        right: 20px;
+        z-index: 9999;
+    }
+</style>
+<div class="canvas-wrapper"> <!-- this wrapper is necessary for WebXR https://github.com/meta-quest/immersive-web-emulator/issues/55 -->
+    <canvas></canvas>
+</div>
+<div class="content">
+    <slot class="overlay-content" style="display: contents;"></slot>
+</div>
+`;
+        // #endregion
+
+        if (this.shadowRoot)
+            this.shadowRoot.appendChild(template.content.cloneNode(true));
+
+        this._context = new Context({ domElement: this });
+        this.addEventListener("error", this.onError);
+    }
+
+
+    /**
+     * @internal
+     */
+    async connectedCallback() {
+        if (debug) {
+            console.log("<needle-engine> connected");
+        }
+
+        this.setPublicKey();
+        this.setVersion();
+
+        // If tabindex is not defined we set it to 0 to make it focusable and reachable via keyboard. Also keyboard events will be dispatched to the element (e.g. keydown, keyup) which is used by OrbitControls
+        if (this.getAttribute("tabindex") === null || this.getAttribute("tabindex") === undefined)
+            this.setAttribute("tabindex", "0");
+
+        this.addEventListener("xr-session-started", this.onXRSessionStarted);
+        this.onSetupDesktop();
+
+        if (!this.getAttribute("src")) {
+            const global = (globalThis as any)["needle:codegen_files"] as unknown as string;
+            if (debug) console.log("src is null, trying to load from globalThis[\"needle:codegen_files\"]", global);
+            if (global) {
+                if (debug) console.log("globalThis[\"needle:codegen_files\"]", global);
+                this.setAttribute("src", global);
+            }
+        }
+
+        if (debug) console.log("src", this.getAttribute("src"));
+
+        // we have to wait because codegen does set the src attribute when it's loaded
+        // which might happen after the element is connected
+        // if the `src` is then still null we want to initialize the default scene
+        const loadId = this._loadId;
+        setTimeout(() => {
+            if (this.isConnected === false) return;
+            if (loadId !== this._loadId) return;
+            this.onLoad();
+        }, 1);
+    }
+
+    /**
+     * @internal
+     */
+    disconnectedCallback() {
+        this.removeEventListener("xr-session-started", this.onXRSessionStarted);
+
+        this._didFullyLoad = false;
+        const keepAlive = this.getAttribute("keep-alive");
+        const dispose = keepAlive == undefined || (keepAlive?.length > 0 && keepAlive !== "true" && keepAlive !== "1");
+        if (debug) console.warn("<needle-engine> disconnected, keep-alive: \"" + keepAlive + "\"", typeof keepAlive, "Dispose=", dispose);
+        if (dispose) {
+            if (debug)
+                console.warn("<needle-engine> dispose");
+            this._context?.dispose();
+            this._context = null!;
+            this._lastSourceFiles = null;
+            this._loadId += 1;
+        }
+        else {
+            if (debug) console.warn("<needle-engine> is not disposed because keep-alive is set");
+        }
+    }
+
+    connectedMoveCallback() {
+        // we dont want needle-engine to cleanup JUST because the element is moved in the DOM. See https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks
+    }
+
+    // #region attributeChanged
+    /**
+     * @internal
+     */
+    attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+        if (debug) console.log("attributeChangedCallback", name, oldValue, newValue);
+        switch (name) {
+            case "src":
+                if (debug) console.warn("<needle-engine src>\nchanged from \"", oldValue, "\" to \"", newValue, "\"")
+                this.onLoad();
+                // this._watcher?.onSourceChanged(newValue);
+                break;
+            case "hash":
+                if (this._context) {
+                    this._context.hash = newValue;
+                }
+                break;
+            case "loadstart":
+            case "progress":
+            case "loadfinished":
+                if (typeof newValue === "string" && newValue.length > 0) {
+                    if (debug) console.log(name + " attribute changed", newValue);
+                    this.registerEventFromAttribute(name, newValue);
+                }
+                break;
+            case "dracoDecoderPath":
+                if (debug) console.log("dracoDecoderPath", newValue);
+                setDracoDecoderPath(newValue);
+                break;
+            case "dracoDecoderType":
+                if (newValue === "wasm" || newValue === "js") {
+                    if (debug) console.log("dracoDecoderType", newValue);
+                    setDracoDecoderType(newValue);
+                }
+                else console.error("Invalid dracoDecoderType", newValue, "expected js or wasm");
+                break;
+            case "ktx2DecoderPath":
+                if (debug) console.log("ktx2DecoderPath", newValue);
+                setKtx2TranscoderPath(newValue);
+                break;
+
+            case "tonemapping":
+            case "tone-mapping":
+            case "tone-mapping-exposure":
+            case "background-blurriness":
+            case "background-color":
+            case "environment-intensity":
+                {
+                    this.applyAttributes();
+                    break;
+                }
+            case "public-key": {
+                if (newValue != PUBLIC_KEY)
+                    this.setPublicKey();
+                break;
+            }
+            case "version": {
+                if (newValue != VERSION)
+                    this.setVersion();
+                break;
+            }
+
+            case "focus-rect":
+                {
+                    const focus_rect = this.getAttribute("focus-rect") as HTMLElement | string | null;
+                    if (focus_rect && this._context) {
+                        if (focus_rect === null) {
+                            this._context.setCameraFocusRect(null);
+                        }
+                        else if (typeof focus_rect === "string" && focus_rect.length > 0) {
+                            const element = document.querySelector(focus_rect);
+                            this._context.setCameraFocusRect(element instanceof HTMLElement ? element : null);
+                        }
+                        else if (focus_rect instanceof HTMLElement) {
+                            this._context.setCameraFocusRect(focus_rect);
+                        }
+
+                    }
+                }
+                break;
+        }
+    }
+
+    /** The tonemapping setting configured as an attribute on the <needle-engine> component */
+    get toneMapping(): TonemappingAttributeOptions | null | undefined {
+        const attribute = (this.getAttribute("tonemapping") || this.getAttribute("tone-mapping")) as TonemappingAttributeOptions | null | undefined;
+        return attribute;
+    }
+
+    private _loadId: number = 0;
+    private _abortController: AbortController | null = null;
+    private _lastSourceFiles: Array<string> | null = null;
+    private _createContextPromise: Promise<boolean> | null = null;
+
+    private async onLoad() {
+
+        if (!this.isConnected) return;
+        if (!this._context) {
+            if (debug) console.warn("Create new context");
+            this._context = new Context({ domElement: this });
+        }
+
+        if (!this._context) {
+            console.error("Needle Engine: Context not initialized");
+            return;
+        }
+
+        const filesToLoad = this.getSourceFiles();
+        if (!this.checkIfSourceHasChanged(filesToLoad, this._lastSourceFiles)) {
+            return;
+        }
+
+        // Abort previous loading (if it's still running)
+        if (this._abortController) {
+            if (debug) console.warn("Abort previous loading process")
+            this._abortController.abort();
+            this._abortController = null;
+        }
+        this._lastSourceFiles = filesToLoad;
+        const loadId = ++this._loadId;
+
+        if (filesToLoad === null || filesToLoad === undefined || filesToLoad.length <= 0) {
+            if (debug) console.warn("Clear scene", filesToLoad);
+            this._context.clear();
+            if (loadId !== this._loadId) return;
+        }
+
+        const alias = this.getAttribute("alias");
+        this.classList.add("loading");
+
+
+
+        // Loading start events
+        const allowOverridingDefaultLoading = hasCommercialLicense();
+        // default loading can be overriden by calling preventDefault in the onload start event
+        this.ensureLoadStartIsRegistered();
+        let useDefaultLoading = this.dispatchEvent(new CustomEvent("loadstart", {
+            detail: {
+                context: this._context,
+                alias: alias
+            },
+            cancelable: true
+        }));
+        if (allowOverridingDefaultLoading) {
+            // Handle the <needle-engine hide-loading-overlay> attribute
+            const hideOverlay = this.getAttribute("hide-loading-overlay");
+            if (hideOverlay !== null && hideOverlay !== undefined && (hideOverlay as any) !== "0") {
+                useDefaultLoading = false;
+            }
+        }
+        // for local development we allow overriding the loading screen - but we notify the user that it won't work in a deployed environment
+        if (useDefaultLoading === false && !allowOverridingDefaultLoading) {
+            if (!isDevEnvironment())
+                useDefaultLoading = true;
+            console.warn("Needle Engine: You need a commercial license to override the default loading view. Visit https://needle.tools/pricing");
+            if (isDevEnvironment()) showBalloonWarning("You need a <a target=\"_blank\" href=\"https://needle.tools/pricing\">commercial license</a> to override the default loading view. This will not work in production.");
+        }
+        // create the loading view idf necessary
+        if (!this._loadingView && useDefaultLoading)
+            this._loadingView = new EngineLoadingView(this);
+        if (useDefaultLoading) {
+            // Only show the loading screen immedialty if we haven't loaded anything before
+            if (this._didFullyLoad !== true)
+                this._loadingView?.onLoadingBegin("begin load");
+            else {
+                // If we have loaded a glb previously and are loading a new glb due to e.g. src change
+                // we don't want to show the loading screen immediately to avoid blinking if the glb to be loaded is tiny
+                // so we wait a bit and only show the loading screen if the loading takes longer than a short moment
+                setTimeout(() => {
+                    // If the loading progress is already above ~ 70% we also don't need to show the loading screen anymore
+                    if (this._loadingView && this._loadingProgress01 < 0.3 && this._loadId === loadId)
+                        this._loadingView.onLoadingBegin("begin load");
+                }, 300)
+            }
+        }
+        if (debug) console.warn("--------------\nNeedle Engine: Begin loading " + loadId + "\n", filesToLoad);
+        this.onBeforeBeginLoading();
+
+        const loadedFiles: Array<LoadedModel> = [];
+        const progressEventDetail = {
+            context: this._context,
+            name: "",
+            progress: {} as ProgressEvent,
+            index: 0,
+            count: filesToLoad.length,
+            totalProgress01: this._loadingProgress01
+        };
+        const progressEvent = new CustomEvent("progress", { detail: progressEventDetail });
+        const displayNames = new Array<string>();
+        const controller = new AbortController();
+        this._abortController = controller;
+        const args: ContextCreateArgs = {
+            files: filesToLoad,
+            abortSignal: controller.signal,
+            onLoadingProgress: evt => {
+                if (debug) console.debug("Loading progress: ", evt);
+                if (controller.signal.aborted) return;
+                const index = evt.index;
+                if (!displayNames[index] && evt.name) {
+                    displayNames[index] = getDisplayName(evt.name);
+                }
+                evt.name = displayNames[index];
+                if (useDefaultLoading) this._loadingView?.onLoadingUpdate(evt);
+                progressEventDetail.name = evt.name;
+                progressEventDetail.progress = evt.progress;
+                this._loadingProgress01 = calculateProgress01(evt);
+                progressEventDetail.totalProgress01 = this._loadingProgress01;
+                this.dispatchEvent(progressEvent);
+            },
+            onLoadingFinished: (_index, file, glTF) => {
+                if (debug) console.debug(`Finished loading \"${file}\" (aborted? ${controller.signal.aborted})`);
+                if (controller.signal.aborted) return;
+                if (glTF) {
+                    loadedFiles.push({
+                        src: file,
+                        file: glTF
+                    });
+                }
+            }
+        }
+
+
+
+        // Experimental loading blur
+        handleLoadingBlur(this);
+
+        const currentHash = this.getAttribute("hash");
+        if (currentHash !== null && currentHash !== undefined)
+            this._context.hash = currentHash;
+        this._context.alias = alias;
+        this._createContextPromise = this._context.create(args);
+        const success = await this._createContextPromise;
+        this.applyAttributes();
+
+        if (debug) console.warn("--------------\nNeedle Engine: finished loading " + loadId + "\n", filesToLoad, `Aborted? ${controller.signal.aborted}`);
+        if (controller.signal.aborted) {
+            console.log("Loading finished but aborted...")
+            return;
+        }
+        if (this._loadId !== loadId) {
+            console.log("Load id changed during loading process")
+            return;
+        }
+
+        this._loadingProgress01 = 1;
+        if (useDefaultLoading && success) {
+            this._loadingView?.onLoadingUpdate(1, "creating scene");
+        }
+        this._didFullyLoad = true;
+        this.classList.remove("loading");
+        this.classList.add("loading-finished");
+        this.dispatchEvent(new CustomEvent("loadfinished", {
+            detail: {
+                context: this._context,
+                src: alias,
+                loadedFiles: loadedFiles,
+            }
+        }));
+    }
+
+    // #region applyAttributes
+    private applyAttributes() {
+        // set tonemapping if configured
+        if (this._context?.renderer) {
+            const threeTonemapping = nameToThreeTonemapping(this.toneMapping);
+            if (threeTonemapping !== undefined) {
+                this._context.renderer.toneMapping = threeTonemapping;
+            }
+            const exposure = this.getAttribute("tone-mapping-exposure");
+            if (exposure !== null && exposure !== undefined) {
+                const value = parseFloat(exposure);
+                if (!isNaN(value))
+                    this._context.renderer.toneMappingExposure = value;
+            }
+        }
+
+        const backgroundBlurriness = this.getAttribute("background-blurriness");
+        if (backgroundBlurriness !== null && backgroundBlurriness !== undefined) {
+            const value = parseFloat(backgroundBlurriness);
+            if (!isNaN(value) && this._context) {
+                this._context.scene.backgroundBlurriness = value;
+            }
+        }
+
+        const environmentIntensity = this.getAttribute("environment-intensity");
+        if (environmentIntensity != undefined && this._context) {
+            const value = parseFloat(environmentIntensity);
+            if (!isNaN(value) && this._context)
+                this._context.scene.environmentIntensity = value;
+        }
+
+        const backgroundColor = this.getAttribute("background-color");
+        if (this._context?.renderer) {
+            if (typeof backgroundColor === "string" && backgroundColor.length > 0) {
+                const rgbaColor = RGBAColor.fromColorRepresentation(backgroundColor);
+                if (debug) console.debug("<needle-engine> background-color changed, str:", backgroundColor, "→", rgbaColor)
+                this._context.renderer.setClearColor(rgbaColor, rgbaColor.alpha);
+                this.context.scene.background = null;
+            }
+            // HACK: if we set background-color to a color and then back to null we want the background-image attribute to re-apply
+            else if (this.getAttribute("background-image")) {
+                this.setAttribute("background-image", this.getAttribute("background-image")!);
+            }
+        }
+    }
+
+    private onXRSessionStarted = () => {
+        const xrSessionMode = this.context.xrSessionMode;
+        if (xrSessionMode === "immersive-ar")
+            this.onEnterAR(this.context.xrSession!);
+        else if (xrSessionMode === "immersive-vr")
+            this.onEnterVR(this.context.xrSession!);
+
+        // handle session end:
+        this.context.xrSession?.addEventListener("end", () => {
+            this.dispatchEvent(new CustomEvent("xr-session-ended", { detail: { session: this.context.xrSession, context: this._context, sessionMode: xrSessionMode } }));
+            if (xrSessionMode === "immersive-ar")
+                this.onExitAR(this.context.xrSession!);
+            else if (xrSessionMode === "immersive-vr")
+                this.onExitVR(this.context.xrSession!);
+        });
+    };
+
+    /** called by the context when the first frame has been rendered */
+    private onReady = () => this._loadingView?.onLoadingFinished();
+    private onError = () => this._loadingView?.setMessage("Loading failed!");
+
+    private getSourceFiles(): Array<string> {
+        const src: string | null | string[] = this.getAttribute("src");
+        if (!src) return [];
+
+        let filesToLoad: Array<string>;
+        // When using globalThis the src is an array already
+        if (Array.isArray(src)) {
+            filesToLoad = src;
+        }
+        // When assigned from codegen the src is a stringified array
+        else if (src.startsWith("[") && src.endsWith("]")) {
+            filesToLoad = JSON.parse(src);
+        }
+        // src.toString for an array produces a comma separated list
+        else if (src.includes(",")) {
+            filesToLoad = src.split(",");
+        }
+        else filesToLoad = [src];
+
+        // filter out invalid or empty strings
+        for (let i = filesToLoad.length - 1; i >= 0; i--) {
+            const file = filesToLoad[i];
+            if (file === "null" || file === "undefined" || file?.length <= 0)
+                filesToLoad.splice(i, 1);
+        }
+
+        return filesToLoad;
+    }
+
+    private checkIfSourceHasChanged(current: Array<string> | null, previous: Array<string> | null): boolean {
+        if (current?.length !== previous?.length) return true;
+        if (current == null && previous !== null) return true;
+        if (current !== null && previous == null) return true;
+        if (current !== null && previous !== null) {
+            for (let i = 0; i < current?.length; i++) {
+                if (current[i] !== previous[i]) return true;
+            }
+        }
+        return false;
+    }
+
+    private _previouslyRegisteredMap: Map<string, Function> = new Map();
+    private ensureLoadStartIsRegistered() {
+        const attributeValue = this.getAttribute("loadstart");
+        if (attributeValue)
+            this.registerEventFromAttribute("loadstart", attributeValue);
+    }
+    private registerEventFromAttribute(eventName: 'loadfinished' | 'loadstart' | 'progress', code: string) {
+        const prev = this._previouslyRegisteredMap.get(eventName);
+        if (prev) {
+            this._previouslyRegisteredMap.delete(eventName);
+            this.removeEventListener(eventName, prev as any);
+        }
+        if (typeof code === "string" && code.length > 0) {
+            try {
+                // indirect eval https://esbuild.github.io/content-types/#direct-eval
+                const fn = (0, eval)(code);
+                // const fn = new Function(newValue);
+                if (typeof fn === "function") {
+                    this._previouslyRegisteredMap.set(eventName, fn);
+                    // @ts-ignore // not sure how to type this properly
+                    this.addEventListener(eventName, evt => fn?.call(globalThis, this._context, evt));
+                }
+            }
+            catch (err) {
+                console.error("Error registering event " + eventName + "=\"" + code + "\" failed with the following error:\n", err);
+            }
+        }
+    }
+
+    private setPublicKey() {
+        if (PUBLIC_KEY && PUBLIC_KEY.length > 0)
+            this.setAttribute("public-key", PUBLIC_KEY);
+    }
+    private setVersion() {
+        if (VERSION && VERSION.length > 0) {
+            this.setAttribute("version", VERSION);
+        }
+    }
+
+    /**
+     * @internal
+     */
+    getAROverlayContainer(): HTMLElement {
+        return this._overlay_ar.createOverlayContainer(this);
+    }
+
+    /**
+     * @internal
+     */
+    getVROverlayContainer(): HTMLElement | null {
+        for (let i = 0; i < this.children.length; i++) {
+            const ch = this.children[i] as HTMLElement;
+            if (ch.classList.contains("vr"))
+                return ch;
+        }
+        return null;
+    }
+
+    /**
+     * @internal
+     */
+    onEnterAR(session: XRSession) {
+        this.onSetupAR();
+        const overlayContainer = this.getAROverlayContainer();
+        this._overlay_ar.onBegin(this._context!, overlayContainer, session);
+        this.dispatchEvent(new CustomEvent("enter-ar", { detail: { session: session, context: this._context, htmlContainer: this._overlay_ar?.ARContainer } }));
+    }
+
+    /**
+     * @internal
+     */
+    onExitAR(session: XRSession) {
+        this._overlay_ar.onEnd(this._context!);
+        this.onSetupDesktop();
+        this.dispatchEvent(new CustomEvent("exit-ar", { detail: { session: session, context: this._context, htmlContainer: this._overlay_ar?.ARContainer } }));
+    }
+
+    /**
+     * @internal
+     */
+    onEnterVR(session: XRSession) {
+        this.onSetupVR();
+        this.dispatchEvent(new CustomEvent("enter-vr", { detail: { session: session, context: this._context } }));
+    }
+
+    /**
+     * @internal
+     */
+    onExitVR(session: XRSession) {
+        this.onSetupDesktop();
+        this.dispatchEvent(new CustomEvent("exit-vr", { detail: { session: session, context: this._context } }));
+    }
+
+    private onSetupAR() {
+        this.classList.add(arSessionActiveClassName);
+        this.classList.remove(desktopSessionActiveClassName);
+        const arContainer = this.getAROverlayContainer();
+        if (debug) console.warn("onSetupAR:", arContainer)
+        if (arContainer) {
+            arContainer.classList.add(arSessionActiveClassName);
+            arContainer.classList.remove(desktopSessionActiveClassName);
+        }
+        this.foreachHtmlElement(ch => this.setupElementsForMode(ch, arContainerClassName));
+    }
+
+    private onSetupVR() {
+        this.classList.remove(arSessionActiveClassName);
+        this.classList.remove(desktopSessionActiveClassName);
+        this.foreachHtmlElement(ch => this.setupElementsForMode(ch, vrContainerClassName));
+    }
+
+    private onSetupDesktop() {
+        this.classList.remove(arSessionActiveClassName);
+        this.classList.add(desktopSessionActiveClassName);
+        const arContainer = this.getAROverlayContainer();
+        if (arContainer) {
+            arContainer.classList.remove(arSessionActiveClassName);
+            arContainer.classList.add(desktopSessionActiveClassName);
+        }
+        this.foreachHtmlElement(ch => this.setupElementsForMode(ch, desktopContainerClassname));
+    }
+
+    private setupElementsForMode(el: HTMLElement, currentSessionType: string, _session: XRSession | null = null) {
+        if (el === this._context?.renderer?.domElement) return;
+        if (el.id === "VRButton" || el.id === "ARButton") return;
+
+        const classList = el.classList;
+        if (classList.contains(currentSessionType)) {
+            el.style.visibility = "visible";
+            if (el.style.display === "none")
+                el.style.display = "block";
+        }
+        else {
+            // only modify style for elements that have a known class (e.g. marked as vr ar desktop)
+            for (const known of knownClasses) {
+                if (el.classList.contains(known)) {
+                    el.style.visibility = "hidden";
+                    el.style.display = "none";
+                }
+            }
+        }
+    }
+
+    private foreachHtmlElement(cb: (HTMLElement) => void) {
+        for (let i = 0; i < this.children.length; i++) {
+            const ch = this.children[i] as HTMLElement;
+            if (ch.style) cb(ch);
+        }
+    }
+
+    private onBeforeBeginLoading() {
+        const customDracoDecoderPath = this.getAttribute("dracoDecoderPath");
+        if (customDracoDecoderPath) {
+            if (debug) console.log("using custom draco decoder path", customDracoDecoderPath);
+            setDracoDecoderPath(customDracoDecoderPath);
+        }
+        const customDracoDecoderType = this.getAttribute("dracoDecoderType");
+        if (customDracoDecoderType) {
+            if (debug) console.log("using custom draco decoder type", customDracoDecoderType);
+            setDracoDecoderType(customDracoDecoderType);
+        }
+        const customKtx2DecoderPath = this.getAttribute("ktx2DecoderPath");
+        if (customKtx2DecoderPath) {
+            if (debug) console.log("using custom ktx2 decoder path", customKtx2DecoderPath);
+            setKtx2TranscoderPath(customKtx2DecoderPath);
+        }
+    }
+
+    // #region setAttribute
+
+    // MainAttributes
+    /** Change which model gets loaded. This will trigger a reload of the scene. 
+     * @example src="path/to/scene.glb"
+     * @example src="[./path/scene1.glb, myOtherScene.gltf]"
+     * */
+    setAttribute(name: 'src', value: string): void;
+    /** Optional. String attached to the context for caching/identification. */
+    setAttribute(name: 'hash', value: string): void;
+    /** Set to automatically add {@link OrbitControls} to the loaded scene */
+    setAttribute(name: 'camera-controls', value: string): void;
+    /** Override the default draco decoder path location. */
+    setAttribute(name: 'dracoDecoderPath', value: string): void;
+    /** Override the default draco library type. */
+    setAttribute(name: 'dracoDecoderType', value: 'wasm' | 'js'): void;
+    /** Override the default KTX2 transcoder/decoder path */
+    setAttribute(name: 'ktx2DecoderPath', value: string): void;
+    /** Prevent Needle Engine context from being disposed when the element is removed from the DOM */
+    setAttribute(name: 'keep-alive', value: 'true' | 'false'): void;
+    
+    /** @private Public key used for licensing and feature gating. */
+    setAttribute(name: 'public-key', value: string): void;
+    /** @private Engine version string — usually set by the build/runtime. */
+    setAttribute(name: 'version', value: string): void;
+
+    // LoadingAttributes
+    // ...
+    
+    // SkyboxAttributes
+    /** URL to .exr, .hdr, .png, .jpg to be used as skybox */
+    setAttribute(name: 'background-image', value: string): void;
+    /** @private Rotation of the background image in degrees. */
+    setAttribute(name: 'background-rotation', value: string | number): void;
+    /** @deprecated Use 'environment-image' instead. */
+    setAttribute(name: 'skybox-image', value: string): void;
+    /** URL to .exr, .hdr, .png, .jpg to be used for lighting */
+    setAttribute(name: 'environment-image', value: string): void;
+    /** Intensity multiplier for environment lighting. */
+    setAttribute(name: 'environment-intensity', value: string): void;
+    /** Blurs the background image. Strength between 0 (sharp) and 1 (fully blurred). */
+    setAttribute(name: 'background-blurriness', value: string): void;
+    /** Intensity multiplier for the background image. */
+    setAttribute(name: 'background-intensity', value: string): void;
+    /**
+     * CSS background color value to be used if no skybox or background image is provided.
+     * @example "background-color='#ff0000'" will set the background color to red.
+     */
+    setAttribute(name: 'background-color', value: string): void;
+    
+    // RenderingAttributes
+    /** Enable/disable renderer canvas transparency. */
+    setAttribute(name: 'transparent', value: 'true' | 'false'): void;
+    /** Enable/disable contact shadows in the rendered scene */
+    setAttribute(name: 'contact-shadows', value: 'true' | 'false'): void;
+    /** Tonemapping mode. */
+    setAttribute(name: 'tone-mapping', value: TonemappingAttributeOptions): void;
+    /** Exposure multiplier for tonemapping. */
+    setAttribute(name: 'tone-mapping-exposure', value: string): void;
+
+    /** Defines a CSS selector or HTMLElement where the camera should be focused on. Content will be fit into this element. */
+    setAttribute(name: 'focus-rect', value: string | HTMLElement): void;
+    /** Allow pointer events to pass through transparent parts of the content to the underlying DOM elements. */
+    setAttribute(name: 'clickthrough', value: 'true' | 'false'): void;
+    /** Automatically fits the model into the camera view on load. */
+    setAttribute(name: 'auto-fit', value: 'true' | 'false'): void;
+    /** Automatically rotates the model until a user interacts with the scene. */
+    setAttribute(name: 'auto-rotate', value: 'true' | 'false'): void;
+    /** Play animations automatically on scene load */
+    setAttribute(name: "autoplay", value: 'true' | 'false'): void;
+    /** @private Used for switching the scene in SceneSwitcher */
+    setAttribute(name: 'scene', value: string): void;
+    
+    // setAttribute(name: 'loadstart', value: string): void;
+    
+    /** @private Experimental.*/
+    setAttribute(name: 'loading-blur', value: 'true' | 'false'): void;
+    /** @private */
+    setAttribute(name: 'alias', value: string): void;
+    /** @private */
+    setAttribute(name: 'hide-loading-overlay', value: 'true' | 'false'): void;
+    /** @private */
+    setAttribute(name: 'no-telemetry', value: 'true' | 'false'): void;
+
+    /** Generic typed setter for known Needle Engine attributes */
+    // Comment out to see errors inside NE for undocumented attributes
+    // setAttribute<T extends keyof NeedleEngineAttributes>(qualifiedName: T, value: NeedleEngineAttributes[T]): void;
+    
+    setAttribute(qualifiedName: ({} & string), value: string): void;
+    
+    // The ones we're using internally:
+    /*
+    setAttribute(name: "tabindex", value: string): void;
+    */
+    setAttribute(qualifiedName: string, value: string): void {
+        super.setAttribute(qualifiedName, value);
+    }
+
+    // #region getAttribute
+
+    // MainAttributes
+    /** Change which model gets loaded. This will trigger a reload of the scene. 
+     * @example src="path/to/scene.glb"
+     * @example src="[./path/scene1.glb, myOtherScene.gltf]"
+     * */
+    getAttribute(name: 'src'): string | null;
+    /** Optional. String attached to the context for caching/identification. */
+    getAttribute(name: 'hash'): string | null;
+    /** Set to automatically add {@link OrbitControls} to the loaded scene */
+    getAttribute(name: 'camera-controls'): "true" | "false" | "none" | null;
+    /** Override the default draco decoder path location. */
+    getAttribute(name: 'dracoDecoderPath'): string | null;
+    /** Override the default draco library type. */
+    getAttribute(name: 'dracoDecoderType'): "wasm" | "js" | null;
+    /** Override the default KTX2 transcoder/decoder path */
+    getAttribute(name: 'ktx2DecoderPath'): string | null;
+    /** Prevent Needle Engine context from being disposed when the element is removed from the DOM */
+    getAttribute(name: 'keep-alive'): string | null;
+    
+    /** @private Public key used for licensing and feature gating. */
+    getAttribute(name: 'public-key'): string | null;
+    /** @private Engine version string — usually set by the build/runtime. */
+    getAttribute(name: 'version'): string | null;
+
+    // LoadingAttributes
+    // ...
+
+    // SkyboxAttributes
+    /** URL to .exr, .hdr, .png, .jpg to be used as skybox */
+    getAttribute(name: 'background-image'): string | null;
+    /** @private Rotation of the background image in degrees. */
+    getAttribute(name: 'background-rotation'): string | null;
+    /** URL to .exr, .hdr, .png, .jpg to be used for lighting */
+    getAttribute(name: 'environment-image'): string | null;
+    /** Intensity multiplier for environment lighting. */
+    getAttribute(name: 'environment-intensity'): string | null;
+    /** Blurs the background image. Strength between 0 (sharp) and 1 (fully blurred). */
+    getAttribute(name: 'background-blurriness'): string | null;
+    /** Intensity multiplier for the background image. */
+    getAttribute(name: 'background-intensity'): string | null;
+    /**
+     * CSS background color value to be used if no skybox or background image is provided.
+     * @example "background-color='#ff0000'" will set the background color to red.
+     */
+    getAttribute(name: 'background-color'): string | null;
+
+    // RenderingAttributes
+    /** Enable/disable renderer canvas transparency. */
+    getAttribute(name: 'transparent'): string | null;
+    /** Enable/disable contact shadows in the rendered scene */
+    getAttribute(name: 'contact-shadows'): string | null;
+    /** @deprecated Use 'contact-shadows' instead. */
+    getAttribute(name: 'contactshadows'): string | null;
+    /** Tonemapping mode. */
+    getAttribute(name: 'tone-mapping'): TonemappingAttributeOptions | null;
+    /** @deprecated Use 'tone-mapping' instead. */
+    getAttribute(name: 'tonemapping'): TonemappingAttributeOptions | null;
+    /** Exposure multiplier for tonemapping. */
+    getAttribute(name: 'tone-mapping-exposure'): string | null;
+
+    /** Defines a CSS selector or HTMLElement where the camera should be focused on. Content will be fit into this element. */
+    getAttribute(name: 'focus-rect'): string | null;
+    /** Allow pointer events to pass through transparent parts of the content to the underlying DOM elements. */
+    getAttribute(name: 'clickthrough'): string | null;
+    /** Automatically fits the model into the camera view on load. */
+    getAttribute(name: 'auto-fit'): string | null;
+    /** @deprecated Use 'auto-fit' instead. */
+    getAttribute(name: 'autofit'): string | null;
+    /** Automatically rotates the model until a user interacts with the scene. */
+    getAttribute(name: 'auto-rotate'): string | null;
+    /** Play animations automatically on scene load */
+    getAttribute(name: "autoplay"): string | null;
+    /** @private Used for switching the scene in SceneSwitcher */
+    getAttribute(name: 'scene'): string | null;
+    // getAttribute(name: 'loadstart'): string | null;
+
+    /** @private Experimental.*/
+    getAttribute(name: 'loading-blur'): string | null;
+    /** @private */
+    getAttribute(name: 'alias'): string | null;
+    /** @private */
+    getAttribute(name: 'hide-loading-overlay'): string | null;
+    /** @private */
+    getAttribute(name: 'no-telemetry'): string | null;
+
+    // Comment these out to get development errors for undocumented NE attributes
+    /** Typed getter for known NeedleEngine attribute names; returns the typed shape declared in NeedleEngineAttributes or null. */
+    // getAttribute<T extends keyof NeedleEngineAttributes>(qualifiedName: T): NeedleEngineAttributes[T] | null;
+    getAttribute(qualifiedName: ({} & string)): string | null;
+    
+    // The ones we're using interally:
+    /*
+    getAttribute(name: "autostart"): string | null;
+    getAttribute(name: "tabindex"): string | null;
+    */
+    
+    getAttribute(qualifiedName: string): string | null {
+        return super.getAttribute(qualifiedName);
+    }
+
+    // #region addEventListener
+
+    /**
+     * Emitted when loading begins for the scene. The event is cancelable — calling `preventDefault()` 
+     * will stop the default loading UI behavior, so apps can implement custom loading flows.
+     */
+    addEventListener(type: 'loadstart', listener: (ev: CustomEvent<{ context: Context; alias: string | null }>) => void, options?: boolean | AddEventListenerOptions): void;
+    /** Emitted repeatedly while loading resources. Use the event detail to show progress. */
+    addEventListener(type: 'progress', listener: (ev: CustomEvent<{ context: Context; name: string; progress: ProgressEvent<EventTarget>; index: number; count: number; totalProgress01: number }>) => void, options?: boolean | AddEventListenerOptions): void;
+    /** Emitted when scene loading has finished. */
+    addEventListener(type: 'loadfinished', listener: (ev: CustomEvent<{ context: Context; src: string | null; loadedFiles: LoadedModel[] }>) => void, options?: boolean | AddEventListenerOptions): void;
+    /** Emitted when an XR session ends. */
+    addEventListener(type: 'xr-session-ended', listener: (ev: CustomEvent<{ session: XRSession | null; context: Context; sessionMode: XRSessionMode | undefined }>) => void, options?: boolean | AddEventListenerOptions): void;
+    /** Emitted when entering an AR session. */
+    addEventListener(type: 'enter-ar', listener: (ev: CustomEvent<{ session: XRSession; context: Context; htmlContainer: HTMLElement | null }>) => void, options?: boolean | AddEventListenerOptions): void;
+    /** Emitted when exiting an AR session. */
+    addEventListener(type: 'exit-ar', listener: (ev: CustomEvent<{ session: XRSession; context: Context; htmlContainer: HTMLElement | null }>) => void, options?: boolean | AddEventListenerOptions): void;
+    /** Emitted when entering a VR session. */
+    addEventListener(type: 'enter-vr', listener: (ev: CustomEvent<{ session: XRSession; context: Context }>) => void, options?: boolean | AddEventListenerOptions): void;
+    /** Emitted when exiting a VR session. */
+    addEventListener(type: 'exit-vr', listener: (ev: CustomEvent<{ session: XRSession; context: Context }>) => void, options?: boolean | AddEventListenerOptions): void;
+    /** Emitted when the engine has rendered its first frame and is ready. */
+    addEventListener(type: 'ready', listener: (ev: Event) => void, options?: boolean | AddEventListenerOptions): void;
+    /** Emitted when an XR session is started. You can do additional setup here. */
+    addEventListener(type: 'xr-session-started', listener: (ev: CustomEvent<{ session: XRSession; context: Context }>) => void, options?: boolean | AddEventListenerOptions): void;
+
+    // Sadly not enough to make types work (see comment below)
+    addEventListener<K extends keyof HTMLElementEventMap>(type: ({} & K), listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+    // These are from the super type. Not sure how we can remove intellisense for the "regular" events while still making the types work...
+    addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+    addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+    // This would be better but doesn't completely solve it
+    // addEventListener(type: ({} & string), listener: any, options?: boolean | AddEventListenerOptions): void;
+    
+    // The ones we're using interally:
+    /* 
+    addEventListener(type: "error", listener: (ev: ErrorEvent) => void, options?: boolean | AddEventListenerOptions): void;
+    addEventListener(type: "wheel", listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+    addEventListener(type: "keydown", listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+    addEventListener(type: "drop", listener: (ev: DragEvent) => void, options?: boolean | AddEventListenerOptions): void;
+    addEventListener(type: "dragover", listener: (ev: DragEvent) => void, options?: boolean | AddEventListenerOptions): void;
+    */
+    addEventListener(type: string, listener: any, options?: boolean | AddEventListenerOptions): void
+    {
+        return super.addEventListener(type, listener as EventListenerOrEventListenerObject, options);
+    }
+}
+
+if (typeof window !== "undefined" && !window.customElements.get(htmlTagName))
+    window.customElements.define(htmlTagName, NeedleEngineWebComponent);
+
+/** Quick testing for the types as declared above */
+/*
+const elem = document.querySelector("needle-engine")!;
+elem.setAttribute("src", "model.glb");
+elem.addEventListener("loadfinished", (ev) => {
+    const context = ev.detail.context;
+});
+elem.setAttribute("dracoDecoderType", "wasm");
+elem.addEventListener("enter-ar", (ev) => {
+    const session = ev.detail.session;
+});
+
+elem.addEventListener("mousedown", (ev) => {
+    console.log("regular mousedown event", ev);
+});
+
+const onDragOverEvent = (e: DragEvent) => {
+
+};
+
+elem.addEventListener("dragover", onDragOverEvent);
+*/
+/* END Type testing */
+
+// #region Utility functions
+
+function getDisplayName(str: string) {
+    if (str.startsWith("blob:")) {
+        return "blob";
+    }
+    const parts = str.split("/");
+    let name = parts[parts.length - 1];
+    // Remove params
+    const paramsIndex = name.indexOf("?")
+    if (paramsIndex > 0)
+        name = name.substring(0, paramsIndex);
+
+    const equalSign = name.indexOf("=");
+    if (equalSign > 0)
+        name = name.substring(equalSign);
+
+    const extension = name.split(".").pop();
+    const extensions = ["glb", "gltf", "usdz", "usd", "fbx", "obj", "mtl"];
+    const matchedIndex = !extension ? -1 : extensions.indexOf(extension.toLowerCase());
+    if (extension && matchedIndex >= 0) {
+        name = name.substring(0, name.length - extension.length - 1);
+    }
+    name = decodeURIComponent(name);
+    if (name.length > 3) {
+        let displayName = "";
+        let lastCharacterWasSpace = false;
+        const ignoredCharacters = ["(", ")", "[", "]", "{", "}", ":", ";", ",", ".", "!", "?"];
+        for (let i = 0; i < name.length; i++) {
+            let c = name[i];
+            if (c === "_" || c === "-") c = " ";
+            if (c === ' ' && displayName.length <= 0) continue;
+            const isIgnored = ignoredCharacters.includes(c);
+            if (isIgnored) continue;
+            const isFirstCharacter = displayName.length === 0;
+
+            if (isFirstCharacter) {
+                c = c.toUpperCase();
+            }
+            if (lastCharacterWasSpace && c === " ") {
+                continue;
+            }
+            if (lastCharacterWasSpace) {
+                c = c.toUpperCase();
+            }
+
+            lastCharacterWasSpace = false;
+            displayName += c;
+
+            if (c === " ") {
+                lastCharacterWasSpace = true;
+            }
+        }
+
+        if (isDevEnvironment() && name !== displayName)
+            console.debug("Generated display name: \"" + name + "\" → \"" + displayName + "\"");
+        return displayName.trim();
+    }
+    if (isDevEnvironment())
+        console.debug("Loading: use default name", name);
+    return name;
+}
+
+
+function handleLoadingBlur(needleEngineElement: NeedleEngineWebComponent) {
+    onStart((ctx) => {
+        const userBlurSetting = needleEngineElement.getAttribute("loading-blur");
+        if (userBlurSetting !== null && userBlurSetting !== "0") {
+            if (ctx.domElement === needleEngineElement) {
+
+                const promise = ctx.lodsManager.manager?.awaitLoading({
+                    frames: 5,
+                    signal: AbortSignal.timeout(10_000), // Limit how long the page can be blurred
+                    maxPromisesPerObject: 1,
+                }).catch(_ => {
+                    // Ignore errors (none are expected tho...)
+                });
+                let blur = "20px";
+                if (userBlurSetting.endsWith("px")) blur = userBlurSetting;
+                const duration = 170;
+
+                // If the scene has a transparent background we apply a blur to the canvas directly to not *also* blur images
+                // But don't always use this effect because the edges don't look as good as with a backdrop filter
+                if (ctx.scene.background === null) {
+                    const domElement = needleEngineElement;
+                    const canvas = ctx.renderer.domElement;
+                    const originalFilterValue = canvas.style.filter;
+                    const originalOverflowValue = canvas.style.overflow;
+                    canvas.style.filter += `blur(${blur})`;
+                    domElement.style.overflow = "hidden";
+                    promise?.then(() => {
+                        const animation = canvas.animate([{
+                            filter: "blur(0px)",
+                        }
+                        ], { duration: duration, easing: "ease-in", });
+                        animation.onfinish = () => {
+                            canvas.style.filter = originalFilterValue;
+                            domElement.style.overflow = originalOverflowValue;
+                        };
+                    });
+                }
+                else {
+                    const blurryElement = document.createElement("div");
+                    ctx.domElement.prepend(blurryElement);
+                    blurryElement.style.cssText = "position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none";
+                    blurryElement.style.backdropFilter = `blur(${blur})`;
+                    promise?.then(() => {
+                        const animation = blurryElement.animate([{
+                            backdropFilter: "blur(0px)",
+                            opacity: 0,
+                        }
+                        ], { duration: duration, easing: "ease-in", });
+                        animation.onfinish = () => {
+                            blurryElement.remove();
+                        };
+                    });
+                }
+            }
+        }
+    }, { once: true });
+}

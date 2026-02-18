@@ -1,0 +1,66 @@
+import { MODULES } from "../../../engine/engine_modules.js";
+import { serializable } from "../../../engine/engine_serialization.js";
+import { type EffectProviderResult, PostProcessingEffect } from "../PostProcessingEffect.js";
+import { VolumeParameter } from "../VolumeParameter.js";
+import { registerCustomEffectType } from "../VolumeProfile.js";
+
+/**
+ * Tilt Shift effect simulates a miniature scene by applying a selective focus blur to the rendered image.  
+ * This effect creates a shallow depth of field, making real-world scenes appear as if they are small-scale models.  
+ * It is often used in photography and cinematography to draw attention to specific areas of the scene while blurring out the rest.
+ * @summary Tilt Shift Post-Processing Effect
+ * @category Effects
+ * @group Components
+ */
+export class TiltShiftEffect extends PostProcessingEffect {
+    get typeName(): string {
+        return "TiltShiftEffect";
+    }
+
+    @serializable(VolumeParameter)
+    offset: VolumeParameter = new VolumeParameter(0);
+    @serializable(VolumeParameter)
+    rotation: VolumeParameter = new VolumeParameter(0);
+    @serializable(VolumeParameter)
+    focusArea: VolumeParameter = new VolumeParameter(0.4);
+    @serializable(VolumeParameter)
+    feather: VolumeParameter = new VolumeParameter(0.3);
+    // Medium is 2 https://github.com/pmndrs/postprocessing/blob/main/src/enums/KernelSize.js
+    @serializable(VolumeParameter)
+    kernelSize: VolumeParameter = new VolumeParameter(2);
+    @serializable(VolumeParameter)
+    resolutionScale: VolumeParameter = new VolumeParameter(1 / window.devicePixelRatio);
+
+    init(): void {
+        this.offset.defaultValue = 0;
+        this.rotation.defaultValue = 0;
+        this.focusArea.defaultValue = 0.4;
+        this.feather.defaultValue = 0.3;
+        this.kernelSize.defaultValue = MODULES.POSTPROCESSING.MODULE.KernelSize.MEDIUM;
+        this.resolutionScale.defaultValue = 1 / window.devicePixelRatio;
+    }
+
+
+    onCreateEffect(): EffectProviderResult | undefined {
+
+        const effect = new MODULES.POSTPROCESSING.MODULE.TiltShiftEffect({
+            kernelSize: MODULES.POSTPROCESSING.MODULE.KernelSize.VERY_LARGE,
+            offset: this.offset.value,
+            rotation: this.rotation.value,
+            focusArea: this.focusArea.value,
+            feather: this.feather.value,
+        });
+
+        this.offset.onValueChanged = v => effect.offset = v;
+        this.rotation.onValueChanged = v => effect.rotation = v;
+        this.focusArea.onValueChanged = v => effect.focusArea = v;
+        this.feather.onValueChanged = v => effect.feather = v;
+        this.kernelSize.onValueChanged = v => effect.blurPass.kernelSize = v;
+        this.resolutionScale.onValueChanged = v => effect.resolution.scale = v / window.devicePixelRatio;
+
+
+        return effect;
+    }
+
+}
+registerCustomEffectType("TiltShiftEffect", TiltShiftEffect);

@@ -1,24 +1,18 @@
 // ============ DIRECTUS SCHEMA TYPES ============
 // TypeScript types matching the Directus database schema
-// Generated based on recreate-schema.js — translations + M2M
 
 export type Language = 'es' | 'en' | 'fr';
-
-// ============ TRANSLATION ROW ============
-// Each *_translations junction row has languages_code + translated fields
 
 export interface TranslationRow {
   languages_code: Language;
 }
 
-// ============ LANGUAGES ============
 export interface DirectusLanguage {
   code: Language;
   name: string;
   direction: 'ltr' | 'rtl';
 }
 
-// ============ CATEGORIES ============
 export interface DirectusCategoryTranslation extends TranslationRow {
   name: string;
   description?: string;
@@ -36,7 +30,6 @@ export interface DirectusCategory {
   status: 'draft' | 'published' | 'archived';
 }
 
-// ============ MUSEUMS ============
 export interface DirectusMuseumTranslation extends TranslationRow {
   name: string;
   short_description?: string;
@@ -71,7 +64,6 @@ export interface DirectusMuseum {
   updated_at: string;
 }
 
-// ============ TOURS 360° ============
 export interface DirectusTour360Translation extends TranslationRow {
   title: string;
   description?: string;
@@ -124,6 +116,16 @@ export interface DirectusARScene {
   featured: boolean;
   launch_count: number;
   completion_count: number;
+
+  // Dynamic mode fields (added to Directus schema)
+  scene_mode?: 'build' | 'dynamic';
+  glb_model?: string;        // UUID → directus_files
+  glb_scale?: number;        // default 1.0
+  glb_rotation_y?: number;   // degrees, default 0
+  audio_es?: string;         // UUID → directus_files
+  audio_en?: string;
+  audio_fr?: string;
+
   translations: DirectusARSceneTranslation[];
   pois?: DirectusPOI[];
   status: 'draft' | 'published' | 'archived';
@@ -131,7 +133,6 @@ export interface DirectusARScene {
   updated_at: string;
 }
 
-// ============ VR EXPERIENCES ============
 export interface DirectusVRExperienceTranslation extends TranslationRow {
   title: string;
   description?: string;
@@ -159,7 +160,6 @@ export interface DirectusVRExperience {
   updated_at: string;
 }
 
-// ============ ROUTES ============
 export interface DirectusRouteTranslation extends TranslationRow {
   title: string;
   short_description?: string;
@@ -194,7 +194,6 @@ export interface DirectusRoute {
   updated_at: string;
 }
 
-// ============ POIs ============
 export interface DirectusPOITranslation extends TranslationRow {
   title: string;
   short_description?: string;
@@ -242,7 +241,6 @@ export interface DirectusPOI {
   updated_at: string;
 }
 
-// ============ ANALYTICS EVENTS ============
 export interface DirectusAnalyticsEvent {
   id: string;
   event_type: string;
@@ -259,7 +257,6 @@ export interface DirectusAnalyticsEvent {
   created_at: string;
 }
 
-// ============ DIRECTUS FILE ============
 export interface DirectusFile {
   id: string;
   storage: string;
@@ -284,7 +281,6 @@ export interface DirectusFile {
   metadata?: any;
 }
 
-// ============ DIRECTUS SCHEMA (for SDK) ============
 export type DirectusSchema = {
   languages: DirectusLanguage[];
   categories: DirectusCategory[];
@@ -298,7 +294,6 @@ export type DirectusSchema = {
   directus_files: DirectusFile[];
 };
 
-// ============ HELPER: extract translation by locale ============
 export function getTranslation<T extends TranslationRow>(
   translations: T[] | undefined,
   locale: Language,
@@ -310,7 +305,6 @@ export function getTranslation<T extends TranslationRow>(
     || translations[0];
 }
 
-// ============ HELPER: build multilingual record from translations ============
 export function toMultilingual(
   translations: TranslationRow[] | undefined,
   field: string
@@ -319,9 +313,7 @@ export function toMultilingual(
   if (!translations) return result as Record<Language, string>;
   for (const t of translations) {
     let value = (t as any)[field] || '';
-    // Remove HTML tags and decode entities (e.g., <p>D&eacute;couvrez</p> → Découvrez)
     if (value && typeof value === 'string') {
-      // Create a temporary div element to strip HTML and decode entities
       const div = document.createElement('div');
       div.innerHTML = value;
       value = div.textContent || div.innerText || '';

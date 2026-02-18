@@ -24,6 +24,8 @@ import { loadDirectusTranslations } from '@/i18n/directus-backend';
 
 import './index.css';
 
+import("@needle-tools/engine");
+
 
 
 // Load CMS-managed translations (merges over bundled fallbacks)

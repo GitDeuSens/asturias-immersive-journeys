@@ -1,0 +1,45 @@
+import { Vector3 } from "three";
+
+import { serializable } from "../engine/engine_serialization_decorator.js";
+import * as utils from "./../engine/engine_three_utils.js";
+import { Behaviour, GameObject } from "./Component.js";
+
+/**
+ * Aligns this GameObject between two other GameObjects, scaling it to fit the distance.  
+ * You can use this to create dynamic beams or connectors between objects.
+ *
+ * @summary Aligns and scales the object between two target GameObjects
+ * @category Constraints
+ * @group Components 
+ **/
+export class AlignmentConstraint extends Behaviour {
+
+    @serializable(GameObject)
+    private from: GameObject | undefined;
+    @serializable(GameObject)
+    private to: GameObject | undefined;
+
+    private width: number = 0;
+    private centered: boolean = true;
+    private _centerPos!: Vector3;
+
+    awake(): void {
+        this._centerPos = new Vector3();
+    }
+
+    update() {
+        if (!this.from || !this.to) return;
+        
+        const fromWorldPos = utils.getWorldPosition(this.from).clone();
+        const toWorldPos = utils.getWorldPosition(this.to).clone();
+        const dist = fromWorldPos.distanceTo(toWorldPos);
+        
+        this._centerPos.copy(fromWorldPos);
+        this._centerPos.add(toWorldPos);
+        this._centerPos.multiplyScalar(0.5);
+
+        utils.setWorldPosition(this.gameObject, this.centered ? this._centerPos : fromWorldPos);
+        this.gameObject.lookAt(utils.getWorldPosition(this.to).clone());
+        this.gameObject.scale.set(this.width, this.width, dist);
+    }
+}

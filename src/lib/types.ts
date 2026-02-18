@@ -36,43 +36,52 @@ export interface KuulaTour {
 
 export type ARType = 'slam' | 'image-tracking' | 'geo';
 export type ARDifficulty = 'easy' | 'moderate' | 'advanced';
+export type ARSceneMode = 'build' | 'dynamic';
 
 export interface ARScene {
   id: string;
   slug: string;
   title: Record<Language, string>;
   description: Record<Language, string>;
-  
+
+  // Scene mode: "build" = deployed Needle ZIP, "dynamic" = GLB from Directus
+  scene_mode?: ARSceneMode;
+
   // Needle Engine data
   needle_scene_url: string;
   needle_type: ARType;
   build_path?: string;
-  
+
+  // Dynamic mode — GLB loaded from Directus
+  glb_model?: string;       // UUID of file in directus_files
+  glb_scale?: number;       // default 1.0
+  glb_rotation_y?: number;  // degrees, default 0
+
   // For image tracking
   tracking_image_url?: string;
   tracking_image_physical_size?: number; // cm
-  
+
   // For geo AR
   location?: {
     lat: number;
     lng: number;
     radius_meters: number;
   };
-  
+
   // Relations
   poi_id?: string;
   route_id?: string;
-  
+
   // Media
   preview_image: string;
   preview_video?: string;
   instructions_image?: string;
-  
+
   // Settings
   difficulty: ARDifficulty;
   duration_minutes: number;
   requires_outdoors: boolean;
-  
+
   // Metadata
   created_at?: string;
   published: boolean;
@@ -134,4 +143,25 @@ export interface VRExperience {
   duration_minutes?: number;
   category: string;
   published: boolean;
+}
+
+// ============ NEEDLE ENGINE CUSTOM ELEMENT ============
+// Global JSX declaration for <needle-engine> web component
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'needle-engine': React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement> & {
+          src?: string;
+          'loading-background'?: string;
+          'loading-logo-src'?: string;
+          'background-color'?: string;
+          // onloadfinished as standard event attr (cast via any at usage site)
+          onloadfinished?: (e: Event) => void;
+        },
+        HTMLElement
+      >;
+    }
+  }
 }

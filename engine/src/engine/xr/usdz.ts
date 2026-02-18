@@ -1,0 +1,36 @@
+import { isDevEnvironment } from "../debug/index.js";
+
+declare type USDZExporter = {
+    exportAndOpen(): Promise<any>,
+}
+
+/** 
+ * Internal registry for USDZ exporters. This is used by NeedleXRSession.start("immersive-ar")
+ */
+export namespace InternalUSDZRegistry {
+
+    const usdzExporter: USDZExporter[] = [];
+
+    export function exportAndOpen(): boolean {
+        if (!usdzExporter?.length) {
+            if (isDevEnvironment()) {
+                console.warn("No USDZ exporters found – cannot export USDZ for QuickLook.");
+            }
+        }
+        for (const exp of usdzExporter) {
+            exp.exportAndOpen();
+        }
+        return true;
+    }
+    export function registerExporter(exporter: USDZExporter) {
+        usdzExporter.push(exporter);
+    }
+    export function unregisterExporter(exporter: USDZExporter) {
+        if (!usdzExporter) return;
+        const index = usdzExporter.indexOf(exporter);
+        if (index >= 0) {
+            usdzExporter.splice(index, 1);
+        }
+    }
+
+}

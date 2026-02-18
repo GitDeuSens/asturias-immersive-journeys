@@ -1,0 +1,63 @@
+import { getParam } from "./engine_utils.js";
+
+const debug = getParam("debugtypes");
+
+declare type Type = new (...args: any[]) => any;
+
+class _TypeStore {
+
+    private _types: Map<string, Type> = new Map();
+    private _reverseTypes: Map<Type, string> = new Map();
+
+    constructor() {
+        if (debug) console.warn("TypeStore: Created", this);
+    }
+
+    /**
+     * add a type to the store
+     */
+    public add(key: string, type: Type) {
+        if (debug) console.warn("ADD TYPE", key);
+        const existing = this._types.get(key);
+        if (!existing) {
+            this._types.set(key, type);
+            this._reverseTypes.set(type, key);
+        }
+        else {
+            if (debug) {
+                if (existing !== type) {
+                    console.warn("Type name exists multiple times in your project and may lead to runtime errors:", key)
+                }
+            }
+        }
+    }
+
+    /**
+     * @returns the type for the given key if registered
+     */
+    public get(key: string): Type | null {
+        return this._types.get(key) || null;
+    }
+
+    /**
+     * @returns the key/name for the given type if registered
+     */
+    public getKey(type: Type): string | null {
+        return this._reverseTypes.get(type) || null;
+    }
+}
+
+export const $BuiltInTypeFlag = Symbol("BuiltInType");
+export const TypeStore = new _TypeStore();
+
+/** 
+ * add to a class declaration to automatically register it to the TypeStore (required for HMR right now)       
+ * 
+ * `@registerType`
+ * 
+ * `export class MyType extends Behaviour { ... }`
+ */
+export const registerType = function (constructor: Type) {
+    if (!TypeStore.get(constructor.name))
+        TypeStore.add(constructor.name, constructor);
+}

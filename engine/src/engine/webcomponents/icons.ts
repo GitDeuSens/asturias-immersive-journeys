@@ -1,0 +1,100 @@
+import { Texture } from "three";
+
+
+const fontname = "Material Symbols Outlined";
+
+/** Returns a HTML element containing an icon. Using https://fonts.google.com/icons   
+ * As a string you should pass in the name of the icon, e.g. "add" or "delete" 
+ * @returns HTMLElement containing the icon
+*/
+export function getIconElement(str: string): HTMLElement {
+    const span = document.createElement("span");
+    span.style.maxWidth = "48px";
+    span.style.maxHeight = "48px";
+    span.style.overflow = "hidden";
+    span.classList.add("material-symbols-outlined", "notranslate");
+    span.setAttribute("translate", "no");
+    span.innerText = str;
+    span.style.visibility = "hidden";
+    span.style.userSelect = "none";
+    fontReady(fontname).then(res => {
+        if (res) span.style.visibility = "";
+        else {
+            if (str === "more_vert") {
+                span.style.visibility = "";
+                span.innerText = "More";
+            }
+            else {
+                span.style.display = "none";
+            }
+        }
+    })
+    return span;
+}
+
+/**@returns true if the element is an needle engine icon element */
+export function isIconElement(element: Node): boolean {
+    const span = element as HTMLElement;
+    return span.classList?.contains("material-symbols-outlined") || false;
+}
+
+const textures = new Map<string, Texture | null>();
+
+export async function getIconTexture(str: string): Promise<Texture | null> {
+    // check if font has loaded
+    await fontReady(fontname);
+    if (textures.has(str)) {
+        return textures.get(str) as Texture | null;
+    }
+    const canvas = document.createElement("canvas");
+    const size = 48;
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+        ctx.font = `${size}px '${fontname}'`;
+        ctx.fillStyle = "black";
+        ctx.fillText(str, 0, size);
+        const data = canvas.toDataURL();
+        const texture = new Texture();
+        texture.name = str + " icon";
+        texture.image = new Image();
+        texture.image.src = data;
+        texture.needsUpdate = true;
+        textures.set(str, texture);
+        return texture;
+    }
+    textures.set(str, null);
+    return null;
+}
+
+
+const loadingPromises: Map<string, Promise<boolean>> = new Map();
+
+async function fontReady(fontName: string, retries: number = 5, currentRetry: number = 0): Promise<boolean> {
+    const res = document.fonts.check(`1em '${fontName}'`);
+    if (!res) {
+        await document.fonts.ready;
+    }
+
+    // check again after waiting for fonts to be ready
+    // we cache this promise once but delete it after it has resolved (since we want to retry if it fails) so that we don't have multiple promises for the same font loading at the same time
+    const promise = loadingPromises.get(fontName) || document.fonts.load(`1em '${fontName}'`)
+        .then(res => res?.length > 0)
+        .finally(() => {
+            loadingPromises.delete(fontName);
+        });
+    loadingPromises.set(fontName, promise);
+    const loaded = await promise;
+    if (!loaded) {
+        if (currentRetry < retries) {
+            return new Promise(res => {
+                setTimeout(() => {
+                    res(fontReady(fontName, retries, currentRetry + 1));
+                }, 1000);
+            });
+        }
+        return false;
+    }
+    return true;
+}
