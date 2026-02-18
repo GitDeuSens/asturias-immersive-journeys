@@ -122,7 +122,7 @@ export interface Route {
 
 export interface RoutePointContent {
   image?: { url: string; caption?: Record<Language, string> };
-  gallery?: Array<{ url: string; caption?: Record<Language, string> }>;
+  gallery?: any[];
   video?: { url: string; caption?: Record<Language, string> };
   pdf?: { url: string; title: Record<Language, string> };
   audioGuide?: {

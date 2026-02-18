@@ -57,6 +57,7 @@ export function SettingsDropdown({ variant = "light" }: SettingsDropdownProps) {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
+      style={{width: '65px', height: '50px'}}
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${getButtonStyles()}`}
         aria-label={t("a11y.languageSelector")}

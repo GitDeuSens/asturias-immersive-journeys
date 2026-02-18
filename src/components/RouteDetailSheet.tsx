@@ -1,11 +1,11 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
-import { 
-  X, 
-  MapPin, 
-  Clock, 
-  RotateCw, 
-  Mountain, 
+import {
+  X,
+  MapPin,
+  Clock,
+  RotateCw,
+  Mountain,
   ChevronRight,
   Camera,
   Play,
@@ -87,7 +87,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+        className="fixed inset-0 z-50"
         onClick={onClose}
         role="presentation"
       />
@@ -96,31 +96,37 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
         initial={{ x: '100%', opacity: 0.8 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: '100%', opacity: 0.8 }}
-        transition={{ 
-          type: 'spring', 
-          damping: 28, 
+        transition={{
+          type: 'spring',
+          damping: 28,
           stiffness: 200,
           mass: 0.9,
           opacity: { duration: 0.2, ease: 'easeOut' }
         }}
         className="fixed right-0 top-0 bottom-0 w-100 max-w-lg bg-background z-50 shadow-2xl flex flex-col overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
         role="dialog"
         aria-modal="true"
         aria-labelledby="route-detail-title"
       >
         {/* Hero image */}
-        <div 
+        <div
           className="relative h-56 bg-cover bg-center flex-shrink-0"
           style={{ backgroundImage: `url(${route.coverImage})` }}
           role="img"
           aria-label={route.title[lang]}
         >
           <div className="absolute inset-0 from-background via-background/20 to-transparent" aria-hidden="true" />
-          
+
           {/* Close button */}
-          <button 
-            onClick={onClose}
+          <button
+            onClick={() => {
+              onClose();
+              location.reload();
+            }
+            }
             className="absolute top-4 right-4 p-2 rounded-full bg-background/80 backdrop-blur-sm text-foreground hover:bg-background transition-colors focus:outline-none focus:ring-2 focus:ring-primary shadow-lg"
             aria-label={t('common.close')}
           >
@@ -132,7 +138,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
             {route.id}
           </span>
 
-          
+
         </div>
 
         {/* Scrollable content */}
@@ -156,7 +162,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
                   {route.duration[lang]}
                 </span>
               )}
-              
+
               {/* Distance */}
               {distance > 0 && (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
@@ -180,7 +186,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
                   {surfaceLabels[route.surfaceType]?.[lang] || route.surfaceType}
                 </span>
               )}
-              
+
               {/* Points */}
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
                 <MapPin className="w-4 h-4 text-primary" aria-hidden="true" />
@@ -223,7 +229,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
                 variant="outline"
                 className="w-100 justify-between"
                 onClick={handleNavigateToStart}
-                style={{width: '100%'}}
+                style={{ width: '100%' }}
               >
                 <span className="flex items-center gap-2">
                   <Navigation className="w-4 h-4" aria-hidden="true" />
@@ -248,7 +254,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
             {/* Share buttons - NEW */}
             <div>
               <p className="text-sm font-semibold text-foreground mb-2">{t('common.share')}</p>
-              <ShareButtons 
+              <ShareButtons
                 title={route.title[lang]}
                 description={route.shortDescription[lang]}
                 routeCode={route.id}
@@ -279,8 +285,8 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
 
         {/* CTA Footer */}
         <div className="p-4 border-t border-border bg-background flex-shrink-0">
-          <Button 
-            onClick={() => allFunctions(route) }
+          <Button
+            onClick={() => allFunctions(route)}
             className="w-full h-12 text-base font-bold bg-primary hover:bg-primary/90"
           >
             {t('routes.enterRoute')}
@@ -303,12 +309,12 @@ function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: nu
   const hasPDF = !!content.pdf;
   const pointTitle = point.title;
   return (
-    <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50" style={{width: '100%'}}>
+    <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50" style={{ width: '100%' }}>
       {/* Thumbnail */}
       <div className="relative flex-shrink-0">
-        <div 
+        <div
           className="w-12 h-12 rounded-lg bg-cover bg-center border-2 border-primary/30"
-          style={{ backgroundImage: point.coverImage ? `url(http://192.168.12.71:8055/assets/${point.coverImage})` : undefined }}
+          style={{ backgroundImage: point.coverImage ? `url(https://back.asturias.digitalmetaverso.com/assets/${point.coverImage})` : undefined }}
           role="img"
           aria-label={point.title as any}
         />
@@ -316,7 +322,7 @@ function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: nu
           {index + 1}
         </div>
       </div>
-      
+
       {/* Info */}
       <div className="flex-1 min-w-0">
         <p className="font-medium text-foreground text-sm">{point.title as any}</p>

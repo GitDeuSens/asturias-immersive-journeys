@@ -62,7 +62,6 @@ export function BFCacheOptimizer() {
     const handlePageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
         // Page was restored from bfcache
-        console.log('Page restored from bfcache');
         // Reinitialize any state that might have been lost
         window.dispatchEvent(new CustomEvent('bfcache-restore'));
       }

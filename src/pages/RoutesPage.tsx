@@ -58,14 +58,13 @@ const createPointMarkerIcon = (point: RoutePoint, index: number, pointName: stri
   const has360 = !!point.content.tour360;
   const borderColor = hasAR ? "hsl(48, 100%, 50%)" : has360 ? "#C2634C" : "hsl(203, 100%, 32%)";
   const truncatedName = pointName.length > 20 ? pointName.substring(0, 18) + "..." : pointName;
-
   return L.divIcon({
     className: "custom-marker",
     html: `
       <div style="display: flex; flex-direction: column; align-items: center; cursor: pointer;" role="button" aria-label="${pointName}">
         <div style="position: relative; width: 48px; height: 48px;">
           <div style="width: 48px; height: 48px; border-radius: 50%; border: 4px solid ${borderColor}; overflow: hidden; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-            ${point.coverImage ? `<img src="${point.coverImage}" style="width: 100%; height: 100%; object-fit: cover;" alt="${pointName}"/>` : `<div style="width: 100%; height: 100%; background: ${borderColor}20;"></div>`}
+            ${point.coverImage ? `<img src="https://back.asturias.digitalmetaverso.com/assets/${point.coverImage}" style="width: 100%; height: 100%; object-fit: cover;" alt="${pointName}"/>` : `<div style="width: 100%; height: 100%; background: ${borderColor}20;"></div>`}
           </div>
           <div style="position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; background: ${borderColor}; border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: ${hasAR ? "#1a1a1a" : "white"}; box-shadow: 0 2px 8px rgba(0,0,0,0.25); font-family: 'Montserrat', sans-serif;">${index + 1}</div>
         </div>
@@ -365,7 +364,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <SEOHead title={t("routes.title")} description={t("routes.title")} />
-      <AppHeader variant="light" />
+      <AppHeader routes={filteredRoutes} markerRoute={markersRef} mapReference={mapRef} variant="light" />
 
       <main id="main-content" className="flex-1 relative pt-14">
         {/* Map view */}
@@ -482,6 +481,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                       route={route}
                       onClick={() => {
                         setSelectedRoute(route);
+                        setExploringRoute(route);
                         setShowRouteDetail(true);
                       }}
                     />
