@@ -367,7 +367,8 @@ class DirectusApiClient {
             'points.*',
             'points.translations.*',
             'points.content.ar_scene_id.*',
-            'points.content.tour360_id.*'
+            'points.content.tour360_id.*',
+            'points.gallery.*'
           ],
         })
       );

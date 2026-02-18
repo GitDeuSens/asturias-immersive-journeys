@@ -61,6 +61,15 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
         };
       }
 
+      if (poi.tour_360_id === null && poi.ar_scene_id === null) {
+        const photos = [];
+        poi.gallery.map((photo) => {
+          photos.push({url: 'https://back.asturias.digitalmetaverso.com/assets/' + photo.directus_files_id})
+          content.gallery = photos;
+        })
+        
+      }
+
       // Map practical info
       if (poi.phone || poi.email || poi.website || poi.opening_hours || poi.prices) {
         content.practicalInfo = {
@@ -79,7 +88,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
 
       const lat = Number(poi.lat) || 0;
       const lng = Number(poi.lng) || 0;
-
+      // TODO meter gallery aqui
       return {
         id: poi.id || poi.slug || `point-${idx}`,
         order: poi.order ?? idx + 1,
@@ -92,6 +101,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
         },
         coverImage: poi.cover_image || '',
         content,
+        gallery: poi.gallery,
         tags: poi.tags || [],
       };
     });

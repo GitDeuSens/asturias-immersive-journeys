@@ -328,7 +328,7 @@ function PointCard({ point, index, isVisited, isSelected, isLast, isNearest, dis
           {point.coverImage && (
             <div
               className="w-full h-24 bg-cover bg-center"
-              style={{ backgroundImage: `url(http://192.168.12.71:8055/assets/${point.coverImage})` }}
+              style={{ backgroundImage: `url(https://back.asturias.digitalmetaverso.com/assets/${point.coverImage})` }}
             />
           )}
 
