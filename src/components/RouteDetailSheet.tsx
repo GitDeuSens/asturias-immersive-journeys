@@ -299,15 +299,20 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
 }
 
 // Small point preview card
+function getText(value: any, lang: string): string {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  return value[lang] || value.es || value.en || '';
+}
+
 function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: number; lang: any }) {
   const content = point.content;
-  // Determine what content types are available
   const hasAR = !!content.arExperience;
   const has360 = !!content.tour360;
   const hasVideo = !!content.video;
   const hasAudio = !!content.audioGuide;
   const hasPDF = !!content.pdf;
-  const pointTitle = point.title;
+  const pointTitle = getText(point.title, lang);
   return (
     <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50" style={{ width: '100%' }}>
       {/* Thumbnail */}
@@ -316,7 +321,7 @@ function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: nu
           className="w-12 h-12 rounded-lg bg-cover bg-center border-2 border-primary/30"
           style={{ backgroundImage: point.coverImage ? `url(https://back.asturias.digitalmetaverso.com/assets/${point.coverImage})` : undefined }}
           role="img"
-          aria-label={point.title as any}
+          aria-label={pointTitle}
         />
         <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center text-xs font-bold text-white border-2 border-white shadow-sm">
           {index + 1}
@@ -325,7 +330,7 @@ function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: nu
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-foreground text-sm">{point.title as any}</p>
+        <p className="font-medium text-foreground text-sm">{pointTitle}</p>
         <div className="flex items-center gap-1.5 mt-1">
           {hasAR && <Smartphone className="w-3.5 h-3.5 text-warm" aria-label="AR" />}
           {has360 && <Camera className="w-3.5 h-3.5 text-360" aria-label="360°" />}

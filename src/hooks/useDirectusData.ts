@@ -14,6 +14,7 @@ import {
   getCategories, 
   getPOIs,
 } from "@/lib/api/directus-client";
+import { toMultilingual } from "@/lib/directus-types";
 import { logger } from "@/lib/logger";
 import { dataCache } from "./useCachedData";
 
@@ -66,13 +67,14 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
         };
       }
 
-      if (poi.tour_360_id === null && poi.ar_scene_id === null) {
-        const photos = [];
-        poi.gallery.map((photo) => {
-          photos.push({url: 'https://back.asturias.digitalmetaverso.com/assets/' + photo.directus_files_id})
-          content.gallery = photos;
-        })
-        
+      if (poi.tour_360_id === null && poi.ar_scene_id === null && Array.isArray(poi.gallery)) {
+        const photos: {url: string}[] = [];
+        poi.gallery.forEach((photo: any) => {
+          if (photo?.directus_files_id) {
+            photos.push({url: 'https://back.asturias.digitalmetaverso.com/assets/' + photo.directus_files_id});
+          }
+        });
+        content.gallery = photos;
       }
 
       // Map practical info
@@ -97,8 +99,8 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       return {
         id: poi.id || poi.slug || `point-${idx}`,
         order: poi.order ?? idx + 1,
-        title: poi.translations[0].title || { es: '', en: '', fr: '' },
-        shortDescription: poi.translations[0].short_description || { es: '', en: '', fr: '' },
+        title: toMultilingual(poi.translations, 'title') || { es: '', en: '', fr: '' },
+        shortDescription: toMultilingual(poi.translations, 'short_description') || { es: '', en: '', fr: '' },
         location: {
           lat,
           lng,
@@ -198,7 +200,7 @@ export function useImmersiveRoutes(language: Language = 'es') {
 
       setRoutes(immersiveRoutes);
     } catch (err: any) {
-      // Error loading routes
+      logger.error('[useImmersiveRoutes] Failed to load routes:', err);
       setError(err?.message || 'Failed to load routes');
       setRoutes([]);
     } finally {

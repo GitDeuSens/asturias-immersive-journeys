@@ -3,6 +3,7 @@ import {
     WebXRButtonFactory,
     onXRSessionStart,
     onXRSessionEnd,
+    DeviceUtilities,
 } from "@needle-tools/engine";
 import QRCode from 'qrcode';
 
@@ -77,11 +78,11 @@ const ASTURIAS = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const T: Record<string, Record<string, string>> = {
-    startAR: { es: 'Iniciar Experiencia AR', en: 'Start AR Experience', fr: 'Démarrer l\'AR' },
+    startAR: { es: 'Iniciar AR', en: 'Start AR', fr: 'Démarrer AR' },
     stopAR:  { es: 'Salir de AR',            en: 'Exit AR',             fr: 'Quitter AR' },
     info:    { es: 'Información',            en: 'Information',         fr: 'Informations' },
     close:   { es: 'Cerrar',                 en: 'Close',               fr: 'Fermer' },
-    qrTitle: { es: 'Escanea para AR',        en: 'Scan for AR',         fr: 'Scanner pour AR' },
+    qrTitle: { es: 'Escanear para abrir AR', en: 'Scan to open AR',     fr: 'Scanner pour ouvrir AR' },
     qrDesc:  {
         es: 'Apunta la cámara de tu móvil a este código para abrir la experiencia de Realidad Aumentada.',
         en: 'Point your phone camera at this code to open the Augmented Reality experience.',
@@ -230,7 +231,10 @@ export class AsturiasAROverlay extends Behaviour {
             this._sceneInfo = await fetchSceneInfo(this._slug);
         }
 
-        this._arUrl = window.location.href;
+        // Add ?autostart=1 so QR scan triggers AR immediately without showing the launch button
+        const url = new URL(window.location.href);
+        url.searchParams.set('autostart', '1');
+        this._arUrl = url.toString();
 
         this._buildPreARPanel();
 
@@ -275,9 +279,14 @@ export class AsturiasAROverlay extends Behaviour {
     }
 
     private _detectLanguage() {
+        // 1. React app stores language in localStorage under this key
+        const stored = localStorage.getItem('asturias-inmersivo-lang')?.toLowerCase();
+        if (stored && LANGUAGES.some(x => x.code === stored)) { this._lang = stored; return; }
+        // 2. URL param override
         const p = new URLSearchParams(window.location.search);
         const l = p.get('lang')?.toLowerCase();
         if (l && LANGUAGES.some(x => x.code === l)) { this._lang = l; return; }
+        // 3. Browser language fallback
         const b = navigator.language.split('-')[0].toLowerCase();
         if (LANGUAGES.some(x => x.code === b)) { this._lang = b; }
     }
@@ -355,15 +364,45 @@ export class AsturiasAROverlay extends Behaviour {
                 z-index: ${ASTURIAS.zIndex.overlay};
                 font-family: ${ASTURIAS.fonts.family};
             `;
-            const needleEl = document.querySelector('needle-engine') as HTMLElement | null;
-            if (needleEl) {
-                // Ensure needle-engine is a positioning context
-                if (!needleEl.style.position || needleEl.style.position === 'static') {
-                    needleEl.style.position = 'relative';
+
+            const isAppClip = DeviceUtilities.isNeedleAppClip();
+            const isAndroid = DeviceUtilities.isAndroidDevice();
+
+            if (isAppClip) {
+                // iOS AppClips: use needle-overlay-slot — Needle's designated XR overlay container
+                const overlaySlot = document.getElementById('needle-overlay-slot') as HTMLElement | null;
+                if (overlaySlot) {
+                    overlaySlot.appendChild(this._root);
+                } else {
+                    // fallback: append to needle-engine and wait for slot
+                    const needleEl = document.querySelector('needle-engine') as HTMLElement | null;
+                    (needleEl ?? document.body).appendChild(this._root);
                 }
-                needleEl.appendChild(this._root);
+            } else if (isAndroid) {
+                // Android WebXR: must be inside needle-engine for xr-overlay DOM slot visibility
+                const needleEl = document.querySelector('needle-engine') as HTMLElement | null;
+                if (needleEl) {
+                    if (!needleEl.style.position || needleEl.style.position === 'static') {
+                        needleEl.style.position = 'relative';
+                    }
+                    needleEl.appendChild(this._root);
+                } else {
+                    document.body.appendChild(this._root);
+                }
             } else {
-                document.body.appendChild(this._root);
+                // Desktop / other: prefer needle-overlay-slot, fallback to needle-engine, then body
+                const overlaySlot = document.getElementById('needle-overlay-slot') as HTMLElement | null;
+                const needleEl = document.querySelector('needle-engine') as HTMLElement | null;
+                if (overlaySlot) {
+                    overlaySlot.appendChild(this._root);
+                } else if (needleEl) {
+                    if (!needleEl.style.position || needleEl.style.position === 'static') {
+                        needleEl.style.position = 'relative';
+                    }
+                    needleEl.appendChild(this._root);
+                } else {
+                    document.body.appendChild(this._root);
+                }
             }
         }
         return this._root;
@@ -558,43 +597,49 @@ export class AsturiasAROverlay extends Behaviour {
         const title = this._getTitle();
 
         panel.innerHTML = `
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-                <div>
-                    <div style="font-size:10px;font-weight:700;color:${ASTURIAS.colors.primary};
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:clamp(10px,2.5vw,16px);">
+                <div style="flex:1;min-width:0;padding-right:10px;">
+                    <div style="font-size:clamp(9px,2vw,11px);font-weight:700;color:${ASTURIAS.colors.primary};
                         text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px;">
                         Asturias AR
                     </div>
-                    <div style="font-size:16px;font-weight:700;color:#fff;line-height:1.2;">
+                    <div style="font-size:clamp(13px,3.5vw,17px);font-weight:700;color:#fff;line-height:1.2;
+                        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                         ${title}
                     </div>
                 </div>
                 <button id="ast-pre-close" style="
                     background:rgba(255,255,255,0.1);border:none;border-radius:${ASTURIAS.radius.full};
-                    width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+                    width:clamp(28px,7vw,36px);height:clamp(28px,7vw,36px);
+                    display:flex;align-items:center;justify-content:center;
                     color:#fff;cursor:pointer;flex-shrink:0;
                 ">${this._icon('close')}</button>
             </div>
-            <div style="display:flex;gap:10px;align-items:stretch;">
+            <div style="display:flex;gap:clamp(6px,2vw,10px);align-items:stretch;">
                 ${this._isDesktop ? `
                     <button id="ast-show-qr-btn" class="ast-btn" style="
-                        flex:1;gap:8px;background:${ASTURIAS.colors.primary};
-                        color:#fff;border-radius:${ASTURIAS.radius.base};padding:13px 16px;
-                        font-size:14px;font-weight:700;justify-content:center;
+                        flex:1;gap:6px;background:${ASTURIAS.colors.primary};
+                        color:#fff;border-radius:${ASTURIAS.radius.base};
+                        padding:clamp(10px,2.5vw,14px) clamp(10px,3vw,16px);
+                        font-size:clamp(11px,2.8vw,14px);font-weight:700;justify-content:center;
                         box-shadow:0 4px 20px rgba(122,184,0,0.4);
                     ">${this._icon('qr')} ${t('qrTitle', this._lang)}</button>
                 ` : `
                     <button id="ast-start-ar-btn" class="ast-btn" style="
-                        flex:1;gap:8px;background:${ASTURIAS.colors.primary};
-                        color:#fff;border-radius:${ASTURIAS.radius.base};padding:13px 16px;
-                        font-size:14px;font-weight:700;justify-content:center;
+                        flex:1;gap:6px;background:${ASTURIAS.colors.primary};
+                        color:#fff;border-radius:${ASTURIAS.radius.base};
+                        padding:clamp(10px,2.5vw,14px) clamp(10px,3vw,16px);
+                        font-size:clamp(11px,2.8vw,14px);font-weight:700;justify-content:center;
                         box-shadow:0 4px 20px rgba(122,184,0,0.4);
                     ">${this._icon('ar')} ${t('startAR', this._lang)}</button>
                 `}
                 <button id="ast-lang-btn" style="
                     background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);
-                    border-radius:${ASTURIAS.radius.base};padding:13px 14px;
+                    border-radius:${ASTURIAS.radius.base};
+                    padding:clamp(10px,2.5vw,14px) clamp(10px,2.5vw,14px);
                     color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;
-                    font-size:12px;font-weight:600;gap:6px;font-family:${ASTURIAS.fonts.family};
+                    font-size:clamp(10px,2.5vw,13px);font-weight:600;gap:5px;
+                    font-family:${ASTURIAS.fonts.family};flex-shrink:0;
                 ">${this._icon('lang')} ${this._lang.toUpperCase()}</button>
             </div>
         `;

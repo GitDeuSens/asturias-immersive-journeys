@@ -59,6 +59,8 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
   const [isLoading, setIsLoading] = useState(true);
   const initialized = useRef(false);
   const needleRef = useRef<HTMLElement | null>(null);
+  const autostart = typeof window !== 'undefined'
+    && new URLSearchParams(window.location.search).get('autostart') === '1';
 
   useEffect(() => {
     (window as any).__DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL ?? 'http://192.168.12.71:8055';
@@ -98,6 +100,22 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
 
         await loadSceneInto(modelLoader, scene.slug);
         setIsLoading(false);
+
+        // Auto-trigger AR session if ?autostart=1 (from QR scan)
+        // Browser will show camera/XR permission popup — this is expected
+        if (autostart) {
+          setTimeout(async () => {
+            try {
+              const { WebXRButtonFactory } = await import('@needle-tools/engine');
+              const factory = WebXRButtonFactory.getOrCreate();
+              if (factory?.arButton) { factory.arButton.click(); return; }
+            } catch {}
+            const btn = document.querySelector('[ar-button]') as HTMLElement
+              ?? document.querySelector('needle-button[ar]') as HTMLElement
+              ?? (el as any)?.shadowRoot?.querySelector('[ar-button]') as HTMLElement;
+            btn?.click();
+          }, 500);
+        }
       } catch (err: any) {
         const msg = err?.message ?? 'Unknown error';
         console.error('[AR] Error loading scene:', msg);
@@ -170,22 +188,8 @@ export function NeedleARViewer({ scene, locale = 'es', onStart, onError }: Needl
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const checkARSupport = async () => {
-      if ('xr' in navigator) {
-        try {
-          const supported = await (navigator as any).xr?.isSessionSupported('immersive-ar');
-          setIsARSupported(supported || false);
-        } catch { setIsARSupported(false); }
-      } else { setIsARSupported(false); }
-    };
-    checkARSupport();
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      iframeRef.current?.remove();
-      closeBtnRef.current?.remove();
-    };
-  }, []);
+  const autostart = typeof window !== 'undefined'
+    && new URLSearchParams(window.location.search).get('autostart') === '1';
 
   const launchIframeAR = useCallback(async () => {
     if (!containerRef.current) return;
@@ -229,6 +233,29 @@ export function NeedleARViewer({ scene, locale = 'es', onStart, onError }: Needl
       trackARError(scene.id, msg); onError?.(msg);
     }
   }, [scene, locale, onStart, onError]);
+
+  useEffect(() => {
+    const checkARSupport = async () => {
+      if ('xr' in navigator) {
+        try {
+          const supported = await (navigator as any).xr?.isSessionSupported('immersive-ar');
+          setIsARSupported(supported || false);
+        } catch { setIsARSupported(false); }
+      } else { setIsARSupported(false); }
+    };
+    checkARSupport();
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      iframeRef.current?.remove();
+      closeBtnRef.current?.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!autostart || isARSupported === null || isARSupported === false) return;
+    if (scene.scene_mode === 'dynamic') return;
+    launchIframeAR();
+  }, [autostart, isARSupported, scene.scene_mode, launchIframeAR]);
 
   const openNavigation = useCallback(() => {
     if (!scene.location) return;

@@ -100,6 +100,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
   const [panelExpanded, setPanelExpanded] = useState(true);
   const selectedCategoriesSet = useMemo(() => new Set(selectedCategories), [selectedCategories]);
 
+  const [mapReady, setMapReady] = useState(false);
   const routeCodeHandledRef = useRef(false);
   useEffect(() => {
     if (!routeCode || routeCodeHandledRef.current || immersiveRoutes.length === 0) return;
@@ -156,12 +157,14 @@ export const RoutesPage = React.memo(function RoutesPage() {
     // Initialize cluster group
     clusterGroupRef.current = createClusterGroup();
     mapRef.current.addLayer(clusterGroupRef.current);
+    setMapReady(true);
 
     return () => {
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
       }
+      setMapReady(false);
     };
   }, [t]);
 
@@ -248,9 +251,9 @@ export const RoutesPage = React.memo(function RoutesPage() {
     mapRef.current.setView([userPosition.lat, userPosition.lng], 12);
   }, [userPosition]);
 
-  // Update markers
+  // Update markers — depends on mapReady so it re-runs after map initializes
   useEffect(() => {
-    if (!mapRef.current || !clusterGroupRef.current) return;
+    if (!mapReady || !mapRef.current || !clusterGroupRef.current) return;
 
     // Clear existing markers
     markersRef.current.forEach((marker) => marker.remove());
@@ -287,7 +290,8 @@ export const RoutesPage = React.memo(function RoutesPage() {
       // Only place markers for points with valid coordinates
       exploringRoute.points.forEach((point, idx) => {
         if (point.location.lat === 0 && point.location.lng === 0) return;
-        const pointName = point.title as any;
+        const t = point.title as any;
+        const pointName = typeof t === 'string' ? t : (t?.[lang] || t?.es || '');
         const marker = L.marker([point.location.lat, point.location.lng], {
           icon: createPointMarkerIcon(point, idx, pointName),
         })
@@ -312,7 +316,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
         markersRef.current.push(marker);
       });
     }
-  }, [exploringRoute, filteredRoutes, fitToRoute, lang]);
+  }, [mapReady, exploringRoute, filteredRoutes, fitToRoute, lang]);
 
   // Re-center when filters change
   useEffect(() => {
