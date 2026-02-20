@@ -14,6 +14,11 @@ const texts = {
   routesTitle: { es: 'Rutas Inmersivas', en: 'Immersive Routes', fr: 'Itinéraires Immersifs' },
   routesSubtitle: { es: 'Recorre itinerarios con mapa, AR y puntos de interés', en: 'Follow routes with map, AR and points of interest', fr: 'Suivez des itinéraires avec carte, AR et points d\'intérêt' },
   back: { es: 'Volver', en: 'Back', fr: 'Retour' },
+  homeDescription: {
+    es: "Planifica tu viaje con tours virtuales 360° y rutas inmersivas. Explora Asturias sin moverte del sofá.",
+    en: "Plan your trip with 360° virtual tours and immersive routes. Explore Asturias from your couch.",
+    fr: "Planifiez votre voyage avec des visites virtuelles 360° et des itinéraires immersifs. Explorez les Asturies depuis chez vous.",
+  },
 };
 
 export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps) {
@@ -28,7 +33,7 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
           onClick={onBack}
-          className="absolute top-24 left-6 flex items-center gap-2 text-white/70 hover:text-white transition-colors"
+          className="hidden absolute top-24 left-6 flex items-center gap-2 text-white/70 hover:text-white transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
           <span className="font-medium">{t(texts.back)}</span>
@@ -44,6 +49,7 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
       >
         {t(texts.title)}
       </motion.h1>
+      <p className="text-white/80 text-base md:text-lg leading-relaxed pb-4">{t(texts.homeDescription)}</p>
 
       {/* Experience Cards */}
       <div className="flex flex-col md:flex-row gap-6 w-full max-w-4xl">

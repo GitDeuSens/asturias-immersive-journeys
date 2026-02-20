@@ -275,6 +275,12 @@
     @apply border border-border bg-muted text-muted-foreground;
   }
 
+  /* Category chips - Turismo style */
+  .category-chip-detail {
+    @apply px-4 py-2 rounded-full text-sm font-medium transition-all duration-200;
+    @apply border border-border bg-muted text-muted-foreground;
+  }
+
   .category-chip:hover,
   .category-chip.active {
     @apply bg-primary text-primary-foreground border-primary;

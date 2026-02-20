@@ -15,7 +15,7 @@
  *   node fix-utf8.js             (apply fixes)
  */
 
-var DIRECTUS_URL = 'http://192.168.12.71:8055';
+var DIRECTUS_URL = "https://back.asturias.digitalmetaverso.com";
 var ADMIN_EMAIL = 'admin@asturiasxr.com';
 var ADMIN_PASSWORD = '6xkMbCgPA636ZNCc';
 var DRY_RUN = process.argv.includes('--dry-run');

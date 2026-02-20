@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, progress } from 'framer-motion';
 import {
   ChevronLeft,
   MapPin,
@@ -211,6 +211,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
                 isLast={idx === route.points.length - 1}
                 isNearest={nearestPoint?.id === point.id}
                 distanceInfo={pointDistances.get(point.id)}
+                progress={progress}
                 onClick={() => handlePointClick(point)}
               />
             ))
@@ -239,9 +240,10 @@ interface PointCardProps {
   isNearest: boolean;
   distanceInfo?: { distance: string; walkTime: number };
   onClick: () => void;
+  progress: any;
 }
 
-function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNearest, distanceInfo, onClick }: PointCardProps) {
+function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNearest, distanceInfo, onClick, progress }: PointCardProps) {
   const { t } = useTranslation();
   const content = point.content;
 
@@ -277,7 +279,12 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
         {isVisited && (
           <Check
             style={{ position: 'absolute', right: '5px', top: '5px', padding: '5px' }}
-            className="w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-md z-10 bg-primary"
+            className="cursor-pointer w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-md z-10 bg-primary"
+            onClick={() => {
+              const progreso = 44;
+              progress = progreso;
+              console.log(' hola ', progress);
+            }}
           />
         )}
         <motion.button

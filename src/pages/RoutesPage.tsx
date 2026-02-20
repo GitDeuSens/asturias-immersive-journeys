@@ -187,6 +187,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
     return immersiveRoutes.filter((route) => {
       // Search filter
       const matchesSearch = searchQuery === "" || 
+        route.title[lang]?.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().includes(searchLower) || 
         route.title[lang]?.toLowerCase().includes(searchLower) ||
         route.theme[lang]?.toLowerCase().includes(searchLower);
       
@@ -415,7 +416,8 @@ export const RoutesPage = React.memo(function RoutesPage() {
             mass: 0.9,
             opacity: { duration: 0.25, ease: "easeOut" },
           }}
-          className="absolute bottom-0 left-0 right-0 md:top-[100px] md:bottom-0 md:left-auto md:right-4 md:w-[400px] bg-card/95 backdrop-blur-md border border-border shadow-xl rounded-t-3xl md:rounded-3xl md:my-4 max-h-[75vh] md:max-h-none overflow-hidden flex flex-col z-20"
+          style={{width: '100%'}}
+          className="fixed right-0 top-0 bottom-0 w-100 max-w-lg bg-background z-50 shadow-2xl flex flex-col overflow-hidden"
         >
           {/* Mobile handle */}
           <button
@@ -443,7 +445,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {/* Header */}
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-serif font-bold text-foreground">{t("routes.title")}</h2>
+                  <h2 className="text-3xl font-serif font-bold text-foreground">{t("routes.title")}</h2>
                   <span className="text-xs text-muted-foreground" aria-live="polite">
                     {filteredRoutes.length} {t("common.results")}
                   </span>

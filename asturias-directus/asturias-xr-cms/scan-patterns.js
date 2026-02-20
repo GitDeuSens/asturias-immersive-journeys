@@ -3,7 +3,7 @@
  * and other box-drawing / CP437 characters, to build a complete replacement map.
  */
 
-var DIRECTUS_URL = 'http://192.168.12.71:8055';
+var DIRECTUS_URL = "https://back.asturias.digitalmetaverso.com";
 var ADMIN_EMAIL = 'admin@asturiasxr.com';
 var ADMIN_PASSWORD = '6xkMbCgPA636ZNCc';
 

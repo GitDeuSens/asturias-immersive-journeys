@@ -5,7 +5,7 @@
  * Usage: node add-ar-dynamic-fields.js
  */
 
-const DIRECTUS_URL = 'http://192.168.12.71:8055';
+const DIRECTUS_URL = "https://back.asturias.digitalmetaverso.com";
 const ADMIN_EMAIL = 'admin@asturiasxr.com';
 const ADMIN_PASSWORD = '6xkMbCgPA636ZNCc';
 const COLLECTION = 'ar_scenes';

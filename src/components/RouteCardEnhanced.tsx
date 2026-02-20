@@ -1,6 +1,6 @@
 import React, { forwardRef, memo } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Clock, RotateCw, ChevronRight, Ruler, Mountain } from "lucide-react";
+import { MapPin, Clock, RotateCw, ChevronRight, Ruler, Mountain, Landmark, Compass, UtensilsCrossed, BookOpen, Tag } from "lucide-react";
 import type { ImmersiveRoute } from "@/data/types";
 import { useTranslation } from "react-i18next";
 import { useDirectusCategories } from "@/hooks/useDirectusData";
@@ -16,6 +16,14 @@ const RouteCardComponent = forwardRef<HTMLButtonElement, RouteCardProps>(functio
   const { t, i18n } = useTranslation();
   const lang = i18n.language as "es" | "en" | "fr";
   const { getCategoryById } = useDirectusCategories(lang);
+  const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+    Mountain,
+    Landmark,
+    Compass,
+    UtensilsCrossed,
+    BookOpen,
+    Tag,
+  };
 
   const difficultyColors = {
     easy: "bg-primary/20 text-primary border-primary/30",
@@ -52,7 +60,7 @@ const RouteCardComponent = forwardRef<HTMLButtonElement, RouteCardProps>(functio
           aspectRatio="aspect-[16/9]"
         />
         {/* Route ID badge */}
-        <span className="absolute top-2 left-2 px-2 py-1 rounded-md bg-black/60 backdrop-blur-sm text-white text-xs font-bold">
+        <span className="hidden absolute top-2 left-2 px-2 py-1 rounded-md bg-black/60 backdrop-blur-sm text-white text-xs font-bold">
           {route.id}
         </span>
 
@@ -133,13 +141,14 @@ const RouteCardComponent = forwardRef<HTMLButtonElement, RouteCardProps>(functio
           )}
 
           {/* Categories */}
-          <div className="flex items-center justify-between" style={{width: '100%'}}>
+          <div className="flex items-center justify-between" style={{ width: '100%' }}>
             <div className="flex gap-3 w-64">
-              {route.categoryIds.slice(0, 2).map((catId) => {
+              {route.categoryIds.map(catId => {
                 const cat = getCategoryById(catId);
+                const IconComponent = iconMap[cat?.icon] || Tag;
                 return cat ? (
-                  <span key={catId} className="category-chip text-[10px] w-32 text-base">
-                    {cat.label[lang]}
+                  <span className="px-2 py-2 border text-base" style={{ borderRadius: '300px' }}>
+                    <IconComponent className="w-8 h-8 text-base" />
                   </span>
                 ) : null;
               })}

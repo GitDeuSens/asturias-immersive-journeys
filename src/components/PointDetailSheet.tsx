@@ -146,7 +146,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
           {/* Hero image */}
           <div
             className="relative h-56 bg-cover bg-center flex-shrink-0"
-            style={{ backgroundImage: point.coverImage ? `url(http://192.168.12.71:8055/assets/${point.coverImage})` : undefined }}
+            style={{ backgroundImage: point.coverImage ? `url(https://back.asturias.digitalmetaverso.com/assets/${point.coverImage})` : undefined }}
           >
             <div className="absolute inset-0 from-background via-background/40 to-transparent" />
             <button

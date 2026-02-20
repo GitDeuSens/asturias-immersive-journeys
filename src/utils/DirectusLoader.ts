@@ -10,7 +10,7 @@ import { Box3, MathUtils, Object3D, Vector3 } from "three";
 // ─────────────────────────────────────────────
 // CONFIG
 // ─────────────────────────────────────────────
-export const DIRECTUS_URL = "http://192.168.12.71:8055";
+export const DIRECTUS_URL = "https://back.asturias.digitalmetaverso.com";
 const DEFAULT_SCALE = 1;
 const DEFAULT_RY = 0;
 
