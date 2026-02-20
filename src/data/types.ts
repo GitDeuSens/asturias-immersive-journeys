@@ -134,6 +134,7 @@ export interface RoutePointContent {
     launchUrl: string;
     qrValue: string;
     iframe3dUrl?: string;
+    arSlug?: string;
     instructions?: Record<Language, string>;
   };
   tour360?: {

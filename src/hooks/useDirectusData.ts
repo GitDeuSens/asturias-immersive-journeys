@@ -14,6 +14,7 @@ import {
   getCategories, 
   getPOIs,
 } from "@/lib/api/directus-client";
+import { toMultilingual } from "@/lib/directus-types";
 import { logger } from "@/lib/logger";
 import { dataCache } from "./useCachedData";
 
@@ -46,10 +47,15 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
 
       // Map AR scene if linked
       if (poi.ar_scene_id) {
+        // Extract slug from ar_launch_url (e.g. https://.../ar/Conjunto_valdedios → Conjunto_valdedios)
+        const arSlugFromUrl = poi.ar_launch_url
+          ? poi.ar_launch_url.split('/ar/').pop()?.split('?')[0] || undefined
+          : undefined;
         content.arExperience = {
           launchUrl: poi.ar_launch_url || '',
           qrValue: poi.ar_qr_value || '',
           iframe3dUrl: poi.ar_iframe_url,
+          arSlug: poi.ar_slug || arSlugFromUrl,
         };
       }
 
@@ -61,13 +67,14 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
         };
       }
 
-      if (poi.tour_360_id === null && poi.ar_scene_id === null) {
-        const photos = [];
-        poi.gallery.map((photo) => {
-          photos.push({url: 'https://back.asturias.digitalmetaverso.com/assets/' + photo.directus_files_id})
-          content.gallery = photos;
-        })
-        
+      if (poi.tour_360_id === null && poi.ar_scene_id === null && Array.isArray(poi.gallery)) {
+        const photos: {url: string}[] = [];
+        poi.gallery.forEach((photo: any) => {
+          if (photo?.directus_files_id) {
+            photos.push({url: 'https://back.asturias.digitalmetaverso.com/assets/' + photo.directus_files_id});
+          }
+        });
+        content.gallery = photos;
       }
 
       // Map practical info
@@ -92,8 +99,8 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       return {
         id: poi.id || poi.slug || `point-${idx}`,
         order: poi.order ?? idx + 1,
-        title: poi.translations[0].title || { es: '', en: '', fr: '' },
-        shortDescription: poi.translations[0].short_description || { es: '', en: '', fr: '' },
+        title: toMultilingual(poi.translations, 'title') || { es: '', en: '', fr: '' },
+        shortDescription: toMultilingual(poi.translations, 'short_description') || { es: '', en: '', fr: '' },
         location: {
           lat,
           lng,
@@ -181,15 +188,6 @@ export function useImmersiveRoutes(language: Language = 'es') {
     setLoading(true);
     setError(null);
     
-    // Check cache first
-    const cacheKey = `routes_${language}`;
-    const cached = dataCache.get<ImmersiveRoute[]>(cacheKey);
-    if (cached) {
-      setRoutes(cached);
-      setLoading(false);
-      return;
-    }
-    
     try {
       const directusRoutes = await getRoutes(language);
       
@@ -201,10 +199,8 @@ export function useImmersiveRoutes(language: Language = 'es') {
       });
 
       setRoutes(immersiveRoutes);
-      // Cache for 5 minutes
-      dataCache.set(cacheKey, immersiveRoutes, 5 * 60 * 1000);
     } catch (err: any) {
-      // Error loading routes
+      logger.error('[useImmersiveRoutes] Failed to load routes:', err);
       setError(err?.message || 'Failed to load routes');
       setRoutes([]);
     } finally {

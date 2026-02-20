@@ -2,13 +2,15 @@
 // Individual AR scene page with QR code and WebXR support
 
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { QRCodeSVG } from "qrcode.react";
 import {
-  ArrowLeft, Clock, MapPin, Download, Share2,
-  Smartphone, Eye, Navigation, Sparkles, AlertCircle,
+  ArrowLeft, Clock, Download, Share2,
+  Smartphone, Eye, Navigation, Sparkles, AlertCircle, Footprints, Car,
 } from "lucide-react";
+import { useGeolocation } from "@/hooks/useGeolocation";
+import { calculateDistanceTo, formatTime } from "@/lib/navigationService";
+import { NavigationButton } from "@/components/NavigationButton";
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -64,6 +66,10 @@ const texts = {
 export function ARScenePage() {
   const { slug } = useParams<{ slug: string }>();
   const { language: locale } = useLanguage();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const fromRoute = (location.state as any)?.fromRoute as string | undefined;
+  const { latitude, longitude, hasLocation } = useGeolocation();
   const [scene, setScene] = useState<ARScene | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -143,7 +149,12 @@ export function ARScenePage() {
         <div className="pt-20 flex flex-col items-center justify-center min-h-[60vh]">
           <AlertCircle className="w-12 h-12 text-muted-foreground mb-4" />
           <h1 className="text-xl font-semibold text-foreground mb-2">{texts.notFound[locale as Language]}</h1>
-          <Link to="/"><Button variant="outline"><ArrowLeft className="w-4 h-4 mr-2" />{texts.back[locale as Language]}</Button></Link>
+          <button
+            onClick={() => fromRoute ? navigate(`/routes/${fromRoute}`) : navigate(-1)}
+            className="inline-flex items-center text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />{texts.back[locale as Language]}
+          </button>
         </div>
       </div>
     );
@@ -164,9 +175,12 @@ export function ARScenePage() {
 
       <main className="pt-20">
         <div className="container mx-auto px-4 max-w-4xl">
-          <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6">
+          <button
+            onClick={() => fromRoute ? navigate(`/routes/${fromRoute}`) : navigate(-1)}
+            className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />{texts.back[locale as Language]}
-          </Link>
+          </button>
 
           {/* Hero */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
@@ -236,47 +250,52 @@ export function ARScenePage() {
                   </div>
                 )}
 
-                {scene.needle_type === "geo" && scene.location && (
+                {scene.location && (
                   <div className="mt-6 pt-6 border-t border-border">
-                    <div className="flex items-center gap-2 mb-3">
-                      <MapPin className="w-5 h-5 text-primary" />
-                      <span className="text-sm text-muted-foreground">
-                        {scene.location.lat.toFixed(4)}, {scene.location.lng.toFixed(4)}
-                      </span>
-                    </div>
-                    <Button variant="outline" onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${scene.location?.lat ?? 43.36},${scene.location?.lng ?? -5.85}`, "_blank")}>
-                      <Navigation className="w-4 h-4 mr-2" />
-                      {locale === "es" ? "Cómo llegar" : locale === "en" ? "Get directions" : "Itinéraire"}
-                    </Button>
+                    <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2 mb-3">
+                      <Navigation className="w-4 h-4 text-primary" />
+                      {locale === "es" ? "Cómo llegar" : locale === "en" ? "How to get there" : "Comment y arriver"}
+                    </h3>
+                    {hasLocation && latitude !== null && longitude !== null && (() => {
+                      const dist = calculateDistanceTo(latitude, longitude, {
+                        id: scene.id, name: scene.title[locale as Language] || scene.title.es,
+                        lat: scene.location!.lat, lng: scene.location!.lng, type: 'route-point',
+                      });
+                      return (
+                        <div className="flex items-center gap-4 mb-4 p-3 rounded-lg bg-muted/50">
+                          <p className="text-2xl font-bold text-primary">{dist.distanceFormatted}</p>
+                          <div className="flex-1 grid grid-cols-2 gap-2 text-sm">
+                            <div className="flex items-center gap-1.5 text-muted-foreground">
+                              <Footprints className="w-4 h-4" /><span>{formatTime(dist.estimatedWalkingTime)}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-muted-foreground">
+                              <Car className="w-4 h-4" /><span>{formatTime(dist.estimatedDrivingTime)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                    <NavigationButton
+                      destination={{ id: scene.id, name: scene.title[locale as Language] || scene.title.es, lat: scene.location.lat, lng: scene.location.lng, type: 'route-point' }}
+                      variant="primary"
+                      className="w-full"
+                    />
                   </div>
                 )}
               </section>
-            </div>
 
-            {/* Sidebar */}
-            <div className="space-y-6">
-              <div className="bg-card border border-border rounded-xl p-6 text-center">
-                <div className="bg-white p-4 rounded-lg inline-block mb-4">
-                  <QRCodeSVG id="ar-qr-code" value={currentUrl} size={180} level="H" includeMargin={false} />
-                </div>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {locale === "es" ? "Escanea para abrir en tu móvil" : locale === "en" ? "Scan to open on your phone" : "Scannez pour ouvrir sur votre téléphone"}
-                </p>
-                <Button variant="outline" size="sm" onClick={handleDownloadQR} className="w-full">
-                  <Download className="w-4 h-4 mr-2" />{texts.downloadQR[locale as Language]}
-                </Button>
-              </div>
-
-              <div className="bg-card border border-border rounded-xl p-6">
-                <h3 className="font-medium text-foreground mb-4 flex items-center gap-2">
-                  <Share2 className="w-4 h-4" />{texts.shareExperience[locale as Language]}
-                </h3>
+              {/* Share */}
+              <section className="bg-card border border-border rounded-xl p-6">
+                <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Share2 className="w-5 h-5 text-primary" />{texts.shareExperience[locale as Language]}
+                </h2>
                 <ShareButtons
                   url={currentUrl}
                   title={scene.title[locale as Language] || scene.title.es}
                   description={scene.description[locale as Language] || scene.description.es}
+                  variant="inline"
                 />
-              </div>
+              </section>
 
               <div className="bg-muted/50 border border-border rounded-xl p-4">
                 <div className="flex items-start gap-3">

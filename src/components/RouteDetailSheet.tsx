@@ -317,9 +317,14 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
 }
 
 // Small point preview card
+function getText(value: any, lang: string): string {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  return value[lang] || value.es || value.en || '';
+}
+
 function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: number; lang: any }) {
   const content = point.content;
-  // Determine what content types are available
   const hasAR = !!content.arExperience;
   const has360 = !!content.tour360;
   const hasVideo = !!content.video;
@@ -342,7 +347,7 @@ function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: nu
           className="w-12 h-12 rounded-lg bg-cover bg-center border-2 border-primary/30"
           style={{ backgroundImage: point.coverImage ? `url(https://back.asturias.digitalmetaverso.com/assets/${point.coverImage})` : undefined }}
           role="img"
-          aria-label={point.title as any}
+          aria-label={pointTitle}
         />
         <div className={`absolute -top-2 -right-2 w-6 h-6 ${colors.bg} rounded-full flex items-center justify-center text-xs font-bold text-white border-2 border-white shadow-sm`}>
           {index + 1}
@@ -351,7 +356,7 @@ function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: nu
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-foreground text-sm">{point.title as any}</p>
+        <p className="font-medium text-foreground text-sm">{pointTitle}</p>
         <div className="flex items-center gap-1.5 mt-1">
           {hasAR &&
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-warm/15 text-warm text-[10px] font-bold">
