@@ -211,6 +211,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
                 isLast={idx === route.points.length - 1}
                 isNearest={nearestPoint?.id === point.id}
                 distanceInfo={pointDistances.get(point.id)}
+                routeId={route.id}
                 onClick={() => handlePointClick(point)}
               />
             ))
@@ -238,10 +239,11 @@ interface PointCardProps {
   isLast: boolean;
   isNearest: boolean;
   distanceInfo?: { distance: string; walkTime: number };
+  routeId: string;
   onClick: () => void;
 }
 
-function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNearest, distanceInfo, onClick }: PointCardProps) {
+function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNearest, distanceInfo, routeId, onClick }: PointCardProps) {
   const { t } = useTranslation();
   const content = point.content;
 
@@ -286,8 +288,11 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
           style={{ width: '100%' }}
           transition={{ delay: index * 0.04, duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
           onClick={() => {
+            const arSlug = point.content.arExperience?.arSlug;
+            if (arSlug) {
+              window.history.pushState({ fromRoute: routeId }, '', `/ar/${arSlug}`);
+            }
             onClick();
-            window.history.pushState({}, '', '/routes/' + window.location.href.split('/')[4] + '/' + point.order);
           }}
           className={`flex-1 mb-3 rounded-xl overflow-hidden transition-all text-left border ${
             isSelected

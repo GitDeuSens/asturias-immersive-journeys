@@ -283,11 +283,34 @@ class DirectusApiClient {
 
   async getRoutes(_locale: Language = 'es') {
     try {
-      const routes = await this.getClient().request(readItems('routes', {
-        filter: { status: { _in: API_CONFIG.getStatusFilter() } },
-        fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.*', 'categories.categories_id.translations.*', 'points.*', 'points.translations.*', 'points.content.ar_scene_id.*', 'points.content.tour360_id.*'],
+      // Step 1: fetch all routes without deep point relations (avoids query complexity limit)
+      const routes = await this.getClient().request(readItems('routes' as any, {
+        filter: { status: { _in: API_CONFIG.getStatusFilter() } } as any,
+        fields: ['*', 'translations.*', 'categories.categories_id.*', 'categories.categories_id.translations.*'] as any,
+        limit: -1,
       }));
-      return (routes as unknown as DirectusRoute[]).map(transformRoute);
+      const routeList = routes as unknown as DirectusRoute[];
+
+      // Step 2: fetch all points in one separate query (avoids deep-relation complexity limit)
+      const allPoints = await this.getClient().request(readItems('pois' as any, {
+        filter: { status: { _in: API_CONFIG.getStatusFilter() } } as any,
+        fields: ['*', 'translations.*'] as any,
+        limit: -1,
+      })).catch(() => []);
+
+      // Attach points to their routes
+      const pointsByRoute = new Map<string, any[]>();
+      for (const pt of allPoints as any[]) {
+        const rid = pt.route_id;
+        if (!rid) continue;
+        if (!pointsByRoute.has(rid)) pointsByRoute.set(rid, []);
+        pointsByRoute.get(rid)!.push(pt);
+      }
+      for (const route of routeList) {
+        (route as any).points = pointsByRoute.get(route.id) ?? (route as any).points ?? [];
+      }
+
+      return routeList.map(transformRoute);
     } catch (error) { logger.error('[DirectusClient] Error fetching routes:', error); return []; }
   }
 

@@ -22,12 +22,17 @@ export default defineConfig(({ mode }) => {
         overlay: false,
       },
       proxy: {
-        '/directus-api': {
-          target: env.VITE_DIRECTUS_INTERNAL_URL || 'http://192.168.12.71:8055',
-          changeOrigin: true,
-          rewrite: (p: string) => p.replace(/^\/directus-api/, ''),
-        },
-      },
+  '/directus-api': {
+    target: env.VITE_DIRECTUS_INTERNAL_URL || 'https://back.asturias.digitalmetaverso.com',
+    changeOrigin: true,
+    rewrite: (p: string) => p.replace(/^\/directus-api/, ''),
+  },
+  '/directus-assets': {
+    target: 'https://back.asturias.digitalmetaverso.com',
+    changeOrigin: true,
+    rewrite: (p: string) => p.replace(/^\/directus-assets/, '/assets'),
+  },
+},
     },
     plugins: [
       mkcert(),

@@ -10,7 +10,17 @@ import { Box3, MathUtils, Object3D, Vector3 } from "three";
 // ─────────────────────────────────────────────
 // CONFIG
 // ─────────────────────────────────────────────
-export const DIRECTUS_URL = "http://192.168.12.71:8055";
+// Reads URL injected by React app (NeedleARViewer sets window.__DIRECTUS_URL)
+// Falls back to Vite env var (works in direct web context), then hardcoded dev fallback
+export function getDirectusUrl(): string {
+  return (
+    (window as any).__DIRECTUS_URL ??
+    (typeof import.meta !== 'undefined' ? (import.meta as any).env?.VITE_DIRECTUS_URL : undefined) ??
+    'http://192.168.12.71:8055'
+  );
+}
+// Keep DIRECTUS_URL as a compat alias (used in getAssetUrl)
+export const DIRECTUS_URL = "http://192.168.12.71:8055"; // fallback only
 const DEFAULT_SCALE = 1;
 const DEFAULT_RY = 0;
 
@@ -34,7 +44,7 @@ export interface ArScene {
 export async function fetchSceneBySlug(slug: string): Promise<ArScene | null> {
   try {
     const res = await fetch(
-      `${DIRECTUS_URL}/items/ar_scenes` +
+      `${getDirectusUrl()}/items/ar_scenes` +
         `?filter[slug][_eq]=${encodeURIComponent(slug)}` +
         `&fields=id,slug,glb_model,glb_scale,glb_rotation_y,audio_es,audio_en,audio_fr` +
         `&limit=1`
@@ -52,7 +62,10 @@ export async function fetchSceneBySlug(slug: string): Promise<ArScene | null> {
 }
 
 export function getAssetUrl(uuid: string): string {
-  return `${DIRECTUS_URL}/assets/${uuid}`;
+  if (import.meta.env.DEV) {
+    return `/directus-assets/${uuid}`;
+  }
+  return `${getDirectusUrl()}/assets/${uuid}`;
 }
 
 // ─────────────────────────────────────────────
@@ -95,11 +108,22 @@ export class ModelLoading extends Behaviour {
 
   private async instantiateModel(url: string, name: string): Promise<void> {
     const asset = AssetReference.getOrCreate(this, url, this.context);
-    await asset.loadAssetAsync();
+
+    try {
+      await asset.loadAssetAsync();
+    } catch (e) {
+      console.error(`[DirectusLoader] Failed to load asset "${name}" from ${url}:`, e);
+      return;
+    }
 
     const parentGO = this.parent ?? this.gameObject;
     const parentObj = parentGO as unknown as Object3D;
     const instance = (await asset.instantiate(parentGO)) as unknown as Object3D;
+
+    if (!instance) {
+      console.error(`[DirectusLoader] instantiate() returned null for "${name}" — asset likely failed to load (403?)`);
+      return;
+    }
 
     instance.name = name;
     instance.visible = true;

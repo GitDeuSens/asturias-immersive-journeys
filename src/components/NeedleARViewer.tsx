@@ -6,11 +6,11 @@ import { motion } from 'framer-motion';
 import { Camera, AlertTriangle, RefreshCw, Smartphone, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { trackEvent, trackARStarted, trackARCompleted, trackARError } from '@/lib/analytics';
+import '@needle-tools/engine';
+import '../generated/register_types';
 import { GameObject } from '@needle-tools/engine';
 import { ModelLoading, loadSceneInto } from '@/utils/DirectusLoader';
 import type { ARScene, Language } from '@/lib/types';
-
-// Tell TypeScript about <needle-engine> custom element
 
 interface NeedleARViewerProps {
   scene: ARScene;
@@ -20,12 +20,12 @@ interface NeedleARViewerProps {
 }
 
 const texts = {
-  startAR: { es: 'Iniciar Experiencia AR', en: 'Start AR Experience', fr: 'Démarrer l\'expérience AR' },
+  startAR: { es: 'Iniciar Experiencia AR', en: 'Start AR Experience', fr: "Démarrer l'expérience AR" },
   notSupported: { es: 'AR no disponible', en: 'AR not available', fr: 'AR non disponible' },
   notSupportedDesc: {
     es: 'Tu dispositivo no soporta experiencias de Realidad Aumentada.',
     en: 'Your device does not support Augmented Reality experiences.',
-    fr: 'Votre appareil ne prend pas en charge les expériences de Réalité Augmentée.'
+    fr: "Votre appareil ne prend pas en charge les expériences de Réalité Augmentée."
   },
   requirements: {
     es: 'Para disfrutar de esta experiencia, necesitas:',
@@ -44,26 +44,25 @@ const texts = {
   },
   preview: { es: 'Vista previa', en: 'Preview', fr: 'Aperçu' },
   checking: { es: 'Comprobando compatibilidad...', en: 'Checking compatibility...', fr: 'Vérification de la compatibilité...' },
-  lighting: { es: 'Asegúrate de estar en un lugar con buena iluminación', en: 'Make sure you are in a well-lit area', fr: 'Assurez-vous d\'être dans un endroit bien éclairé' },
-  loading: { es: 'Cargando experiencia AR...', en: 'Loading AR experience...', fr: 'Chargement de l\'expérience AR...' },
-  goToLocation: { es: 'Ir a la ubicación', en: 'Go to location', fr: 'Aller à l\'emplacement' },
+  lighting: { es: 'Asegúrate de estar en un lugar con buena iluminación', en: 'Make sure you are in a well-lit area', fr: "Assurez-vous d'être dans un endroit bien éclairé" },
+  loading: { es: 'Cargando experiencia AR...', en: 'Loading AR experience...', fr: "Chargement de l'expérience AR..." },
+  goToLocation: { es: 'Ir a la ubicación', en: 'Go to location', fr: "Aller à l'emplacement" },
   geoRequired: {
     es: 'Esta experiencia requiere estar en la ubicación física',
     en: 'This experience requires being at the physical location',
-    fr: 'Cette expérience nécessite d\'être à l\'emplacement physique'
+    fr: "Cette expérience nécessite d'être à l'emplacement physique"
   },
 };
 
-// ─── Dynamic Viewer: inline needle-engine + GLB from Directus ────────────────
-function DynamicNeedleViewer({
-  scene,
-  locale,
-  onStart,
-  onError,
-}: NeedleARViewerProps) {
+// Dynamic Viewer
+function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const initialized = useRef(false);
   const needleRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    (window as any).__DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL ?? 'http://192.168.12.71:8055';
+  }, []);
 
   useEffect(() => {
     const el = needleRef.current;
@@ -79,24 +78,22 @@ function DynamicNeedleViewer({
         onStart?.();
         trackARStarted(scene.id, scene.needle_type, scene.title[locale!] || scene.title.es);
 
-        // Find ModelLoading in the loaded scene
         let modelLoader = GameObject.findObjectOfType(ModelLoading);
-        console.log('[AR] ModelLoading found:', modelLoader);
+
+        const { Context } = await import('@needle-tools/engine');
+        const ctx = Context.Current;
+
+        const firstChild = ctx?.scene?.children?.[0] as any;
 
         if (!modelLoader) {
-          console.warn('[AR] ModelLoading not found in scene — trying Context');
-          const { Context } = await import('@needle-tools/engine');
-          const ctx = Context.Current;
-          console.log('[AR] Context.current:', ctx);
-          const firstChild = ctx?.scene?.children?.[0] as any;
-          if (firstChild?.addComponent) {
-            modelLoader = firstChild.addComponent(ModelLoading);
-            console.log('[AR] ModelLoading added to first child:', modelLoader);
+          if (!firstChild?.addComponent) {
+            throw new Error('[AR] firstChild has no addComponent method.');
           }
+          modelLoader = firstChild.addComponent(ModelLoading);
         }
 
         if (!modelLoader) {
-          throw new Error('Could not create ModelLoading — no suitable GameObject found');
+          throw new Error('Could not create ModelLoading — no suitable GameObject found.');
         }
 
         await loadSceneInto(modelLoader, scene.slug);
@@ -110,63 +107,60 @@ function DynamicNeedleViewer({
       }
     };
 
+    const hideQRLabel = () => {
+      const shadow = (el as any).shadowRoot;
+      if (!shadow) return;
+      const style = document.createElement('style');
+      style.textContent = `
+        .qr-code-label, [class*="qr"] a, [class*="qr"] span, [class*="qr"] p,
+        .webxr-ar-button + *, a[href*="localhost"], a[href*="ar/"] { display: none !important; }
+      `;
+      shadow.appendChild(style);
+    };
+
     el.addEventListener('loadfinished', onLoadFinished);
+    el.addEventListener('loadfinished', hideQRLabel);
+    setTimeout(hideQRLabel, 500);
     return () => el.removeEventListener('loadfinished', onLoadFinished);
   }, [scene, locale, onStart, onError]);
 
   return (
-    <div
-      className="relative rounded-xl overflow-hidden border border-border bg-black"
-      style={{ minHeight: 500 }}
-    >
+    <div className="relative rounded-xl border border-border bg-black" style={{ minHeight: 500 }}>
       {isLoading && (
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: '#000',
-            color: '#fff',
-            zIndex: 10,
-            gap: '1rem',
-          }}
-        >
-          <div
-            style={{
-              width: 40,
-              height: 40,
-              border: '3px solid rgba(255,255,255,0.3)',
-              borderTopColor: '#fff',
-              borderRadius: '50%',
-              animation: 'needle_spin 1s linear infinite',
-            }}
-          />
+        <div style={{
+          position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center', background: '#000',
+          color: '#fff', zIndex: 10, gap: '1rem',
+        }}>
+          <div style={{
+            width: 40, height: 40, border: '3px solid rgba(255,255,255,0.3)',
+            borderTopColor: '#fff', borderRadius: '50%', animation: 'needle_spin 1s linear infinite',
+          }} />
           <span style={{ fontSize: '0.9rem' }}>{texts.loading[locale!]}</span>
         </div>
       )}
-
       <needle-engine
         ref={needleRef as any}
         src="/assets/scene.glb"
         loading-background="#000000"
+        no-menu
         style={{ width: '100%', height: '100%', minHeight: 500, display: 'block' }}
-      />
-
-      <style>{`@keyframes needle_spin { to { transform: rotate(360deg); } }`}</style>
+      >
+        <div id="needle-overlay-slot" style={{ display: 'contents' }} />
+      </needle-engine>
+      <style>{`
+        @keyframes needle_spin { to { transform: rotate(360deg); } }
+        needle-engine .qr-code-label,
+        needle-engine [class*="qr"] span,
+        needle-engine [class*="qr"] a,
+        needle-engine [class*="qr"] p { display: none !important; }
+      `}</style>
     </div>
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
-export function NeedleARViewer({
-  scene,
-  locale = 'es',
-  onStart,
-  onError,
-}: NeedleARViewerProps) {
+// Main Component
+export function NeedleARViewer({ scene, locale = 'es', onStart, onError }: NeedleARViewerProps) {
   const [isARSupported, setIsARSupported] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [arActive, setARActive] = useState(false);
@@ -182,15 +176,10 @@ export function NeedleARViewer({
         try {
           const supported = await (navigator as any).xr?.isSessionSupported('immersive-ar');
           setIsARSupported(supported || false);
-        } catch {
-          setIsARSupported(false);
-        }
-      } else {
-        setIsARSupported(false);
-      }
+        } catch { setIsARSupported(false); }
+      } else { setIsARSupported(false); }
     };
     checkARSupport();
-
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       iframeRef.current?.remove();
@@ -202,72 +191,42 @@ export function NeedleARViewer({
     if (!containerRef.current) return;
     setIsLoading(true);
     startTimeRef.current = Date.now();
-
     try {
       trackARStarted(scene.id, scene.needle_type, scene.title[locale] || scene.title.es);
       onStart?.();
       setARActive(true);
-
       const iframe = document.createElement('iframe');
       iframe.src = scene.needle_scene_url;
       iframe.style.cssText = 'width:100%;height:100vh;border:none;position:fixed;top:0;left:0;z-index:9999';
       iframe.allow = 'camera; xr-spatial-tracking; gyroscope; accelerometer; magnetometer';
       iframe.allowFullscreen = true;
       iframeRef.current = iframe;
-
       const closeBtn = document.createElement('button');
       closeBtn.innerHTML = '✕';
-      closeBtn.style.cssText = `
-        position:fixed;top:20px;right:20px;z-index:10000;
-        width:48px;height:48px;border-radius:50%;
-        background:rgba(0,0,0,0.7);color:white;
-        border:none;font-size:24px;cursor:pointer;
-      `;
-
+      closeBtn.style.cssText = `position:fixed;top:20px;right:20px;z-index:10000;width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,0.7);color:white;border:none;font-size:24px;cursor:pointer;`;
       const cleanup = () => {
         iframeRef.current?.remove(); iframeRef.current = null;
         closeBtnRef.current?.remove(); closeBtnRef.current = null;
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        setARActive(false);
-        setIsLoading(false);
+        setARActive(false); setIsLoading(false);
       };
-
       closeBtn.onclick = () => {
         const timeSpent = Math.round((Date.now() - startTimeRef.current) / 1000);
         if (timeSpent > 2) trackARCompleted(scene.id, timeSpent);
         cleanup();
       };
-
       closeBtnRef.current = closeBtn;
       document.body.appendChild(iframe);
       document.body.appendChild(closeBtn);
-
       timeoutRef.current = setTimeout(() => {
-        if (isLoading) {
-          cleanup();
-          const msg = 'AR scene loading timeout';
-          trackARError(scene.id, msg);
-          onError?.(msg);
-        }
+        if (isLoading) { cleanup(); const msg = 'AR scene loading timeout'; trackARError(scene.id, msg); onError?.(msg); }
       }, 15000);
-
-      iframe.onload = () => {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        setIsLoading(false);
-      };
-
-      iframe.onerror = () => {
-        cleanup();
-        const msg = 'Failed to load AR scene';
-        trackARError(scene.id, msg);
-        onError?.(msg);
-      };
+      iframe.onload = () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); setIsLoading(false); };
+      iframe.onerror = () => { cleanup(); const msg = 'Failed to load AR scene'; trackARError(scene.id, msg); onError?.(msg); };
     } catch (error) {
-      setIsLoading(false);
-      setARActive(false);
+      setIsLoading(false); setARActive(false);
       const msg = error instanceof Error ? error.message : 'Unknown error';
-      trackARError(scene.id, msg);
-      onError?.(msg);
+      trackARError(scene.id, msg); onError?.(msg);
     }
   }, [scene, locale, onStart, onError]);
 
@@ -277,7 +236,6 @@ export function NeedleARViewer({
     trackEvent('ar_navigation_opened', { ar_id: scene.id });
   }, [scene]);
 
-  // ── Checking AR support ──
   if (isARSupported === null) {
     return (
       <div className="flex items-center justify-center p-8 bg-muted/50 rounded-xl">
@@ -289,29 +247,15 @@ export function NeedleARViewer({
     );
   }
 
-  // ── Dynamic mode: inline Needle Engine viewer ──
-  // Shown regardless of AR support check — Needle handles its own AR session
   if (scene.scene_mode === 'dynamic') {
-    return (
-      <DynamicNeedleViewer
-        scene={scene}
-        locale={locale}
-        onStart={onStart}
-        onError={onError}
-      />
-    );
+    return <DynamicNeedleViewer scene={scene} locale={locale} onStart={onStart} onError={onError} />;
   }
 
-  // ── AR not supported (for iframe/build modes) ──
   if (isARSupported === false) {
     return (
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-        className="p-6 bg-card border border-border rounded-xl"
-      >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 bg-card border border-border rounded-xl">
         <div className="flex items-start gap-4">
-          <div className="p-3 bg-destructive/10 rounded-full">
-            <AlertTriangle className="w-6 h-6 text-destructive" />
-          </div>
+          <div className="p-3 bg-destructive/10 rounded-full"><AlertTriangle className="w-6 h-6 text-destructive" /></div>
           <div className="flex-1">
             <h3 className="font-semibold text-foreground mb-2">{texts.notSupported[locale]}</h3>
             <p className="text-muted-foreground mb-4">{texts.notSupportedDesc[locale]}</p>
@@ -333,63 +277,41 @@ export function NeedleARViewer({
     );
   }
 
-  // ── Geo AR ──
   if (scene.needle_type === 'geo' && scene.location) {
     return (
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-        className="p-6 bg-card border border-border rounded-xl"
-      >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 bg-card border border-border rounded-xl">
         <div className="flex items-start gap-4 mb-6">
-          <div className="p-3 bg-primary/10 rounded-full">
-            <MapPin className="w-6 h-6 text-primary" />
-          </div>
+          <div className="p-3 bg-primary/10 rounded-full"><MapPin className="w-6 h-6 text-primary" /></div>
           <div>
             <h3 className="font-semibold text-foreground mb-1">{texts.geoRequired[locale]}</h3>
-            <p className="text-sm text-muted-foreground">
-              Lat: {scene.location.lat.toFixed(4)}, Lng: {scene.location.lng.toFixed(4)}
-            </p>
+            <p className="text-sm text-muted-foreground">Lat: {scene.location.lat.toFixed(4)}, Lng: {scene.location.lng.toFixed(4)}</p>
           </div>
         </div>
-        <Button onClick={openNavigation} className="w-full mb-4">
-          <MapPin className="w-4 h-4 mr-2" />{texts.goToLocation[locale]}
-        </Button>
+        <Button onClick={openNavigation} className="w-full mb-4"><MapPin className="w-4 h-4 mr-2" />{texts.goToLocation[locale]}</Button>
         <Button onClick={launchIframeAR} variant="outline" className="w-full" disabled={isLoading}>
-          {isLoading
-            ? <><RefreshCw className="w-4 h-4 mr-2 animate-spin" />{texts.loading[locale]}</>
-            : <><Camera className="w-4 h-4 mr-2" />{texts.startAR[locale]}</>
-          }
+          {isLoading ? <><RefreshCw className="w-4 h-4 mr-2 animate-spin" />{texts.loading[locale]}</> : <><Camera className="w-4 h-4 mr-2" />{texts.startAR[locale]}</>}
         </Button>
       </motion.div>
     );
   }
 
-  // ── Default: launch via iframe (build mode) ──
   return (
     <motion.div ref={containerRef} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative">
       {!arActive && (
         <div className="p-6 bg-card border border-border rounded-xl text-center">
           <div className="mb-6">
-            <img
-              src={scene.preview_image}
-              alt={scene.title[locale] || scene.title.es}
-              className="w-full max-h-48 object-cover rounded-lg mb-4"
-            />
+            <img src={scene.preview_image} alt={scene.title[locale] || scene.title.es} className="w-full max-h-48 object-cover rounded-lg mb-4" />
             <p className="text-sm text-muted-foreground">{texts.lighting[locale]}</p>
           </div>
           <Button onClick={launchIframeAR} size="lg" className="w-full" disabled={isLoading}>
-            {isLoading
-              ? <><RefreshCw className="w-5 h-5 mr-2 animate-spin" />{texts.loading[locale]}</>
-              : <><Camera className="w-5 h-5 mr-2" />{texts.startAR[locale]}</>
-            }
+            {isLoading ? <><RefreshCw className="w-5 h-5 mr-2 animate-spin" />{texts.loading[locale]}</> : <><Camera className="w-5 h-5 mr-2" />{texts.startAR[locale]}</>}
           </Button>
           {scene.needle_type === 'image-tracking' && scene.tracking_image_url && (
             <div className="mt-4 pt-4 border-t border-border">
               <p className="text-sm text-muted-foreground mb-2">
                 {locale === 'es' ? 'Necesitarás este marcador:' : locale === 'en' ? 'You will need this marker:' : 'Vous aurez besoin de ce marqueur:'}
               </p>
-              <a href={scene.tracking_image_url} download="marcador-ar.png"
-                className="inline-flex items-center text-sm text-primary hover:underline"
-              >
+              <a href={scene.tracking_image_url} download="marcador-ar.png" className="inline-flex items-center text-sm text-primary hover:underline">
                 ⬇️ {locale === 'es' ? 'Descargar marcador' : locale === 'en' ? 'Download marker' : 'Télécharger le marqueur'}
               </a>
             </div>

@@ -20,7 +20,7 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
   const { t } = useLanguage();
 
   return (
-    <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 pt-20 pb-10">
+    <div className="relative z-10 flex flex-col items-center justify-center min-h-[100dvh] px-4 pt-16 pb-4">
       {/* Back button */}
       {onBack && (
         <motion.button
@@ -40,37 +40,37 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="text-3xl md:text-4xl lg:text-5xl font-bold text-white text-center mb-12 drop-shadow-lg"
+        className="text-xl md:text-4xl lg:text-5xl font-bold text-white text-center mb-4 md:mb-10 drop-shadow-lg"
       >
         {t(texts.title)}
       </motion.h1>
 
       {/* Experience Cards */}
-      <div className="flex flex-col md:flex-row gap-6 w-full max-w-4xl">
+      <div className="flex flex-col md:flex-row gap-3 md:gap-6 w-full max-w-4xl">
         {/* Tours 360 */}
         <motion.button
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
           onClick={() => onSelect('tours')}
-          className="flex-1 group relative overflow-hidden rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-8 text-left transition-all duration-300 hover:bg-white/20 hover:border-primary/50 hover:scale-[1.02]"
+          className="flex-1 group relative overflow-hidden rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-5 md:p-8 text-left transition-all duration-300 hover:bg-white/20 hover:border-primary/50 hover:scale-[1.02]"
         >
           {/* Icon */}
-          <div className="w-16 h-16 rounded-xl bg-primary flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
-            <View className="w-8 h-8 text-white" />
+          <div className="w-10 h-10 md:w-16 md:h-16 rounded-xl bg-primary flex items-center justify-center mb-3 md:mb-6 shadow-lg group-hover:scale-110 transition-transform">
+            <View className="w-5 h-5 md:w-8 md:h-8 text-white" />
           </div>
 
           {/* Content */}
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 drop-shadow-md">
+          <h2 className="text-lg md:text-3xl font-bold text-white mb-1 md:mb-3 drop-shadow-md">
             {t(texts.toursTitle)}
           </h2>
-          <p className="text-white/80 text-base md:text-lg leading-relaxed">
+          <p className="text-white/80 text-sm md:text-lg leading-relaxed line-clamp-2 md:line-clamp-none">
             {t(texts.toursSubtitle)}
           </p>
 
           {/* CTA hint on hover */}
-          <div className="mt-6 opacity-0 group-hover:opacity-100 transition-opacity">
-            <span className="text-primary font-semibold uppercase tracking-wider text-sm">
+          <div className="mt-3 md:mt-6 opacity-0 group-hover:opacity-100 transition-opacity">
+            <span className="text-primary font-semibold uppercase tracking-wider text-xs md:text-sm">
               {t({ es: 'Explorar tours →', en: 'Explore tours →', fr: 'Explorer les visites →' })}
             </span>
           </div>
@@ -85,24 +85,24 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
           onClick={() => onSelect('routes')}
-          className="flex-1 group relative overflow-hidden rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-8 text-left transition-all duration-300 hover:bg-white/20 hover:border-accent/50 hover:scale-[1.02]"
+          className="flex-1 group relative overflow-hidden rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-5 md:p-8 text-left transition-all duration-300 hover:bg-white/20 hover:border-accent/50 hover:scale-[1.02]"
         >
           {/* Icon */}
-          <div className="w-16 h-16 rounded-xl bg-accent flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
-            <Map className="w-8 h-8 text-white" />
+          <div className="w-10 h-10 md:w-16 md:h-16 rounded-xl bg-accent flex items-center justify-center mb-3 md:mb-6 shadow-lg group-hover:scale-110 transition-transform">
+            <Map className="w-5 h-5 md:w-8 md:h-8 text-white" />
           </div>
 
           {/* Content */}
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 drop-shadow-md">
+          <h2 className="text-lg md:text-3xl font-bold text-white mb-1 md:mb-3 drop-shadow-md">
             {t(texts.routesTitle)}
           </h2>
-          <p className="text-white/80 text-base md:text-lg leading-relaxed">
+          <p className="text-white/80 text-sm md:text-lg leading-relaxed line-clamp-2 md:line-clamp-none">
             {t(texts.routesSubtitle)}
           </p>
 
           {/* CTA hint on hover */}
-          <div className="mt-6 opacity-0 group-hover:opacity-100 transition-opacity">
-            <span className="text-accent font-semibold uppercase tracking-wider text-sm">
+          <div className="mt-3 md:mt-6 opacity-0 group-hover:opacity-100 transition-opacity">
+            <span className="text-accent font-semibold uppercase tracking-wider text-xs md:text-sm">
               {t({ es: 'Ver rutas →', en: 'View routes →', fr: 'Voir les itinéraires →' })}
             </span>
           </div>

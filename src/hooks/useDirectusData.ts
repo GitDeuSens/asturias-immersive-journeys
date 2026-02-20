@@ -46,10 +46,15 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
 
       // Map AR scene if linked
       if (poi.ar_scene_id) {
+        // Extract slug from ar_launch_url (e.g. https://.../ar/Conjunto_valdedios → Conjunto_valdedios)
+        const arSlugFromUrl = poi.ar_launch_url
+          ? poi.ar_launch_url.split('/ar/').pop()?.split('?')[0] || undefined
+          : undefined;
         content.arExperience = {
           launchUrl: poi.ar_launch_url || '',
           qrValue: poi.ar_qr_value || '',
           iframe3dUrl: poi.ar_iframe_url,
+          arSlug: poi.ar_slug || arSlugFromUrl,
         };
       }
 
@@ -181,15 +186,6 @@ export function useImmersiveRoutes(language: Language = 'es') {
     setLoading(true);
     setError(null);
     
-    // Check cache first
-    const cacheKey = `routes_${language}`;
-    const cached = dataCache.get<ImmersiveRoute[]>(cacheKey);
-    if (cached) {
-      setRoutes(cached);
-      setLoading(false);
-      return;
-    }
-    
     try {
       const directusRoutes = await getRoutes(language);
       
@@ -201,8 +197,6 @@ export function useImmersiveRoutes(language: Language = 'es') {
       });
 
       setRoutes(immersiveRoutes);
-      // Cache for 5 minutes
-      dataCache.set(cacheKey, immersiveRoutes, 5 * 60 * 1000);
     } catch (err: any) {
       // Error loading routes
       setError(err?.message || 'Failed to load routes');

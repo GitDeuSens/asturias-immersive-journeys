@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () =>
 	const needleEngine = document.querySelector("needle-engine");
 	if(needleEngine && needleEngine.getAttribute("src") === null)
 	{
-		needleEngine.setAttribute("hash", "1771410715760");
+		needleEngine.setAttribute("hash", "1771426342178");
 		needleEngine.setAttribute("src", JSON.stringify(needle_exported_files));
 	}
 });
