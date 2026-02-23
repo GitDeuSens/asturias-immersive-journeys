@@ -15,7 +15,8 @@ import {
   Check,
   X,
   Navigation,
-  Footprints
+  Footprints,
+  Home
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { ImmersiveRoute, RoutePoint } from '@/data/types';
@@ -31,6 +32,14 @@ import {
   type NavigationDestination
 } from '@/lib/navigationService';
 import { useNavigate } from 'react-router-dom';
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from '@/components/ui/breadcrumb';
 
 interface RouteExplorerViewProps {
   route: ImmersiveRoute;
@@ -81,19 +90,12 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
     return distances;
   }, [route.points, latitude, longitude, hasLocation, mode, lang]);
 
-  const nearestPoint = useMemo(() => {
-    if (pointDistances.size === 0) return null;
-    let nearest: RoutePoint | null = null;
-    let minDistance = Infinity;
-    route.points.forEach(point => {
-      const distData = pointDistances.get(point.id);
-      if (distData && distData.walkTime < minDistance) {
-        minDistance = distData.walkTime;
-        nearest = point;
-      }
-    });
-    return nearest;
-  }, [pointDistances, route.points]);
+  // Next suggested POI: first unvisited point in route order
+  const nextRoutePoint = useMemo(() => {
+    return route.points.find(point => !visitedPoints.has(point.id)) || null;
+  }, [route.points, visitedPoints]);
+
+  const nearestPoint = nextRoutePoint;
 
   const handlePointClick = (point: RoutePoint) => {
     if (!visitedPoints.has(point.id)) {
@@ -130,6 +132,45 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
 
   return (
     <div className="flex flex-col h-full">
+      {/* Breadcrumb */}
+      <div className="px-4 pt-3 pb-1">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/" className="flex items-center gap-1 text-xs">
+                <Home className="w-3 h-3" />
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink
+                href="#"
+                onClick={(e) => { e.preventDefault(); onBack(); navigate('/routes'); }}
+                className="text-xs"
+              >
+                {t('routes.title')}
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="text-xs truncate max-w-[120px]">
+                {getText(route.title, lang)}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+            {selectedPoint && (
+              <>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="text-xs truncate max-w-[100px]">
+                    {getText(selectedPoint.title, lang)}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </>
+            )}
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+
       {/* Header */}
       <div className="p-4 border-b border-border/50 space-y-3">
         <button
@@ -179,8 +220,21 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
       {/* Points list */}
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-2">
-          {/* Nearest point suggestion */}
-          {nearestPoint && mode === 'here' && (
+          {/* Next point suggestion or completion CTA */}
+          {progress === 100 ? (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="mb-4 p-3 rounded-xl bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/30 text-center"
+            >
+              <p className="text-sm font-bold text-primary mb-1">🎉 {t('routes.congratulations')}</p>
+              <p className="text-xs text-muted-foreground mb-2">{t('routes.visitOtherRoutes')}</p>
+              <Button size="sm" onClick={() => { onBack(); navigate('/routes'); }} className="text-xs">
+                {t('routes.exploreMore')}
+              </Button>
+            </motion.div>
+          ) : nearestPoint && (
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -190,19 +244,21 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
               <div className="flex items-center gap-2 mb-2">
                 <Navigation className="w-4 h-4 text-primary" />
                 <span className="text-xs font-semibold text-primary uppercase tracking-wide">
-                  {t('navigation.nearestPoint')}
+                  {t('routes.nextPoint')}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-semibold text-foreground">{getText(nearestPoint.title, lang)}</p>
-                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                    <MapPin className="w-3 h-3" />
-                    {pointDistances.get(nearestPoint.id)?.distance}
-                    <span className="mx-1">•</span>
-                    <Footprints className="w-3 h-3" />
-                    {formatTime(pointDistances.get(nearestPoint.id)?.walkTime || 0)}
-                  </p>
+                  {pointDistances.get(nearestPoint.id) && (
+                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                      <MapPin className="w-3 h-3" />
+                      {pointDistances.get(nearestPoint.id)?.distance}
+                      <span className="mx-1">•</span>
+                      <Footprints className="w-3 h-3" />
+                      {formatTime(pointDistances.get(nearestPoint.id)?.walkTime || 0)}
+                    </p>
+                  )}
                 </div>
                 <Button size="sm" onClick={() => handlePointClick(nearestPoint)} className="text-xs">
                   {t('navigation.startHere')}

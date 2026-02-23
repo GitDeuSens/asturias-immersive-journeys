@@ -147,8 +147,8 @@ const RouteCardComponent = forwardRef<HTMLButtonElement, RouteCardProps>(functio
                 const cat = getCategoryById(catId);
                 const IconComponent = iconMap[cat?.icon] || Tag;
                 return cat ? (
-                  <span className="px-2 py-2 border text-base" style={{ borderRadius: '300px' }}>
-                    <IconComponent className="w-8 h-8 text-base" />
+                  <span className="px-1.5 py-1.5 border text-xs" style={{ borderRadius: '300px' }}>
+                    <IconComponent className="w-4 h-4" />
                   </span>
                 ) : null;
               })}

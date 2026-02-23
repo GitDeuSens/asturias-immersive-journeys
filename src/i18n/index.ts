@@ -70,6 +70,10 @@ const resources = {
       "routes.located": "Localizado",
       "routes.viewRoutes": "Rutas",
       "routes.viewPoints": "Puntos",
+      "routes.congratulations": "¡Enhorabuena!",
+      "routes.visitOtherRoutes": "Has completado esta ruta. ¡Visita otras rutas!",
+      "routes.exploreMore": "Explorar más rutas",
+      "routes.nextPoint": "Siguiente punto",
 
       // Difficulty
       "difficulty.easy": "Fácil",
@@ -297,6 +301,10 @@ const resources = {
       "routes.located": "Located",
       "routes.viewRoutes": "Routes",
       "routes.viewPoints": "Points",
+      "routes.congratulations": "Congratulations!",
+      "routes.visitOtherRoutes": "You completed this route. Visit other routes!",
+      "routes.exploreMore": "Explore more routes",
+      "routes.nextPoint": "Next point",
 
       // Difficulty
       "difficulty.easy": "Easy",
@@ -524,6 +532,10 @@ const resources = {
       "routes.located": "Localisé",
       "routes.viewRoutes": "Itinéraires",
       "routes.viewPoints": "Points",
+      "routes.congratulations": "Félicitations !",
+      "routes.visitOtherRoutes": "Vous avez terminé cet itinéraire. Visitez d'autres itinéraires !",
+      "routes.exploreMore": "Explorer plus d'itinéraires",
+      "routes.nextPoint": "Point suivant",
 
       // Difficulty
       "difficulty.easy": "Facile",
