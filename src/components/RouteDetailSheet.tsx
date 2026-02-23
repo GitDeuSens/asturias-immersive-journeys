@@ -71,7 +71,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
   const allFunctions = (route: ImmersiveRoute) => {
     onEnterRoute(route);
     onClose();
-    window.history.pushState({}, '', '/routes/' + route.id);
+    navigate('/routes/' + route.id, { replace: true });
   }
 
   const surfaceLabels: Record<string, Record<string, string>> = {

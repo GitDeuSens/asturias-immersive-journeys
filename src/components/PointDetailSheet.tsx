@@ -149,7 +149,6 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
             <button
               onClick={() => {
                 onClose();
-                window.history.pushState({}, '', '/routes/' + window.location.href.split('/')[4]);
               }}
               className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
             >
