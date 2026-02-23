@@ -491,7 +491,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                 />
 
                 {/* Routes list */}
-                <div className="space-y-3">
+                <div className="space-y-3 mt-5">
                   {filteredRoutes.map((route) => (
                     <RouteCard
                       key={route.id}

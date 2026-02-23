@@ -274,67 +274,47 @@ export function NeedleARViewer({ scene, locale = 'es', onStart, onError }: Needl
     );
   }
 
-  if (scene.scene_mode === 'dynamic') {
-    return <DynamicNeedleViewer scene={scene} locale={locale} onStart={onStart} onError={onError} />;
-  }
-
-  if (isARSupported === false) {
-    return (
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 bg-card border border-border rounded-xl">
-        <div className="flex items-start gap-4">
-          <div className="p-3 bg-destructive/10 rounded-full"><AlertTriangle className="w-6 h-6 text-destructive" /></div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-foreground mb-2">{texts.notSupported[locale]}</h3>
-            <p className="text-muted-foreground mb-4">{texts.notSupportedDesc[locale]}</p>
-            <p className="text-sm text-muted-foreground mb-3">{texts.requirements[locale]}</p>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-center gap-2"><Smartphone className="w-4 h-4" />{texts.reqMobile[locale]}</li>
-              <li className="flex items-center gap-2"><Camera className="w-4 h-4" />{texts.reqBrowser[locale]}</li>
-            </ul>
-            <div className="mt-6">
-              <p className="text-sm font-medium text-foreground mb-2">{texts.preview[locale]}:</p>
-              {scene.preview_video
-                ? <video src={scene.preview_video} controls className="w-full rounded-lg" poster={scene.preview_image} />
-                : <img src={scene.preview_image} alt={scene.title[locale] || scene.title.es} className="w-full rounded-lg" />
-              }
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    );
-  }
-
-  if (scene.needle_type === 'geo' && scene.location) {
-    return (
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 bg-card border border-border rounded-xl">
-        <div className="flex items-start gap-4 mb-6">
-          <div className="p-3 bg-primary/10 rounded-full"><MapPin className="w-6 h-6 text-primary" /></div>
-          <div>
-            <h3 className="font-semibold text-foreground mb-1">{texts.geoRequired[locale]}</h3>
-            <p className="text-sm text-muted-foreground">Lat: {scene.location.lat.toFixed(4)}, Lng: {scene.location.lng.toFixed(4)}</p>
-          </div>
-        </div>
-        <Button onClick={openNavigation} className="w-full mb-4"><MapPin className="w-4 h-4 mr-2" />{texts.goToLocation[locale]}</Button>
-        <Button onClick={launchIframeAR} variant="outline" className="w-full" disabled={isLoading}>
-          {isLoading ? <><RefreshCw className="w-4 h-4 mr-2 animate-spin" />{texts.loading[locale]}</> : <><Camera className="w-4 h-4 mr-2" />{texts.startAR[locale]}</>}
-        </Button>
-      </motion.div>
-    );
-  }
-
+  // Always show the 3D preview for all scenes, with AR controls overlaid
   return (
-    <motion.div ref={containerRef} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative">
+    <motion.div ref={containerRef} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative space-y-4">
+      {/* 3D Preview — always visible */}
+      <DynamicNeedleViewer scene={scene} locale={locale} onStart={onStart} onError={onError} />
+
+      {/* AR Controls — shown below the 3D preview */}
       {!arActive && (
-        <div className="p-6 bg-card border border-border rounded-xl text-center">
-          <div className="mb-6">
-            <img src={scene.preview_image} alt={scene.title[locale] || scene.title.es} className="w-full max-h-48 object-cover rounded-lg mb-4" />
-            <p className="text-sm text-muted-foreground">{texts.lighting[locale]}</p>
-          </div>
-          <Button onClick={launchIframeAR} size="lg" className="w-full" disabled={isLoading}>
-            {isLoading ? <><RefreshCw className="w-5 h-5 mr-2 animate-spin" />{texts.loading[locale]}</> : <><Camera className="w-5 h-5 mr-2" />{texts.startAR[locale]}</>}
-          </Button>
+        <div className="space-y-3">
+          {/* AR supported → show launch button */}
+          {isARSupported && (
+            <>
+              <Button onClick={launchIframeAR} size="lg" className="w-full" disabled={isLoading}>
+                {isLoading
+                  ? <><RefreshCw className="w-5 h-5 mr-2 animate-spin" />{texts.loading[locale]}</>
+                  : <><Camera className="w-5 h-5 mr-2" />{texts.startAR[locale]}</>}
+              </Button>
+              <p className="text-xs text-center text-muted-foreground">{texts.lighting[locale]}</p>
+            </>
+          )}
+
+          {/* AR not supported → info banner (not blocking) */}
+          {isARSupported === false && (
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
+              <Smartphone className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+              <p className="text-xs text-muted-foreground">
+                {texts.notSupportedDesc[locale]} {texts.reqMobile[locale]}.
+              </p>
+            </div>
+          )}
+
+          {/* Geo-located scene → navigation button */}
+          {scene.needle_type === 'geo' && scene.location && (
+            <Button onClick={openNavigation} variant="outline" className="w-full">
+              <MapPin className="w-4 h-4 mr-2" />{texts.goToLocation[locale]}
+            </Button>
+          )}
+
+          {/* Image tracking → marker download */}
           {scene.needle_type === 'image-tracking' && scene.tracking_image_url && (
-            <div className="mt-4 pt-4 border-t border-border">
+            <div className="pt-3 border-t border-border">
               <p className="text-sm text-muted-foreground mb-2">
                 {locale === 'es' ? 'Necesitarás este marcador:' : locale === 'en' ? 'You will need this marker:' : 'Vous aurez besoin de ce marqueur:'}
               </p>
