@@ -454,15 +454,31 @@ export const RoutesPage = React.memo(function RoutesPage() {
           </button>
 
           <div id="routes-panel" className="overflow-y-scroll">
+            <AnimatePresence mode="wait">
             {exploringRoute ? (
+              <motion.div
+                key={`explorer-${exploringRoute.id}`}
+                initial={{ opacity: 0, x: 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -40 }}
+                transition={{ duration: 0.25, ease: 'easeInOut' }}
+              >
               <RouteExplorerView
                 route={exploringRoute}
                 onBack={handleExitRoute}
                 onSelectPoint={setSelectedPoint}
                 selectedPoint={selectedPoint}
               />
+              </motion.div>
             ) : (
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <motion.div
+                key="routes-list"
+                initial={{ opacity: 0, x: -40 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 40 }}
+                transition={{ duration: 0.25, ease: 'easeInOut' }}
+                className="flex-1 overflow-y-auto p-4 space-y-4"
+              >
                 {/* Header */}
                 <div className="flex items-center justify-between">
                   <h2 className="text-3xl font-bold text-foreground">{t("routes.title")}</h2>
@@ -507,7 +523,6 @@ export const RoutesPage = React.memo(function RoutesPage() {
                       } else {
                         const success = await requestLocation();
                         if (success && mapRef.current) {
-                          // Center will happen via the useEffect when userPosition updates
                           setTimeout(() => centerOnUser(), 500);
                         }
                       }
@@ -526,10 +541,12 @@ export const RoutesPage = React.memo(function RoutesPage() {
 
                 {/* Content list */}
                 <div className="space-y-3 mt-5">
+                  <AnimatePresence mode="wait">
                   {viewMode === 'routes' ? (
-                    filteredRoutes.map((route) => (
+                    <motion.div key="routes-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="space-y-3">
+                    {filteredRoutes.map((route, i) => (
+                      <motion.div key={route.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, delay: i * 0.04 }}>
                       <RouteCard
-                        key={route.id}
                         route={route}
                         onClick={() => {
                           setSelectedRoute(route);
@@ -537,9 +554,12 @@ export const RoutesPage = React.memo(function RoutesPage() {
                           setShowRouteDetail(true);
                         }}
                       />
-                    ))
+                      </motion.div>
+                    ))}
+                    </motion.div>
                   ) : (
-                    allPoints.map((point) => {
+                    <motion.div key="points-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="space-y-3">
+                    {allPoints.map((point, i) => {
                       const directusUrl = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
                       const imgSrc = point.coverImage
                         ? `${directusUrl}/assets/${point.coverImage}`
@@ -552,7 +572,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                           key={point.id}
                           initial={{ opacity: 0, y: 12 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.3 }}
+                          transition={{ duration: 0.25, delay: i * 0.04 }}
                           onClick={() => setSelectedPoint(point)}
                           className="w-full text-left rounded-2xl bg-card/50 border border-border/50 hover:border-primary/50 hover:bg-card/80 transition-all duration-200 group overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                         >
@@ -570,16 +590,20 @@ export const RoutesPage = React.memo(function RoutesPage() {
                           </div>
                         </motion.button>
                       );
-                    })
+                    })}
+                    </motion.div>
                   )}
+                  </AnimatePresence>
                 </div>
-              </div>
+              </motion.div>
             )}
+            </AnimatePresence>
           </div>
         </motion.div>
       </main>
 
       {/* Route Detail Sheet */}
+      <AnimatePresence>
       {showRouteDetail && selectedRoute && (
         <RouteDetailSheet
           route={selectedRoute}
@@ -591,8 +615,10 @@ export const RoutesPage = React.memo(function RoutesPage() {
           onSelectPoint={setSelectedPoint}
         />
       )}
+      </AnimatePresence>
 
       {/* Point Detail Sheet */}
+      <AnimatePresence>
       {selectedPoint && (
         <PointDetailSheet
           point={selectedPoint}
@@ -601,6 +627,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
           onBackToRoute={exploringRoute ? () => setSelectedPoint(null) : undefined}
         />
       )}
+      </AnimatePresence>
     </div>
   );
 });
