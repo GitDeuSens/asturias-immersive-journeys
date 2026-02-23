@@ -458,7 +458,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {/* Header */}
                 <div className="flex items-center justify-between">
-                  <h2 className="text-3xl font-serif font-bold text-foreground">{t("routes.title")}</h2>
+                  <h2 className="text-3xl font-bold text-foreground">{t("routes.title")}</h2>
                   <span className="text-xs text-muted-foreground" aria-live="polite">
                     {filteredRoutes.length} {t("common.results")}
                   </span>
