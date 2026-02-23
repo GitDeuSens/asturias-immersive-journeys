@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import L from "leaflet";
-import { MapPin, Search, ChevronUp, ChevronDown, Maximize2, Locate, Loader2 } from "lucide-react";
+import { MapPin, Search, ChevronUp, ChevronDown, Maximize2, Locate, Loader2, Route, Navigation } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { AppHeader } from "@/components/AppHeader";
 import { CategoryChips } from "@/components/CategoryChips";
@@ -99,6 +99,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
   const [exploringRoute, setExploringRoute] = useState<ImmersiveRoute | null>(null);
   const [selectedPoint, setSelectedPoint] = useState<RoutePoint | null>(null);
   const [panelExpanded, setPanelExpanded] = useState(true);
+  const [viewMode, setViewMode] = useState<'routes' | 'points'>('routes');
   const selectedCategoriesSet = useMemo(() => new Set(selectedCategories), [selectedCategories]);
 
   const [mapReady, setMapReady] = useState(false);
@@ -208,8 +209,14 @@ export const RoutesPage = React.memo(function RoutesPage() {
   }, [immersiveRoutes, searchQuery, selectedCategories, selectedDifficulties, lang]);
 
   filteredRoutes.sort((a: any, b: any) => a.id.split('-')[1] - b.id.split('-')[1]);
-  // Create Set for faster category lookup
-  
+
+  // All points from filtered routes for "Points" view
+  const allPoints = useMemo(() => {
+    return filteredRoutes.flatMap((route) =>
+      route.points.map((point) => ({ ...point, routeTitle: route.title, routeId: route.id }))
+    );
+  }, [filteredRoutes]);
+
 
   const getPanelOffset = useCallback(() => {
     if (typeof window !== "undefined" && window.innerWidth >= BREAKPOINTS.MOBILE) {
@@ -460,7 +467,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                 <div className="flex items-center justify-between">
                   <h2 className="text-3xl font-bold text-foreground">{t("routes.title")}</h2>
                   <span className="text-xs text-muted-foreground" aria-live="polite">
-                    {filteredRoutes.length} {t("common.results")}
+                    {viewMode === 'routes' ? filteredRoutes.length : allPoints.length} {t("common.results")}
                   </span>
                 </div>
 
@@ -480,8 +487,8 @@ export const RoutesPage = React.memo(function RoutesPage() {
                   />
                 </div>
 
-                {/* Categories & Locate */}
-                <div className="flex items-center gap-2">
+                {/* Categories, Toggle & Locate */}
+                <div className="flex items-center gap-2 flex-wrap">
                   <CategoryChips
                     categories={categories}
                     selectedIds={selectedCategories}
@@ -490,6 +497,33 @@ export const RoutesPage = React.memo(function RoutesPage() {
                     onToggleDifficulty={toggleDifficulty}
                     className="justify-start"
                   />
+
+                  {/* Routes / Points toggle */}
+                  <div className="flex items-center rounded-xl bg-muted/50 border border-border/50 p-0.5">
+                    <button
+                      onClick={() => setViewMode('routes')}
+                      className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
+                        viewMode === 'routes'
+                          ? 'bg-primary text-primary-foreground shadow-sm'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <Route className="w-3.5 h-3.5" />
+                      {t("routes.viewRoutes")}
+                    </button>
+                    <button
+                      onClick={() => setViewMode('points')}
+                      className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
+                        viewMode === 'points'
+                          ? 'bg-primary text-primary-foreground shadow-sm'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <MapPin className="w-3.5 h-3.5" />
+                      {t("routes.viewPoints")}
+                    </button>
+                  </div>
+
                   <button
                     onClick={() => requestLocation()}
                     className={`category-chip flex items-center gap-2 text-sm px-4 py-2 whitespace-nowrap ${hasLocation ? 'active' : ''}`}
@@ -504,19 +538,54 @@ export const RoutesPage = React.memo(function RoutesPage() {
                   </button>
                 </div>
 
-                {/* Routes list */}
+                {/* Content list */}
                 <div className="space-y-3 mt-5">
-                  {filteredRoutes.map((route) => (
-                    <RouteCard
-                      key={route.id}
-                      route={route}
-                      onClick={() => {
-                        setSelectedRoute(route);
-                        setExploringRoute(route);
-                        setShowRouteDetail(true);
-                      }}
-                    />
-                  ))}
+                  {viewMode === 'routes' ? (
+                    filteredRoutes.map((route) => (
+                      <RouteCard
+                        key={route.id}
+                        route={route}
+                        onClick={() => {
+                          setSelectedRoute(route);
+                          setExploringRoute(route);
+                          setShowRouteDetail(true);
+                        }}
+                      />
+                    ))
+                  ) : (
+                    allPoints.map((point) => {
+                      const directusUrl = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
+                      const imgSrc = point.coverImage
+                        ? `${directusUrl}/assets/${point.coverImage}`
+                        : '/placeholder-route.jpg';
+                      const pointTitle = point.title[lang] || point.title.es || '';
+                      const pointDesc = point.shortDescription[lang] || point.shortDescription.es || '';
+                      const routeName = point.routeTitle[lang] || point.routeTitle.es || '';
+                      return (
+                        <motion.button
+                          key={point.id}
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3 }}
+                          onClick={() => setSelectedPoint(point)}
+                          className="w-full text-left rounded-2xl bg-card/50 border border-border/50 hover:border-primary/50 hover:bg-card/80 transition-all duration-200 group overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                        >
+                          <div className="flex gap-3 p-3">
+                            <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-muted">
+                              <img src={imgSrc} alt={pointTitle} className="w-full h-full object-cover" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                                {pointTitle}
+                              </h3>
+                              <p className="text-xs text-primary/80 font-medium mt-0.5 line-clamp-1">{routeName}</p>
+                              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{pointDesc}</p>
+                            </div>
+                          </div>
+                        </motion.button>
+                      );
+                    })
+                  )}
                 </div>
               </div>
             )}
