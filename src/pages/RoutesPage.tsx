@@ -92,6 +92,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
   const { categories } = useDirectusCategories(lang);
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedDifficulties, setSelectedDifficulties] = useState<('easy' | 'medium' | 'hard')[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRoute, setSelectedRoute] = useState<ImmersiveRoute | null>(null);
   const [showRouteDetail, setShowRouteDetail] = useState(false);
@@ -198,9 +199,13 @@ export const RoutesPage = React.memo(function RoutesPage() {
       const matchesCategory = selectedCategories.length === 0 || 
         selectedCategoriesSet.has(route.categoryIds?.[0] || '');
       
-      return matchesSearch && matchesCategory;
+      // Difficulty filter
+      const matchesDifficulty = selectedDifficulties.length === 0 ||
+        (route.difficulty && selectedDifficulties.includes(route.difficulty));
+      
+      return matchesSearch && matchesCategory && matchesDifficulty;
     });
-  }, [immersiveRoutes, searchQuery, selectedCategories, lang]);
+  }, [immersiveRoutes, searchQuery, selectedCategories, selectedDifficulties, lang]);
 
   filteredRoutes.sort((a: any, b: any) => a.id.split('-')[1] - b.id.split('-')[1]);
   // Create Set for faster category lookup
@@ -350,6 +355,10 @@ export const RoutesPage = React.memo(function RoutesPage() {
     setSelectedCategories((prev) => (prev.includes(catId) ? prev.filter((id) => id !== catId) : [...prev, catId]));
   };
 
+  const toggleDifficulty = (d: 'easy' | 'medium' | 'hard') => {
+    setSelectedDifficulties((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]));
+  };
+
   const handleEnterRoute = (route: ImmersiveRoute) => {
     // Track route start
     const routeName = typeof route.title === 'string' ? route.title : route.title[i18n.language as keyof typeof route.title] || route.title.es;
@@ -476,6 +485,8 @@ export const RoutesPage = React.memo(function RoutesPage() {
                   categories={categories}
                   selectedIds={selectedCategories}
                   onToggle={toggleCategory}
+                  selectedDifficulties={selectedDifficulties}
+                  onToggleDifficulty={toggleDifficulty}
                   className="justify-start"
                 />
 
