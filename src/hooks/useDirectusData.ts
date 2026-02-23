@@ -91,8 +91,8 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       }
 
       // Map cover image
-      if (poi.cover_image_url) {
-        content.image = { url: poi.cover_image };
+      if (poi.cover_image) {
+        content.image = { url: getFileUrl(poi.cover_image) };
       }
 
       const lat = Number(poi.lat) || 0;

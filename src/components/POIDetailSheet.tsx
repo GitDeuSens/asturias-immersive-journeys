@@ -153,7 +153,7 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
 
             {/* CONTENT */}
             <div className="flex-1 overflow-y-auto pb-24">
-              <Accordion type="multiple" defaultValue={['description', 'experience']} className="px-5 py-4">
+              <Accordion type="multiple" defaultValue={['description', 'ar-experience', 'tour360-experience']} className="px-5 py-4">
                 {/* Description */}
                 <AccordionItem value="description" className="border-b border-border/50">
                   <AccordionTrigger className="hover:no-underline py-4">
@@ -171,56 +171,68 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
                   </AccordionContent>
                 </AccordionItem>
 
-                {/* Experience Section (AR/360) */}
-                {(poi.experienceType === 'AR' || poi.experienceType === '360') && (
-                  <AccordionItem value="experience" className="border-b border-border/50" ref={experienceSectionRef}>
+                {/* AR Experience Section */}
+                {poi.ar && (
+                  <AccordionItem value="ar-experience" className="border-b border-border/50" ref={experienceSectionRef}>
                     <AccordionTrigger className="hover:no-underline py-4">
                       <span className="flex items-center gap-2 font-semibold text-foreground">
-                        {poi.experienceType === 'AR' ? <Smartphone className="w-5 h-5 text-[hsl(48,100%,40%)]" /> : <Camera className="w-5 h-5 text-primary" />}
-                        {poi.experienceType === 'AR' ? t(texts.experienceAR) : t(texts.tour360)}
+                        <Smartphone className="w-5 h-5 text-warm" />
+                        {t(texts.experienceAR)}
                       </span>
                     </AccordionTrigger>
                     <AccordionContent className="pb-4">
-                      {poi.experienceType === 'AR' && poi.ar && (
-                        <div className="space-y-4">
-                          <div className="flex flex-col items-center p-4 bg-muted/50 rounded-xl">
-                            <QRCodeSVG value={poi.ar.qrValue} size={150} className="mb-3" />
-                            <p className="text-sm text-muted-foreground text-center">{t(texts.scanQR)}</p>
-                          </div>
-                          <a href={poi.ar.launchUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[hsl(48,100%,50%)] text-[hsl(210,11%,15%)] font-bold hover:bg-[hsl(48,100%,45%)] transition-colors">
-                            <Smartphone className="w-5 h-5" />{t(texts.openExperience)}
-                          </a>
+                      <div className="space-y-4">
+                        <div className="flex flex-col items-center p-4 bg-muted/50 rounded-xl">
+                          <QRCodeSVG value={poi.ar.qrValue} size={150} className="mb-3" />
+                          <p className="text-sm text-muted-foreground text-center">{t(texts.scanQR)}</p>
+                        </div>
+                        <a href={poi.ar.launchUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-warm text-warm-foreground font-bold hover:bg-warm/90 transition-colors">
+                          <Smartphone className="w-5 h-5" />{t(texts.openExperience)}
+                        </a>
+                        {poi.ar.iframe3dUrl && (
                           <div className="aspect-video rounded-xl overflow-hidden bg-muted">
                             <iframe src={poi.ar.iframe3dUrl} className="w-full h-full" allowFullScreen title="3D Model" />
                           </div>
-                          {poi.ar.instructions && (
-                            <div className="p-3 bg-[hsl(48,100%,50%)]/10 rounded-lg text-sm text-foreground/80 whitespace-pre-line">{t(poi.ar.instructions)}</div>
-                          )}
-                          {poi.ar.compatibilityNote && <p className="text-xs text-muted-foreground text-center">{t(poi.ar.compatibilityNote)}</p>}
+                        )}
+                        {poi.ar.instructions && (
+                          <div className="p-3 bg-warm/10 rounded-lg text-sm text-foreground/80 whitespace-pre-line">{t(poi.ar.instructions)}</div>
+                        )}
+                        {poi.ar.compatibilityNote && <p className="text-xs text-muted-foreground text-center">{t(poi.ar.compatibilityNote)}</p>}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
+
+                {/* 360 Tour Section */}
+                {poi.tour360 && (
+                  <AccordionItem value="tour360-experience" className="border-b border-border/50">
+                    <AccordionTrigger className="hover:no-underline py-4">
+                      <span className="flex items-center gap-2 font-semibold text-foreground">
+                        <Camera className="w-5 h-5 text-primary" />
+                        {t(texts.tour360)}
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-4">
+                      <div className="space-y-4">
+                        <div className="aspect-video rounded-2xl overflow-hidden bg-muted">
+                          <iframe src={poi.tour360.iframe360Url} className="w-full h-full rounded-2xl" allowFullScreen allow="xr-spatial-tracking; gyroscope; accelerometer" title="360 Tour" />
                         </div>
-                      )}
-                      {poi.experienceType === '360' && poi.tour360 && (
-                        <div className="space-y-4">
-                          <div className="aspect-video rounded-xl overflow-hidden bg-muted">
-                            <iframe src={poi.tour360.iframe360Url} className="w-full h-full" allowFullScreen allow="xr-spatial-tracking; gyroscope; accelerometer" title="360 Tour" />
-                          </div>
-                          {poi.tour360.allowFullscreen && (
-                            <button onClick={() => setShow360Modal(true)} className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 transition-colors">
-                              <Maximize2 className="w-5 h-5" />{t(texts.maximize)}
-                            </button>
-                          )}
-                          {poi.tour360.scenes && poi.tour360.scenes.length > 0 && (
-                            <div>
-                              <p className="text-sm font-semibold text-foreground mb-2">{t(texts.scenes)}</p>
-                              <div className="flex flex-wrap gap-2">
-                                {poi.tour360.scenes.map(scene => (
-                                  <span key={scene.id} className="px-3 py-1.5 rounded-full text-xs bg-muted text-foreground">{t(scene.title)}</span>
-                                ))}
-                              </div>
+                        {poi.tour360.allowFullscreen && (
+                          <button onClick={() => setShow360Modal(true)} className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold hover:bg-primary/90 transition-colors">
+                            <Maximize2 className="w-5 h-5" />{t(texts.maximize)}
+                          </button>
+                        )}
+                        {poi.tour360.scenes && poi.tour360.scenes.length > 0 && (
+                          <div>
+                            <p className="text-sm font-semibold text-foreground mb-2">{t(texts.scenes)}</p>
+                            <div className="flex flex-wrap gap-2">
+                              {poi.tour360.scenes.map(scene => (
+                                <span key={scene.id} className="px-3 py-1.5 rounded-full text-xs bg-muted text-foreground">{t(scene.title)}</span>
+                              ))}
                             </div>
-                          )}
-                        </div>
-                      )}
+                          </div>
+                        )}
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
                 )}

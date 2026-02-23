@@ -94,7 +94,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
     }
   };
 
-  console.log(' route ', route);
+  
 
   return (
     <AnimatePresence>
@@ -139,11 +139,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
 
           {/* Close button */}
           <button
-            onClick={() => {
-              onClose();
-              location.reload();
-            }
-            }
+            onClick={onClose}
             className="absolute top-4 right-4 p-2 rounded-full bg-background/80 backdrop-blur-sm text-foreground hover:bg-background transition-colors focus:outline-none focus:ring-2 focus:ring-primary shadow-lg"
             aria-label={t('common.close')}
           >
