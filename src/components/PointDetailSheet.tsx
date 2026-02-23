@@ -162,7 +162,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
 
           <ScrollArea className="flex-1">
             <div className="px-6 pt-3 space-y-1">
-              <h1 className="text-2xl font-serif font-bold">{title}</h1>
+              <h1 className="text-2xl font-bold">{title}</h1>
               {hasAR && arDescription && (
                 <p className="text-sm text-muted-foreground leading-relaxed">{arDescription}</p>
               )}
