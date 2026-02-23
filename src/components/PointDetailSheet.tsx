@@ -307,6 +307,10 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                       <Maximize2 className="w-4 h-4" />
                     </button>
                   </div>
+                  <Button variant="outline" className="w-full justify-between" onClick={() => window.open(content.tour360!.iframe360Url, '_blank')}>
+                    <span className="flex items-center gap-2"><Camera className="w-4 h-4" />{t(texts.open360)}</span>
+                    <Maximize2 className="w-4 h-4" />
+                  </Button>
                 </div>
               )}
 
