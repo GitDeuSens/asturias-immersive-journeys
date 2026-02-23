@@ -1,6 +1,6 @@
 ﻿import { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MapPin, Camera, Play, FileText, Headphones, Smartphone, ExternalLink, ChevronRight, Maximize2, Sparkles, Image as ImageIcon, Phone, Mail, Globe, Clock, Euro, Info, Navigation, Footprints, Car, Eye, Download, Share2 } from 'lucide-react';
+import { X, MapPin, Camera, Play, FileText, Headphones, Smartphone, ExternalLink, ChevronRight, Maximize2, Sparkles, Image as ImageIcon, Phone, Mail, Globe, Clock, Euro, Info, Navigation, Footprints, Car, Eye, Download, Share2, Home } from 'lucide-react';
 import type { RoutePoint } from '@/data/types';
 import { useLanguage, useExplorationMode } from '@/hooks/useLanguage';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -15,8 +15,11 @@ import { trackPOITimeSpent } from '@/lib/analytics';
 import { openNavigation } from '@/lib/mapUtils';
 import { getARScenesByPOI } from '@/lib/api/directus-client';
 import { ShareButtons } from '@/components/ShareButtons';
+import {
+  Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage,
+} from '@/components/ui/breadcrumb';
 
-interface PointDetailSheetProps { point: RoutePoint | null; onClose: () => void; }
+interface PointDetailSheetProps { point: RoutePoint | null; onClose: () => void; routeTitle?: string; onBackToRoute?: () => void; }
 
 function getText(value: any, lang: string): string {
   if (!value) return '';
@@ -61,7 +64,7 @@ const AR_INSTRUCTIONS: Record<string, Record<string, string[]>> = {
   },
 };
 
-export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
+export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: PointDetailSheetProps) {
   const { t, language } = useLanguage();
   const isMobile = useIsMobile();
   const [showARViewer, setShowARViewer] = useState(false);
@@ -161,6 +164,40 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
           </div>
 
           <ScrollArea className="flex-1">
+            {/* Breadcrumb */}
+            {routeTitle && (
+              <div className="px-6 pt-3 pb-1">
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem>
+                      <BreadcrumbLink href="/" className="flex items-center gap-1 text-xs">
+                        <Home className="w-3 h-3" />
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbLink href="/routes" className="text-xs">
+                        {language === 'es' ? 'Rutas' : language === 'en' ? 'Routes' : 'Itinéraires'}
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      {onBackToRoute ? (
+                        <BreadcrumbLink href="#" onClick={(e) => { e.preventDefault(); onBackToRoute(); }} className="text-xs truncate max-w-[100px]">
+                          {routeTitle}
+                        </BreadcrumbLink>
+                      ) : (
+                        <span className="text-xs text-muted-foreground truncate max-w-[100px]">{routeTitle}</span>
+                      )}
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage className="text-xs truncate max-w-[120px]">{title}</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+              </div>
+            )}
             <div className="px-6 pt-3 space-y-1">
               <h1 className="text-2xl font-bold">{title}</h1>
               {hasAR && arDescription && (
