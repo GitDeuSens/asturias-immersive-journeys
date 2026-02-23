@@ -446,7 +446,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
             )}
           </button>
 
-          <div id="routes-panel" className="overflow-y-scroll">
+          <div id="routes-panel" className="overflow-y-scroll" style={{ top: 120 }}>
             {exploringRoute ? (
               <RouteExplorerView
                 route={exploringRoute}
