@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import L from "leaflet";
-import { MapPin, Search, ChevronUp, ChevronDown, Maximize2, Locate } from "lucide-react";
+import { MapPin, Search, ChevronUp, ChevronDown, Maximize2, Locate, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { AppHeader } from "@/components/AppHeader";
 import { CategoryChips } from "@/components/CategoryChips";
@@ -117,7 +117,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
   }, [routeCode, immersiveRoutes, lang]);
 
   // Geolocation
-  const { latitude, longitude, error: geoError, requestLocation, hasLocation } = useGeolocation();
+  const { latitude, longitude, error: geoError, requestLocation, hasLocation, loading: geoLoading } = useGeolocation();
   const userPosition = hasLocation && latitude != null && longitude != null 
     ? { lat: latitude, lng: longitude } 
     : null;
@@ -480,15 +480,29 @@ export const RoutesPage = React.memo(function RoutesPage() {
                   />
                 </div>
 
-                {/* Categories */}
-                <CategoryChips
-                  categories={categories}
-                  selectedIds={selectedCategories}
-                  onToggle={toggleCategory}
-                  selectedDifficulties={selectedDifficulties}
-                  onToggleDifficulty={toggleDifficulty}
-                  className="justify-start"
-                />
+                {/* Categories & Locate */}
+                <div className="flex items-center gap-2">
+                  <CategoryChips
+                    categories={categories}
+                    selectedIds={selectedCategories}
+                    onToggle={toggleCategory}
+                    selectedDifficulties={selectedDifficulties}
+                    onToggleDifficulty={toggleDifficulty}
+                    className="justify-start"
+                  />
+                  <button
+                    onClick={() => requestLocation()}
+                    className={`category-chip flex items-center gap-2 text-sm px-4 py-2 whitespace-nowrap ${hasLocation ? 'active' : ''}`}
+                    disabled={geoLoading}
+                  >
+                    {geoLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Locate className="w-4 h-4" />
+                    )}
+                    <span>{hasLocation ? t("routes.located") : t("routes.locateMe")}</span>
+                  </button>
+                </div>
 
                 {/* Routes list */}
                 <div className="space-y-3 mt-5">

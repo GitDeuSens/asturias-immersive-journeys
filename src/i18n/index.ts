@@ -66,6 +66,8 @@ const resources = {
       "routes.progress": "Progreso",
       "routes.exploring": "Explorando",
       "routes.howToGet": "Cómo llegar",
+      "routes.locateMe": "Localizarme",
+      "routes.located": "Localizado",
 
       // Difficulty
       "difficulty.easy": "Fácil",
@@ -289,6 +291,8 @@ const resources = {
       "routes.progress": "Progress",
       "routes.exploring": "Exploring",
       "routes.howToGet": "How to get there",
+      "routes.locateMe": "Locate Me",
+      "routes.located": "Located",
 
       // Difficulty
       "difficulty.easy": "Easy",
@@ -512,6 +516,8 @@ const resources = {
       "routes.progress": "Progression",
       "routes.exploring": "Exploration",
       "routes.howToGet": "Comment y aller",
+      "routes.locateMe": "Me localiser",
+      "routes.located": "Localisé",
 
       // Difficulty
       "difficulty.easy": "Facile",
