@@ -75,14 +75,11 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
 
   useEffect(() => {
     if (!point?.content?.arExperience) return;
-    prevUrlRef.current = window.location.pathname;
     getARScenesByPOI(point.id, language as Language).then(scenes => {
       if (scenes.length > 0) {
         setLoadedARScene(scenes[0]);
-        window.history.pushState({ fromRoute: true }, '', `/ar/${scenes[0].slug}`);
       }
     });
-    return () => { window.history.pushState({}, '', prevUrlRef.current); };
   }, [point?.id, point?.content?.arExperience, language]);
 
   useEffect(() => {
