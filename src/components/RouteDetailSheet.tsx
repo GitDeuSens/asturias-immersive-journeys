@@ -330,7 +330,7 @@ function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: nu
   const hasVideo = !!content.video;
   const hasAudio = !!content.audioGuide;
   const hasPDF = !!content.pdf;
-  const pointTitle = point.title;
+  const pointTitle = getText(point.title, lang);
   const primaryType = hasAR ? 'ar' : has360 ? '360' : 'info';
   const typeColors = {
     ar: { bg: 'bg-warm', text: 'text-warm', border: 'border-warm' },
@@ -345,9 +345,9 @@ function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: nu
       <div className="relative flex-shrink-0">
         <div
           className="w-12 h-12 rounded-lg bg-cover bg-center border-2 border-primary/30"
-          style={{ backgroundImage: point.coverImage ? `url(https://back.asturias.digitalmetaverso.com/assets/${point.coverImage})` : undefined }}
+          style={{ backgroundImage: point.coverImage ? `url(${import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com'}/assets/${point.coverImage})` : undefined }}
           role="img"
-          aria-label={pointTitle}
+          aria-label={typeof pointTitle === 'string' ? pointTitle : (pointTitle as any)?.es || ''}
         />
         <div className={`absolute -top-2 -right-2 w-6 h-6 ${colors.bg} rounded-full flex items-center justify-center text-xs font-bold text-white border-2 border-white shadow-sm`}>
           {index + 1}
