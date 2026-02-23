@@ -294,7 +294,7 @@ class DirectusApiClient {
       // Step 2: fetch all points in one separate query (avoids deep-relation complexity limit)
       const allPoints = await this.getClient().request(readItems('pois' as any, {
         filter: { status: { _in: API_CONFIG.getStatusFilter() } } as any,
-        fields: ['*', 'translations.*', 'ar_scene_id.slug', 'ar_scene_id.build_path', 'ar_scene_id.translations.*', 'ar_scene_id.scene_mode', 'ar_scene_id.glb_model', 'ar_scene_id.glb_scale', 'ar_scene_id.glb_rotation_y', 'tour_360_id.slug', 'tour_360_id.build_path', 'tour_360_id.translations.*'] as any,
+        fields: ['*', 'translations.*', 'ar_scene_id.slug', 'ar_scene_id.build_path', 'ar_scene_id.translations.*', 'ar_scene_id.scene_mode', 'ar_scene_id.glb_model', 'ar_scene_id.glb_scale', 'ar_scene_id.glb_rotation_y', 'tour_360_id.slug', 'tour_360_id.build_path', 'tour_360_id.translations.*', 'gallery.*'] as any,
         limit: -1,
       })).catch(() => []);
 

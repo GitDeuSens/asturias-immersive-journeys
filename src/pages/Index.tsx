@@ -12,7 +12,7 @@ type FlowStep = 'mode' | 'experience';
 const Index = () => {
   const navigate = useNavigate();
   const { setMode } = useExplorationMode();
-  const [step, setStep] = useState<FlowStep>('experience');
+  const [step, setStep] = useState<FlowStep>('mode');
   
   // Optimize LCP
   useLCPOptimization();
@@ -47,7 +47,7 @@ const Index = () => {
         
         {/* Content */}
         {step === 'experience' && <ExperienceSelector onSelect={handleExperienceSelect} onBack={handleBack} />}
-        {/*step === 'mode' && <ModeSelector onSelect={handleModeSelect} />*/}
+        {step === 'mode' && <ModeSelector onSelect={handleModeSelect} />}
       </div>
     </>
   );

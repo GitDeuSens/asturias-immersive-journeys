@@ -89,7 +89,6 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
   const handleNavigateToStart = () => {
     if (route.polyline.length > 0) {
       const start = route.points[0].location;
-      console.log(' ruta ??? ', route);
       openNavigation(start.lat, start.lng, route.title[lang]);
     }
   };
