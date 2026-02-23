@@ -103,6 +103,18 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
     onSelectPoint(point);
   };
 
+  const handleToggleVisited = (pointId: string) => {
+    setVisitedPoints(prev => {
+      const next = new Set(prev);
+      if (next.has(pointId)) {
+        next.delete(pointId);
+      } else {
+        next.add(pointId);
+      }
+      return next;
+    });
+  };
+
   useEffect(() => {
     if (visitedPoints.size === route.points.length && route.points.length > 0) {
       const durationSec = Math.round((Date.now() - routeStartTime) / 1000);
@@ -214,6 +226,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
                 routeId={route.id}
                 progress={progress}
                 onClick={() => handlePointClick(point)}
+                onToggleVisited={() => handleToggleVisited(point.id)}
               />
             ))
           ) : (
@@ -242,10 +255,11 @@ interface PointCardProps {
   distanceInfo?: { distance: string; walkTime: number };
   routeId: string;
   onClick: () => void;
+  onToggleVisited: () => void;
   progress: any;
 }
 
-function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNearest, distanceInfo, routeId, onClick, progress }: PointCardProps) {
+function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNearest, distanceInfo, routeId, onClick, onToggleVisited, progress }: PointCardProps) {
   const { t } = useTranslation();
   const content = point.content;
 
@@ -282,10 +296,9 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
           <Check
             style={{ position: 'absolute', right: '5px', top: '5px', padding: '5px' }}
             className="cursor-pointer w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-md z-10 bg-primary"
-            onClick={() => {
-              const progreso = 44;
-              progress = progreso;
-              console.log(' hola ', progress);
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleVisited();
             }}
           />
         )}
