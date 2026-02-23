@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import L from "leaflet";
-import { MapPin, Search, ChevronUp, ChevronDown, Maximize2, Locate, Loader2, Route, Navigation } from "lucide-react";
+import { MapPin, Search, ChevronUp, ChevronDown, Maximize2, Locate, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { AppHeader } from "@/components/AppHeader";
 import { CategoryChips } from "@/components/CategoryChips";
@@ -495,34 +495,10 @@ export const RoutesPage = React.memo(function RoutesPage() {
                     onToggle={toggleCategory}
                     selectedDifficulties={selectedDifficulties}
                     onToggleDifficulty={toggleDifficulty}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
                     className="justify-start"
                   />
-
-                  {/* Routes / Points toggle */}
-                  <div className="flex items-center rounded-xl bg-muted/50 border border-border/50 p-0.5">
-                    <button
-                      onClick={() => setViewMode('routes')}
-                      className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
-                        viewMode === 'routes'
-                          ? 'bg-primary text-primary-foreground shadow-sm'
-                          : 'text-muted-foreground hover:text-foreground'
-                      }`}
-                    >
-                      <Route className="w-3.5 h-3.5" />
-                      {t("routes.viewRoutes")}
-                    </button>
-                    <button
-                      onClick={() => setViewMode('points')}
-                      className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
-                        viewMode === 'points'
-                          ? 'bg-primary text-primary-foreground shadow-sm'
-                          : 'text-muted-foreground hover:text-foreground'
-                      }`}
-                    >
-                      <MapPin className="w-3.5 h-3.5" />
-                      {t("routes.viewPoints")}
-                    </button>
-                  </div>
 
                   <button
                     onClick={() => requestLocation()}
