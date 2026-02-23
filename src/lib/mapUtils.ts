@@ -107,11 +107,11 @@ export const openNavigation = (lat: number, lng: number, name?: string): void =>
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   
   if (isIOS) {
-    // Apple Maps
-    openInNewTab(`maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d${name ? `&q=${encodedName}` : ''}`);
+    // Apple Maps — open as search/place view
+    openInNewTab(`maps://maps.apple.com/?ll=${lat},${lng}${name ? `&q=${encodedName}` : `&q=${lat},${lng}`}`);
   } else {
-    // Google Maps
-    openInNewTab(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}${name ? `&destination_place_id=${encodedName}` : ''}`);
+    // Google Maps — open place/search view (like the info card)
+    openInNewTab(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}${name ? `&query_place_id=${encodedName}` : ''}`);
   }
 };
 
