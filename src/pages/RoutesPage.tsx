@@ -430,7 +430,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
             opacity: { duration: 0.25, ease: "easeOut" },
           }}
           style={{width: '100%', top: '120px'}}
-          className="fixed right-0 top-0 bottom-0 w-100 max-w-lg bg-background z-50 shadow-2xl flex flex-col overflow-hidden"
+          className="fixed right-0 bottom-0 w-100 max-w-lg bg-background z-50 shadow-2xl flex flex-col overflow-hidden"
         >
           {/* Mobile handle */}
           <button
