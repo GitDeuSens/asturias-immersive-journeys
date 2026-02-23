@@ -91,6 +91,22 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
     };
   }, [point, language]);
 
+  const arScene: ARScene | null = useMemo(() => {
+    if (!point) return null;
+    if (loadedARScene) return loadedARScene;
+    const content = point.content;
+    if (!content.arExperience?.iframe3dUrl) return null;
+    return {
+      id: point.id, slug: `poi-${point.id}`,
+      title: typeof point.title === 'string' ? { es: point.title, en: point.title, fr: point.title } : point.title,
+      description: (point as any).shortDescription || { es: '', en: '', fr: '' },
+      needle_scene_url: content.arExperience.iframe3dUrl,
+      needle_type: 'slam' as const, scene_mode: 'build' as const, build_path: undefined,
+      preview_image: point.coverImage || '', difficulty: 'easy' as const,
+      duration_minutes: 5, requires_outdoors: false, published: true,
+    };
+  }, [point, loadedARScene]);
+
   if (!point) return null;
 
   const content = point.content;
@@ -106,19 +122,6 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
     if (point.location !== null) openNavigation(point.location.lat, point.location.lng, title);
   };
 
-  const arScene: ARScene | null = useMemo(() => {
-    if (loadedARScene) return loadedARScene;
-    if (!content.arExperience?.iframe3dUrl) return null;
-    return {
-      id: point.id, slug: `poi-${point.id}`,
-      title: typeof point.title === 'string' ? { es: point.title, en: point.title, fr: point.title } : point.title,
-      description: (point as any).shortDescription || { es: '', en: '', fr: '' },
-      needle_scene_url: content.arExperience.iframe3dUrl,
-      needle_type: 'slam' as const, scene_mode: 'build' as const, build_path: undefined,
-      preview_image: point.coverImage || '', difficulty: 'easy' as const,
-      duration_minutes: 5, requires_outdoors: false, published: true,
-    };
-  }, [loadedARScene, point, content.arExperience]);
 
   const arTitle = arScene ? getText(arScene.title, language) : title;
   const arDescription = arScene ? getText(arScene.description, language) : shortDescription;
@@ -137,7 +140,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
           {/* Hero image */}
           <div
             className="relative h-56 bg-cover bg-center flex-shrink-0"
-            style={{ backgroundImage: point.coverImage ? `url(https://back.asturias.digitalmetaverso.com/assets/${point.coverImage})` : undefined }}
+            style={{ backgroundImage: point.coverImage ? `url(${import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com'}/assets/${point.coverImage})` : undefined }}
           >
             <div className="absolute inset-0 from-background via-background/40 to-transparent" />
             <button

@@ -245,8 +245,7 @@ interface PointCardProps {
   progress: any;
 }
 
-function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNearest, distanceInfo, routeId, onClick }: PointCardProps) {
-function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNearest, distanceInfo, onClick, progress }: PointCardProps) {
+function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNearest, distanceInfo, routeId, onClick, progress }: PointCardProps) {
   const { t } = useTranslation();
   const content = point.content;
 
@@ -315,7 +314,7 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
           {point.coverImage && (
             <div
               className="w-full h-24 bg-cover bg-center"
-              style={{ backgroundImage: `url(https://back.asturias.digitalmetaverso.com/assets/${point.coverImage})` }}
+              style={{ backgroundImage: `url(${import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com'}/assets/${point.coverImage})` }}
             />
           )}
 

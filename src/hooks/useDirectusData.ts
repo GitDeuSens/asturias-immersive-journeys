@@ -71,7 +71,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
         const photos: {url: string}[] = [];
         poi.gallery.forEach((photo: any) => {
           if (photo?.directus_files_id) {
-            photos.push({url: 'https://back.asturias.digitalmetaverso.com/assets/' + photo.directus_files_id});
+            photos.push({url: (import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com') + '/assets/' + photo.directus_files_id});
           }
         });
         content.gallery = photos;
