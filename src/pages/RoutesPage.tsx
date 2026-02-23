@@ -519,6 +519,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
             setSelectedRoute(null);
           }}
           onEnterRoute={handleEnterRoute}
+          onSelectPoint={setSelectedPoint}
         />
       )}
 
