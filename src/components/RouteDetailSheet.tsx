@@ -103,7 +103,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50"
+        className="fixed inset-0 z-[60]"
         onClick={onClose}
         role="presentation"
       />
@@ -120,7 +120,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
           opacity: { duration: 0.2, ease: 'easeOut' }
         }}
         style={{ width: '100%' }}
-        className="fixed right-0 top-0 bottom-0 max-w-lg bg-background z-50 shadow-2xl flex flex-col overflow-hidden"
+        className="fixed right-0 top-0 bottom-0 max-w-lg bg-background z-[60] shadow-2xl flex flex-col overflow-hidden"
         onClick={(e) => {
           e.stopPropagation();
         }}
