@@ -145,7 +145,7 @@ export function AppHeader({ showRestart = true, variant = "light", routes = {}, 
             {showRestart && (
               <button
                 onClick={handleRestart}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-lg transition-all duration-200 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg"
+                className="hidden flex items-center gap-2 px-5 py-2.5 rounded-lg transition-all duration-200 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg"
                 aria-label={t("common.home")}
               >
                 <House className="w-7 h-7 text-primary-foreground" aria-hidden="true" />
