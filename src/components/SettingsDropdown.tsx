@@ -78,7 +78,7 @@ export function SettingsDropdown({ variant = "light" }: SettingsDropdownProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 mt-2 w-56 rounded-xl bg-popover shadow-xl border border-border overflow-hidden z-50"
+            className="absolute right-0 mt-2 w-56 rounded-xl bg-popover shadow-xl border border-border overflow-hidden z-[100]"
             role="menu"
           >
             {/* Language section */}
