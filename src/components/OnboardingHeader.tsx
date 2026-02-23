@@ -108,6 +108,7 @@ export function OnboardingHeader() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
                   transition={{ duration: 0.15 }}
+                  style={{ zIndex: '50000'}}
                   className="absolute right-0 mt-2 w-48 rounded-xl bg-popover shadow-xl border border-border overflow-hidden"
                   role="menu"
                 >
