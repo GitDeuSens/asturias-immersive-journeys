@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import type { Category } from '@/data/types';
-import { Mountain, Landmark, Compass, UtensilsCrossed, BookOpen, Tag, SlidersHorizontal, Check, Gauge } from 'lucide-react';
+import { Mountain, Landmark, Compass, UtensilsCrossed, BookOpen, Tag, SlidersHorizontal, Check, Gauge, Route, MapPin } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
+type ViewMode = 'routes' | 'points';
 
 interface CategoryChipsProps {
   categories: Category[];
@@ -13,6 +14,8 @@ interface CategoryChipsProps {
   onToggle: (id: string) => void;
   selectedDifficulties?: Difficulty[];
   onToggleDifficulty?: (d: Difficulty) => void;
+  viewMode?: ViewMode;
+  onViewModeChange?: (mode: ViewMode) => void;
   className?: string;
 }
 
@@ -32,7 +35,12 @@ const difficultyColors: Record<Difficulty, string> = {
   hard: 'text-destructive',
 };
 
-export function CategoryChips({ categories, selectedIds, onToggle, selectedDifficulties = [], onToggleDifficulty, className = '' }: CategoryChipsProps) {
+const viewModeLabels: Record<ViewMode, Record<string, string>> = {
+  routes: { es: 'Rutas', en: 'Routes', fr: 'Itinéraires' },
+  points: { es: 'Puntos', en: 'Points', fr: 'Points' },
+};
+
+export function CategoryChips({ categories, selectedIds, onToggle, selectedDifficulties = [], onToggleDifficulty, viewMode, onViewModeChange, className = '' }: CategoryChipsProps) {
   const { t, language: lang } = useLanguage();
   const [open, setOpen] = useState(false);
   const count = selectedIds.length + selectedDifficulties.length;
@@ -52,6 +60,32 @@ export function CategoryChips({ categories, selectedIds, onToggle, selectedDiffi
           </button>
         </PopoverTrigger>
         <PopoverContent align="start" className="w-56 p-2" sideOffset={8}>
+          {/* View mode toggle */}
+          {onViewModeChange && viewMode && (
+            <>
+              <p className="px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                {t({ es: 'Vista', en: 'View', fr: 'Vue' })}
+              </p>
+              <div className="flex items-center gap-1 mx-2 mb-1 p-0.5 rounded-lg bg-muted/60 border border-border/40">
+                {(['routes', 'points'] as ViewMode[]).map((mode) => (
+                  <button
+                    key={mode}
+                    onClick={() => onViewModeChange(mode)}
+                    className={`flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold px-2 py-1.5 rounded-md transition-all ${
+                      viewMode === mode
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {mode === 'routes' ? <Route className="w-3.5 h-3.5" /> : <MapPin className="w-3.5 h-3.5" />}
+                    {viewModeLabels[mode][lang] || viewModeLabels[mode].en}
+                  </button>
+                ))}
+              </div>
+              <Separator className="my-2" />
+            </>
+          )}
+
           {/* Categories section */}
           <p className="px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             {t({ es: 'Categorías', en: 'Categories', fr: 'Catégories' })}
