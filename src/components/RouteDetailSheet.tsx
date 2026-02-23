@@ -37,9 +37,10 @@ interface RouteDetailSheetProps {
   route: ImmersiveRoute | null;
   onClose: () => void;
   onEnterRoute: (route: ImmersiveRoute) => void;
+  onSelectPoint?: (point: RoutePoint) => void;
 }
 
-export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSheetProps) {
+export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }: RouteDetailSheetProps) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as 'es' | 'en' | 'fr';
   const { getCategoryById } = useDirectusCategories(lang);
@@ -287,7 +288,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
                 </h3>
                 <div className="space-y-4">
                   {route.points.map((point, idx) => (
-                    <PointPreviewCard key={point.id} point={point} index={idx} lang={lang} />
+                    <PointPreviewCard key={point.id} point={point} index={idx} lang={lang} onClick={() => onSelectPoint?.(point)} />
                   ))}
                   {route.points.length > 3 && (
                     <p className="text-xs text-muted-foreground text-center py-2">
@@ -322,7 +323,7 @@ function getText(value: any, lang: string): string {
   return value[lang] || value.es || value.en || '';
 }
 
-function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: number; lang: any }) {
+function PointPreviewCard({ point, index, lang, onClick }: { point: RoutePoint; index: number; lang: any; onClick?: () => void }) {
   const content = point.content;
   const hasAR = !!content.arExperience;
   const has360 = !!content.tour360;
@@ -339,7 +340,7 @@ function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: nu
   const colors = typeColors[primaryType];
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50" style={{ width: '100%' }}>
+    <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50 cursor-pointer hover:bg-muted/50 transition-colors" style={{ width: '100%' }} onClick={onClick}>
       {/* Thumbnail */}
       <div className="relative flex-shrink-0">
         <div
