@@ -162,7 +162,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
         <ScrollArea className="flex-1">
           {/* Bottom info */}
           <div className="pl-6 pt-3">
-            <h1 id="route-detail-title" className="text-2xl font-serif font-bold mb-1">
+            <h1 id="route-detail-title" className="text-2xl font-bold mb-1">
               {route.title[lang]}
             </h1>
             <p className="text-sm font-medium">
