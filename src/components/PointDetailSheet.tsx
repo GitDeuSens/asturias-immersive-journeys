@@ -284,14 +284,29 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                 </motion.div>
               )}
 
-              {has360 && (
+              {has360 && content.tour360?.iframe360Url && (
                 <div className="space-y-3">
                   <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2">
-                    <Camera className="w-4 h-4 text-primary" />Tour 360
+                    <Camera className="w-4 h-4 text-primary" />Tour 360°
                   </h3>
-                  <Button variant="outline" className="w-full justify-between" onClick={() => window.open(content.tour360!.iframe360Url, '_blank')}>
-                    {t(texts.open360)}<Maximize2 className="w-4 h-4" />
-                  </Button>
+                  {/* Inline 360 preview */}
+                  <div className="relative rounded-2xl overflow-hidden border border-border bg-black" style={{ minHeight: 250 }}>
+                    <iframe
+                      src={content.tour360.iframe360Url}
+                      className="w-full rounded-2xl"
+                      style={{ height: 250, border: 'none' }}
+                      allowFullScreen
+                      allow="xr-spatial-tracking; gyroscope; accelerometer"
+                      title="Tour 360"
+                    />
+                    <button
+                      onClick={() => window.open(content.tour360!.iframe360Url, '_blank')}
+                      className="absolute top-3 right-3 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors backdrop-blur-sm"
+                      aria-label="Fullscreen"
+                    >
+                      <Maximize2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -318,7 +333,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                 </div>
               )}
 
-              {!hasAR && (
+              {(content.gallery?.length || content.image) && (
                 <div className="space-y-3">
                   <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2">
                     <ImageIcon className="w-4 h-4 text-primary" />{t(texts.gallery)}

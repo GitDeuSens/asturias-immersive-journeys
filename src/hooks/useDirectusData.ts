@@ -69,14 +69,14 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
         };
       }
 
-      if (!tour360 && !arScene && Array.isArray(poi.gallery)) {
+      if (Array.isArray(poi.gallery)) {
         const photos: {url: string}[] = [];
         poi.gallery.forEach((photo: any) => {
           if (photo?.directus_files_id) {
             photos.push({url: DIRECTUS_URL + '/assets/' + photo.directus_files_id});
           }
         });
-        content.gallery = photos;
+        if (photos.length > 0) content.gallery = photos;
       }
 
       // Map practical info
