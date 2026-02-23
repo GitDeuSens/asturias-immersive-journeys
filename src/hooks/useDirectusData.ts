@@ -45,33 +45,35 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
     .map((poi: any, idx: number) => {
       const content: RoutePointContent = {};
 
-      // Map AR scene if linked
-      if (poi.ar_scene_id) {
-        // Extract slug from ar_launch_url (e.g. https://.../ar/Conjunto_valdedios → Conjunto_valdedios)
-        const arSlugFromUrl = poi.ar_launch_url
-          ? poi.ar_launch_url.split('/ar/').pop()?.split('?')[0] || undefined
-          : undefined;
+      // Map AR scene if linked (ar_scene_id is expanded object from Directus deep query)
+      const arScene = typeof poi.ar_scene_id === 'object' && poi.ar_scene_id ? poi.ar_scene_id : null;
+      if (arScene) {
+        const arSlug = (arScene as any).slug || '';
+        const buildPath = (arScene as any).build_path || '';
+        const baseUrl = window.location.origin;
         content.arExperience = {
-          launchUrl: poi.ar_launch_url || '',
-          qrValue: poi.ar_qr_value || '',
-          iframe3dUrl: poi.ar_iframe_url,
-          arSlug: poi.ar_slug || arSlugFromUrl,
+          launchUrl: arSlug ? `${baseUrl}/ar/${arSlug}` : '',
+          qrValue: arSlug ? `${baseUrl}/ar/${arSlug}` : '',
+          iframe3dUrl: buildPath || undefined,
+          arSlug,
         };
       }
 
-      // Map 360 tour if linked
-      if (poi.tour_360_id) {
+      // Map 360 tour if linked (tour_360_id is expanded object from Directus deep query)
+      const tour360 = typeof poi.tour_360_id === 'object' && poi.tour_360_id ? poi.tour_360_id : null;
+      if (tour360) {
+        const buildPath = (tour360 as any).build_path || '';
         content.tour360 = {
-          iframe360Url: poi.tour_360_url || '',
+          iframe360Url: buildPath,
           allowFullscreen: true,
         };
       }
 
-      if (poi.tour_360_id === null && poi.ar_scene_id === null && Array.isArray(poi.gallery)) {
+      if (!tour360 && !arScene && Array.isArray(poi.gallery)) {
         const photos: {url: string}[] = [];
         poi.gallery.forEach((photo: any) => {
           if (photo?.directus_files_id) {
-            photos.push({url: (import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com') + '/assets/' + photo.directus_files_id});
+            photos.push({url: DIRECTUS_URL + '/assets/' + photo.directus_files_id});
           }
         });
         content.gallery = photos;
@@ -167,7 +169,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
     center,
     maxPoints: points.length,
     points: routePoints,
-    tour360: route.tour_360_id ? { available: true } : undefined,
+    tour360: typeof route.tour_360_id === 'object' && route.tour_360_id ? { available: true } : undefined,
     polyline,
     distanceKm: route.distance_km,
     elevationGainMeters: route.elevation_gain_meters,
