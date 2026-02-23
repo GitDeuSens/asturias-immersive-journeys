@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { View, ChevronRight, X, Filter, Search } from "lucide-react";
+import { View, ChevronRight, X, Filter, Search, Home } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { CategoryChips } from "@/components/CategoryChips";
 import { KuulaTourEmbed } from "@/components/KuulaTourEmbed";
@@ -10,6 +10,14 @@ import { useDirectusTours, useDirectusCategories } from "@/hooks/useDirectusData
 import { useLanguage } from "@/hooks/useLanguage";
 import { trackTourViewed } from "@/lib/analytics";
 import type { KuulaTour, Language } from "@/lib/types";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
 
 const texts = {
   title: { es: "Tours Virtuales 360°", en: "Virtual Tours 360°", fr: "Visites Virtuelles 360°" },
@@ -78,8 +86,39 @@ export function Tours360Page() {
       <AppHeader variant="light" />
 
       <main className="pt-20">
+        {/* Breadcrumb */}
+        <div className="container mx-auto px-4 max-w-6xl pt-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/" className="flex items-center gap-1 text-xs">
+                  <Home className="w-3 h-3" />
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                {activeTour ? (
+                  <BreadcrumbLink href="#" onClick={(e) => { e.preventDefault(); closeTour(); }} className="text-xs">
+                    {t(texts.title)}
+                  </BreadcrumbLink>
+                ) : (
+                  <BreadcrumbPage className="text-xs">{t(texts.title)}</BreadcrumbPage>
+                )}
+              </BreadcrumbItem>
+              {activeTour && (
+                <>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage className="text-xs truncate max-w-[150px]">{t(activeTour.title)}</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </>
+              )}
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+
         {/* Hero section */}
-        <div className="bg-primary py-12 mb-8">
+        <div className="bg-primary py-12 mb-8 mt-2">
           <div className="container mx-auto pb-5 px-4 max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
