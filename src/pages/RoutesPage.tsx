@@ -501,7 +501,17 @@ export const RoutesPage = React.memo(function RoutesPage() {
                   />
 
                   <button
-                    onClick={() => requestLocation()}
+                    onClick={async () => {
+                      if (hasLocation) {
+                        centerOnUser();
+                      } else {
+                        const success = await requestLocation();
+                        if (success && mapRef.current) {
+                          // Center will happen via the useEffect when userPosition updates
+                          setTimeout(() => centerOnUser(), 500);
+                        }
+                      }
+                    }}
                     className={`category-chip flex items-center gap-2 text-sm px-4 py-2 whitespace-nowrap ${hasLocation ? 'active' : ''}`}
                     disabled={geoLoading}
                   >
