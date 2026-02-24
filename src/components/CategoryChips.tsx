@@ -46,7 +46,7 @@ export function CategoryChips({ categories, selectedIds, onToggle, selectedDiffi
   const count = selectedIds.length + selectedDifficulties.length;
 
   return (
-    <div className={`flex ${className}`}>
+    <div style={{zIndex: '9999999999'}} className={`flex ${className}`}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <button className="category-chip flex items-center gap-2 text-sm px-4 py-2 active">

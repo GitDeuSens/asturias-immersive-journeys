@@ -35,7 +35,7 @@ export function OnboardingHeader() {
   };
 
   const toggleTheme = () => {
-    setTheme(isDark ? "light" : "dark");
+    setTheme('light');
   };
 
   return (
