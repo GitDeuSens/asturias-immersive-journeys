@@ -248,7 +248,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
 
   const fitToAllRoutes = useCallback(() => {
     if (!mapRef.current) return;
-    const positions = filteredRoutes.map((r) => [r.center.lat, r.center.lng] as [number, number]);
+    const positions = filteredRoutes.filter(r => r.hasValidCenter).map((r) => [r.center.lat, r.center.lng] as [number, number]);
     if (positions.length > 0) {
       const offset = getPanelOffset();
       mapRef.current.fitBounds(positions, {
@@ -315,8 +315,9 @@ export const RoutesPage = React.memo(function RoutesPage() {
 
       fitToRoute(exploringRoute);
     } else {
-      // Add all routes to cluster group
+      // Add all routes to cluster group — skip routes without real coordinates
       filteredRoutes.forEach((route) => {
+        if (!route.hasValidCenter) return; // Don't place marker at default Oviedo fallback
         const routeName = route.title[lang] as any;
         const marker = L.marker([route.center.lat, route.center.lng], {
           icon: createRouteMarkerIcon(route, routeName),

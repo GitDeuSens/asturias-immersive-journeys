@@ -145,10 +145,12 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
 
   // Calculate center: prefer DB center_lat/center_lng, then polyline, then POI points
   let center = { lat: 43.36, lng: -5.85 }; // Default: Asturias center
+  let hasValidCenter = false;
   const dbCenterLat = Number(route.center_lat);
   const dbCenterLng = Number(route.center_lng);
   if (isValidCoord(dbCenterLat, dbCenterLng)) {
     center = { lat: dbCenterLat, lng: dbCenterLng };
+    hasValidCenter = true;
   } else {
     const allCoords = polyline.length > 0 ? polyline : routePoints.map(p => p.location);
     const coordsForCenter = allCoords.filter(p => isValidCoord(p.lat, p.lng));
@@ -156,6 +158,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       const sumLat = coordsForCenter.reduce((s, p) => s + p.lat, 0);
       const sumLng = coordsForCenter.reduce((s, p) => s + p.lng, 0);
       center = { lat: sumLat / coordsForCenter.length, lng: sumLng / coordsForCenter.length };
+      hasValidCenter = true;
     }
   }
 
@@ -171,6 +174,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
     difficulty: route.difficulty || 'easy',
     isCircular: route.is_circular ?? false,
     center,
+    hasValidCenter,
     maxPoints: points.length,
     points: routePoints,
     tour360: typeof route.tour_360_id === 'object' && route.tour_360_id ? { available: true } : undefined,
