@@ -30,7 +30,7 @@ export function AppHeader({ showRestart = true, variant = "light", routes = {}, 
 
       {/* Social bar */}
       <div style={{backgroundColor: '#0a4b77', borderTop: '8px solid hsl(var(--primary))'}}>
-        <div className="container flex mx-auto px-4 justify-between">
+        <div className="container flex mx-auto pl-4 px-2 justify-between">
           <div style={{ width: '33px', height: '48px', backgroundColor: 'hsl(var(--primary))', position: 'absolute', top: '16px' }}>
           </div>
           <div className="container mx-auto pl-4 px-2 py-1.5 flex justify-end gap-2">
