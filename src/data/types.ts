@@ -177,6 +177,7 @@ export interface ImmersiveRoute {
   difficulty?: 'easy' | 'medium' | 'hard';
   isCircular: boolean;
   center: { lat: number; lng: number };
+  hasValidCenter: boolean;
   maxPoints: number;
   points: RoutePoint[];
   tour360?: {
