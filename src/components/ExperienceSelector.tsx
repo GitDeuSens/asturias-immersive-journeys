@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { View, Map, ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
+import { Footer } from './Footer';
 
 interface ExperienceSelectorProps {
   onSelect: (experience: 'tours' | 'routes') => void;
@@ -25,7 +26,8 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
   const { t } = useLanguage();
 
   return (
-    <div className="relative z-10 flex flex-col items-center justify-center min-h-[100dvh] px-4 pt-16 pb-4">
+    <>
+    <div style={{height: '90vh'}} className="relative z-10 flex flex-col items-center justify-center px-4 pt-16 pb-4">
       {/* Back button */}
       {onBack && (
         <motion.button
@@ -33,7 +35,7 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
           onClick={onBack}
-          className="hidden absolute top-24 left-6 flex items-center gap-2 text-white/70 hover:text-white transition-colors"
+          className="absolute top-24 left-6 flex items-center gap-2 text-white/70 hover:text-white transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
           <span className="font-medium">{t(texts.back)}</span>
@@ -118,5 +120,7 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
         </motion.button>
       </div>
     </div>
+    <Footer />
+    </>
   );
 }

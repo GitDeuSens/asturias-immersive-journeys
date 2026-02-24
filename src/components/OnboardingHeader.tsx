@@ -43,7 +43,7 @@ export function OnboardingHeader() {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="fixed -top-3 left-0 right-0 z-50"
+      className="fixed -top-1 left-0 right-0 z-50"
     >
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         {/* Logo */}

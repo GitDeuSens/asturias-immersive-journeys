@@ -19,13 +19,14 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
   return (
     <footer
       ref={ref}
-      className="bg-muted text-muted-foreground relative"
+      className="text-muted-foreground"
       role="contentinfo"
       aria-label={t("footer.ariaLabel", "Pie de página")}
+      style={{ backgroundColor: 'white', width: '100%', zIndex: '999999', position: 'relative'}}
     >
-      <div className="container mx-auto px-4 py-8 md:py-12">
+      <div className="container mx-auto px-4 py-4 md:py-4">
         {/* Institutional logos - Row 1 */}
-        <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12 mb-6">
+        <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12 mb-4">
           {/* NextGenerationEU */}
           <a
             href="https://next-generation-eu.europa.eu/index_es"
@@ -81,8 +82,8 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
           </a>
         </div>
         {/* Legal links */}
-        <nav aria-label={t("footer.legalNav", "Enlaces legales")} className="mb-6">
-          <ul className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
+        <nav aria-label={t("footer.legalNav", "Enlaces legales")} className="mb-2">
+          <ul className="flex flex-wrap items-center justify-center gap-2 md:gap-2">
             <li>
               <a
                 href="/legal"
