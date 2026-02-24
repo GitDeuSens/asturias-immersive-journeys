@@ -132,7 +132,10 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
 
   // Fallback: generate polyline from valid POI points (in order)
   if (polyline.length < 2 && routePoints.length >= 2) {
-    polyline = routePoints.map(p => ({ lat: p.location.lat, lng: p.location.lng }));
+    const validPoints = routePoints.filter(p => isValidCoord(p.location.lat, p.location.lng));
+    if (validPoints.length >= 2) {
+      polyline = validPoints.map(p => ({ lat: p.location.lat, lng: p.location.lng }));
+    }
   }
 
   // If only 1 point or 0 points, polyline stays empty — no line will be drawn
@@ -147,7 +150,8 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
   if (isValidCoord(dbCenterLat, dbCenterLng)) {
     center = { lat: dbCenterLat, lng: dbCenterLng };
   } else {
-    const coordsForCenter = polyline.length > 0 ? polyline : routePoints.map(p => p.location);
+    const allCoords = polyline.length > 0 ? polyline : routePoints.map(p => p.location);
+    const coordsForCenter = allCoords.filter(p => isValidCoord(p.lat, p.lng));
     if (coordsForCenter.length > 0) {
       const sumLat = coordsForCenter.reduce((s, p) => s + p.lat, 0);
       const sumLng = coordsForCenter.reduce((s, p) => s + p.lng, 0);
