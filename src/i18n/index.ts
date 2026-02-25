@@ -23,6 +23,7 @@ const resources = {
       "common.viewDetails": "Ver detalles",
       "common.viewList": "Ver lista",
       "common.viewMap": "Ver mapa",
+      "common.title": "Experiencias turísticas inmersivas",
 
       // Navigation
       "nav.home": "Inicio",
@@ -254,6 +255,7 @@ const resources = {
       "common.viewDetails": "View details",
       "common.viewList": "View list",
       "common.viewMap": "View map",
+      "common.title": "Immersive tourism experiences",
 
       // Navigation
       "nav.home": "Home",
@@ -485,6 +487,7 @@ const resources = {
       "common.viewDetails": "Voir les détails",
       "common.viewList": "Vue liste",
       "common.viewMap": "Vue carte",
+      "common.title": "Expériences de tourisme immersif",
 
       // Navigation
       "nav.home": "Accueil",

@@ -397,7 +397,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
         />
 
         {/* Map controls */}
-        <div className="absolute top-20 right-4 z-10 flex flex-col gap-2">
+        <div className="hidden absolute top-20 right-4 z-10 flex flex-col gap-2">
           {/* User location button */}
           <Button
             variant="secondary"
