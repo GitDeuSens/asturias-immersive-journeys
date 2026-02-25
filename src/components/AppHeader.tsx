@@ -20,6 +20,7 @@ export function AppHeader({ showRestart = true, variant = "light", routes = {}, 
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
+      style={{zIndex: '50000000000'}}
       className="fixed -top-3 left-0 right-0 z-50"
     >
       {/* Green accent bar */}
