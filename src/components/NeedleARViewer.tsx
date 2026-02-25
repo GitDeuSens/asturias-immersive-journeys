@@ -131,7 +131,12 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
       const style = document.createElement('style');
       style.textContent = `
         .qr-code-label, [class*="qr"] a, [class*="qr"] span, [class*="qr"] p,
-        .webxr-ar-button + *, a[href*="localhost"], a[href*="ar/"] { display: none !important; }
+        .webxr-ar-button + *, a[href*="localhost"], a[href*="ar/"],
+        .quit-ar, .quit-ar-button, [class*="quit-ar"], svg.quit-ar-button,
+        .content > slot[name="quit-ar"],
+        div[style*="position: fixed"][style*="z-index: 600"],
+        button[class*="close"], .close-button,
+        svg[width="40px"][height="40px"] { display: none !important; }
       `;
       shadow.appendChild(style);
     };
