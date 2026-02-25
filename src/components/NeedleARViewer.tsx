@@ -125,26 +125,58 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
       }
     };
 
-    const hideQRLabel = () => {
+    const hideUnwantedUI = () => {
       const shadow = (el as any).shadowRoot;
       if (!shadow) return;
+
+      // Inject aggressive CSS into shadow DOM
       const style = document.createElement('style');
       style.textContent = `
         .qr-code-label, [class*="qr"] a, [class*="qr"] span, [class*="qr"] p,
         .webxr-ar-button + *, a[href*="localhost"], a[href*="ar/"],
         .quit-ar, .quit-ar-button, [class*="quit-ar"], svg.quit-ar-button,
-        .content > slot[name="quit-ar"],
+        slot[name="quit-ar"], .content > slot[name="quit-ar"],
         div[style*="position: fixed"][style*="z-index: 600"],
-        button[class*="close"], .close-button,
-        svg[width="40px"][height="40px"] { display: none !important; }
+        svg[width="40px"][height="40px"] { display: none !important; visibility: hidden !important; pointer-events: none !important; width: 0 !important; height: 0 !important; overflow: hidden !important; }
       `;
       shadow.appendChild(style);
+
+      // Actively remove close buttons from shadow DOM
+      const removeCloseButtons = () => {
+        shadow.querySelectorAll('.quit-ar, .quit-ar-button, [class*="quit-ar"], svg.quit-ar-button, slot[name="quit-ar"], svg[width="40px"][height="40px"]').forEach((e: Element) => e.remove());
+        // Also check for the fixed-position container with the X button
+        shadow.querySelectorAll('div').forEach((d: HTMLElement) => {
+          if (d.style.position === 'fixed' && d.style.zIndex === '600') d.remove();
+        });
+      };
+      removeCloseButtons();
+
+      // Watch for dynamically added close buttons
+      const observer = new MutationObserver(() => removeCloseButtons());
+      observer.observe(shadow, { childList: true, subtree: true });
+
+      // Also remove from document.body (needle appends overlay elements there)
+      const removeBodyOverlays = () => {
+        document.querySelectorAll('.quit-ar, .quit-ar-button, svg.quit-ar-button').forEach((e) => e.remove());
+        document.querySelectorAll('body > div').forEach((d: HTMLElement) => {
+          if (d.style.position === 'fixed' && d.style.zIndex === '600') d.remove();
+        });
+      };
+      removeBodyOverlays();
+      const bodyObserver = new MutationObserver(() => removeBodyOverlays());
+      bodyObserver.observe(document.body, { childList: true, subtree: true });
+
+      return () => { observer.disconnect(); bodyObserver.disconnect(); };
     };
 
+    let cleanupObservers: (() => void) | undefined;
+    const onUIReady = () => { cleanupObservers = hideUnwantedUI(); };
+
     el.addEventListener('loadfinished', onLoadFinished);
-    el.addEventListener('loadfinished', hideQRLabel);
-    setTimeout(hideQRLabel, 500);
-    return () => el.removeEventListener('loadfinished', onLoadFinished);
+    el.addEventListener('loadfinished', onUIReady);
+    setTimeout(() => { hideUnwantedUI(); }, 500);
+    setTimeout(() => { hideUnwantedUI(); }, 2000);
+    return () => { el.removeEventListener('loadfinished', onLoadFinished); cleanupObservers?.(); };
   }, [scene, locale, onStart, onError]);
 
   return (
