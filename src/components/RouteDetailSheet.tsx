@@ -69,9 +69,9 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
   const distance = route.distanceKm || calculatedDistance;
 
   const allFunctions = (route: ImmersiveRoute) => {
-    onEnterRoute(route);
     onClose();
-    navigate('/routes/' + route.id, { replace: true });
+    onEnterRoute(route);
+    window.history.pushState({}, '/routes', `/routes/${route.id}`);
   }
 
   const surfaceLabels: Record<string, Record<string, string>> = {
@@ -94,7 +94,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
     }
   };
 
-  
+
 
   return (
     <AnimatePresence>
@@ -104,7 +104,9 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[60]"
-        onClick={onClose}
+        onClick={() => {
+          location.reload();
+        }}
         role="presentation"
       />
       <motion.div
@@ -139,11 +141,10 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
 
           {/* Close button */}
           <button
-            onClick={onClose}
             className="absolute top-4 right-4 p-2 rounded-full bg-background/80 backdrop-blur-sm text-foreground hover:bg-background transition-colors focus:outline-none focus:ring-2 focus:ring-primary shadow-lg"
             aria-label={t('common.close')}
           >
-            <X className="w-5 h-5" />
+            <a href='/routes'> <X className="w-5 h-5" /></a>
           </button>
 
           {/* Route ID */}

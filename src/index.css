@@ -464,3 +464,10 @@
 .leaflet-control-zoom {
   margin-bottom: 50px !important;
 }
+
+@media (min-width: 800px) {
+  .leaflet-control-zoom {
+    margin-bottom: 50px !important;
+    right: 520px;
+  }
+}
