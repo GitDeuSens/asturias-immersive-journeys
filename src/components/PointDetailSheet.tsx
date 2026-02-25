@@ -222,18 +222,6 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
 
                   <NeedleARViewer scene={arScene} locale={language as Language} />
 
-                  {isMobile && (
-                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                      <Button onClick={() => setShowARViewer(true)}
-                        className="w-full h-14 text-base font-bold bg-gradient-to-r from-warm to-amber-500 hover:from-warm/90 hover:to-amber-500/90 text-warm-foreground shadow-lg shadow-warm/25 border-0">
-                        <div className="flex items-center gap-3">
-                          <div className="p-1.5 bg-white/20 rounded-lg"><Smartphone className="w-5 h-5" /></div>
-                          <span>{t(texts.launchAR)}</span>
-                          <ExternalLink className="w-4 h-4" />
-                        </div>
-                      </Button>
-                    </motion.div>
-                  )}
 
                   <div className="bg-card border border-border rounded-xl p-4">
                     <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
@@ -405,14 +393,6 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {showARViewer && arScene && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[70] bg-black">
-            <NeedleARViewer scene={arScene} locale={language as Language} onError={() => setShowARViewer(false)} />
-            <button onClick={() => setShowARViewer(false)} className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors z-[80]"><X className="w-5 h-5" /></button>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 }
