@@ -1,25 +1,17 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { setAccessMode } from '@/lib/analytics';
 
 export type Language = 'es' | 'en' | 'fr';
 
-const LANGUAGE_KEY = 'asturias-inmersivo-lang';
-
 export function useLanguage() {
-  const [language, setLanguageState] = useState<Language>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(LANGUAGE_KEY);
-      if (saved === 'es' || saved === 'en' || saved === 'fr') {
-        return saved;
-      }
-    }
-    return 'es';
-  });
+  const { i18n } = useTranslation();
+  const language = (i18n.language as Language) || 'es';
 
   const setLanguage = useCallback((lang: Language) => {
-    setLanguageState(lang);
-    localStorage.setItem(LANGUAGE_KEY, lang);
-  }, []);
+    i18n.changeLanguage(lang);
+    localStorage.setItem('asturias-inmersivo-lang', lang);
+  }, [i18n]);
 
   const t = useCallback(<T extends Record<string, string>>(texts: T): string => {
     return texts[language] || texts['es'] || '';
