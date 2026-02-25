@@ -138,6 +138,11 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
         slot[name="quit-ar"], .content > slot[name="quit-ar"],
         div[style*="position: fixed"][style*="z-index: 600"],
         svg[width="40px"][height="40px"] { display: none !important; visibility: hidden !important; pointer-events: none !important; width: 0 !important; height: 0 !important; overflow: hidden !important; }
+        /* Hide ALL fixed-position overlays from needle build UI */
+        .overlay-content, .content > div[style*="position"], div[style*="position: fixed"],
+        div[style*="position:fixed"] { display: none !important; }
+        /* Hide the slotted overlay content that breaks out */
+        ::slotted(div) { display: none !important; }
       `;
       shadow.appendChild(style);
 
@@ -166,7 +171,24 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
       const bodyObserver = new MutationObserver(() => removeBodyOverlays());
       bodyObserver.observe(document.body, { childList: true, subtree: true });
 
-      return () => { observer.disconnect(); bodyObserver.disconnect(); };
+      // Remove the needle build's own overlay UI (green bar with close button, "Scan to open AR", etc.)
+      // It's a direct child div of needle-engine with position:fixed that escapes the container
+      const removeOverlayUI = () => {
+        const overlaySlot = el.querySelector('#needle-overlay-slot');
+        // Hide all direct child divs of needle-engine EXCEPT the overlay slot we control
+        Array.from(el.children).forEach((child) => {
+          if (child === overlaySlot || child.tagName === 'CANVAS') return;
+          const htmlChild = child as HTMLElement;
+          if (htmlChild.tagName === 'DIV' && htmlChild.id !== 'needle-overlay-slot') {
+            htmlChild.style.display = 'none';
+          }
+        });
+      };
+      removeOverlayUI();
+      const lightDomObserver = new MutationObserver(() => removeOverlayUI());
+      lightDomObserver.observe(el, { childList: true, subtree: true });
+
+      return () => { observer.disconnect(); bodyObserver.disconnect(); lightDomObserver.disconnect(); };
     };
 
     let cleanupObservers: (() => void) | undefined;
@@ -209,6 +231,8 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
         needle-engine [class*="qr"] span,
         needle-engine [class*="qr"] a,
         needle-engine [class*="qr"] p { display: none !important; }
+        /* Hide the needle build's fixed overlay bar (green bar with close X, "Scan to open AR", etc.) */
+        needle-engine > div:not(#needle-overlay-slot) { display: none !important; }
       `}</style>
     </div>
   );
