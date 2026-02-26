@@ -257,11 +257,11 @@ export class AsturiasAROverlay extends Behaviour {
         this._buildPreARPanel();
 
         // If ?autostart=1 (from QR scan), skip the pre-AR panel and launch AR immediately
+        // BUT: on iOS, only autostart if we're in an AppClip (not Safari)
         const params = new URLSearchParams(window.location.search);
         if (params.get('autostart') === '1') {
             this._hidePrePanel();
-            // Small delay to let Needle Engine fully initialize XR subsystem
-            setTimeout(() => this._startAR(), 300);
+            this._handleAutostart();
         }
 
         // Use Needle-native XR hooks — work on Android WebXR AND iOS AppClips
@@ -466,6 +466,41 @@ export class AsturiasAROverlay extends Behaviour {
     // ─────────────────────────────────────────────────────────────────────────
     // TRIGGER AR (reuse Needle's button)
     // ─────────────────────────────────────────────────────────────────────────
+
+    private async _handleAutostart() {
+        try {
+            const { DeviceUtilities } = await import('@needle-tools/engine');
+            
+            // On iOS: only autostart if we're in an AppClip
+            // Otherwise, show the pre-panel so user can tap the AR button
+            if (DeviceUtilities.isiOS()) {
+                if (DeviceUtilities.isNeedleAppClip && DeviceUtilities.isNeedleAppClip()) {
+                    // We're in an AppClip - autostart is safe
+                    console.log('[AsturiasAROverlay] iOS AppClip detected, autostarting AR');
+                    setTimeout(() => this._startAR(), 100);
+                } else {
+                    // Regular Safari - show pre-panel, user must tap AR button
+                    console.log('[AsturiasAROverlay] iOS Safari detected, showing AR button instead of autostart');
+                    this._showPrePanel();
+                }
+                return;
+            }
+            
+            // On Android: autostart immediately (WebXR works)
+            if (DeviceUtilities.isAndroidDevice()) {
+                console.log('[AsturiasAROverlay] Android detected, autostarting AR');
+                setTimeout(() => this._startAR(), 100);
+                return;
+            }
+            
+            // Desktop or unknown: show pre-panel
+            console.log('[AsturiasAROverlay] Desktop/unknown device, showing pre-panel');
+            this._showPrePanel();
+        } catch (e) {
+            console.warn('[AsturiasAROverlay] DeviceUtilities not available, falling back to autostart', e);
+            setTimeout(() => this._startAR(), 100);
+        }
+    }
 
     private async _startAR() {
         try {

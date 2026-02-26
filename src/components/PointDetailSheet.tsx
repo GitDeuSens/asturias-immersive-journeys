@@ -107,11 +107,14 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
 
   const arScene: ARScene | null = useMemo(() => {
     if (!point) return null;
+    // Always prefer loadedARScene from Directus with real slug
     if (loadedARScene) return loadedARScene;
+    // Fallback: create temporary scene only if iframe3dUrl exists
     const content = point.content;
     if (!content.arExperience?.iframe3dUrl) return null;
     return {
-      id: point.id, slug: `poi-${point.id}`,
+      id: point.id, 
+      slug: `poi-${point.id}`, // Temporary slug - will be replaced by loadedARScene
       title: typeof point.title === 'string' ? { es: point.title, en: point.title, fr: point.title } : point.title,
       description: (point as any).shortDescription || { es: '', en: '', fr: '' },
       needle_scene_url: content.arExperience.iframe3dUrl,

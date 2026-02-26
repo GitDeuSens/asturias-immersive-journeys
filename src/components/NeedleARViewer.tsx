@@ -102,8 +102,38 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
         setIsLoading(false);
 
         // Auto-trigger AR session if ?autostart=1 (from QR scan)
-        // AsturiasAROverlay also attempts autostart at 300ms; this is a backup.
+        // AsturiasAROverlay also handles autostart; this is a backup.
         if (autostart) {
+          const handleAutostart = async () => {
+            try {
+              const { DeviceUtilities } = await import('@needle-tools/engine');
+              
+              // On iOS: only autostart if we're in an AppClip
+              if (DeviceUtilities.isiOS()) {
+                if (DeviceUtilities.isNeedleAppClip && DeviceUtilities.isNeedleAppClip()) {
+                  console.log('[NeedleARViewer] iOS AppClip detected, autostarting AR');
+                  setTimeout(() => tryStartAR(), 100);
+                } else {
+                  console.log('[NeedleARViewer] iOS Safari detected, skipping autostart');
+                }
+                return;
+              }
+              
+              // On Android: autostart immediately
+              if (DeviceUtilities.isAndroidDevice()) {
+                console.log('[NeedleARViewer] Android detected, autostarting AR');
+                setTimeout(() => tryStartAR(), 100);
+                return;
+              }
+              
+              // Desktop: skip autostart
+              console.log('[NeedleARViewer] Desktop detected, skipping autostart');
+            } catch (e) {
+              console.warn('[NeedleARViewer] DeviceUtilities not available, falling back to autostart', e);
+              setTimeout(() => tryStartAR(), 100);
+            }
+          };
+
           const tryStartAR = async (): Promise<boolean> => {
             try {
               // Preferred: NeedleXRSession.start — official Needle Engine API
@@ -124,12 +154,8 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
             if (btn) { btn.click(); return true; }
             return false;
           };
-          // Retry: first at 800ms, then at 2s if the first attempt didn't find a button
-          setTimeout(async () => {
-            if (!(await tryStartAR())) {
-              setTimeout(() => tryStartAR(), 1200);
-            }
-          }, 800);
+          
+          handleAutostart();
         }
       } catch (err: any) {
         const msg = err?.message ?? 'Unknown error';
