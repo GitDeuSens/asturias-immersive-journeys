@@ -100,6 +100,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       // TODO meter gallery aqui
       return {
         id: poi.slug || poi.id || `point-${idx}`, // Use slug first for clean URLs
+        poiUUID: poi.id, // Keep original UUID for API queries
         order: poi.order ?? idx + 1,
         title: toMultilingual(poi.translations, 'title') || { es: '', en: '', fr: '' },
         shortDescription: toMultilingual(poi.translations, 'short_description') || { es: '', en: '', fr: '' },

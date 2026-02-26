@@ -267,7 +267,7 @@ export class AsturiasAROverlay extends Behaviour {
         // Use Needle-native XR hooks — work on Android WebXR AND iOS AppClips
         this._xrStartHandler = () => {
             this._isAR = true;
-            // Keep pre-panel visible, add AR controls on top
+            this._hidePrePanel(); // Hide web overlay when XR session actually starts
             this._buildARControls();
         };
         this._xrEndHandler = () => {
@@ -704,7 +704,7 @@ export class AsturiasAROverlay extends Behaviour {
         root.appendChild(panel);
 
         panel.querySelector('#ast-start-ar-btn')?.addEventListener('click', () => {
-            // Don't hide pre-panel, just start AR - overlay stays visible
+            // Pre-panel stays visible until XR actually starts (_xrStartHandler will hide it)
             this._startAR();
         });
         panel.querySelector('#ast-show-qr-btn')?.addEventListener('click', () => this._showQRPanel());
