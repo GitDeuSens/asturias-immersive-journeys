@@ -616,12 +616,6 @@ export class AsturiasAROverlay extends Behaviour {
                         ${title}
                     </div>
                 </div>
-                <button id="ast-pre-close" style="
-                    background:rgba(255,255,255,0.1);border:none;border-radius:${ASTURIAS.radius.full};
-                    width:clamp(28px,7vw,36px);height:clamp(28px,7vw,36px);
-                    display:flex;align-items:center;justify-content:center;
-                    color:#fff;cursor:pointer;flex-shrink:0;
-                ">${this._icon('close')}</button>
             </div>
             <div style="display:flex;gap:clamp(6px,2vw,10px);align-items:stretch;">
                 ${this._isDesktop ? `
@@ -654,7 +648,6 @@ export class AsturiasAROverlay extends Behaviour {
 
         root.appendChild(panel);
 
-        panel.querySelector('#ast-pre-close')?.addEventListener('click', () => this._hidePrePanel());
         panel.querySelector('#ast-start-ar-btn')?.addEventListener('click', () => {
             this._hidePrePanel();
             this._startAR();
