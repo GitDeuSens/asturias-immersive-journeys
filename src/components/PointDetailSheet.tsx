@@ -237,7 +237,15 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                     <h3 className="text-base font-semibold text-foreground">{t(texts.arExperience)}</h3>
                   </div>
 
-                  <NeedleARViewer scene={arScene} locale={language as Language} />
+                  <Button 
+                    onClick={() => window.open(`/ar/${arScene.slug}`, '_blank', 'noopener,noreferrer')}
+                    className="w-full h-auto py-6 bg-gradient-to-r from-warm to-primary hover:from-warm/90 hover:to-primary/90 text-white shadow-lg"
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <Smartphone className="w-8 h-8" />
+                      <span className="text-lg font-semibold">{t(texts.launchAR)}</span>
+                    </div>
+                  </Button>
 
 
                   <div className="bg-card border border-border rounded-xl p-4">
