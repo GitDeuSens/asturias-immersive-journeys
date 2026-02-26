@@ -71,7 +71,6 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
   const allFunctions = (route: ImmersiveRoute) => {
     onClose();
     onEnterRoute(route);
-    window.history.pushState({}, '/routes', `/routes/${route.id}`);
   }
 
   const surfaceLabels: Record<string, Record<string, string>> = {
@@ -104,9 +103,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[60]"
-        onClick={() => {
-          location.reload();
-        }}
+        onClick={onClose}
         role="presentation"
       />
       <motion.div
@@ -141,10 +138,11 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
 
           {/* Close button */}
           <button
+            onClick={onClose}
             className="absolute top-4 right-4 p-2 rounded-full bg-background/80 backdrop-blur-sm text-foreground hover:bg-background transition-colors focus:outline-none focus:ring-2 focus:ring-primary shadow-lg"
             aria-label={t('common.close')}
           >
-            <a href='/routes'> <X className="w-5 h-5" /></a>
+            <X className="w-5 h-5" />
           </button>
 
           {/* Route ID */}

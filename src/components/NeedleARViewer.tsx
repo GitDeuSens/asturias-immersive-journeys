@@ -63,7 +63,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
     && new URLSearchParams(window.location.search).get('autostart') === '1';
 
   useEffect(() => {
-    (window as any).__DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL ?? 'http://192.168.12.71:8055';
+    (window as any).__DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL ?? 'https://back.asturias.digitalmetaverso.com';
   }, []);
 
   useEffect(() => {
@@ -102,19 +102,60 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
         setIsLoading(false);
 
         // Auto-trigger AR session if ?autostart=1 (from QR scan)
-        // Browser will show camera/XR permission popup — this is expected
+        // AsturiasAROverlay also handles autostart; this is a backup.
         if (autostart) {
-          setTimeout(async () => {
+          const handleAutostart = async () => {
+            try {
+              const { DeviceUtilities } = await import('@needle-tools/engine');
+              
+              // On iOS: only autostart if we're in an AppClip
+              if (DeviceUtilities.isiOS()) {
+                if (DeviceUtilities.isNeedleAppClip && DeviceUtilities.isNeedleAppClip()) {
+                  console.log('[NeedleARViewer] iOS AppClip detected, autostarting AR');
+                  setTimeout(() => tryStartAR(), 0);
+                } else {
+                  console.log('[NeedleARViewer] iOS Safari detected, skipping autostart');
+                }
+                return;
+              }
+              
+              // On Android: autostart immediately
+              if (DeviceUtilities.isAndroidDevice()) {
+                console.log('[NeedleARViewer] Android detected, autostarting AR');
+                setTimeout(() => tryStartAR(), 0);
+                return;
+              }
+              
+              // Desktop: skip autostart
+              console.log('[NeedleARViewer] Desktop detected, skipping autostart');
+            } catch (e) {
+              console.warn('[NeedleARViewer] DeviceUtilities not available, falling back to autostart', e);
+              setTimeout(() => tryStartAR(), 0);
+            }
+          };
+
+          const tryStartAR = async (): Promise<boolean> => {
+            try {
+              // Preferred: NeedleXRSession.start — official Needle Engine API
+              const { NeedleXRSession, Context } = await import('@needle-tools/engine');
+              const ctx = Context.Current;
+              if (NeedleXRSession && ctx) {
+                await NeedleXRSession.start("immersive-ar", undefined, ctx);
+                return true;
+              }
+            } catch {}
             try {
               const { WebXRButtonFactory } = await import('@needle-tools/engine');
               const factory = WebXRButtonFactory.getOrCreate();
-              if (factory?.arButton) { factory.arButton.click(); return; }
+              if (factory?.arButton) { factory.arButton.click(); return true; }
             } catch {}
             const btn = document.querySelector('[ar-button]') as HTMLElement
-              ?? document.querySelector('needle-button[ar]') as HTMLElement
-              ?? (el as any)?.shadowRoot?.querySelector('[ar-button]') as HTMLElement;
-            btn?.click();
-          }, 500);
+              ?? document.querySelector('needle-button[ar]') as HTMLElement;
+            if (btn) { btn.click(); return true; }
+            return false;
+          };
+          
+          handleAutostart();
         }
       } catch (err: any) {
         const msg = err?.message ?? 'Unknown error';
@@ -143,14 +184,15 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
         shadow.appendChild(style);
       }
 
-      // Find and hide ONLY the close button in the needle build's overlay
-      // The close button is a <button> containing only an <img> (no text), sibling of the title div
+      // Find and hide ONLY Needle's own close button in the build overlay.
+      // IMPORTANT: skip buttons inside #asturias-ar-root — those are our AR HUD controls.
       const hideCloseButton = () => {
-        // Search in light DOM (slotted content inside needle-engine)
         el.querySelectorAll('button').forEach((btn: HTMLButtonElement) => {
+          // Never touch our own Asturias overlay buttons
+          if (btn.closest('#asturias-ar-root')) return;
           const text = btn.textContent?.trim() || '';
           const hasImg = btn.querySelector('img, svg');
-          // Close button: has an icon but no meaningful text
+          // Needle's close button: has an icon but no meaningful text
           if (hasImg && text.length === 0) {
             btn.style.display = 'none';
           }
@@ -222,7 +264,7 @@ export function NeedleARViewer({ scene, locale = 'es', onStart, onError }: Needl
       {scene.needle_type === 'geo' && scene.location && (
         <Button onClick={() => {
           if (!scene.location) return;
-          window.open(`https://www.google.com/maps/dir/?api=1&destination=${scene.location.lat},${scene.location.lng}`, '_blank');
+          window.open(`https://www.google.com/maps/dir/?api=1&destination=${scene.location.lat},${scene.location.lng}`, '_blank', 'noopener,noreferrer');
           trackEvent('ar_navigation_opened', { ar_id: scene.id });
         }} variant="outline" className="w-full">
           <MapPin className="w-4 h-4 mr-2" />{texts.goToLocation[locale]}

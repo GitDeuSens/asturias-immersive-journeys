@@ -4,7 +4,7 @@ import {
   Play, Pause, Camera, Smartphone, ExternalLink, Navigation,
   Info, Image, Link2, Headphones, Maximize2, QrCode
 } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import type { POI } from '@/data/types';
 import { useDirectusCategories } from '@/hooks/useDirectusData';
 import { useLanguage, Language } from '@/hooks/useLanguage';
@@ -60,6 +60,45 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
   const [selectedAudioLang, setSelectedAudioLang] = useState<Language>(language);
   const [show360Modal, setShow360Modal] = useState(false);
   const experienceSectionRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Cleanup audio on unmount or language change
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.removeAttribute('src');
+        audioRef.current.load();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  // Stop audio when switching languages
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+      setIsPlaying(false);
+    }
+  }, [selectedAudioLang]);
+
+  const handleToggleAudio = useCallback(() => {
+    const audioData = poi?.audioGuides?.[selectedAudioLang];
+    if (!audioData?.url) return;
+
+    if (isPlaying && audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      if (!audioRef.current) {
+        audioRef.current = new Audio(audioData.url);
+        audioRef.current.addEventListener('ended', () => setIsPlaying(false));
+        audioRef.current.addEventListener('error', () => setIsPlaying(false));
+      }
+      audioRef.current.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+    }
+  }, [isPlaying, selectedAudioLang, poi?.audioGuides]);
 
   if (!poi) return null;
 
@@ -102,7 +141,7 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
     } else if (poi.experienceType === '360' && poi.tour360) {
       setShow360Modal(true);
     } else {
-      window.open(`https://www.google.com/maps/dir/?api=1&destination=${poi.access.lat},${poi.access.lng}`, '_blank');
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${poi.access.lat},${poi.access.lng}`, '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -257,7 +296,7 @@ export function POIDetailSheet({ poi, onClose }: POIDetailSheetProps) {
                       </div>
                       {audioAvailable ? (
                         <div className="space-y-2">
-                          <button onClick={() => setIsPlaying(!isPlaying)} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors text-primary font-bold">
+                          <button onClick={handleToggleAudio} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors text-primary font-bold">
                             {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
                             {isPlaying ? t(texts.pauseAudio) : t(texts.playAudio)}
                           </button>

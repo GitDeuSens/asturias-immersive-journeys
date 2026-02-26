@@ -251,7 +251,7 @@ export function VRExperiencesPage() {
                     className="w-full h-12 text-base font-bold bg-accent hover:bg-accent/90"
                     onClick={() => {
                       trackVRStarted(selectedExperience.id, selectedExperience.title[lang]);
-                      window.open(selectedExperience.apk_url, '_blank');
+                      window.open(selectedExperience.apk_url, '_blank', 'noopener,noreferrer');
                     }}
                   >
                     <Download className="w-5 h-5 mr-2" aria-hidden="true" />

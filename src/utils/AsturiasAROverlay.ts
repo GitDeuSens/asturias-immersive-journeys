@@ -109,6 +109,17 @@ function t(key: string, lang: string): string {
     return T[key]?.[lang] ?? T[key]?.['es'] ?? key;
 }
 
+/** Escape user/CMS-provided strings before inserting into innerHTML to prevent XSS */
+function escapeHtml(str: string): string {
+    if (!str) return '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // DIRECTUS HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
@@ -117,7 +128,7 @@ function getDirectusUrl(): string {
     // Try to read from window (set by React app) or fallback
     return (window as any).__DIRECTUS_URL
         ?? (window as any).VITE_DIRECTUS_URL
-        ?? 'http://192.168.12.71:8055';
+        ?? 'https://back.asturias.digitalmetaverso.com';
 }
 
 function getAssetUrl(uuid: string): string {
@@ -199,19 +210,7 @@ export class AsturiasAROverlay extends Behaviour {
     private _infoPanel?:    HTMLElement;   // info popup
     private _langPanel?:    HTMLElement;   // language picker
     private _subtitleBar?:  HTMLElement;   // audio subtitle bar
-
-    private _icon(name: string): string {
-        const icons: Record<string, string> = {
-            ar:    `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`,
-            info:  `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
-            close: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
-            lang:  `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
-            audio: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`,
-            stop:  `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>`,
-            qr:    `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/></svg>`,
-        };
-        return icons[name] ?? '';
-    }
+    private _resizeHandler?: () => void;
 
     private _audio = new InlineAudioPlayer();
     private _xrStartHandler?: () => void;
@@ -334,17 +333,17 @@ async start() {
     }
 
     private _getTitle(): string {
-        if (!this._sceneInfo) return this._slug;
+        if (!this._sceneInfo) return escapeHtml(this._slug);
         const t = this._sceneInfo.title;
-        if (typeof t === 'string') return t;
-        return t?.[this._lang] ?? t?.['es'] ?? this._slug;
+        if (typeof t === 'string') return escapeHtml(t);
+        return escapeHtml(t?.[this._lang] ?? t?.['es'] ?? this._slug);
     }
 
     private _getDescription(): string {
         const d = this._sceneInfo?.description;
         if (!d) return '';
-        if (typeof d === 'string') return d;
-        return d?.[this._lang] ?? d?.['es'] ?? '';
+        if (typeof d === 'string') return escapeHtml(d);
+        return escapeHtml(d?.[this._lang] ?? d?.['es'] ?? '');
     }
 
     private _hasAudio(): boolean {
@@ -471,15 +470,31 @@ async start() {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
+    // ICONS HELPER
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private _icon(name: string): string {
+        const icons: Record<string, string> = {
+            ar:    `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`,
+            qr:    `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><rect x="19" y="14" width="2" height="2"/><rect x="14" y="19" width="2" height="2"/><rect x="18" y="18" width="3" height="3"/></svg>`,
+            info:  `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
+            close: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+            lang:  `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
+            audio: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`,
+            stop:  `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>`,
+        };
+        return icons[name] ?? '';
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
     // PRE-AR PANEL (mobile, before entering AR)
     // ─────────────────────────────────────────────────────────────────────────
 
     private _buildPreARPanel() {
-        const root = this._ensureRoot();
         const panel = document.createElement('div');
         this._prePanel = panel;
         panel.style.cssText = `
-            position: absolute; left: 0; right: 0; bottom: 0;
+            position: fixed; bottom: 0;
             background: linear-gradient(160deg, ${ASTURIAS.colors.forest} 0%, #0d2b18 100%);
             border-radius: ${ASTURIAS.radius.xl} ${ASTURIAS.radius.xl} 0 0;
             padding: 20px 20px max(env(safe-area-inset-bottom, 16px), 20px);
@@ -527,7 +542,10 @@ async start() {
             </div>
         `;
 
-        root.appendChild(panel);
+        document.body.appendChild(panel);
+        this._updatePrePanelPosition();
+        this._resizeHandler = () => this._updatePrePanelPosition();
+        window.addEventListener('resize', this._resizeHandler);
 
         panel.querySelector('#ast-pre-close')?.addEventListener('click', () => this._hidePrePanel());
         panel.querySelector('#ast-start-ar-btn')?.addEventListener('click', () => {
@@ -539,6 +557,20 @@ async start() {
 
     private _showPrePanel()  { if (this._prePanel) this._prePanel.style.display = 'block'; }
     private _hidePrePanel()  { if (this._prePanel) this._prePanel.style.display = 'none'; }
+
+    private _updatePrePanelPosition() {
+        if (!this._prePanel) return;
+        const rect = this._getContainer()?.getBoundingClientRect();
+        if (!rect) {
+            this._prePanel.style.left = '50%';
+            this._prePanel.style.width = 'min(640px, 94vw)';
+            this._prePanel.style.transform = 'translateX(-50%)';
+            return;
+        }
+        this._prePanel.style.left = `${rect.left + window.scrollX}px`;
+        this._prePanel.style.width = `${rect.width}px`;
+        this._prePanel.style.transform = 'none';
+    }
 
     // ─────────────────────────────────────────────────────────────────────────
     // DESKTOP PANEL

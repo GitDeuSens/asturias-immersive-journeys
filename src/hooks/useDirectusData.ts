@@ -18,7 +18,7 @@ import { toMultilingual } from "@/lib/directus-types";
 import { logger } from "@/lib/logger";
 import { dataCache } from "./useCachedData";
 
-const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'http://localhost:8055';
+const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
 
 function getFileUrl(fileId: string | undefined): string {
   if (!fileId) return '';
@@ -99,7 +99,8 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       const lng = Number(poi.lng) || 0;
       // TODO meter gallery aqui
       return {
-        id: poi.id || poi.slug || `point-${idx}`,
+        id: poi.slug || poi.id || `point-${idx}`, // Use slug first for clean URLs
+        poiUUID: poi.id, // Keep original UUID for API queries
         order: poi.order ?? idx + 1,
         title: toMultilingual(poi.translations, 'title') || { es: '', en: '', fr: '' },
         shortDescription: toMultilingual(poi.translations, 'short_description') || { es: '', en: '', fr: '' },

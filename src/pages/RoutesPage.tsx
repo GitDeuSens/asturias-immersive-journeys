@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import L from "leaflet";
 import { MapPin, Search, ChevronUp, ChevronDown, Maximize2, Locate, Loader2 } from "lucide-react";
@@ -77,7 +77,9 @@ const createPointMarkerIcon = (point: RoutePoint, index: number, pointName: stri
 };
 
 export const RoutesPage = React.memo(function RoutesPage() {
-  const { routeCode } = useParams<{ routeCode?: string }>();
+  const { routeCode, id: pointId } = useParams<{ routeCode?: string; id?: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { t, i18n } = useTranslation();
   const lang = i18n.language as "es" | "en" | "fr";
   const mapRef = useRef<L.Map | null>(null);
@@ -104,6 +106,8 @@ export const RoutesPage = React.memo(function RoutesPage() {
 
   const [mapReady, setMapReady] = useState(false);
   const routeCodeHandledRef = useRef(false);
+
+  // Sync URL → state on initial load and when URL params change
   useEffect(() => {
     if (!routeCode || routeCodeHandledRef.current || immersiveRoutes.length === 0) return;
     const matched = immersiveRoutes.find(route => {
@@ -114,8 +118,60 @@ export const RoutesPage = React.memo(function RoutesPage() {
       setSelectedRoute(matched);
       setShowRouteDetail(true);
       routeCodeHandledRef.current = true;
+
+      // If a point ID is in the URL, find and select the point
+      if (pointId) {
+        const point = matched.points.find(p => p.id === pointId);
+        if (point) {
+          setExploringRoute(matched);
+          setShowRouteDetail(false);
+          setSelectedPoint(point);
+        }
+      }
     }
-  }, [routeCode, immersiveRoutes, lang]);
+  }, [routeCode, pointId, immersiveRoutes, lang]);
+
+  // UX2: Handle browser back button — close sheets instead of leaving page
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      if (path === '/routes' || path === '/routes/') {
+        setSelectedPoint(null);
+        setShowRouteDetail(false);
+        setExploringRoute(null);
+        setSelectedRoute(null);
+      } else if (path.match(/^\/routes\/[^/]+$/) && !path.match(/^\/routes\/[^/]+\/.+$/)) {
+        // At route level — close point if open
+        setSelectedPoint(null);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // UX6: Escape key closes sheets
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (selectedPoint) {
+          setSelectedPoint(null);
+          if (exploringRoute) {
+            navigate(`/routes/${exploringRoute.id}`, { replace: true });
+          } else {
+            navigate('/routes', { replace: true });
+          }
+        } else if (showRouteDetail) {
+          setShowRouteDetail(false);
+          setSelectedRoute(null);
+          navigate('/routes', { replace: true });
+        } else if (exploringRoute) {
+          handleExitRoute();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedPoint, showRouteDetail, exploringRoute, navigate]);
 
   // Geolocation
   const { latitude, longitude, error: geoError, requestLocation, hasLocation, loading: geoLoading } = useGeolocation();
@@ -208,7 +264,14 @@ export const RoutesPage = React.memo(function RoutesPage() {
     });
   }, [immersiveRoutes, searchQuery, selectedCategories, selectedDifficulties, lang]);
 
-  filteredRoutes.sort((a: any, b: any) => a.id.split('-')[1] - b.id.split('-')[1]);
+  // UX7: Sort inside useMemo to avoid mutation on every render
+  const sortedFilteredRoutes = useMemo(() => {
+    return [...filteredRoutes].sort((a: any, b: any) => {
+      const aNum = parseInt(a.id.split('-')[1]) || 0;
+      const bNum = parseInt(b.id.split('-')[1]) || 0;
+      return aNum - bNum;
+    });
+  }, [filteredRoutes]);
 
   // All points from filtered routes for "Points" view
   const allPoints = useMemo(() => {
@@ -368,19 +431,45 @@ export const RoutesPage = React.memo(function RoutesPage() {
   };
 
   const handleEnterRoute = (route: ImmersiveRoute) => {
-    // Track route start
     const routeName = typeof route.title === 'string' ? route.title : route.title[i18n.language as keyof typeof route.title] || route.title.es;
     trackRouteStarted(route.id, routeName);
     
     setShowRouteDetail(false);
     setExploringRoute(route);
     setSelectedPoint(null);
+    navigate(`/routes/${route.id}`, { replace: false });
   };
 
   const handleExitRoute = () => {
     setExploringRoute(null);
     setSelectedPoint(null);
+    navigate('/routes', { replace: false });
     setTimeout(() => fitToAllRoutes(), 100);
+  };
+
+  // Helper: update URL when selecting a point
+  const handleSelectPoint = (point: RoutePoint) => {
+    setSelectedPoint(point);
+    const routeId = exploringRoute?.id || selectedRoute?.id;
+    if (routeId) {
+      navigate(`/routes/${routeId}/${point.id}`, { replace: false });
+    }
+  };
+
+  const handleClosePoint = () => {
+    setSelectedPoint(null);
+    const routeId = exploringRoute?.id || selectedRoute?.id;
+    if (routeId) {
+      navigate(`/routes/${routeId}`, { replace: true });
+    } else {
+      navigate('/routes', { replace: true });
+    }
+  };
+
+  const handleCloseRouteDetail = () => {
+    setShowRouteDetail(false);
+    setSelectedRoute(null);
+    navigate('/routes', { replace: true });
   };
 
   return (
@@ -467,7 +556,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
               <RouteExplorerView
                 route={exploringRoute}
                 onBack={handleExitRoute}
-                onSelectPoint={setSelectedPoint}
+                onSelectPoint={handleSelectPoint}
                 selectedPoint={selectedPoint}
               />
               </motion.div>
@@ -484,7 +573,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                 <div className="flex items-center justify-between">
                   <h2 className="text-3xl font-bold text-foreground">{t("routes.title")}</h2>
                   <span className="text-xs text-muted-foreground" aria-live="polite">
-                    {viewMode === 'routes' ? filteredRoutes.length : allPoints.length} {t("common.results")}
+                    {viewMode === 'routes' ? sortedFilteredRoutes.length : allPoints.length} {t("common.results")}
                   </span>
                 </div>
 
@@ -545,7 +634,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                   <AnimatePresence mode="wait">
                   {viewMode === 'routes' ? (
                     <motion.div key="routes-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="space-y-3">
-                    {filteredRoutes.map((route, i) => (
+                    {sortedFilteredRoutes.map((route, i) => (
                       <motion.div key={route.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, delay: i * 0.04 }}>
                       <RouteCard
                         route={route}
@@ -553,6 +642,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                           setSelectedRoute(route);
                           setExploringRoute(route);
                         //  setShowRouteDetail(true);
+                          navigate(`/routes/${route.id}`, { replace: false });
                         }}
                       />
                       </motion.div>
@@ -574,7 +664,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                           initial={{ opacity: 0, y: 12 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.25, delay: i * 0.04 }}
-                          onClick={() => setSelectedPoint(point)}
+                          onClick={() => handleSelectPoint(point)}
                           className="w-full text-left rounded-2xl bg-card/50 border border-border/50 hover:border-primary/50 hover:bg-card/80 transition-all duration-200 group overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                         >
                           <div className="flex gap-3 p-3">
@@ -608,12 +698,9 @@ export const RoutesPage = React.memo(function RoutesPage() {
       {showRouteDetail && selectedRoute && (
         <RouteDetailSheet
           route={selectedRoute}
-          onClose={() => {
-            setShowRouteDetail(false);
-            setSelectedRoute(null);
-          }}
+          onClose={handleCloseRouteDetail}
           onEnterRoute={handleEnterRoute}
-          onSelectPoint={setSelectedPoint}
+          onSelectPoint={handleSelectPoint}
         />
       )}
       </AnimatePresence>
@@ -623,9 +710,9 @@ export const RoutesPage = React.memo(function RoutesPage() {
       {selectedPoint && (
         <PointDetailSheet
           point={selectedPoint}
-          onClose={() => setSelectedPoint(null)}
+          onClose={handleClosePoint}
           routeTitle={exploringRoute ? (typeof exploringRoute.title === 'string' ? exploringRoute.title : (exploringRoute.title as any)[lang] || (exploringRoute.title as any).es || '') : selectedRoute ? (typeof selectedRoute.title === 'string' ? selectedRoute.title : (selectedRoute.title as any)[lang] || (selectedRoute.title as any).es || '') : undefined}
-          onBackToRoute={exploringRoute ? () => setSelectedPoint(null) : undefined}
+          onBackToRoute={exploringRoute ? handleClosePoint : undefined}
         />
       )}
       </AnimatePresence>

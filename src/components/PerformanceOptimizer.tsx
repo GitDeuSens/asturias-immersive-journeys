@@ -95,13 +95,13 @@ export function useResourceHints() {
     // DNS prefetch for external domains
     const dnsPrefetch = document.createElement('link');
     dnsPrefetch.rel = 'dns-prefetch';
-    dnsPrefetch.href = '//localhost:8055';
+    dnsPrefetch.href = '//' + new URL(import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com').host;
     document.head.appendChild(dnsPrefetch);
 
     // Preconnect to Directus API
     const preconnect = document.createElement('link');
     preconnect.rel = 'preconnect';
-    preconnect.href = 'http://localhost:8055';
+    preconnect.href = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
     document.head.appendChild(preconnect);
 
     return () => {

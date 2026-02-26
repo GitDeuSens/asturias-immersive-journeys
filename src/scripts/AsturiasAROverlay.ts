@@ -109,6 +109,17 @@ function t(key: string, lang: string): string {
     return T[key]?.[lang] ?? T[key]?.['es'] ?? key;
 }
 
+/** Escape user/CMS-provided strings before inserting into innerHTML to prevent XSS */
+function escapeHtml(str: string): string {
+    if (!str) return '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // DIRECTUS HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
@@ -117,7 +128,7 @@ function getDirectusUrl(): string {
     // Try to read from window (set by React app) or fallback
     return (window as any).__DIRECTUS_URL
         ?? (window as any).VITE_DIRECTUS_URL
-        ?? 'http://192.168.12.71:8055';
+        ?? 'https://back.asturias.digitalmetaverso.com';
 }
 
 function getAssetUrl(uuid: string): string {
@@ -231,17 +242,32 @@ export class AsturiasAROverlay extends Behaviour {
             this._sceneInfo = await fetchSceneInfo(this._slug);
         }
 
-        // Add ?autostart=1 so QR scan triggers AR immediately without showing the launch button
-        const url = new URL(window.location.href);
-        url.searchParams.set('autostart', '1');
-        this._arUrl = url.toString();
+        // Build the AR URL for QR codes: always use /ar/{slug} path, not current page URL
+        // This ensures QR codes generated inside /routes sheets point to the correct AR page
+        if (this._slug) {
+            const arUrl = new URL(`${window.location.origin}/ar/${this._slug}`);
+            arUrl.searchParams.set('autostart', '1');
+            this._arUrl = arUrl.toString();
+        } else {
+            const url = new URL(window.location.href);
+            url.searchParams.set('autostart', '1');
+            this._arUrl = url.toString();
+        }
 
         this._buildPreARPanel();
+
+        // If ?autostart=1 (from QR scan), skip the pre-AR panel and launch AR immediately
+        // BUT: on iOS, only autostart if we're in an AppClip (not Safari)
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('autostart') === '1') {
+            this._hidePrePanel();
+            this._handleAutostart();
+        }
 
         // Use Needle-native XR hooks — work on Android WebXR AND iOS AppClips
         this._xrStartHandler = () => {
             this._isAR = true;
-            this._hidePrePanel();
+            this._hidePrePanel(); // Hide web overlay when XR session actually starts
             this._buildARControls();
         };
         this._xrEndHandler = () => {
@@ -409,17 +435,17 @@ export class AsturiasAROverlay extends Behaviour {
     }
 
     private _getTitle(): string {
-        if (!this._sceneInfo) return this._slug;
+        if (!this._sceneInfo) return escapeHtml(this._slug);
         const t = this._sceneInfo.title;
-        if (typeof t === 'string') return t;
-        return t?.[this._lang] ?? t?.['es'] ?? this._slug;
+        if (typeof t === 'string') return escapeHtml(t);
+        return escapeHtml(t?.[this._lang] ?? t?.['es'] ?? this._slug);
     }
 
     private _getDescription(): string {
         const d = this._sceneInfo?.description;
         if (!d) return '';
-        if (typeof d === 'string') return d;
-        return d?.[this._lang] ?? d?.['es'] ?? '';
+        if (typeof d === 'string') return escapeHtml(d);
+        return escapeHtml(d?.[this._lang] ?? d?.['es'] ?? '');
     }
 
     private _hasAudio(): boolean {
@@ -441,21 +467,58 @@ export class AsturiasAROverlay extends Behaviour {
     // TRIGGER AR (reuse Needle's button)
     // ─────────────────────────────────────────────────────────────────────────
 
+    private async _handleAutostart() {
+        try {
+            const { DeviceUtilities } = await import('@needle-tools/engine');
+            
+            // On iOS: only autostart if we're in an AppClip
+            // Otherwise, show the pre-panel so user can tap the AR button
+            if (DeviceUtilities.isiOS()) {
+                if (DeviceUtilities.isNeedleAppClip && DeviceUtilities.isNeedleAppClip()) {
+                    // We're in an AppClip - autostart is safe
+                    console.log('[AsturiasAROverlay] iOS AppClip detected, autostarting AR');
+                    setTimeout(() => this._startAR(), 0);
+                } else {
+                    // Regular Safari - show pre-panel, user must tap AR button
+                    console.log('[AsturiasAROverlay] iOS Safari detected, showing AR button instead of autostart');
+                    this._showPrePanel();
+                }
+                return;
+            }
+            
+            // On Android: autostart immediately (WebXR works)
+            if (DeviceUtilities.isAndroidDevice()) {
+                console.log('[AsturiasAROverlay] Android detected, autostarting AR');
+                setTimeout(() => this._startAR(), 0);
+                return;
+            }
+            
+            // Desktop or unknown: show pre-panel
+            console.log('[AsturiasAROverlay] Desktop/unknown device, showing pre-panel');
+            this._showPrePanel();
+        } catch (e) {
+            console.warn('[AsturiasAROverlay] DeviceUtilities not available, falling back to autostart', e);
+            setTimeout(() => this._startAR(), 0);
+        }
+    }
+
     private async _startAR() {
         try {
-            // Try Needle's WebXRButtonFactory first (Android WebXR + desktop)
+            // Preferred: use NeedleXRSession.start("immersive-ar") — the official Needle Engine API
+            const { NeedleXRSession, Context } = await import('@needle-tools/engine');
+            const ctx = Context.Current;
+            if (NeedleXRSession && ctx) {
+                await NeedleXRSession.start("immersive-ar", undefined, ctx);
+                return;
+            }
+        } catch (e) {
+            console.warn('[AsturiasAROverlay] NeedleXRSession.start failed, trying fallbacks', e);
+        }
+        try {
+            // Fallback: WebXRButtonFactory button click (older Needle versions)
             const factory = WebXRButtonFactory.getOrCreate();
             if (factory.arButton) {
                 factory.arButton.click();
-                return;
-            }
-        } catch {}
-        try {
-            // iOS AppClips / fallback: trigger via needle-engine context directly
-            const { Context } = await import('@needle-tools/engine');
-            const ctx = Context.Current;
-            if (ctx && typeof (ctx as any).startAR === 'function') {
-                await (ctx as any).startAR();
                 return;
             }
         } catch {}
@@ -608,12 +671,6 @@ export class AsturiasAROverlay extends Behaviour {
                         ${title}
                     </div>
                 </div>
-                <button id="ast-pre-close" style="
-                    background:rgba(255,255,255,0.1);border:none;border-radius:${ASTURIAS.radius.full};
-                    width:clamp(28px,7vw,36px);height:clamp(28px,7vw,36px);
-                    display:flex;align-items:center;justify-content:center;
-                    color:#fff;cursor:pointer;flex-shrink:0;
-                ">${this._icon('close')}</button>
             </div>
             <div style="display:flex;gap:clamp(6px,2vw,10px);align-items:stretch;">
                 ${this._isDesktop ? `
@@ -646,9 +703,8 @@ export class AsturiasAROverlay extends Behaviour {
 
         root.appendChild(panel);
 
-        panel.querySelector('#ast-pre-close')?.addEventListener('click', () => this._hidePrePanel());
         panel.querySelector('#ast-start-ar-btn')?.addEventListener('click', () => {
-            this._hidePrePanel();
+            // Pre-panel stays visible until XR actually starts (_xrStartHandler will hide it)
             this._startAR();
         });
         panel.querySelector('#ast-show-qr-btn')?.addEventListener('click', () => this._showQRPanel());

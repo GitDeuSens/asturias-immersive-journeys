@@ -4,11 +4,11 @@
 
 import i18n from 'i18next';
 
-const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'http://localhost:8055';
+const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
 const BASE_URL = import.meta.env.DEV ? '/directus-api' : DIRECTUS_URL;
 
 // Fallback URL for development
-const FALLBACK_URL = 'http://localhost:8055';
+const FALLBACK_URL = 'https://back.asturias.digitalmetaverso.com';
 const CACHE_KEY = 'asturias-ui-translations';
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
