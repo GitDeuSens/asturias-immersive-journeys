@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Camera, AlertTriangle, RefreshCw, Smartphone, MapPin } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Smartphone, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { trackEvent, trackARStarted, trackARCompleted, trackARError } from '@/lib/analytics';
 import '@needle-tools/engine';
@@ -125,25 +125,57 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
       }
     };
 
-    const hideQRLabel = () => {
+    const hideUnwantedUI = () => {
       const shadow = (el as any).shadowRoot;
       if (!shadow) return;
-      const style = document.createElement('style');
-      style.textContent = `
-        .qr-code-label, [class*="qr"] a, [class*="qr"] span, [class*="qr"] p,
-        .webxr-ar-button + *, a[href*="localhost"], a[href*="ar/"] { display: none !important; }
-      `;
-      shadow.appendChild(style);
+
+      // Inject targeted CSS into shadow DOM — only hide quit-ar and QR labels
+      if (!shadow.querySelector('#needle-hide-style')) {
+        const style = document.createElement('style');
+        style.id = 'needle-hide-style';
+        style.textContent = `
+          .qr-code-label, [class*="qr"] a, [class*="qr"] span, [class*="qr"] p,
+          .webxr-ar-button + *, a[href*="localhost"], a[href*="ar/"],
+          .quit-ar, .quit-ar-button, [class*="quit-ar"], svg.quit-ar-button,
+          slot[name="quit-ar"], .content > slot[name="quit-ar"],
+          svg[width="40px"][height="40px"] { display: none !important; }
+        `;
+        shadow.appendChild(style);
+      }
+
+      // Find and hide ONLY the close button in the needle build's overlay
+      // The close button is a <button> containing only an <img> (no text), sibling of the title div
+      const hideCloseButton = () => {
+        // Search in light DOM (slotted content inside needle-engine)
+        el.querySelectorAll('button').forEach((btn: HTMLButtonElement) => {
+          const text = btn.textContent?.trim() || '';
+          const hasImg = btn.querySelector('img, svg');
+          // Close button: has an icon but no meaningful text
+          if (hasImg && text.length === 0) {
+            btn.style.display = 'none';
+          }
+        });
+      };
+      hideCloseButton();
+
+      const lightDomObserver = new MutationObserver(() => hideCloseButton());
+      lightDomObserver.observe(el, { childList: true, subtree: true });
+
+      return () => { lightDomObserver.disconnect(); };
     };
 
+    let cleanupObservers: (() => void) | undefined;
+    const onUIReady = () => { cleanupObservers = hideUnwantedUI(); };
+
     el.addEventListener('loadfinished', onLoadFinished);
-    el.addEventListener('loadfinished', hideQRLabel);
-    setTimeout(hideQRLabel, 500);
-    return () => el.removeEventListener('loadfinished', onLoadFinished);
+    el.addEventListener('loadfinished', onUIReady);
+    setTimeout(() => { hideUnwantedUI(); }, 500);
+    setTimeout(() => { hideUnwantedUI(); }, 2000);
+    return () => { el.removeEventListener('loadfinished', onLoadFinished); cleanupObservers?.(); };
   }, [scene, locale, onStart, onError]);
 
   return (
-    <div className="relative rounded-xl border border-border bg-black" style={{ minHeight: 500 }}>
+    <div className="relative rounded-2xl border border-border bg-black overflow-hidden" style={{ minHeight: 500 }}>
       {isLoading && (
         <div style={{
           position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
@@ -179,170 +211,33 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
 
 // Main Component
 export function NeedleARViewer({ scene, locale = 'es', onStart, onError }: NeedleARViewerProps) {
-  const [isARSupported, setIsARSupported] = useState<boolean | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [arActive, setARActive] = useState(false);
-  const startTimeRef = useRef<number>(0);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const autostart = typeof window !== 'undefined'
-    && new URLSearchParams(window.location.search).get('autostart') === '1';
-
-  const launchIframeAR = useCallback(async () => {
-    if (!containerRef.current) return;
-    setIsLoading(true);
-    startTimeRef.current = Date.now();
-    try {
-      trackARStarted(scene.id, scene.needle_type, scene.title[locale] || scene.title.es);
-      onStart?.();
-      setARActive(true);
-      const iframe = document.createElement('iframe');
-      iframe.src = scene.needle_scene_url;
-      iframe.style.cssText = 'width:100%;height:100vh;border:none;position:fixed;top:0;left:0;z-index:9999';
-      iframe.allow = 'camera; xr-spatial-tracking; gyroscope; accelerometer; magnetometer';
-      iframe.allowFullscreen = true;
-      iframeRef.current = iframe;
-      const closeBtn = document.createElement('button');
-      closeBtn.innerHTML = '✕';
-      closeBtn.style.cssText = `position:fixed;top:20px;right:20px;z-index:10000;width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,0.7);color:white;border:none;font-size:24px;cursor:pointer;`;
-      const cleanup = () => {
-        iframeRef.current?.remove(); iframeRef.current = null;
-        closeBtnRef.current?.remove(); closeBtnRef.current = null;
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        setARActive(false); setIsLoading(false);
-      };
-      closeBtn.onclick = () => {
-        const timeSpent = Math.round((Date.now() - startTimeRef.current) / 1000);
-        if (timeSpent > 2) trackARCompleted(scene.id, timeSpent);
-        cleanup();
-      };
-      closeBtnRef.current = closeBtn;
-      document.body.appendChild(iframe);
-      document.body.appendChild(closeBtn);
-      timeoutRef.current = setTimeout(() => {
-        if (isLoading) { cleanup(); const msg = 'AR scene loading timeout'; trackARError(scene.id, msg); onError?.(msg); }
-      }, 15000);
-      iframe.onload = () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); setIsLoading(false); };
-      iframe.onerror = () => { cleanup(); const msg = 'Failed to load AR scene'; trackARError(scene.id, msg); onError?.(msg); };
-    } catch (error) {
-      setIsLoading(false); setARActive(false);
-      const msg = error instanceof Error ? error.message : 'Unknown error';
-      trackARError(scene.id, msg); onError?.(msg);
-    }
-  }, [scene, locale, onStart, onError]);
-
-  useEffect(() => {
-    const checkARSupport = async () => {
-      if ('xr' in navigator) {
-        try {
-          const supported = await (navigator as any).xr?.isSessionSupported('immersive-ar');
-          setIsARSupported(supported || false);
-        } catch { setIsARSupported(false); }
-      } else { setIsARSupported(false); }
-    };
-    checkARSupport();
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      iframeRef.current?.remove();
-      closeBtnRef.current?.remove();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!autostart || isARSupported === null || isARSupported === false) return;
-    if (scene.scene_mode === 'dynamic') return;
-    launchIframeAR();
-  }, [autostart, isARSupported, scene.scene_mode, launchIframeAR]);
-
-  const openNavigation = useCallback(() => {
-    if (!scene.location) return;
-    window.open(`https://www.google.com/maps/dir/?api=1&destination=${scene.location.lat},${scene.location.lng}`, '_blank');
-    trackEvent('ar_navigation_opened', { ar_id: scene.id });
-  }, [scene]);
-
-  if (isARSupported === null) {
-    return (
-      <div className="flex items-center justify-center p-8 bg-muted/50 rounded-xl">
-        <div className="flex items-center gap-3 text-muted-foreground">
-          <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-          <span>{texts.checking[locale]}</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (scene.scene_mode === 'dynamic') {
-    return <DynamicNeedleViewer scene={scene} locale={locale} onStart={onStart} onError={onError} />;
-  }
-
-  if (isARSupported === false) {
-    return (
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 bg-card border border-border rounded-xl">
-        <div className="flex items-start gap-4">
-          <div className="p-3 bg-destructive/10 rounded-full"><AlertTriangle className="w-6 h-6 text-destructive" /></div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-foreground mb-2">{texts.notSupported[locale]}</h3>
-            <p className="text-muted-foreground mb-4">{texts.notSupportedDesc[locale]}</p>
-            <p className="text-sm text-muted-foreground mb-3">{texts.requirements[locale]}</p>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-center gap-2"><Smartphone className="w-4 h-4" />{texts.reqMobile[locale]}</li>
-              <li className="flex items-center gap-2"><Camera className="w-4 h-4" />{texts.reqBrowser[locale]}</li>
-            </ul>
-            <div className="mt-6">
-              <p className="text-sm font-medium text-foreground mb-2">{texts.preview[locale]}:</p>
-              {scene.preview_video
-                ? <video src={scene.preview_video} controls className="w-full rounded-lg" poster={scene.preview_image} />
-                : <img src={scene.preview_image} alt={scene.title[locale] || scene.title.es} className="w-full rounded-lg" />
-              }
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    );
-  }
-
-  if (scene.needle_type === 'geo' && scene.location) {
-    return (
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 bg-card border border-border rounded-xl">
-        <div className="flex items-start gap-4 mb-6">
-          <div className="p-3 bg-primary/10 rounded-full"><MapPin className="w-6 h-6 text-primary" /></div>
-          <div>
-            <h3 className="font-semibold text-foreground mb-1">{texts.geoRequired[locale]}</h3>
-            <p className="text-sm text-muted-foreground">Lat: {scene.location.lat.toFixed(4)}, Lng: {scene.location.lng.toFixed(4)}</p>
-          </div>
-        </div>
-        <Button onClick={openNavigation} className="w-full mb-4"><MapPin className="w-4 h-4 mr-2" />{texts.goToLocation[locale]}</Button>
-        <Button onClick={launchIframeAR} variant="outline" className="w-full" disabled={isLoading}>
-          {isLoading ? <><RefreshCw className="w-4 h-4 mr-2 animate-spin" />{texts.loading[locale]}</> : <><Camera className="w-4 h-4 mr-2" />{texts.startAR[locale]}</>}
-        </Button>
-      </motion.div>
-    );
-  }
-
   return (
-    <motion.div ref={containerRef} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative">
-      {!arActive && (
-        <div className="p-6 bg-card border border-border rounded-xl text-center">
-          <div className="mb-6">
-            <img src={scene.preview_image} alt={scene.title[locale] || scene.title.es} className="w-full max-h-48 object-cover rounded-lg mb-4" />
-            <p className="text-sm text-muted-foreground">{texts.lighting[locale]}</p>
-          </div>
-          <Button onClick={launchIframeAR} size="lg" className="w-full" disabled={isLoading}>
-            {isLoading ? <><RefreshCw className="w-5 h-5 mr-2 animate-spin" />{texts.loading[locale]}</> : <><Camera className="w-5 h-5 mr-2" />{texts.startAR[locale]}</>}
-          </Button>
-          {scene.needle_type === 'image-tracking' && scene.tracking_image_url && (
-            <div className="mt-4 pt-4 border-t border-border">
-              <p className="text-sm text-muted-foreground mb-2">
-                {locale === 'es' ? 'Necesitarás este marcador:' : locale === 'en' ? 'You will need this marker:' : 'Vous aurez besoin de ce marqueur:'}
-              </p>
-              <a href={scene.tracking_image_url} download="marcador-ar.png" className="inline-flex items-center text-sm text-primary hover:underline">
-                ⬇️ {locale === 'es' ? 'Descargar marcador' : locale === 'en' ? 'Download marker' : 'Télécharger le marqueur'}
-              </a>
-            </div>
-          )}
+    <motion.div ref={containerRef} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative space-y-4">
+      {/* 3D Preview with built-in AR button inside needle-engine */}
+      <DynamicNeedleViewer scene={scene} locale={locale} onStart={onStart} onError={onError} />
+
+      {/* Geo-located scene → navigation button */}
+      {scene.needle_type === 'geo' && scene.location && (
+        <Button onClick={() => {
+          if (!scene.location) return;
+          window.open(`https://www.google.com/maps/dir/?api=1&destination=${scene.location.lat},${scene.location.lng}`, '_blank');
+          trackEvent('ar_navigation_opened', { ar_id: scene.id });
+        }} variant="outline" className="w-full">
+          <MapPin className="w-4 h-4 mr-2" />{texts.goToLocation[locale]}
+        </Button>
+      )}
+
+      {/* Image tracking → marker download */}
+      {scene.needle_type === 'image-tracking' && scene.tracking_image_url && (
+        <div className="pt-3 border-t border-border">
+          <p className="text-sm text-muted-foreground mb-2">
+            {locale === 'es' ? 'Necesitarás este marcador:' : locale === 'en' ? 'You will need this marker:' : 'Vous aurez besoin de ce marqueur:'}
+          </p>
+          <a href={scene.tracking_image_url} download="marcador-ar.png" className="inline-flex items-center text-sm text-primary hover:underline">
+            ⬇️ {locale === 'es' ? 'Descargar marcador' : locale === 'en' ? 'Download marker' : 'Télécharger le marqueur'}
+          </a>
         </div>
       )}
     </motion.div>

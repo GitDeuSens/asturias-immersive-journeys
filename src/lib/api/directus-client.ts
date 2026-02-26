@@ -294,7 +294,8 @@ class DirectusApiClient {
       // Step 2: fetch all points in one separate query (avoids deep-relation complexity limit)
       const allPoints = await this.getClient().request(readItems('pois' as any, {
         filter: { status: { _in: API_CONFIG.getStatusFilter() } } as any,
-        fields: ['*', 'translations.*'] as any,
+        fields: ['*', 'translations.*', 'ar_scene_id.slug', 'ar_scene_id.build_path', 'ar_scene_id.translations.*', 'ar_scene_id.scene_mode', 'ar_scene_id.glb_model', 'ar_scene_id.glb_scale', 'ar_scene_id.glb_rotation_y', 'tour_360_id.slug', 'tour_360_id.build_path', 'tour_360_id.translations.*', 'gallery.*'] as any,
+        sort: ['order'] as any,
         limit: -1,
       })).catch(() => []);
 
@@ -318,7 +319,7 @@ class DirectusApiClient {
     try {
       const routes = await this.getClient().request(readItems('routes', {
         filter: { slug: { _eq: slug }, status: { _in: ['published', 'draft'] } },
-        fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.*', 'categories.categories_id.translations.*', 'points.*', 'points.translations.*'],
+        fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.*', 'categories.categories_id.translations.*', 'points.*', 'points.translations.*', 'points.ar_scene_id.*', 'points.ar_scene_id.translations.*', 'points.tour_360_id.*', 'points.tour_360_id.translations.*', 'points.gallery.*'] as any,
         limit: 1,
       }));
       if ((routes as any[]).length === 0) return null;
@@ -330,7 +331,7 @@ class DirectusApiClient {
     try {
       const routes = await this.getClient().request(readItems('routes', {
         filter: { route_code: { _eq: code }, status: { _in: ['published', 'draft'] } },
-        fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.*', 'categories.categories_id.translations.*', 'points.*', 'points.translations.*'],
+        fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.*', 'categories.categories_id.translations.*', 'points.*', 'points.translations.*', 'points.ar_scene_id.*', 'points.ar_scene_id.translations.*', 'points.tour_360_id.*', 'points.tour_360_id.translations.*', 'points.gallery.*'] as any,
         limit: 1,
       }));
       if ((routes as any[]).length === 0) return null;
@@ -382,7 +383,8 @@ class DirectusApiClient {
     try {
       const pois = await this.getClient().request(readItems('pois', {
         filter: { status: { _in: API_CONFIG.getStatusFilter() } },
-        fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.slug'],
+        fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.slug', 'ar_scene_id.*', 'ar_scene_id.translations.*', 'tour_360_id.*', 'tour_360_id.translations.*', 'gallery.*'] as any,
+        sort: ['order'] as any,
       }));
       return (pois as unknown as DirectusPOI[]).map(transformPOI);
     } catch (error) { logger.error('[DirectusClient] Error fetching POIs:', error); return []; }
@@ -390,7 +392,7 @@ class DirectusApiClient {
 
   async getPOIById(id: string, _locale: Language = 'es') {
     try {
-      const poi = await this.getClient().request(readItem('pois', id, { fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.*', 'categories.categories_id.translations.*'] }));
+      const poi = await this.getClient().request(readItem('pois', id, { fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.*', 'categories.categories_id.translations.*', 'ar_scene_id.*', 'ar_scene_id.translations.*', 'tour_360_id.*', 'tour_360_id.translations.*', 'gallery.*'] as any }));
       return transformPOI(poi as unknown as DirectusPOI);
     } catch (error) { logger.error(`[DirectusClient] Error fetching POI ${id}:`, error); return null; }
   }
@@ -399,7 +401,7 @@ class DirectusApiClient {
     try {
       const pois = await this.getClient().request(readItems('pois', {
         filter: { slug: { _eq: slug }, status: { _in: ['published', 'draft'] } },
-        fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.*', 'categories.categories_id.translations.*'],
+        fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.*', 'categories.categories_id.translations.*', 'ar_scene_id.*', 'ar_scene_id.translations.*', 'tour_360_id.*', 'tour_360_id.translations.*', 'gallery.*'] as any,
         limit: 1,
       }));
       if ((pois as any[]).length === 0) return null;
@@ -411,7 +413,7 @@ class DirectusApiClient {
     try {
       const pois = await this.getClient().request(readItems('pois', {
         filter: { route_id: { _eq: routeId }, status: { _in: ['published', 'draft'] } },
-        fields: ['*', ...TRANSLATIONS_DEEP],
+        fields: ['*', ...TRANSLATIONS_DEEP, 'ar_scene_id.slug', 'ar_scene_id.build_path', 'ar_scene_id.translations.*', 'ar_scene_id.scene_mode', 'ar_scene_id.glb_model', 'ar_scene_id.glb_scale', 'ar_scene_id.glb_rotation_y', 'tour_360_id.slug', 'tour_360_id.build_path', 'tour_360_id.translations.*'],
         sort: ['order'],
       }));
       return (pois as unknown as DirectusPOI[]).map(transformPOI);

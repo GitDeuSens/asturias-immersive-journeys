@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, Clock, MapPin, ChevronRight, Filter } from "lucide-react";
+import { Sparkles, Clock, MapPin, ChevronRight, Filter, Home } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,14 @@ import { Footer } from "@/components/Footer";
 import { getARScenes } from "@/lib/api/directus-client";
 import { useLanguage } from "@/hooks/useLanguage";
 import type { ARScene, Language } from "@/lib/types";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
 
 const texts = {
   title: { es: "Experiencias AR", en: "AR Experiences", fr: "Expériences AR" },
@@ -75,8 +83,25 @@ export function ARExperiencesPage() {
       <AppHeader variant="light" />
 
       <main className="pt-20">
+        {/* Breadcrumb */}
+        <div className="container mx-auto px-4 max-w-6xl pt-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/" className="flex items-center gap-1 text-xs">
+                  <Home className="w-3 h-3" />
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage className="text-xs">{texts.title[locale]}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+
         {/* Hero section */}
-        <div className="bg-primary py-12 mb-8">
+        <div className="bg-primary py-12 mb-8 mt-2">
           <div className="container mx-auto px-4 pb-5 max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -204,9 +229,11 @@ export function ARExperiencesPage() {
                           <Clock className="w-3 h-3 mr-1" />
                           {scene.duration_minutes} {texts.duration[locale]}
                         </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          {texts.difficulty[scene.difficulty][locale]}
-                        </Badge>
+                        {scene.difficulty && texts.difficulty[scene.difficulty] && (
+                          <Badge variant="outline" className="text-xs">
+                            {texts.difficulty[scene.difficulty][locale]}
+                          </Badge>
+                        )}
                         {scene.location && (
                           <Badge variant="outline" className="text-xs">
                             <MapPin className="w-3 h-3 mr-1" />

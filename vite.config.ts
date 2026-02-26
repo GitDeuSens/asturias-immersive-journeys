@@ -4,7 +4,7 @@ import { resolve } from 'path';
 import { componentTagger } from "lovable-tagger";
 import fs from 'fs';
 import path from 'path';
-import mkcert from 'vite-plugin-mkcert';
+// mkcert removed — breaks Lovable sandbox
 // https://vitejs.dev/config/
 // BASE_PATH configuration:
 // - Set VITE_BASE_PATH env variable to deploy under a subdirectory
@@ -35,7 +35,7 @@ export default defineConfig(({ mode }) => {
 },
     },
     plugins: [
-      mkcert(),
+      // mkcert() removed — breaks sandbox
       // Serve /tours-builds/ as static files BEFORE SPA fallback
       {
         name: 'serve-tours-builds',

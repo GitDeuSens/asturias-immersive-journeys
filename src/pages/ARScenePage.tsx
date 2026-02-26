@@ -6,7 +6,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, Clock, Download, Share2,
-  Smartphone, Eye, Navigation, Sparkles, AlertCircle, Footprints, Car,
+  Smartphone, Eye, Navigation, Sparkles, AlertCircle, Footprints, Car, Home,
 } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { calculateDistanceTo, formatTime } from "@/lib/navigationService";
@@ -21,6 +21,14 @@ import { getARSceneBySlug } from "@/lib/api/directus-client";
 import { trackEvent, trackShare } from "@/lib/analytics";
 import { useLanguage } from "@/hooks/useLanguage";
 import type { ARScene, Language } from "@/lib/types";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
 
 const texts = {
   back: { es: "Volver", en: "Back", fr: "Retour" },
@@ -175,12 +183,36 @@ export function ARScenePage() {
 
       <main className="pt-20">
         <div className="container mx-auto px-4 max-w-4xl">
-          <button
-            onClick={() => fromRoute ? navigate(`/routes/${fromRoute}`) : navigate(-1)}
-            className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />{texts.back[locale as Language]}
-          </button>
+          {/* Breadcrumb */}
+          <div className="mb-4">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/" className="flex items-center gap-1 text-xs">
+                    <Home className="w-3 h-3" />
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  {fromRoute ? (
+                    <BreadcrumbLink href="#" onClick={(e) => { e.preventDefault(); navigate(`/routes/${fromRoute}`); }} className="text-xs">
+                      {locale === 'es' ? 'Rutas' : locale === 'en' ? 'Routes' : 'Itinéraires'}
+                    </BreadcrumbLink>
+                  ) : (
+                    <BreadcrumbLink href="/ar" className="text-xs">
+                      {locale === 'es' ? 'Experiencias AR' : locale === 'en' ? 'AR Experiences' : 'Expériences AR'}
+                    </BreadcrumbLink>
+                  )}
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="text-xs truncate max-w-[150px]">
+                    {scene.title[locale as Language] || scene.title.es}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
 
           {/* Hero */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}

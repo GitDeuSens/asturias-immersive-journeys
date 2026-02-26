@@ -1,6 +1,6 @@
 ﻿import { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MapPin, Camera, Play, FileText, Headphones, Smartphone, ExternalLink, ChevronRight, Maximize2, Sparkles, Image as ImageIcon, Phone, Mail, Globe, Clock, Euro, Info, Navigation, Footprints, Car, Eye, Download, Share2 } from 'lucide-react';
+import { X, MapPin, Camera, Play, FileText, Headphones, Smartphone, ExternalLink, ChevronRight, Maximize2, Sparkles, Image as ImageIcon, Phone, Mail, Globe, Clock, Euro, Info, Navigation, Footprints, Car, Eye, Download, Share2, Home } from 'lucide-react';
 import type { RoutePoint } from '@/data/types';
 import { useLanguage, useExplorationMode } from '@/hooks/useLanguage';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -15,8 +15,11 @@ import { trackPOITimeSpent } from '@/lib/analytics';
 import { openNavigation } from '@/lib/mapUtils';
 import { getARScenesByPOI } from '@/lib/api/directus-client';
 import { ShareButtons } from '@/components/ShareButtons';
+import {
+  Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage,
+} from '@/components/ui/breadcrumb';
 
-interface PointDetailSheetProps { point: RoutePoint | null; onClose: () => void; }
+interface PointDetailSheetProps { point: RoutePoint | null; onClose: () => void; routeTitle?: string; onBackToRoute?: () => void; }
 
 function getText(value: any, lang: string): string {
   if (!value) return '';
@@ -61,7 +64,7 @@ const AR_INSTRUCTIONS: Record<string, Record<string, string[]>> = {
   },
 };
 
-export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
+export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: PointDetailSheetProps) {
   const { t, language } = useLanguage();
   const isMobile = useIsMobile();
   const [showARViewer, setShowARViewer] = useState(false);
@@ -72,14 +75,11 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
 
   useEffect(() => {
     if (!point?.content?.arExperience) return;
-    prevUrlRef.current = window.location.pathname;
     getARScenesByPOI(point.id, language as Language).then(scenes => {
       if (scenes.length > 0) {
         setLoadedARScene(scenes[0]);
-        window.history.pushState({ fromRoute: true }, '', `/ar/${scenes[0].slug}`);
       }
     });
-    return () => { window.history.pushState({}, '', prevUrlRef.current); };
   }, [point?.id, point?.content?.arExperience, language]);
 
   useEffect(() => {
@@ -90,6 +90,22 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
       }
     };
   }, [point, language]);
+
+  const arScene: ARScene | null = useMemo(() => {
+    if (!point) return null;
+    if (loadedARScene) return loadedARScene;
+    const content = point.content;
+    if (!content.arExperience?.iframe3dUrl) return null;
+    return {
+      id: point.id, slug: `poi-${point.id}`,
+      title: typeof point.title === 'string' ? { es: point.title, en: point.title, fr: point.title } : point.title,
+      description: (point as any).shortDescription || { es: '', en: '', fr: '' },
+      needle_scene_url: content.arExperience.iframe3dUrl,
+      needle_type: 'slam' as const, scene_mode: 'build' as const, build_path: undefined,
+      preview_image: point.coverImage || '', difficulty: 'easy' as const,
+      duration_minutes: 5, requires_outdoors: false, published: true,
+    };
+  }, [point, loadedARScene]);
 
   if (!point) return null;
 
@@ -106,19 +122,6 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
     if (point.location !== null) openNavigation(point.location.lat, point.location.lng, title);
   };
 
-  const arScene: ARScene | null = useMemo(() => {
-    if (loadedARScene) return loadedARScene;
-    if (!content.arExperience?.iframe3dUrl) return null;
-    return {
-      id: point.id, slug: `poi-${point.id}`,
-      title: typeof point.title === 'string' ? { es: point.title, en: point.title, fr: point.title } : point.title,
-      description: (point as any).shortDescription || { es: '', en: '', fr: '' },
-      needle_scene_url: content.arExperience.iframe3dUrl,
-      needle_type: 'slam' as const, scene_mode: 'build' as const, build_path: undefined,
-      preview_image: point.coverImage || '', difficulty: 'easy' as const,
-      duration_minutes: 5, requires_outdoors: false, published: true,
-    };
-  }, [loadedARScene, point, content.arExperience]);
 
   const arTitle = arScene ? getText(arScene.title, language) : title;
   const arDescription = arScene ? getText(arScene.description, language) : shortDescription;
@@ -127,23 +130,22 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
     <>
       <AnimatePresence>
         <motion.div key="overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+          className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm" onClick={onClose} />
         <motion.div key="sheet"
           initial={{ x: '100%', opacity: 0.8 }} animate={{ x: 0, opacity: 1 }} exit={{ x: '100%', opacity: 0.8 }}
           transition={{ type: 'spring', damping: 28, stiffness: 200, mass: 0.9, opacity: { duration: 0.2, ease: 'easeOut' } }}
-          className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-background z-50 shadow-2xl flex flex-col overflow-hidden md:rounded-l-3xl"
+          className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-background z-[60] shadow-2xl flex flex-col overflow-hidden md:rounded-l-3xl"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Hero image */}
           <div
             className="relative h-56 bg-cover bg-center flex-shrink-0"
-            style={{ backgroundImage: point.coverImage ? `url(https://back.asturias.digitalmetaverso.com/assets/${point.coverImage})` : undefined }}
+            style={{ backgroundImage: point.coverImage ? `url(${import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com'}/assets/${point.coverImage})` : undefined }}
           >
             <div className="absolute inset-0 from-background via-background/40 to-transparent" />
             <button
               onClick={() => {
                 onClose();
-                window.history.pushState({}, '', '/routes/' + window.location.href.split('/')[4]);
               }}
               className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
             >
@@ -158,8 +160,42 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
           </div>
 
           <ScrollArea className="flex-1">
+            {/* Breadcrumb */}
+            {routeTitle && (
+              <div className="px-6 pt-3 pb-1">
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem>
+                      <BreadcrumbLink href="/" className="flex items-center gap-1 text-xs">
+                        <Home className="w-3 h-3" />
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbLink href="/routes" className="text-xs">
+                        {language === 'es' ? 'Rutas' : language === 'en' ? 'Routes' : 'Itinéraires'}
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      {onBackToRoute ? (
+                        <BreadcrumbLink href="#" onClick={(e) => { e.preventDefault(); onBackToRoute(); }} className="text-xs truncate max-w-[100px]">
+                          {routeTitle}
+                        </BreadcrumbLink>
+                      ) : (
+                        <span className="text-xs text-muted-foreground truncate max-w-[100px]">{routeTitle}</span>
+                      )}
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage className="text-xs truncate max-w-[120px]">{title}</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+              </div>
+            )}
             <div className="px-6 pt-3 space-y-1">
-              <h1 className="text-2xl font-serif font-bold">{title}</h1>
+              <h1 className="text-2xl font-bold">{title}</h1>
               {hasAR && arDescription && (
                 <p className="text-sm text-muted-foreground leading-relaxed">{arDescription}</p>
               )}
@@ -186,18 +222,6 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
 
                   <NeedleARViewer scene={arScene} locale={language as Language} />
 
-                  {isMobile && (
-                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                      <Button onClick={() => setShowARViewer(true)}
-                        className="w-full h-14 text-base font-bold bg-gradient-to-r from-warm to-amber-500 hover:from-warm/90 hover:to-amber-500/90 text-warm-foreground shadow-lg shadow-warm/25 border-0">
-                        <div className="flex items-center gap-3">
-                          <div className="p-1.5 bg-white/20 rounded-lg"><Smartphone className="w-5 h-5" /></div>
-                          <span>{t(texts.launchAR)}</span>
-                          <ExternalLink className="w-4 h-4" />
-                        </div>
-                      </Button>
-                    </motion.div>
-                  )}
 
                   <div className="bg-card border border-border rounded-xl p-4">
                     <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
@@ -244,13 +268,32 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                 </motion.div>
               )}
 
-              {has360 && (
+              {has360 && content.tour360?.iframe360Url && (
                 <div className="space-y-3">
                   <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2">
-                    <Camera className="w-4 h-4 text-primary" />Tour 360
+                    <Camera className="w-4 h-4 text-primary" />Tour 360°
                   </h3>
+                  {/* Inline 360 preview */}
+                  <div className="relative rounded-2xl overflow-hidden border border-border bg-black" style={{ minHeight: 250 }}>
+                    <iframe
+                      src={content.tour360.iframe360Url}
+                      className="w-full rounded-2xl"
+                      style={{ height: 250, border: 'none' }}
+                      allowFullScreen
+                      allow="xr-spatial-tracking; gyroscope; accelerometer"
+                      title="Tour 360"
+                    />
+                    <button
+                      onClick={() => window.open(content.tour360!.iframe360Url, '_blank')}
+                      className="absolute top-3 right-3 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors backdrop-blur-sm"
+                      aria-label="Fullscreen"
+                    >
+                      <Maximize2 className="w-4 h-4" />
+                    </button>
+                  </div>
                   <Button variant="outline" className="w-full justify-between" onClick={() => window.open(content.tour360!.iframe360Url, '_blank')}>
-                    {t(texts.open360)}<Maximize2 className="w-4 h-4" />
+                    <span className="flex items-center gap-2"><Camera className="w-4 h-4" />{t(texts.open360)}</span>
+                    <Maximize2 className="w-4 h-4" />
                   </Button>
                 </div>
               )}
@@ -278,7 +321,7 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
                 </div>
               )}
 
-              {!hasAR && (
+              {(content.gallery?.length || content.image) && (
                 <div className="space-y-3">
                   <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2">
                     <ImageIcon className="w-4 h-4 text-primary" />{t(texts.gallery)}
@@ -350,14 +393,6 @@ export function PointDetailSheet({ point, onClose }: PointDetailSheetProps) {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {showARViewer && arScene && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[70] bg-black">
-            <NeedleARViewer scene={arScene} locale={language as Language} onError={() => setShowARViewer(false)} />
-            <button onClick={() => setShowARViewer(false)} className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors z-[80]"><X className="w-5 h-5" /></button>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 }

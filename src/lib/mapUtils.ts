@@ -107,11 +107,13 @@ export const openNavigation = (lat: number, lng: number, name?: string): void =>
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   
   if (isIOS) {
-    // Apple Maps
-    openInNewTab(`maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=d${name ? `&q=${encodedName}` : ''}`);
+    // Apple Maps — use name as query near the coordinates so the place card appears
+    openInNewTab(`maps://maps.apple.com/?ll=${lat},${lng}&q=${encodedName || `${lat},${lng}`}`);
   } else {
-    // Google Maps
-    openInNewTab(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}${name ? `&destination_place_id=${encodedName}` : ''}`);
+    // Google Maps — use place name as query so Google resolves the business listing with photo
+    // Adding coordinates as a fallback in the name ensures nearby results
+    const query = name ? `${encodedName}+${lat},${lng}` : `${lat},${lng}`;
+    openInNewTab(`https://www.google.com/maps/search/?api=1&query=${query}`);
   }
 };
 

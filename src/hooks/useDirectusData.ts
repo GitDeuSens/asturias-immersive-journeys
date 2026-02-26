@@ -45,36 +45,38 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
     .map((poi: any, idx: number) => {
       const content: RoutePointContent = {};
 
-      // Map AR scene if linked
-      if (poi.ar_scene_id) {
-        // Extract slug from ar_launch_url (e.g. https://.../ar/Conjunto_valdedios → Conjunto_valdedios)
-        const arSlugFromUrl = poi.ar_launch_url
-          ? poi.ar_launch_url.split('/ar/').pop()?.split('?')[0] || undefined
-          : undefined;
+      // Map AR scene if linked (ar_scene_id is expanded object from Directus deep query)
+      const arScene = typeof poi.ar_scene_id === 'object' && poi.ar_scene_id ? poi.ar_scene_id : null;
+      if (arScene) {
+        const arSlug = (arScene as any).slug || '';
+        const buildPath = (arScene as any).build_path || '';
+        const baseUrl = window.location.origin;
         content.arExperience = {
-          launchUrl: poi.ar_launch_url || '',
-          qrValue: poi.ar_qr_value || '',
-          iframe3dUrl: poi.ar_iframe_url,
-          arSlug: poi.ar_slug || arSlugFromUrl,
+          launchUrl: arSlug ? `${baseUrl}/ar/${arSlug}` : '',
+          qrValue: arSlug ? `${baseUrl}/ar/${arSlug}` : '',
+          iframe3dUrl: buildPath || undefined,
+          arSlug,
         };
       }
 
-      // Map 360 tour if linked
-      if (poi.tour_360_id) {
+      // Map 360 tour if linked (tour_360_id is expanded object from Directus deep query)
+      const tour360 = typeof poi.tour_360_id === 'object' && poi.tour_360_id ? poi.tour_360_id : null;
+      if (tour360) {
+        const buildPath = (tour360 as any).build_path || '';
         content.tour360 = {
-          iframe360Url: poi.tour_360_url || '',
+          iframe360Url: buildPath,
           allowFullscreen: true,
         };
       }
 
-      if (poi.tour_360_id === null && poi.ar_scene_id === null && Array.isArray(poi.gallery)) {
+      if (Array.isArray(poi.gallery)) {
         const photos: {url: string}[] = [];
         poi.gallery.forEach((photo: any) => {
           if (photo?.directus_files_id) {
-            photos.push({url: 'https://back.asturias.digitalmetaverso.com/assets/' + photo.directus_files_id});
+            photos.push({url: DIRECTUS_URL + '/assets/' + photo.directus_files_id});
           }
         });
-        content.gallery = photos;
+        if (photos.length > 0) content.gallery = photos;
       }
 
       // Map practical info
@@ -89,8 +91,8 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       }
 
       // Map cover image
-      if (poi.cover_image_url) {
-        content.image = { url: poi.cover_image };
+      if (poi.cover_image) {
+        content.image = { url: getFileUrl(poi.cover_image) };
       }
 
       const lat = Number(poi.lat) || 0;
@@ -130,7 +132,10 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
 
   // Fallback: generate polyline from valid POI points (in order)
   if (polyline.length < 2 && routePoints.length >= 2) {
-    polyline = routePoints.map(p => ({ lat: p.location.lat, lng: p.location.lng }));
+    const validPoints = routePoints.filter(p => isValidCoord(p.location.lat, p.location.lng));
+    if (validPoints.length >= 2) {
+      polyline = validPoints.map(p => ({ lat: p.location.lat, lng: p.location.lng }));
+    }
   }
 
   // If only 1 point or 0 points, polyline stays empty — no line will be drawn
@@ -140,16 +145,20 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
 
   // Calculate center: prefer DB center_lat/center_lng, then polyline, then POI points
   let center = { lat: 43.36, lng: -5.85 }; // Default: Asturias center
+  let hasValidCenter = false;
   const dbCenterLat = Number(route.center_lat);
   const dbCenterLng = Number(route.center_lng);
   if (isValidCoord(dbCenterLat, dbCenterLng)) {
     center = { lat: dbCenterLat, lng: dbCenterLng };
+    hasValidCenter = true;
   } else {
-    const coordsForCenter = polyline.length > 0 ? polyline : routePoints.map(p => p.location);
+    const allCoords = polyline.length > 0 ? polyline : routePoints.map(p => p.location);
+    const coordsForCenter = allCoords.filter(p => isValidCoord(p.lat, p.lng));
     if (coordsForCenter.length > 0) {
       const sumLat = coordsForCenter.reduce((s, p) => s + p.lat, 0);
       const sumLng = coordsForCenter.reduce((s, p) => s + p.lng, 0);
       center = { lat: sumLat / coordsForCenter.length, lng: sumLng / coordsForCenter.length };
+      hasValidCenter = true;
     }
   }
 
@@ -165,9 +174,10 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
     difficulty: route.difficulty || 'easy',
     isCircular: route.is_circular ?? false,
     center,
+    hasValidCenter,
     maxPoints: points.length,
     points: routePoints,
-    tour360: route.tour_360_id ? { available: true } : undefined,
+    tour360: typeof route.tour_360_id === 'object' && route.tour_360_id ? { available: true } : undefined,
     polyline,
     distanceKm: route.distance_km,
     elevationGainMeters: route.elevation_gain_meters,

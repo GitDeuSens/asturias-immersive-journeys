@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Navigation, Footprints, Car, MapPin, Eye, Download } from 'lucide-react';
 import { NeedleARViewer } from '@/components/NeedleARViewer';
@@ -44,6 +45,7 @@ const texts = {
 };
 
 export function ARPointSheet({ arSlug, routeId, onClose }: ARPointSheetProps) {
+  const navigate = useNavigate();
   const { language: locale } = useLanguage();
   const lang = locale as Language;
   const { latitude, longitude, hasLocation } = useGeolocation();
@@ -62,9 +64,9 @@ export function ARPointSheet({ arSlug, routeId, onClose }: ARPointSheetProps) {
   const handleClose = () => {
     // Restore URL to route
     if (routeId) {
-      window.history.pushState({}, '', `/routes/${routeId}`);
+      navigate(`/routes/${routeId}`, { replace: true });
     } else {
-      window.history.back();
+      navigate(-1);
     }
     onClose();
   };

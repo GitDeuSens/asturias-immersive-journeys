@@ -5,6 +5,10 @@
   text-align: center;
 }
 
+:root {
+  color-scheme: light only;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -42,4 +46,11 @@
 }
 
 .panel-lateral {
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+      background-color: #fff; /* Fondo oscuro, no negro puro */
+      color: hsl(var(--foreground)); /* Texto claro */
+  }
 }

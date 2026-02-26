@@ -4,6 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: light only;
+}
+
 /* Asturias Inmersivo Design System
    Inspired by turismoasturias.es official branding
    Primary: Asturias Green #7AB800
@@ -459,4 +463,11 @@
 /* Leaflet zoom controls positioning */
 .leaflet-control-zoom {
   margin-bottom: 50px !important;
+}
+
+@media (min-width: 800px) {
+  .leaflet-control-zoom {
+    margin-bottom: 50px !important;
+    right: 520px;
+  }
 }

@@ -37,9 +37,10 @@ interface RouteDetailSheetProps {
   route: ImmersiveRoute | null;
   onClose: () => void;
   onEnterRoute: (route: ImmersiveRoute) => void;
+  onSelectPoint?: (point: RoutePoint) => void;
 }
 
-export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSheetProps) {
+export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }: RouteDetailSheetProps) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as 'es' | 'en' | 'fr';
   const { getCategoryById } = useDirectusCategories(lang);
@@ -68,9 +69,9 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
   const distance = route.distanceKm || calculatedDistance;
 
   const allFunctions = (route: ImmersiveRoute) => {
-    onEnterRoute(route);
     onClose();
-    window.history.pushState({}, '', '/routes/' + route.id);
+    onEnterRoute(route);
+    window.history.pushState({}, '/routes', `/routes/${route.id}`);
   }
 
   const surfaceLabels: Record<string, Record<string, string>> = {
@@ -89,12 +90,11 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
   const handleNavigateToStart = () => {
     if (route.polyline.length > 0) {
       const start = route.points[0].location;
-      console.log(' ruta ??? ', route);
       openNavigation(start.lat, start.lng, route.title[lang]);
     }
   };
 
-  console.log(' route ', route);
+
 
   return (
     <AnimatePresence>
@@ -103,8 +103,10 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50"
-        onClick={onClose}
+        className="fixed inset-0 z-[60]"
+        onClick={() => {
+          location.reload();
+        }}
         role="presentation"
       />
       <motion.div
@@ -120,7 +122,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
           opacity: { duration: 0.2, ease: 'easeOut' }
         }}
         style={{ width: '100%' }}
-        className="fixed right-0 top-0 bottom-0 max-w-lg bg-background z-50 shadow-2xl flex flex-col overflow-hidden"
+        className="fixed right-0 top-0 bottom-0 max-w-lg bg-background z-[60] shadow-2xl flex flex-col overflow-hidden"
         onClick={(e) => {
           e.stopPropagation();
         }}
@@ -139,15 +141,10 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
 
           {/* Close button */}
           <button
-            onClick={() => {
-              onClose();
-              location.reload();
-            }
-            }
             className="absolute top-4 right-4 p-2 rounded-full bg-background/80 backdrop-blur-sm text-foreground hover:bg-background transition-colors focus:outline-none focus:ring-2 focus:ring-primary shadow-lg"
             aria-label={t('common.close')}
           >
-            <X className="w-5 h-5" />
+            <a href='/routes'> <X className="w-5 h-5" /></a>
           </button>
 
           {/* Route ID */}
@@ -162,7 +159,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
         <ScrollArea className="flex-1">
           {/* Bottom info */}
           <div className="pl-6 pt-3">
-            <h1 id="route-detail-title" className="text-2xl font-serif font-bold mb-1">
+            <h1 id="route-detail-title" className="text-2xl font-bold mb-1">
               {route.title[lang]}
             </h1>
             <p className="text-sm font-medium">
@@ -262,8 +259,8 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
                 const cat = getCategoryById(catId);
                 const IconComponent = iconMap[cat?.icon] || Tag;
                 return cat ? (
-                  <span className="px-2 py-2 border text-base" style={{ borderRadius: '300px' }}>
-                    <IconComponent className="w-8 h-8 text-base" />
+                  <span className="px-1.5 py-1.5 border text-xs" style={{ borderRadius: '300px' }}>
+                    <IconComponent className="w-4 h-4" />
                   </span>
                 ) : null;
               })}
@@ -288,7 +285,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute }: RouteDetailSh
                 </h3>
                 <div className="space-y-4">
                   {route.points.map((point, idx) => (
-                    <PointPreviewCard key={point.id} point={point} index={idx} lang={lang} />
+                    <PointPreviewCard key={point.id} point={point} index={idx} lang={lang} onClick={() => onSelectPoint?.(point)} />
                   ))}
                   {route.points.length > 3 && (
                     <p className="text-xs text-muted-foreground text-center py-2">
@@ -323,14 +320,14 @@ function getText(value: any, lang: string): string {
   return value[lang] || value.es || value.en || '';
 }
 
-function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: number; lang: any }) {
+function PointPreviewCard({ point, index, lang, onClick }: { point: RoutePoint; index: number; lang: any; onClick?: () => void }) {
   const content = point.content;
   const hasAR = !!content.arExperience;
   const has360 = !!content.tour360;
   const hasVideo = !!content.video;
   const hasAudio = !!content.audioGuide;
   const hasPDF = !!content.pdf;
-  const pointTitle = point.title;
+  const pointTitle = getText(point.title, lang);
   const primaryType = hasAR ? 'ar' : has360 ? '360' : 'info';
   const typeColors = {
     ar: { bg: 'bg-warm', text: 'text-warm', border: 'border-warm' },
@@ -340,14 +337,14 @@ function PointPreviewCard({ point, index, lang }: { point: RoutePoint; index: nu
   const colors = typeColors[primaryType];
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50" style={{ width: '100%' }}>
+    <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50 cursor-pointer hover:bg-muted/50 transition-colors" style={{ width: '100%' }} onClick={onClick}>
       {/* Thumbnail */}
       <div className="relative flex-shrink-0">
         <div
           className="w-12 h-12 rounded-lg bg-cover bg-center border-2 border-primary/30"
-          style={{ backgroundImage: point.coverImage ? `url(https://back.asturias.digitalmetaverso.com/assets/${point.coverImage})` : undefined }}
+          style={{ backgroundImage: point.coverImage ? `url(${import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com'}/assets/${point.coverImage})` : undefined }}
           role="img"
-          aria-label={pointTitle}
+          aria-label={typeof pointTitle === 'string' ? pointTitle : (pointTitle as any)?.es || ''}
         />
         <div className={`absolute -top-2 -right-2 w-6 h-6 ${colors.bg} rounded-full flex items-center justify-center text-xs font-bold text-white border-2 border-white shadow-sm`}>
           {index + 1}
