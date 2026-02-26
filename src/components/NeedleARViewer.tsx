@@ -112,7 +112,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
               if (DeviceUtilities.isiOS()) {
                 if (DeviceUtilities.isNeedleAppClip && DeviceUtilities.isNeedleAppClip()) {
                   console.log('[NeedleARViewer] iOS AppClip detected, autostarting AR');
-                  setTimeout(() => tryStartAR(), 100);
+                  setTimeout(() => tryStartAR(), 0);
                 } else {
                   console.log('[NeedleARViewer] iOS Safari detected, skipping autostart');
                 }
@@ -122,7 +122,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
               // On Android: autostart immediately
               if (DeviceUtilities.isAndroidDevice()) {
                 console.log('[NeedleARViewer] Android detected, autostarting AR');
-                setTimeout(() => tryStartAR(), 100);
+                setTimeout(() => tryStartAR(), 0);
                 return;
               }
               
@@ -130,7 +130,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
               console.log('[NeedleARViewer] Desktop detected, skipping autostart');
             } catch (e) {
               console.warn('[NeedleARViewer] DeviceUtilities not available, falling back to autostart', e);
-              setTimeout(() => tryStartAR(), 100);
+              setTimeout(() => tryStartAR(), 0);
             }
           };
 

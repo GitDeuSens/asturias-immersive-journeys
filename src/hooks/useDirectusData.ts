@@ -99,7 +99,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       const lng = Number(poi.lng) || 0;
       // TODO meter gallery aqui
       return {
-        id: poi.id || poi.slug || `point-${idx}`,
+        id: poi.slug || poi.id || `point-${idx}`, // Use slug first for clean URLs
         order: poi.order ?? idx + 1,
         title: toMultilingual(poi.translations, 'title') || { es: '', en: '', fr: '' },
         shortDescription: toMultilingual(poi.translations, 'short_description') || { es: '', en: '', fr: '' },

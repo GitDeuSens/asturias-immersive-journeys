@@ -477,7 +477,7 @@ export class AsturiasAROverlay extends Behaviour {
                 if (DeviceUtilities.isNeedleAppClip && DeviceUtilities.isNeedleAppClip()) {
                     // We're in an AppClip - autostart is safe
                     console.log('[AsturiasAROverlay] iOS AppClip detected, autostarting AR');
-                    setTimeout(() => this._startAR(), 100);
+                    setTimeout(() => this._startAR(), 0);
                 } else {
                     // Regular Safari - show pre-panel, user must tap AR button
                     console.log('[AsturiasAROverlay] iOS Safari detected, showing AR button instead of autostart');
@@ -489,7 +489,7 @@ export class AsturiasAROverlay extends Behaviour {
             // On Android: autostart immediately (WebXR works)
             if (DeviceUtilities.isAndroidDevice()) {
                 console.log('[AsturiasAROverlay] Android detected, autostarting AR');
-                setTimeout(() => this._startAR(), 100);
+                setTimeout(() => this._startAR(), 0);
                 return;
             }
             
@@ -498,7 +498,7 @@ export class AsturiasAROverlay extends Behaviour {
             this._showPrePanel();
         } catch (e) {
             console.warn('[AsturiasAROverlay] DeviceUtilities not available, falling back to autostart', e);
-            setTimeout(() => this._startAR(), 100);
+            setTimeout(() => this._startAR(), 0);
         }
     }
 
