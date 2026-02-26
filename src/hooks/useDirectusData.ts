@@ -18,7 +18,7 @@ import { toMultilingual } from "@/lib/directus-types";
 import { logger } from "@/lib/logger";
 import { dataCache } from "./useCachedData";
 
-const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'http://localhost:8055';
+const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
 
 function getFileUrl(fileId: string | undefined): string {
   if (!fileId) return '';

@@ -13,10 +13,9 @@ import { loadDirectusTranslations } from '@/i18n/directus-backend';
 import './index.css';
 import './generated/register_types';
 
-// ─── Needle Engine: preload ──────────────────────────────────────────────────
-// Components (AsturiasAROverlay, ModelLoading etc.) are auto-registered via
-// src/generated/register_types.ts which Needle generates from Unity export.
-import("@needle-tools/engine");
+// ─── Needle Engine ──────────────────────────────────────────────────────────
+// Needle Engine is loaded lazily by NeedleARViewer and ARScenePage components.
+// No global preload — saves ~2-3MB for users who don't visit AR pages.
 
 // Load CMS-managed translations (merges over bundled fallbacks)
 loadDirectusTranslations().catch(err => {

@@ -1,4 +1,4 @@
-﻿import { useState, useMemo, useEffect, useRef } from 'react';
+﻿import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MapPin, Camera, Play, FileText, Headphones, Smartphone, ExternalLink, ChevronRight, Maximize2, Sparkles, Image as ImageIcon, Phone, Mail, Globe, Clock, Euro, Info, Navigation, Footprints, Car, Eye, Download, Share2, Home } from 'lucide-react';
 import type { RoutePoint } from '@/data/types';
@@ -70,17 +70,31 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
   const [showARViewer, setShowARViewer] = useState(false);
   const [selectedGalleryImage, setSelectedGalleryImage] = useState<string | null>(null);
   const [loadedARScene, setLoadedARScene] = useState<ARScene | null>(null);
+  const [arSceneError, setArSceneError] = useState<string | null>(null);
+  const [arSceneLoading, setArSceneLoading] = useState(false);
   const poiStartTime = useRef<number>(Date.now());
   const prevUrlRef = useRef<string>(window.location.pathname);
 
-  useEffect(() => {
+  const loadARScene = useCallback(async () => {
     if (!point?.content?.arExperience) return;
-    getARScenesByPOI(point.id, language as Language).then(scenes => {
+    setArSceneLoading(true);
+    setArSceneError(null);
+    try {
+      const scenes = await getARScenesByPOI(point.id, language as Language);
       if (scenes.length > 0) {
         setLoadedARScene(scenes[0]);
       }
-    });
+    } catch (err: any) {
+      console.error('[PointDetailSheet] Failed to load AR scene:', err);
+      setArSceneError(err?.message || 'Failed to load AR scene');
+    } finally {
+      setArSceneLoading(false);
+    }
   }, [point?.id, point?.content?.arExperience, language]);
+
+  useEffect(() => {
+    loadARScene();
+  }, [loadARScene]);
 
   useEffect(() => {
     return () => {
@@ -251,7 +265,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                     <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                       <Share2 className="w-4 h-4 text-primary" />{t(texts.shareExperience)}
                     </h4>
-                    <ShareButtons url={window.location.href} title={arTitle} description={arDescription} variant="inline" />
+                    <ShareButtons url={arScene?.slug ? `${window.location.origin}/ar/${arScene.slug}` : window.location.href} title={arTitle} description={arDescription} variant="inline" />
                   </div>
                 </motion.div>
               )}
@@ -262,9 +276,24 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                     <div className="p-2 rounded-lg bg-warm/20"><Smartphone className="w-5 h-5 text-warm" /></div>
                     <h3 className="text-base font-semibold text-foreground">{t(texts.arExperience)}</h3>
                   </div>
-                  <div className="flex items-center justify-center p-8 bg-muted/30 rounded-xl">
-                    <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                  </div>
+                  {arSceneError ? (
+                    <div className="flex flex-col items-center gap-3 p-6 bg-destructive/5 border border-destructive/20 rounded-xl">
+                      <Info className="w-6 h-6 text-destructive" />
+                      <p className="text-sm text-muted-foreground text-center">
+                        {language === 'es' ? 'No se pudo cargar la experiencia AR' : language === 'en' ? 'Could not load AR experience' : 'Impossible de charger l\'expérience AR'}
+                      </p>
+                      <button
+                        onClick={loadARScene}
+                        className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+                      >
+                        {language === 'es' ? 'Reintentar' : language === 'en' ? 'Retry' : 'Réessayer'}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center p-8 bg-muted/30 rounded-xl">
+                      <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
                 </motion.div>
               )}
 
@@ -284,14 +313,14 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                       title="Tour 360"
                     />
                     <button
-                      onClick={() => window.open(content.tour360!.iframe360Url, '_blank')}
+                      onClick={() => window.open(content.tour360!.iframe360Url, '_blank', 'noopener,noreferrer')}
                       className="absolute top-3 right-3 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors backdrop-blur-sm"
                       aria-label="Fullscreen"
                     >
                       <Maximize2 className="w-4 h-4" />
                     </button>
                   </div>
-                  <Button variant="outline" className="w-full justify-between" onClick={() => window.open(content.tour360!.iframe360Url, '_blank')}>
+                  <Button variant="outline" className="w-full justify-between" onClick={() => window.open(content.tour360!.iframe360Url, '_blank', 'noopener,noreferrer')}>
                     <span className="flex items-center gap-2"><Camera className="w-4 h-4" />{t(texts.open360)}</span>
                     <Maximize2 className="w-4 h-4" />
                   </Button>
@@ -303,17 +332,17 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                   <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">{t(texts.contentAvailable)}</h3>
                   <div className="space-y-2">
                     {hasVideo && (
-                      <Button variant="outline" className="w-full justify-between" onClick={() => window.open(content.video!.url, '_blank')}>
+                      <Button variant="outline" className="w-full justify-between" onClick={() => window.open(content.video!.url, '_blank', 'noopener,noreferrer')}>
                         <span className="flex items-center gap-2"><Play className="w-4 h-4" />{t(texts.playVideo)}</span><ChevronRight className="w-4 h-4" />
                       </Button>
                     )}
                     {hasAudio && content.audioGuide?.[language as keyof typeof content.audioGuide] && (
-                      <Button variant="outline" className="w-full justify-between" onClick={() => window.open(content.audioGuide![language as keyof typeof content.audioGuide]!.url, '_blank')}>
+                      <Button variant="outline" className="w-full justify-between" onClick={() => window.open(content.audioGuide![language as keyof typeof content.audioGuide]!.url, '_blank', 'noopener,noreferrer')}>
                         <span className="flex items-center gap-2"><Headphones className="w-4 h-4" />{t(texts.listenAudio)}</span><ChevronRight className="w-4 h-4" />
                       </Button>
                     )}
                     {hasPDF && (
-                      <Button variant="outline" className="w-full justify-between" onClick={() => window.open(content.pdf!.url, '_blank')}>
+                      <Button variant="outline" className="w-full justify-between" onClick={() => window.open(content.pdf!.url, '_blank', 'noopener,noreferrer')}>
                         <span className="flex items-center gap-2"><FileText className="w-4 h-4" />{t(texts.downloadPDF)}</span><ChevronRight className="w-4 h-4" />
                       </Button>
                     )}

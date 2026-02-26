@@ -109,6 +109,17 @@ function t(key: string, lang: string): string {
     return T[key]?.[lang] ?? T[key]?.['es'] ?? key;
 }
 
+/** Escape user/CMS-provided strings before inserting into innerHTML to prevent XSS */
+function escapeHtml(str: string): string {
+    if (!str) return '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // DIRECTUS HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
@@ -117,7 +128,7 @@ function getDirectusUrl(): string {
     // Try to read from window (set by React app) or fallback
     return (window as any).__DIRECTUS_URL
         ?? (window as any).VITE_DIRECTUS_URL
-        ?? 'http://192.168.12.71:8055';
+        ?? 'https://back.asturias.digitalmetaverso.com';
 }
 
 function getAssetUrl(uuid: string): string {
@@ -322,17 +333,17 @@ async start() {
     }
 
     private _getTitle(): string {
-        if (!this._sceneInfo) return this._slug;
+        if (!this._sceneInfo) return escapeHtml(this._slug);
         const t = this._sceneInfo.title;
-        if (typeof t === 'string') return t;
-        return t?.[this._lang] ?? t?.['es'] ?? this._slug;
+        if (typeof t === 'string') return escapeHtml(t);
+        return escapeHtml(t?.[this._lang] ?? t?.['es'] ?? this._slug);
     }
 
     private _getDescription(): string {
         const d = this._sceneInfo?.description;
         if (!d) return '';
-        if (typeof d === 'string') return d;
-        return d?.[this._lang] ?? d?.['es'] ?? '';
+        if (typeof d === 'string') return escapeHtml(d);
+        return escapeHtml(d?.[this._lang] ?? d?.['es'] ?? '');
     }
 
     private _hasAudio(): boolean {

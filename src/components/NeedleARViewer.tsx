@@ -63,7 +63,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
     && new URLSearchParams(window.location.search).get('autostart') === '1';
 
   useEffect(() => {
-    (window as any).__DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL ?? 'http://192.168.12.71:8055';
+    (window as any).__DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL ?? 'https://back.asturias.digitalmetaverso.com';
   }, []);
 
   useEffect(() => {
@@ -103,17 +103,24 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
 
         // Auto-trigger AR session if ?autostart=1 (from QR scan)
         // AsturiasAROverlay also attempts autostart at 300ms; this is a backup.
-        // Browser will show camera/XR permission popup — this is expected.
         if (autostart) {
-          const tryStartAR = async () => {
+          const tryStartAR = async (): Promise<boolean> => {
+            try {
+              // Preferred: NeedleXRSession.start — official Needle Engine API
+              const { NeedleXRSession, Context } = await import('@needle-tools/engine');
+              const ctx = Context.Current;
+              if (NeedleXRSession && ctx) {
+                await NeedleXRSession.start("immersive-ar", undefined, ctx);
+                return true;
+              }
+            } catch {}
             try {
               const { WebXRButtonFactory } = await import('@needle-tools/engine');
               const factory = WebXRButtonFactory.getOrCreate();
               if (factory?.arButton) { factory.arButton.click(); return true; }
             } catch {}
             const btn = document.querySelector('[ar-button]') as HTMLElement
-              ?? document.querySelector('needle-button[ar]') as HTMLElement
-              ?? (el as any)?.shadowRoot?.querySelector('[ar-button]') as HTMLElement;
+              ?? document.querySelector('needle-button[ar]') as HTMLElement;
             if (btn) { btn.click(); return true; }
             return false;
           };
@@ -231,7 +238,7 @@ export function NeedleARViewer({ scene, locale = 'es', onStart, onError }: Needl
       {scene.needle_type === 'geo' && scene.location && (
         <Button onClick={() => {
           if (!scene.location) return;
-          window.open(`https://www.google.com/maps/dir/?api=1&destination=${scene.location.lat},${scene.location.lng}`, '_blank');
+          window.open(`https://www.google.com/maps/dir/?api=1&destination=${scene.location.lat},${scene.location.lng}`, '_blank', 'noopener,noreferrer');
           trackEvent('ar_navigation_opened', { ar_id: scene.id });
         }} variant="outline" className="w-full">
           <MapPin className="w-4 h-4 mr-2" />{texts.goToLocation[locale]}

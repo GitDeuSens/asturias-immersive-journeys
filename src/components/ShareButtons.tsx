@@ -87,7 +87,7 @@ export function ShareButtons({
 
   const handleShare = (platform: keyof typeof shareLinks) => {
     trackShare(platform, 'content', url || window.location.pathname);
-    window.open(shareLinks[platform], '_blank', 'width=600,height=400');
+    window.open(shareLinks[platform], '_blank', 'noopener,noreferrer,width=600,height=400');
   };
 
   if (variant === 'inline') {

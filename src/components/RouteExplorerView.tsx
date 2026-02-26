@@ -31,7 +31,6 @@ import {
   formatTime,
   type NavigationDestination
 } from '@/lib/navigationService';
-import { useNavigate } from 'react-router-dom';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -62,7 +61,6 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   const { latitude, longitude, hasLocation } = useGeolocation();
   const [visitedPoints, setVisitedPoints] = useState<Set<string>>(new Set());
   const [routeStartTime] = useState(Date.now());
-  const navigate = useNavigate();
 
   const progress = route.points.length > 0
     ? Math.round((visitedPoints.size / route.points.length) * 100)
@@ -145,7 +143,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
             <BreadcrumbItem>
               <BreadcrumbLink
                 href="#"
-                onClick={(e) => { e.preventDefault(); onBack(); navigate('/routes'); }}
+                onClick={(e) => { e.preventDefault(); onBack(); }}
                 className="text-xs"
               >
                 {t('routes.title')}
@@ -174,7 +172,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
       {/* Header */}
       <div className="p-4 border-b border-border/50 space-y-3">
         <button
-          onClick={() => { onBack(); navigate('/routes'); }}
+          onClick={onBack}
           className="flex items-center gap-2 text-sm text-primary font-medium hover:text-primary/80 transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -230,7 +228,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
             >
               <p className="text-sm font-bold text-primary mb-1">🎉 {t('routes.congratulations')}</p>
               <p className="text-xs text-muted-foreground mb-2">{t('routes.visitOtherRoutes')}</p>
-              <Button size="sm" onClick={() => { onBack(); navigate('/routes'); }} className="text-xs">
+              <Button size="sm" onClick={onBack} className="text-xs">
                 {t('routes.exploreMore')}
               </Button>
             </motion.div>
@@ -364,10 +362,6 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
           style={{ width: '100%' }}
           transition={{ delay: index * 0.04, duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
           onClick={() => {
-            const arSlug = point.content.arExperience?.arSlug;
-            if (arSlug) {
-              window.history.pushState({ fromRoute: routeId }, '', `/ar/${arSlug}`);
-            }
             onClick();
           }}
           className={`flex-1 mb-3 rounded-xl overflow-hidden transition-all text-left border ${

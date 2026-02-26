@@ -137,8 +137,9 @@ export function useLCPOptimization() {
 export function ResourceOptimizer() {
   useEffect(() => {
     // Add DNS prefetch for external domains
+    const directusHost = new URL(import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com').host;
     const domains = [
-      'localhost:8055',
+      directusHost,
       'fonts.googleapis.com',
       'fonts.gstatic.com'
     ];
@@ -151,11 +152,11 @@ export function ResourceOptimizer() {
     });
 
     // Add preconnect for critical domains
-    const preconnectDomains = ['localhost:8055'];
-    preconnectDomains.forEach(domain => {
+    const preconnectDomains = [import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com'];
+    preconnectDomains.forEach(url => {
       const link = document.createElement('link');
       link.rel = 'preconnect';
-      link.href = `http://${domain}`;
+      link.href = url;
       document.head.appendChild(link);
     });
 

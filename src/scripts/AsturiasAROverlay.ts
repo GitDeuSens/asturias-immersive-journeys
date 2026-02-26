@@ -109,6 +109,17 @@ function t(key: string, lang: string): string {
     return T[key]?.[lang] ?? T[key]?.['es'] ?? key;
 }
 
+/** Escape user/CMS-provided strings before inserting into innerHTML to prevent XSS */
+function escapeHtml(str: string): string {
+    if (!str) return '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // DIRECTUS HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
@@ -117,7 +128,7 @@ function getDirectusUrl(): string {
     // Try to read from window (set by React app) or fallback
     return (window as any).__DIRECTUS_URL
         ?? (window as any).VITE_DIRECTUS_URL
-        ?? 'http://192.168.12.71:8055';
+        ?? 'https://back.asturias.digitalmetaverso.com';
 }
 
 function getAssetUrl(uuid: string): string {
@@ -231,10 +242,17 @@ export class AsturiasAROverlay extends Behaviour {
             this._sceneInfo = await fetchSceneInfo(this._slug);
         }
 
-        // Add ?autostart=1 so QR scan triggers AR immediately without showing the launch button
-        const url = new URL(window.location.href);
-        url.searchParams.set('autostart', '1');
-        this._arUrl = url.toString();
+        // Build the AR URL for QR codes: always use /ar/{slug} path, not current page URL
+        // This ensures QR codes generated inside /routes sheets point to the correct AR page
+        if (this._slug) {
+            const arUrl = new URL(`${window.location.origin}/ar/${this._slug}`);
+            arUrl.searchParams.set('autostart', '1');
+            this._arUrl = arUrl.toString();
+        } else {
+            const url = new URL(window.location.href);
+            url.searchParams.set('autostart', '1');
+            this._arUrl = url.toString();
+        }
 
         this._buildPreARPanel();
 
@@ -417,17 +435,17 @@ export class AsturiasAROverlay extends Behaviour {
     }
 
     private _getTitle(): string {
-        if (!this._sceneInfo) return this._slug;
+        if (!this._sceneInfo) return escapeHtml(this._slug);
         const t = this._sceneInfo.title;
-        if (typeof t === 'string') return t;
-        return t?.[this._lang] ?? t?.['es'] ?? this._slug;
+        if (typeof t === 'string') return escapeHtml(t);
+        return escapeHtml(t?.[this._lang] ?? t?.['es'] ?? this._slug);
     }
 
     private _getDescription(): string {
         const d = this._sceneInfo?.description;
         if (!d) return '';
-        if (typeof d === 'string') return d;
-        return d?.[this._lang] ?? d?.['es'] ?? '';
+        if (typeof d === 'string') return escapeHtml(d);
+        return escapeHtml(d?.[this._lang] ?? d?.['es'] ?? '');
     }
 
     private _hasAudio(): boolean {
@@ -451,19 +469,21 @@ export class AsturiasAROverlay extends Behaviour {
 
     private async _startAR() {
         try {
-            // Try Needle's WebXRButtonFactory first (Android WebXR + desktop)
+            // Preferred: use NeedleXRSession.start("immersive-ar") — the official Needle Engine API
+            const { NeedleXRSession, Context } = await import('@needle-tools/engine');
+            const ctx = Context.Current;
+            if (NeedleXRSession && ctx) {
+                await NeedleXRSession.start("immersive-ar", undefined, ctx);
+                return;
+            }
+        } catch (e) {
+            console.warn('[AsturiasAROverlay] NeedleXRSession.start failed, trying fallbacks', e);
+        }
+        try {
+            // Fallback: WebXRButtonFactory button click (older Needle versions)
             const factory = WebXRButtonFactory.getOrCreate();
             if (factory.arButton) {
                 factory.arButton.click();
-                return;
-            }
-        } catch {}
-        try {
-            // iOS AppClips / fallback: trigger via needle-engine context directly
-            const { Context } = await import('@needle-tools/engine');
-            const ctx = Context.Current;
-            if (ctx && typeof (ctx as any).startAR === 'function') {
-                await (ctx as any).startAR();
                 return;
             }
         } catch {}

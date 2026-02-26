@@ -1,17 +1,14 @@
 // ============ DIRECTUS API CLIENT ============
-import { createDirectus, rest, staticToken, readItems, readItem, createItem } from '@directus/sdk';
+import { createDirectus, rest, readItems, readItem, createItem } from '@directus/sdk';
 import type { KuulaTour, ARScene, Museum, SearchResults, VRExperience, Language } from '@/lib/types';
 import type { DirectusSchema, DirectusMuseum, DirectusTour360, DirectusARScene, DirectusRoute, DirectusPOI, DirectusVRExperience } from '@/lib/directus-types';
 import { toMultilingual } from '@/lib/directus-types';
 import { logger } from "@/lib/logger";
 import { API_CONFIG } from "@/constants/api";
 
-const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'http://localhost:8055';
-const DIRECTUS_TOKEN = import.meta.env.VITE_DIRECTUS_TOKEN;
+const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
 
-const directusClient = DIRECTUS_TOKEN
-  ? createDirectus<DirectusSchema>(DIRECTUS_URL).with(staticToken(DIRECTUS_TOKEN)).with(rest())
-  : createDirectus<DirectusSchema>(DIRECTUS_URL).with(rest());
+const directusClient = createDirectus<DirectusSchema>(DIRECTUS_URL).with(rest());
 
 const TRANSLATIONS_DEEP: any[] = ['translations.*'];
 

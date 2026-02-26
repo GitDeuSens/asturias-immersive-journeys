@@ -236,7 +236,7 @@ export const trackSessionEnd = () => {
     created_at: new Date().toISOString(),
   };
 
-  const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'http://localhost:8055';
+  const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
   const BASE_URL = import.meta.env.DEV ? '/directus-api' : DIRECTUS_URL;
   const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
   navigator.sendBeacon(`${BASE_URL}/items/analytics_events`, blob);
