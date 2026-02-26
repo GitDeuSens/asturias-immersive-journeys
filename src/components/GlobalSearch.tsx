@@ -301,7 +301,7 @@ export function GlobalSearch({
   const defaultPlaceholder = isLocalMode ? texts.placeholderLocal[locale] : texts.placeholder[locale];
 
   return (
-    <div className="relative w-full">
+    <div className="relative">
       {/* Search input */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -316,7 +316,7 @@ export function GlobalSearch({
             else if (!isLocalMode && query.length >= 2) setShowDropdown(true);
           }}
           placeholder={placeholder || defaultPlaceholder}
-          className="pl-10 pr-10 h-12 text-base bg-background border-border"
+          className="w-auto pl-10 pr-10 h-12 text-base bg-background border-border"
         />
         {query && (
           <Button

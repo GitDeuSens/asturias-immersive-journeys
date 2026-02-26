@@ -16,6 +16,7 @@
 
 /* Accessibility: Global focus and motion */
 @layer base {
+
   /* Focus visible for keyboard navigation */
   :focus-visible {
     outline: 3px solid hsl(79, 100%, 36%);
@@ -24,6 +25,7 @@
 
   /* Reduced motion preference */
   @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
@@ -47,7 +49,15 @@
   background-color: #C2634C;
 }
 
+.bg-360-10 {
+  background-color: #C2634C1a;
+}
+
 .text-360 {
+  color: #C2634C;
+}
+
+.border-360 {
   color: #C2634C;
 }
 
@@ -76,11 +86,13 @@
     --muted-foreground: 210 11% 45%;
 
     /* Accent - Azul institucional Asturias */
-    --accent: 203 100% 32%; /* #0066A1 */
+    --accent: 203 100% 32%;
+    /* #0066A1 */
     --accent-foreground: 0 0% 100%;
 
     /* Warm - Amarillo Asturias (escudo) */
-    --warm: 48 100% 50%; /* #FFD100 */
+    --warm: 48 100% 50%;
+    /* #FFD100 */
     --warm-foreground: 210 11% 15%;
 
     --destructive: 0 70% 50%;
@@ -93,9 +105,12 @@
     --radius: 0.75rem;
 
     /* Custom Asturias tokens - Paleta oficial */
-    --asturias-green: 79 100% 36%; /* #7AB800 */
-    --asturias-blue: 203 100% 32%; /* #0066A1 Azul institucional */
-    --asturias-yellow: 48 100% 50%; /* #FFD100 Amarillo escudo */
+    --asturias-green: 79 100% 36%;
+    /* #7AB800 */
+    --asturias-blue: 203 100% 32%;
+    /* #0066A1 Azul institucional */
+    --asturias-yellow: 48 100% 50%;
+    /* #FFD100 Amarillo escudo */
     --asturias-dark: 210 20% 20%;
     --asturias-stone: 30 20% 55%;
     --asturias-cream: 45 30% 97%;
@@ -188,6 +203,7 @@
 }
 
 @layer components {
+
   /* Official Asturias header bar */
   .header-bar {
     @apply fixed -top-3 left-0 right-0 z-50 bg-white shadow-sm;
@@ -365,21 +381,26 @@
 
 /* Hide scrollbar but keep scroll functionality */
 * {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
 }
 
 *::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
+  /* Chrome, Safari, Opera */
 }
 
 @layer utilities {
+
   /* Animation keyframes */
   @keyframes fade-up {
     from {
       opacity: 0;
       transform: translateY(30px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -391,6 +412,7 @@
       opacity: 0;
       transform: scale(0.95);
     }
+
     to {
       opacity: 1;
       transform: scale(1);
@@ -401,16 +423,19 @@
     from {
       transform: translateY(100%);
     }
+
     to {
       transform: translateY(0);
     }
   }
 
   @keyframes pulse-gentle {
+
     0%,
     100% {
       opacity: 1;
     }
+
     50% {
       opacity: 0.7;
     }
@@ -435,15 +460,19 @@
   .animation-delay-100 {
     animation-delay: 100ms;
   }
+
   .animation-delay-200 {
     animation-delay: 200ms;
   }
+
   .animation-delay-300 {
     animation-delay: 300ms;
   }
+
   .animation-delay-400 {
     animation-delay: 400ms;
   }
+
   .animation-delay-500 {
     animation-delay: 500ms;
   }
@@ -469,5 +498,80 @@
   .leaflet-control-zoom {
     margin-bottom: 50px !important;
     right: 520px;
+  }
+
+  .initial-buttons {
+    display: flex;
+    padding: 48px 36px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 24px;
+    flex: 1 0 0;
+    align-self: stretch;
+    backdrop-filter: blur(25px);
+  }
+
+  .initial-title {
+    margin-top: 6rem;
+  }
+
+  .icons {
+    width: 4rem;
+    height: 4rem;
+  }
+
+  .experience-buttons {
+    display: flex;
+    padding: 48px 36px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 24px;
+    flex: 1 0 0;
+    align-self: stretch;
+    backdrop-filter: blur(25px);
+  }
+}
+
+@media (max-width: 790px) {
+  .initial-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 8px;
+    backdrop-filter: blur(25px);
+  }
+
+  .initial-title {
+    margin-top: 9rem;
+  }
+
+  .icons {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .experience-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 8px;
+    backdrop-filter: blur(25px);
+  }
+
+  .experiences-container {
+    height: 115vh;
+    overflow: scroll;
+
+    h1 {
+      font-size: 30px;
+    }
+
+    .description {
+      font-weight: lighter;
+    }
   }
 }

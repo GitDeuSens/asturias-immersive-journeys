@@ -75,6 +75,7 @@ const resources = {
       "routes.visitOtherRoutes": "Has completado esta ruta. ¡Visita otras rutas!",
       "routes.exploreMore": "Explorar más rutas",
       "routes.nextPoint": "Siguiente punto",
+      "routes.visitPoint": "Visitar punto",
 
       // Difficulty
       "difficulty.easy": "Fácil",
@@ -131,7 +132,7 @@ const resources = {
       "navigation.chooseMode": "Elige cómo llegar",
       "navigation.fromYourLocation": "Desde tu ubicación",
       "navigation.nearestPoint": "Punto más cercano",
-      "navigation.startHere": "Empezar aquí",
+      "navigation.startHere": "Visitar punto",
       "navigation.nearYou": "Cerca de ti",
       "navigation.withinRadius": "en un radio de",
       "navigation.noLocation": "Activa tu ubicación para ver qué tienes cerca",
@@ -307,6 +308,7 @@ const resources = {
       "routes.visitOtherRoutes": "You completed this route. Visit other routes!",
       "routes.exploreMore": "Explore more routes",
       "routes.nextPoint": "Next point",
+      "routes.visitPoint": "Visit point",
 
       // Difficulty
       "difficulty.easy": "Easy",
@@ -363,7 +365,7 @@ const resources = {
       "navigation.chooseMode": "Choose how to get there",
       "navigation.fromYourLocation": "From your location",
       "navigation.nearestPoint": "Nearest point",
-      "navigation.startHere": "Start here",
+      "navigation.startHere": "Visit point",
       "navigation.nearYou": "Near you",
       "navigation.withinRadius": "within",
       "navigation.noLocation": "Enable location to see what's nearby",
@@ -539,6 +541,7 @@ const resources = {
       "routes.visitOtherRoutes": "Vous avez terminé cet itinéraire. Visitez d'autres itinéraires !",
       "routes.exploreMore": "Explorer plus d'itinéraires",
       "routes.nextPoint": "Point suivant",
+      "routes.visitPoint": "Point de visite",
 
       // Difficulty
       "difficulty.easy": "Facile",
@@ -596,7 +599,7 @@ const resources = {
       "navigation.chooseMode": "Choisissez comment y aller",
       "navigation.fromYourLocation": "Depuis votre position",
       "navigation.nearestPoint": "Point le plus proche",
-      "navigation.startHere": "Commencer ici",
+      "navigation.startHere": "Point de visite",
       "navigation.nearYou": "Près de vous",
       "navigation.withinRadius": "dans un rayon de",
       "navigation.noLocation": "Activez la localisation pour voir ce qui est proche",

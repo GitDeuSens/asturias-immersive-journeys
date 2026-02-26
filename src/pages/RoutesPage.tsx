@@ -552,7 +552,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                         onClick={() => {
                           setSelectedRoute(route);
                           setExploringRoute(route);
-                          setShowRouteDetail(true);
+                        //  setShowRouteDetail(true);
                         }}
                       />
                       </motion.div>

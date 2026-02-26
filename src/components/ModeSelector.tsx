@@ -12,12 +12,17 @@ interface ModeSelectorProps {
 
 const texts = {
   title: {
-    es: "¿Cómo quieres explorar Asturias?",
-    en: "How do you want to explore Asturias?",
-    fr: "Comment voulez-vous explorer les Asturies?",
+    es: "Visita Asturias como nunca antes.",
+    en: "Visit Asturias like never before.",
+    fr: "Découvrez les Asturies comme jamais auparavant.",
+  },
+  subtitle: {
+    es: "Visitas y tours inmersivos.",
+    en: "Immersive visits and tours.",
+    fr: "Visites et excursions immersives.",
   },
   homeTitle: {
-    es: "Descubriendo desde casa",
+    es: "Descúbrela desde casa",
     en: "Discovering from home",
     fr: "Découvrir depuis chez vous",
   },
@@ -35,17 +40,7 @@ const texts = {
     es: "Activa tu ubicación para descubrir qué tienes cerca: experiencias de realidad aumentada, rutas y puntos de interés.",
     en: "Enable your location to discover what's nearby: AR experiences, routes and points of interest.",
     fr: "Activez votre localisation pour découvrir ce qui est proche: expériences AR, itinéraires et points d'intérêt.",
-  },
-  locationHint: {
-    es: "Se solicitará acceso a tu ubicación",
-    en: "Location access will be requested",
-    fr: "L'accès à la localisation sera demandé",
-  },
-  gettingLocation: {
-    es: "Obteniendo ubicación...",
-    en: "Getting location...",
-    fr: "Obtention de la localisation...",
-  },
+  }
 };
 
 export function ModeSelector({ onSelect }: ModeSelectorProps) {
@@ -87,7 +82,7 @@ export function ModeSelector({ onSelect }: ModeSelectorProps) {
 
   return (
     <>
-      <div style={{height: '90vh'}} className="relative z-10 flex flex-col items-center justify-center px-4 pt-0 pb-4">
+      <div style={{ height: '90vh' }} className="relative z-10 flex flex-col items-center justify-center px-4 pt-0 pb-4">
         {/* Geolocation Error Alert */}
         <GeolocationErrorAlert error={geoError} onDismiss={handleDismissError} onRetry={handleRetryLocation} />
 
@@ -96,10 +91,14 @@ export function ModeSelector({ onSelect }: ModeSelectorProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-xl md:text-4xl lg:text-5xl font-bold text-white text-center mb-4 md:mb-10 drop-shadow-lg max-w-3xl"
+          style={{ fontWeight: 'lighter'}}
+          className="sm:text-sm md:text-4xl lg:text-7xl text-white text-center mb-5 drop-shadow-lg max-w-3xl initial-title"
         >
           {t(texts.title)}
         </motion.h1>
+
+        <img className="mb-5" src="./assets/line.png" />
+        <span className="text-white mb-8">{t(texts.subtitle)}</span>
 
         {/* Mode Cards */}
         <div className="flex flex-col md:flex-row gap-3 md:gap-6 w-full max-w-4xl">
@@ -110,13 +109,13 @@ export function ModeSelector({ onSelect }: ModeSelectorProps) {
             transition={{ duration: 0.5, delay: 0.3 }}
             onClick={handleHomeSelect}
             disabled={loading}
-            className="flex-1 group relative overflow-hidden rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-5 md:p-8 text-left transition-all duration-300 hover:bg-white/20 hover:border-primary/50 hover:scale-[1.02] disabled:opacity-50"
+            style={{ backdropFilter: 'blur(25px)' }}
+            className="initial-buttons flex-1 group relative overflow-hidden rounded-2xl bg-white/20  border border-white/20 p-5 md:p-8 text-left transition-all duration-300 hover:bg-white/20 hover:border-primary/50 hover:scale-[1.02] disabled:opacity-50"
           >
             {/* Icon */}
-            <div className="w-10 h-10 md:w-16 md:h-16 rounded-xl bg-primary flex items-center justify-center mb-3 md:mb-6 shadow-lg group-hover:scale-110 transition-transform">
-              <Home className="w-5 h-5 md:w-8 md:h-8 text-white" />
+            <div style={{ position: 'relative', right: '5px' }}>
+              <Home strokeWidth={1} className="icons text-primary" />
             </div>
-
             {/* Content */}
             <h2 className="text-lg md:text-3xl font-bold text-white mb-1 md:mb-3 drop-shadow-md">{t(texts.homeTitle)}</h2>
             <p className="text-white/80 text-sm md:text-lg leading-relaxed line-clamp-2 md:line-clamp-none">{t(texts.homeDescription)}</p>
@@ -132,27 +131,17 @@ export function ModeSelector({ onSelect }: ModeSelectorProps) {
             transition={{ duration: 0.5, delay: 0.4 }}
             onClick={handleHereSelect}
             disabled={loading}
-            className="flex-1 group relative overflow-hidden rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-5 md:p-8 text-left transition-all duration-300 hover:bg-white/20 hover:border-accent/50 hover:scale-[1.02] disabled:opacity-50"
+            style={{ backdropFilter: 'blur(25px)' }}
+            className="initial-buttons flex-1 group relative overflow-hidden rounded-2xl bg-white/20 border border-white/20 p-5 md:p-8 text-left transition-all duration-300 hover:bg-white/20 hover:border-accent/50 hover:scale-[1.02] disabled:opacity-50"
           >
             {/* Icon */}
-            <div className="w-10 h-10 md:w-16 md:h-16 rounded-xl bg-accent flex items-center justify-center mb-3 md:mb-6 shadow-lg group-hover:scale-110 transition-transform">
-              {loading && selectedMode === "here" ? (
-                <Loader2 className="w-5 h-5 md:w-8 md:h-8 text-white animate-spin" />
-              ) : (
-                <MapPin className="w-5 h-5 md:w-8 md:h-8 text-white" />
-              )}
+            <div style={{ position: 'relative', right: '10px' }}>
+              <MapPin strokeWidth={1} className="icons text-primary" />
             </div>
 
             {/* Content */}
             <h2 className="text-lg md:text-3xl font-bold text-white mb-1 md:mb-3 drop-shadow-md">{t(texts.hereTitle)}</h2>
             <p className="text-white/80 text-sm md:text-lg leading-relaxed mb-2 md:mb-4 line-clamp-2 md:line-clamp-none">{t(texts.hereDescription)}</p>
-
-            {/* Location hint */}
-            <div className="flex items-center gap-2 text-white/60 text-xs md:text-sm">
-              <Navigation className="w-3 h-3 md:w-4 md:h-4" />
-              <span>{loading && selectedMode === "here" ? t(texts.gettingLocation) : t(texts.locationHint)}</span>
-            </div>
-
             {/* Decorative gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
           </motion.button>

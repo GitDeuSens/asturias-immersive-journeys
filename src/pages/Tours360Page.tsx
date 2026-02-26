@@ -39,7 +39,7 @@ export function Tours360Page() {
   const { categories } = useDirectusCategories(language as Language);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [activeTour, setActiveTour] = useState<KuulaTour | null>(null);
-  const [showSearch, setShowSearch] = useState(false);
+  const [showSearch, setShowSearch] = useState(true);
 
   const filteredTours = useMemo(() => {
     if (selectedCategories.length === 0) return kuulaTours;
@@ -65,7 +65,7 @@ export function Tours360Page() {
     // Track tour view
     const tourTitle = typeof tour.title === 'string' ? tour.title : tour.title[language] || tour.title.es;
     trackTourViewed(tour.id, tourTitle, language, 'desktop'); // device_type can be dynamic
-    
+
     setActiveTour(tour);
   };
 
@@ -118,7 +118,7 @@ export function Tours360Page() {
         </div>
 
         {/* Hero section */}
-        <div className="bg-primary py-12 mb-8 mt-2">
+        <div className="bg-primary pt-12 mb-8 mt-2">
           <div className="container mx-auto pb-5 px-4 max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -134,7 +134,7 @@ export function Tours360Page() {
               {/* Search toggle */}
               <button
                 onClick={() => setShowSearch(!showSearch)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+                className="hidden inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
               >
                 <Search className="w-4 h-4" />
                 <span>{t(texts.searchPlaceholder)}</span>
@@ -145,25 +145,6 @@ export function Tours360Page() {
 
         <div className="container mx-auto pb-5 px-4 max-w-6xl">
           {/* Search bar */}
-          <AnimatePresence>
-            {showSearch && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mb-6"
-              >
-                <GlobalSearch
-                  locale={language as Language}
-                  localData={localSearchData}
-                  onLocalSelect={handleLocalSearchSelect}
-                  localIcon={<View className="w-4 h-4 text-muted-foreground flex-shrink-0" />}
-                  placeholder={t(texts.searchPlaceholder)}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           {/* Category filters */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -171,11 +152,22 @@ export function Tours360Page() {
             transition={{ delay: 0.1 }}
             className="mb-8"
           >
-            <div className="flex items-center gap-3 mb-4">
+            <div className="hidden flex items-center gap-3 mb-4">
               <Filter className="w-5 h-5 text-muted-foreground" />
               <span className="font-semibold text-foreground">{t(texts.allCategories)}</span>
             </div>
-            <CategoryChips categories={categories} selectedIds={selectedCategories} onToggle={toggleCategory} />
+            <div className="flex">
+              <CategoryChips categories={categories} selectedIds={selectedCategories} onToggle={toggleCategory} />
+              <div style={{ marginLeft: '25px' }}>
+                <GlobalSearch
+                  locale={language as Language}
+                  localData={localSearchData}
+                  onLocalSelect={handleLocalSearchSelect}
+                  localIcon={<View className="w-4 h-4 text-muted-foreground flex-shrink-0" />}
+                  placeholder={t(texts.searchPlaceholder)}
+                />
+              </div>
+            </div>
           </motion.div>
 
           {/* Tours grid */}

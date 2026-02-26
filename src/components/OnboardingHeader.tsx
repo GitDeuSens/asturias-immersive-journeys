@@ -3,6 +3,8 @@ import { Mountain, ChevronDown, Sun, Moon, Check, Globe } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useTheme, Theme } from "@/hooks/useTheme";
+import { Link } from "react-router-dom";
+import { AppHeader } from "./AppHeader";
 
 const languages = [
   { code: "es", label: "ES", fullLabel: "Español", flag: "🇪🇸" },
@@ -39,32 +41,35 @@ export function OnboardingHeader() {
   };
 
   return (
-    <motion.header
+    <AppHeader />
+    /*<motion.header
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       className="fixed -top-1 left-0 right-0 z-50"
     >
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        {/* Logo */}
+        {/* Logo }
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-lg">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="lucide lucide-house w-8 h-8 text-white"
-            >
-              <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path>
-              <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-            </svg>
-          </div>
+          <Link to="/">
+            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-lg">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-house w-8 h-8 text-white"
+              >
+                <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path>
+                <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              </svg>
+            </div>
+          </Link>
           <div className="hidden sm:block">
             <span className="font-bold text-lg text-white drop-shadow-md">Asturias</span>
             <span className="text-primary font-semibold text-sm ml-1 uppercase tracking-wider drop-shadow-md">
@@ -73,9 +78,9 @@ export function OnboardingHeader() {
           </div>
         </div>
 
-        {/* Right controls */}
+        {/* Right controls }
         <div className="flex items-center gap-2">
-          {/* Theme toggle button */}
+          {/* Theme toggle button }
           <button
             onClick={toggleTheme}
             className="hidden p-2.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all duration-200"
@@ -84,7 +89,7 @@ export function OnboardingHeader() {
             {isDark ? <Sun className="w-5 h-5" aria-hidden="true" /> : <Moon className="w-5 h-5" aria-hidden="true" />}
           </button>
 
-          {/* Language Selector Dropdown */}
+          {/* Language Selector Dropdown }
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsOpen(!isOpen)}
@@ -108,7 +113,7 @@ export function OnboardingHeader() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
                   transition={{ duration: 0.15 }}
-                  style={{ zIndex: '50000'}}
+                  style={{ zIndex: '50000' }}
                   className="absolute right-0 mt-2 w-48 rounded-xl bg-popover shadow-xl border border-border overflow-hidden"
                   role="menu"
                 >
@@ -119,9 +124,8 @@ export function OnboardingHeader() {
                         handleLanguageChange(lang.code);
                         setIsOpen(false);
                       }}
-                      className={`w-full flex items-center justify-between px-4 py-3 text-left transition-colors duration-150 ${
-                        i18n.language === lang.code ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted"
-                      }`}
+                      className={`w-full flex items-center justify-between px-4 py-3 text-left transition-colors duration-150 ${i18n.language === lang.code ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted"
+                        }`}
                       role="menuitem"
                     >
                       <span className="flex items-center gap-3">
@@ -137,6 +141,6 @@ export function OnboardingHeader() {
           </div>
         </div>
       </div>
-    </motion.header>
+    </motion.header>*/
   );
 }

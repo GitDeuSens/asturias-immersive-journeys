@@ -16,7 +16,11 @@ import {
   X,
   Navigation,
   Footprints,
-  Home
+  Home,
+  Share,
+  Share2,
+  Mountain,
+  Ruler
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { ImmersiveRoute, RoutePoint } from '@/data/types';
@@ -40,6 +44,8 @@ import {
   BreadcrumbSeparator,
   BreadcrumbPage,
 } from '@/components/ui/breadcrumb';
+import { calculateRouteDistance, formatDistance, openNavigation } from '@/lib/mapUtils';
+
 
 interface RouteExplorerViewProps {
   route: ImmersiveRoute;
@@ -62,7 +68,10 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   const { latitude, longitude, hasLocation } = useGeolocation();
   const [visitedPoints, setVisitedPoints] = useState<Set<string>>(new Set());
   const [routeStartTime] = useState(Date.now());
+  const [copied, setCopied] = useState(false);
   const navigate = useNavigate();
+  const shareUrl = window.location.href;
+  let isCopy = false;
 
   const progress = route.points.length > 0
     ? Math.round((visitedPoints.size / route.points.length) * 100)
@@ -95,6 +104,21 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
     return route.points.find(point => !visitedPoints.has(point.id)) || null;
   }, [route.points, visitedPoints]);
 
+  const surfaceLabels: Record<string, Record<string, string>> = {
+    paved: { es: 'Asfaltado', en: 'Paved', fr: 'Asphalté' },
+    gravel: { es: 'Grava', en: 'Gravel', fr: 'Gravier' },
+    dirt: { es: 'Tierra', en: 'Dirt', fr: 'Terre' },
+    mixed: { es: 'Mixto', en: 'Mixed', fr: 'Mixte' },
+  };
+
+  const difficultyColors = {
+    easy: 'bg-primary/20 text-primary border-primary',
+    medium: 'bg-warm/20 text-warm border-warm',
+    hard: 'bg-destructive/20 text-destructive border-destructive',
+  };
+
+const calculatedDistance = calculateRouteDistance(route.polyline);
+  const distance = route.distanceKm || calculatedDistance;
   const nearestPoint = nextRoutePoint;
 
   const handlePointClick = (point: RoutePoint) => {
@@ -115,6 +139,18 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
       }
       return next;
     });
+  };
+
+  const handleNavigateToStart = () => {
+    if (route.polyline.length > 0) {
+      const start = route.points[0].location;
+      openNavigation(start.lat, start.lng, route.points[0].title[lang]);
+    }
+  };
+
+  const handleCopyLink = async () => {
+    navigator.clipboard.writeText(shareUrl + `/${route.id}`);
+    setCopied(true);
   };
 
   useEffect(() => {
@@ -187,14 +223,14 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
             style={{ backgroundImage: `url(${route.coverImage})` }}
           />
           <div className="flex-1 min-w-0">
-            <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
+            <span className="hidden text-[10px] font-bold text-primary uppercase tracking-wider">
               {t('routes.exploring')}
             </span>
-            <h2 className="font-sans font-bold text-foreground text-lg leading-tight truncate">
+            <h2 className="font-sans font-bold text-foreground text-xl leading-tight truncate">
               {getText(route.title, lang)}
             </h2>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs text-muted-foreground">
+              <span className="text-lg text-muted-foreground">
                 {route.points.length} {t('routes.points')}
               </span>
               {route.isCircular && (
@@ -205,7 +241,83 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
             </div>
           </div>
         </div>
+        <div className="flex flex-wrap gap-2" style={{marginTop: '35px', marginBottom: '25px'}}>
+          {/* Duration */}
+          {route.duration && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
+              <Clock className="w-4 h-4 text-primary" aria-hidden="true" />
+              {route.duration[lang]}
+            </span>
+          )}
 
+          {/* Distance */}
+          {distance > 0 && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
+              <Ruler className="w-4 h-4 text-primary" aria-hidden="true" />
+              {route.distanceKm ? `${route.distanceKm} km` : formatDistance(distance)}
+            </span>
+          )}
+
+          {/* Elevation */}
+          {route.elevationGainMeters && route.elevationGainMeters > 0 && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
+              <Mountain className="w-4 h-4 text-primary" aria-hidden="true" />
+              ↑ {route.elevationGainMeters} m
+            </span>
+          )}
+
+          {/* Surface type */}
+          {route.surfaceType && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
+              <Footprints className="w-4 h-4 text-primary" aria-hidden="true" />
+              {surfaceLabels[route.surfaceType]?.[lang] || route.surfaceType}
+            </span>
+          )}
+
+          {/* Points */}
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
+            <MapPin className="w-4 h-4 text-primary" aria-hidden="true" />
+            {route.points.length} {t('routes.points')}
+          </span>
+
+          {/* Difficulty */}
+          {route.difficulty && (
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-medium ${difficultyColors[route.difficulty]}`}>
+              <Mountain className="w-4 h-4" aria-hidden="true" />
+              {t(`difficulty.${route.difficulty}`)}
+            </span>
+          )}
+
+          {/* Circular/Linear */}
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
+            <RotateCw className={`w-4 h-4 ${route.isCircular ? 'text-primary' : 'text-muted-foreground'}`} aria-hidden="true" />
+            {route.isCircular ? t('routes.circular') : t('routes.linear')}
+          </span>
+
+          {/* 360 tour */}
+          {route.tour360?.available && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/20 text-primary text-sm font-bold border border-primary/30">
+              <Camera className="w-4 h-4" aria-hidden="true" />
+              360°
+            </span>
+          )}
+        </div>
+        <div>
+          <p className='text-muted-foreground leading-relaxed'>
+            {route.fullDescription ? route.fullDescription[lang] : route.shortDescription[lang]}
+          </p>
+        </div>
+        <div className='flex' style={{ justifyContent: 'flex-end', gap: '10px' }}>
+          <div onClick={handleNavigateToStart}>
+            <span className='flex' style={{ alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}><Navigation className="w-6 h-6" /> {t('routes.howToGet')}</span>
+          </div>
+          <div onClick={handleCopyLink}>
+            <span className='flex' style={{ alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}><Share2 className="w-6 h-6" /> {t('share.title')}</span>
+          </div>
+        </div>
+        {copied ? (
+          <small>Enlace copiado</small>
+        ) : ''}
         {route.points.length > 0 && (
           <div className="space-y-1">
             <div className="flex items-center justify-between text-xs">
@@ -242,7 +354,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
               className="mb-4 p-3 rounded-xl bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/30"
             >
               <div className="flex items-center gap-2 mb-2">
-                <Navigation className="w-4 h-4 text-primary" />
+                <MapPin className="w-4 h-4 text-primary" />
                 <span className="text-xs font-semibold text-primary uppercase tracking-wide">
                   {t('routes.nextPoint')}
                 </span>
@@ -261,7 +373,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
                   )}
                 </div>
                 <Button size="sm" onClick={() => handlePointClick(nearestPoint)} className="text-xs">
-                  {t('navigation.startHere')}
+                  {t('routes.visitPoint')}
                 </Button>
               </div>
             </motion.div>
@@ -370,15 +482,18 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
             }
             onClick();
           }}
-          className={`flex-1 mb-3 rounded-xl overflow-hidden transition-all text-left border ${
-            isSelected
-              ? 'border-primary bg-primary/10 shadow-md'
-              : isNearest
-                ? 'border-accent bg-accent/10 shadow-md'
-                : isVisited
-                  ? 'border-primary/40 bg-card/80'
-                  : 'border-border bg-card hover:bg-muted/50 hover:border-muted-foreground/30'
-          }`}
+          className={`flex-1 mb-3 rounded-xl overflow-hidden transition-all text-left border ${isSelected
+            ? 'border-primary bg-primary/10 shadow-md'
+            : isNearest && !hasAR && !has360
+              ? 'border-accent bg-accent/10 shadow-md'
+              : isNearest && hasAR
+                ? 'border-warm bg-warm/10 shadow-md'
+                : isNearest && has360
+                  ? 'border-360 bg-360-10 shadow-md'
+                  : isVisited
+                    ? 'border-primary/40 bg-card/80'
+                    : 'border-border bg-card hover:bg-muted/50 hover:border-muted-foreground/30'
+            }`}
         >
           {point.coverImage && (
             <div

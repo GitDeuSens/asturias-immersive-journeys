@@ -130,11 +130,12 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
     <>
       <AnimatePresence>
         <motion.div key="overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm" onClick={onClose} />
+          className="fixed inset-0 z-[60]" onClick={onClose} />
         <motion.div key="sheet"
           initial={{ x: '100%', opacity: 0.8 }} animate={{ x: 0, opacity: 1 }} exit={{ x: '100%', opacity: 0.8 }}
           transition={{ type: 'spring', damping: 28, stiffness: 200, mass: 0.9, opacity: { duration: 0.2, ease: 'easeOut' } }}
           className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-background z-[60] shadow-2xl flex flex-col overflow-hidden md:rounded-l-3xl"
+          style={{zIndex: 500000000000}}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Hero image */}
