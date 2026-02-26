@@ -238,6 +238,14 @@ export class AsturiasAROverlay extends Behaviour {
 
         this._buildPreARPanel();
 
+        // If ?autostart=1 (from QR scan), skip the pre-AR panel and launch AR immediately
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('autostart') === '1') {
+            this._hidePrePanel();
+            // Small delay to let Needle Engine fully initialize XR subsystem
+            setTimeout(() => this._startAR(), 300);
+        }
+
         // Use Needle-native XR hooks — work on Android WebXR AND iOS AppClips
         this._xrStartHandler = () => {
             this._isAR = true;

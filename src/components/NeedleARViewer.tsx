@@ -102,19 +102,27 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
         setIsLoading(false);
 
         // Auto-trigger AR session if ?autostart=1 (from QR scan)
-        // Browser will show camera/XR permission popup — this is expected
+        // AsturiasAROverlay also attempts autostart at 300ms; this is a backup.
+        // Browser will show camera/XR permission popup — this is expected.
         if (autostart) {
-          setTimeout(async () => {
+          const tryStartAR = async () => {
             try {
               const { WebXRButtonFactory } = await import('@needle-tools/engine');
               const factory = WebXRButtonFactory.getOrCreate();
-              if (factory?.arButton) { factory.arButton.click(); return; }
+              if (factory?.arButton) { factory.arButton.click(); return true; }
             } catch {}
             const btn = document.querySelector('[ar-button]') as HTMLElement
               ?? document.querySelector('needle-button[ar]') as HTMLElement
               ?? (el as any)?.shadowRoot?.querySelector('[ar-button]') as HTMLElement;
-            btn?.click();
-          }, 500);
+            if (btn) { btn.click(); return true; }
+            return false;
+          };
+          // Retry: first at 800ms, then at 2s if the first attempt didn't find a button
+          setTimeout(async () => {
+            if (!(await tryStartAR())) {
+              setTimeout(() => tryStartAR(), 1200);
+            }
+          }, 800);
         }
       } catch (err: any) {
         const msg = err?.message ?? 'Unknown error';
@@ -143,14 +151,15 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
         shadow.appendChild(style);
       }
 
-      // Find and hide ONLY the close button in the needle build's overlay
-      // The close button is a <button> containing only an <img> (no text), sibling of the title div
+      // Find and hide ONLY Needle's own close button in the build overlay.
+      // IMPORTANT: skip buttons inside #asturias-ar-root — those are our AR HUD controls.
       const hideCloseButton = () => {
-        // Search in light DOM (slotted content inside needle-engine)
         el.querySelectorAll('button').forEach((btn: HTMLButtonElement) => {
+          // Never touch our own Asturias overlay buttons
+          if (btn.closest('#asturias-ar-root')) return;
           const text = btn.textContent?.trim() || '';
           const hasImg = btn.querySelector('img, svg');
-          // Close button: has an icon but no meaningful text
+          // Needle's close button: has an icon but no meaningful text
           if (hasImg && text.length === 0) {
             btn.style.display = 'none';
           }
