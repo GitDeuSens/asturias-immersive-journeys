@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { View, ChevronRight, X, Filter, Search, Home } from "lucide-react";
+import { View, ChevronRight, X, Filter, Search, Home, Maximize2, Share2, Info, Minimize2 } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { CategoryChips } from "@/components/CategoryChips";
 import { KuulaTourEmbed } from "@/components/KuulaTourEmbed";
@@ -9,9 +9,10 @@ import { GlobalSearch, LocalSearchItem } from "@/components/GlobalSearch";
 import { Footer } from "@/components/Footer";
 import { useDirectusTours, useDirectusCategories } from "@/hooks/useDirectusData";
 import { useLanguage } from "@/hooks/useLanguage";
-import { trackTourViewed } from "@/lib/analytics";
+import { trackTourViewed, trackEvent } from "@/lib/analytics";
 import { slugify } from "@/lib/slugify";
 import type { KuulaTour, Language } from "@/lib/types";
+import { Button } from "@/components/ui/button";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -33,6 +34,10 @@ const texts = {
   close: { es: "Cerrar", en: "Close", fr: "Fermer" },
   allCategories: { es: "Todas las categorías", en: "All categories", fr: "Toutes les catégories" },
   searchPlaceholder: { es: "Buscar tours...", en: "Search tours...", fr: "Rechercher des visites..." },
+  fullscreen: { es: "Pantalla completa", en: "Fullscreen", fr: "Plein écran" },
+  share: { es: "Compartir", en: "Share", fr: "Partager" },
+  panoramas: { es: "panoramas", en: "panoramas", fr: "panoramas" },
+  duration: { es: "min", en: "min", fr: "min" },
 };
 
 export function Tours360Page() {
@@ -44,9 +49,11 @@ export function Tours360Page() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [activeTour, setActiveTour] = useState<KuulaTour | null>(null);
   const [showSearch, setShowSearch] = useState(true);
+  const [showInfo, setShowInfo] = useState(false);
 
-  // Generate slug for a tour
+  // Generate slug for a tour — prefer DB slug, fallback to title
   const getTourSlug = (tour: KuulaTour): string => {
+    if (tour.slug) return tour.slug;
     const title = typeof tour.title === 'string' ? tour.title : tour.title[language] || tour.title.es || '';
     return slugify(title);
   };
@@ -56,7 +63,7 @@ export function Tours360Page() {
     if (slug && kuulaTours.length > 0 && !activeTour) {
       const found = kuulaTours.find(tour => {
         const tourSlug = getTourSlug(tour);
-        return tourSlug === slug || slugify(tour.id) === slug;
+        return tourSlug === slug || slugify(tour.id) === slug || slug === tour.slug;
       });
       if (found) setActiveTour(found);
     }
@@ -83,12 +90,43 @@ export function Tours360Page() {
     const tourTitle = typeof tour.title === 'string' ? tour.title : tour.title[language] || tour.title.es;
     trackTourViewed(tour.id, tourTitle, language, 'desktop');
     setActiveTour(tour);
+    setShowInfo(false);
     navigate(`/tours/${getTourSlug(tour)}`, { replace: true });
   };
 
   const closeTour = () => {
     setActiveTour(null);
+    setShowInfo(false);
     navigate('/tours', { replace: true });
+  };
+
+  const handleShare = async () => {
+    if (!activeTour) return;
+    const shareData = {
+      title: t(activeTour.title),
+      text: t(activeTour.description),
+      url: window.location.href,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        trackEvent('tour_shared', { tour_id: activeTour.id, method: 'native' });
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        trackEvent('tour_shared', { tour_id: activeTour.id, method: 'clipboard' });
+      }
+    } catch {}
+  };
+
+  const handleFullscreen = () => {
+    const el = document.querySelector('.tour-viewer-container');
+    if (el) {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        el.requestFullscreen?.();
+      }
+    }
   };
 
   const handleLocalSearchSelect = (item: LocalSearchItem) => {
@@ -162,7 +200,6 @@ export function Tours360Page() {
         </div>
 
         <div className="container mx-auto pb-5 px-4 max-w-6xl">
-          {/* Search bar */}
           {/* Category filters */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -200,7 +237,7 @@ export function Tours360Page() {
                 key={tour.id}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * index }}
+                transition={{ delay: 0.04 * index }}
                 className="group cursor-pointer bg-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-border hover:border-primary"
                 onClick={() => handleTourClick(tour)}
               >
@@ -219,6 +256,20 @@ export function Tours360Page() {
                     </span>
                   </div>
 
+                  {/* Metadata badges */}
+                  <div className="absolute top-3 right-3 flex gap-2">
+                    {tour.total_panoramas > 0 && (
+                      <span className="bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                        {tour.total_panoramas} {t(texts.scenes)}
+                      </span>
+                    )}
+                    {tour.duration_minutes && (
+                      <span className="bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                        {tour.duration_minutes} {t(texts.duration)}
+                      </span>
+                    )}
+                  </div>
+
                   {/* Play button overlay */}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center">
@@ -231,7 +282,9 @@ export function Tours360Page() {
                   <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
                     {t(tour.title)}
                   </h3>
-
+                  {tour.description[language] && (
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{tour.description[language]}</p>
+                  )}
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">
                       {tour.total_panoramas} {t(texts.scenes)}
@@ -250,42 +303,99 @@ export function Tours360Page() {
         <Footer />
       </main>
 
-      {/* Tour Viewer Modal - Now using KuulaTourEmbed */}
+      {/* Tour Viewer Modal — z-[70] per layering conventions */}
       <AnimatePresence>
         {activeTour && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/95 flex flex-col"
+            className="fixed inset-0 z-[70] bg-black flex flex-col overflow-hidden"
           >
-            {/* Viewer header */}
-            <div className="flex items-center justify-between p-4 border-b border-white/10">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-                  <View className="w-5 h-5 text-white" />
+            {/* Viewer header — compact, no scroll */}
+            <div className="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-black/90 shrink-0">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
+                  <View className="w-4 h-4 text-white" />
                 </div>
-                <h2 className="text-xl font-bold text-white">{t(activeTour.title)}</h2>
+                <div className="min-w-0">
+                  <h2 className="text-base font-bold text-white truncate">{t(activeTour.title)}</h2>
+                  <p className="text-xs text-white/50">
+                    {activeTour.total_panoramas} {t(texts.panoramas)}
+                    {activeTour.duration_minutes && ` · ${activeTour.duration_minutes} ${t(texts.duration)}`}
+                  </p>
+                </div>
               </div>
-              <button
-                onClick={closeTour}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-white"
-              >
-                <X className="w-4 h-4" />
-                {t(texts.close)}
-              </button>
+              <div className="flex items-center gap-1 shrink-0">
+                {/* Info toggle */}
+                {activeTour.description[language] && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowInfo(!showInfo)}
+                    className={`text-white hover:bg-white/20 h-8 w-8 ${showInfo ? 'bg-white/20' : ''}`}
+                    title={language === 'es' ? 'Información' : 'Info'}
+                  >
+                    <Info className="w-4 h-4" />
+                  </Button>
+                )}
+                {/* Share */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleShare}
+                  className="text-white hover:bg-white/20 h-8 w-8"
+                  title={t(texts.share)}
+                >
+                  <Share2 className="w-4 h-4" />
+                </Button>
+                {/* Fullscreen */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleFullscreen}
+                  className="text-white hover:bg-white/20 h-8 w-8"
+                  title={t(texts.fullscreen)}
+                >
+                  <Maximize2 className="w-4 h-4" />
+                </Button>
+                {/* Close */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={closeTour}
+                  className="text-white hover:bg-white/20 gap-1 h-8 px-3"
+                >
+                  <X className="w-4 h-4" />
+                  <span className="hidden sm:inline text-sm">{t(texts.close)}</span>
+                </Button>
+              </div>
             </div>
 
-            {/* Kuula Tour Embed */}
-            <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
-              <div className="w-full max-w-6xl aspect-video">
-                <KuulaTourEmbed
-                  tour={activeTour}
-                  locale={language as Language}
-                  showControls={false}
-                  onClose={closeTour}
-                />
-              </div>
+            {/* Info panel — collapsible */}
+            <AnimatePresence>
+              {showInfo && activeTour.description[language] && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="bg-black/80 border-b border-white/10 overflow-hidden shrink-0"
+                >
+                  <p className="px-4 py-3 text-sm text-white/70 max-w-4xl">
+                    {activeTour.description[language]}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Tour viewer — fills remaining space, no scroll */}
+            <div className="tour-viewer-container flex-1 min-h-0">
+              <KuulaTourEmbed
+                tour={activeTour}
+                locale={language as Language}
+                showControls={false}
+                onClose={closeTour}
+              />
             </div>
           </motion.div>
         )}
