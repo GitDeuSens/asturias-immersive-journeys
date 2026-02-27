@@ -58,14 +58,23 @@ export function Tours360Page() {
     return slugify(title);
   };
 
-  // Resolve tour from URL slug
+  // Resolve tour from URL slug — always sync state with URL
   useEffect(() => {
-    if (slug && kuulaTours.length > 0 && !activeTour) {
+    if (slug && kuulaTours.length > 0) {
       const found = kuulaTours.find(tour => {
         const tourSlug = getTourSlug(tour);
         return tourSlug === slug || slugify(tour.id) === slug || slug === tour.slug;
       });
-      if (found) setActiveTour(found);
+      if (found) {
+        // Only update if different tour (avoid unnecessary re-renders)
+        if (!activeTour || activeTour.id !== found.id) {
+          setActiveTour(found);
+        }
+      }
+    } else if (!slug && activeTour) {
+      // URL changed to /tours (no slug) — close the modal
+      setActiveTour(null);
+      setShowInfo(false);
     }
   }, [slug, kuulaTours]);
 
@@ -91,13 +100,13 @@ export function Tours360Page() {
     trackTourViewed(tour.id, tourTitle, language, 'desktop');
     setActiveTour(tour);
     setShowInfo(false);
-    navigate(`/tours/${getTourSlug(tour)}`, { replace: true });
+    navigate(`/tours/${getTourSlug(tour)}`);
   };
 
   const closeTour = () => {
     setActiveTour(null);
     setShowInfo(false);
-    navigate('/tours', { replace: true });
+    navigate('/tours');
   };
 
   const handleShare = async () => {
