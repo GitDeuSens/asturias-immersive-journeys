@@ -23,6 +23,7 @@ import {
   Ruler
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import type { ImmersiveRoute, RoutePoint } from '@/data/types';
 import { useExplorationMode } from '@/hooks/useLanguage';
 import { useGeolocation } from '@/hooks/useGeolocation';
