@@ -469,7 +469,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
   const handleCloseRouteDetail = () => {
     setShowRouteDetail(false);
     setSelectedRoute(null);
-    navigate('/routes', { replace: true });
+   // navigate('/routes', { replace: true });
   };
 
   return (
@@ -642,7 +642,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                           setSelectedRoute(route);
                           setExploringRoute(route);
                         //  setShowRouteDetail(true);
-                          navigate(`/routes/${route.id}`, { replace: false });
+                         // navigate(`/routes/${route.id}`, { replace: false });
                         }}
                       />
                       </motion.div>
