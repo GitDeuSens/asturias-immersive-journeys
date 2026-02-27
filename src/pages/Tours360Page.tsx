@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { View, ChevronRight, X, Filter, Search, Home } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
@@ -9,6 +10,7 @@ import { Footer } from "@/components/Footer";
 import { useDirectusTours, useDirectusCategories } from "@/hooks/useDirectusData";
 import { useLanguage } from "@/hooks/useLanguage";
 import { trackTourViewed } from "@/lib/analytics";
+import { slugify } from "@/lib/slugify";
 import type { KuulaTour, Language } from "@/lib/types";
 import {
   Breadcrumb,
@@ -35,25 +37,41 @@ const texts = {
 
 export function Tours360Page() {
   const { t, language } = useLanguage();
+  const navigate = useNavigate();
+  const { slug } = useParams<{ slug?: string }>();
   const { tours: kuulaTours, loading: toursLoading } = useDirectusTours(language as Language);
   const { categories } = useDirectusCategories(language as Language);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [activeTour, setActiveTour] = useState<KuulaTour | null>(null);
   const [showSearch, setShowSearch] = useState(true);
 
+  // Generate slug for a tour
+  const getTourSlug = (tour: KuulaTour): string => {
+    const title = typeof tour.title === 'string' ? tour.title : tour.title[language] || tour.title.es || '';
+    return slugify(title);
+  };
+
+  // Resolve tour from URL slug
+  useEffect(() => {
+    if (slug && kuulaTours.length > 0 && !activeTour) {
+      const found = kuulaTours.find(tour => {
+        const tourSlug = getTourSlug(tour);
+        return tourSlug === slug || slugify(tour.id) === slug;
+      });
+      if (found) setActiveTour(found);
+    }
+  }, [slug, kuulaTours]);
+
   const filteredTours = useMemo(() => {
     if (selectedCategories.length === 0) return kuulaTours;
-    // Note: KuulaTour doesn't have categoryIds, so we show all tours when filtering
-    // If filtering is needed, the API/data model should be extended
     return kuulaTours;
   }, [selectedCategories, kuulaTours]);
 
-  // Prepare local search data from filtered tours
   const localSearchData: LocalSearchItem[] = useMemo(() => {
     return filteredTours.map((tour) => ({
       id: tour.id,
       title: tour.title,
-      subtitle: "", // KuulaTour doesn't have categoryIds
+      subtitle: "",
     }));
   }, [filteredTours]);
 
@@ -62,15 +80,15 @@ export function Tours360Page() {
   };
 
   const handleTourClick = (tour: KuulaTour) => {
-    // Track tour view
     const tourTitle = typeof tour.title === 'string' ? tour.title : tour.title[language] || tour.title.es;
-    trackTourViewed(tour.id, tourTitle, language, 'desktop'); // device_type can be dynamic
-
+    trackTourViewed(tour.id, tourTitle, language, 'desktop');
     setActiveTour(tour);
+    navigate(`/tours/${getTourSlug(tour)}`, { replace: true });
   };
 
   const closeTour = () => {
     setActiveTour(null);
+    navigate('/tours', { replace: true });
   };
 
   const handleLocalSearchSelect = (item: LocalSearchItem) => {
@@ -259,8 +277,8 @@ export function Tours360Page() {
             </div>
 
             {/* Kuula Tour Embed */}
-            <div className="flex-1 p-4 overflow-auto">
-              <div className="max-w-5xl mx-auto h-full">
+            <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
+              <div className="w-full max-w-6xl aspect-video">
                 <KuulaTourEmbed
                   tour={activeTour}
                   locale={language as Language}
