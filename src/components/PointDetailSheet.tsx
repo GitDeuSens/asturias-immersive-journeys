@@ -353,20 +353,21 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
               )}
 
               {/* Embedded Audio Player */}
-              {hasAudio && content.audioGuide?.[language as keyof typeof content.audioGuide] && (
+              {hasAudio && content.audioGuide && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Headphones className="w-5 h-5 text-primary" />
                     <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">{t(texts.listenAudio)}</h3>
                   </div>
                   <AudioGuidePlayer
-                    audioTracks={[
-                      {
-                        language: language as Language,
-                        url: content.audioGuide[language as keyof typeof content.audioGuide]!.url,
-                        durationSec: content.audioGuide[language as keyof typeof content.audioGuide]!.durationSec
-                      }
-                    ]}
+                    tracks={(['es', 'en', 'fr'] as Language[])
+                      .filter(lang => content.audioGuide![lang as keyof typeof content.audioGuide])
+                      .map(lang => ({
+                        language: lang,
+                        url: content.audioGuide![lang as keyof typeof content.audioGuide]!.url,
+                        durationSec: content.audioGuide![lang as keyof typeof content.audioGuide]!.durationSec
+                      }))}
+                    currentLocale={language as Language}
                     autoPlay={false}
                   />
                 </div>
