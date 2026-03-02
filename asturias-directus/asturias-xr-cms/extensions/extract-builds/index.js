@@ -18,9 +18,12 @@ export default ({ action }, { services, logger, getSchema }) => {
   });
 
   // ============================================
-  // TRIGGER: Создание tours_360 / ar_scenes
+  // TRIGGER: Создание tours_360 / ar_scenes / pois
   // ============================================
   action('items.create', async ({ payload, key, collection }, context) => {
+    if (collection === 'pois') {
+      await syncAudioFieldsForPOI(key, payload, context, { services, logger, getSchema });
+    }
     if (collection === 'tours_360' && payload.build_zip) {
       await extractBuild({
         item: { ...payload, id: key },
@@ -46,9 +49,15 @@ export default ({ action }, { services, logger, getSchema }) => {
   });
 
   // ============================================
-  // TRIGGER: Обновление tours_360 / ar_scenes
+  // TRIGGER: Обновление tours_360 / ar_scenes / pois
   // ============================================
   action('items.update', async ({ payload, keys, collection }, context) => {
+    if (collection === 'pois') {
+      for (const key of keys) {
+        await syncAudioFieldsForPOI(key, null, context, { services, logger, getSchema });
+      }
+      return;
+    }
     const configs = {
       tours_360:  { buildSubdir: 'tours-builds', logPrefix: 'EXTRACT-TOUR' },
       ar_scenes:  { buildSubdir: 'ar-builds',    logPrefix: 'EXTRACT-AR' },
@@ -122,6 +131,61 @@ async function processAudioDuration(payload, fileId, context, { services, logger
     logger.info(`[AUDIO-DURATION] ${file.filename_download} → ${durationSec}s`);
   } catch (err) {
     logger.error(`[AUDIO-DURATION] Error for ${fileId}: ${err.message}`);
+  }
+}
+
+// ============================================
+// POI AUDIO SYNC — reads full POI from DB, extracts duration for all audio fields
+// Called on items.create/update for pois collection
+// Payload is ignored — we always read from DB so unchanged fields are included too
+// ============================================
+async function syncAudioFieldsForPOI(poiId, _payload, context, { services, logger, getSchema }) {
+  const langMap = [
+    ['audio_es', 'audio_duration_seconds'],
+    ['audio_en', 'audio_duration_seconds_en'],
+    ['audio_fr', 'audio_duration_seconds_fr'],
+  ];
+  try {
+    const schema = context?.schema || (await getSchema());
+    const filesService = new services.FilesService({ schema, accountability: null });
+    const poisService = new services.ItemsService('pois', { schema, accountability: null });
+
+    const poi = await poisService.readOne(poiId, { fields: ['audio_es', 'audio_en', 'audio_fr'] });
+    const update = {};
+
+    for (const [audioField, durationField] of langMap) {
+      const fileId = poi[audioField];
+      if (!fileId) continue;
+      try {
+        const file = await filesService.readOne(fileId);
+        if (!file || !file.type || !file.type.startsWith('audio/')) continue;
+
+        let durationSec = file.duration;
+        if (!durationSec) {
+          const filePath = path.join('/directus/uploads', file.filename_disk);
+          if (!existsSync(filePath)) {
+            logger.warn(`[AUDIO-DURATION] File not on disk: ${filePath}`);
+            continue;
+          }
+          const metadata = await parseFile(filePath);
+          if (metadata.format.duration) {
+            durationSec = Math.round(metadata.format.duration);
+            await filesService.updateOne(fileId, { duration: durationSec });
+            logger.info(`[AUDIO-DURATION] Extracted ${file.filename_download} → ${durationSec}s`);
+          }
+        }
+        if (durationSec) update[durationField] = durationSec;
+      } catch (err) {
+        logger.error(`[AUDIO-DURATION] Error for file ${fileId}: ${err.message}`);
+      }
+    }
+
+    if (Object.keys(update).length > 0) {
+      await poisService.updateOne(poiId, update);
+      logger.info(`[AUDIO-DURATION] POI ${poiId} updated: ${JSON.stringify(update)}`);
+    }
+  } catch (err) {
+    logger.error(`[AUDIO-DURATION] syncAudioFieldsForPOI error: ${err.message}`);
   }
 }
 
