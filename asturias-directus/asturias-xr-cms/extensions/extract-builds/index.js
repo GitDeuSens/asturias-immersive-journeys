@@ -26,9 +26,14 @@ export default ({ action }, { services, logger, getSchema }) => {
   });
 
   // ============================================
-  // TRIGGER: Создание tours_360 / ar_scenes
+  // TRIGGER: Создание tours_360 / ar_scenes / pois
   // ============================================
   action('items.create', async ({ payload, key, collection }, context) => {
+    // POI audio fields assigned on create
+    if (collection === 'pois') {
+      await syncAudioFieldsForPOI(key, payload, context, { services, logger, getSchema });
+    }
+
     if (collection === 'tours_360' && payload.build_zip) {
       await extractBuild({
         item: { ...payload, id: key },
@@ -54,9 +59,17 @@ export default ({ action }, { services, logger, getSchema }) => {
   });
 
   // ============================================
-  // TRIGGER: Обновление tours_360 / ar_scenes
+  // TRIGGER: Обновление tours_360 / ar_scenes / pois
   // ============================================
   action('items.update', async ({ payload, keys, collection }, context) => {
+    // POI audio fields changed → extract duration for each changed audio field
+    if (collection === 'pois') {
+      for (const key of keys) {
+        await syncAudioFieldsForPOI(key, payload, context, { services, logger, getSchema });
+      }
+      return;
+    }
+
     const configs = {
       tours_360:  { buildSubdir: 'tours-builds', logPrefix: 'EXTRACT-TOUR' },
       ar_scenes:  { buildSubdir: 'ar-builds',    logPrefix: 'EXTRACT-AR' },
@@ -136,6 +149,63 @@ async function processAudioDuration(payload, fileId, context, { services, logger
     await syncPOIDurations(fileId, durationSec, schema, services, logger);
   } catch (err) {
     logger.error(`[AUDIO-DURATION] Error for ${fileId}: ${err.message}`);
+  }
+}
+
+// Called when a POI is saved — checks which audio fields changed and extracts duration
+async function syncAudioFieldsForPOI(poiId, payload, context, { services, logger, getSchema }) {
+  const langMap = [
+    ['audio_es', 'audio_duration_seconds'],
+    ['audio_en', 'audio_duration_seconds_en'],
+    ['audio_fr', 'audio_duration_seconds_fr'],
+  ];
+
+  // Only proceed if at least one audio field is in the payload
+  const changedAudioFields = langMap.filter(([audioField]) => audioField in payload && payload[audioField]);
+  if (changedAudioFields.length === 0) return;
+
+  try {
+    const schema = context?.schema || (await getSchema());
+    const filesService = new services.FilesService({ schema, accountability: null });
+    const poisService = new services.ItemsService('pois', { schema, accountability: null });
+    const update = {};
+
+    for (const [audioField, durationField] of changedAudioFields) {
+      const fileId = payload[audioField];
+      try {
+        const file = await filesService.readOne(fileId);
+        if (!file || !file.type || !file.type.startsWith('audio/')) continue;
+
+        let durationSec = file.duration;
+
+        if (!durationSec) {
+          const filePath = path.join('/directus/uploads', file.filename_disk);
+          if (!existsSync(filePath)) {
+            logger.warn(`[AUDIO-DURATION] File not found on disk: ${filePath}`);
+            continue;
+          }
+          const metadata = await parseFile(filePath);
+          if (metadata.format.duration) {
+            durationSec = Math.round(metadata.format.duration);
+            await filesService.updateOne(fileId, { duration: durationSec });
+            logger.info(`[AUDIO-DURATION] Extracted ${file.filename_download} → ${durationSec}s`);
+          }
+        }
+
+        if (durationSec) {
+          update[durationField] = durationSec;
+          logger.info(`[AUDIO-DURATION] POI ${poiId} ${durationField}=${durationSec}s`);
+        }
+      } catch (err) {
+        logger.error(`[AUDIO-DURATION] Error reading file ${fileId}: ${err.message}`);
+      }
+    }
+
+    if (Object.keys(update).length > 0) {
+      await poisService.updateOne(poiId, update);
+    }
+  } catch (err) {
+    logger.error(`[AUDIO-DURATION] syncAudioFieldsForPOI error: ${err.message}`);
   }
 }
 
