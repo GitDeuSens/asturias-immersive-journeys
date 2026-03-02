@@ -90,6 +90,29 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
         };
       }
 
+      // Map audio guides
+      if (poi.audio_es || poi.audio_en || poi.audio_fr) {
+        content.audioGuide = {};
+        if (poi.audio_es) {
+          content.audioGuide.es = { 
+            url: getFileUrl(poi.audio_es),
+            durationSec: poi.audio_duration_seconds || undefined
+          };
+        }
+        if (poi.audio_en) {
+          content.audioGuide.en = { 
+            url: getFileUrl(poi.audio_en),
+            durationSec: poi.audio_duration_seconds || undefined
+          };
+        }
+        if (poi.audio_fr) {
+          content.audioGuide.fr = { 
+            url: getFileUrl(poi.audio_fr),
+            durationSec: poi.audio_duration_seconds || undefined
+          };
+        }
+      }
+
       // Map cover image
       if (poi.cover_image) {
         content.image = { url: getFileUrl(poi.cover_image) };

@@ -1,0 +1,10 @@
+{
+  "name": "audio-duration-hook",
+  "version": "1.0.0",
+  "description": "Directus hook for automatic audio duration extraction",
+  "main": "audio-duration-hook.js",
+  "dependencies": {
+    "music-metadata": "^7.14.0",
+    "axios": "^1.6.0"
+  }
+}
