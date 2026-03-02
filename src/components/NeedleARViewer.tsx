@@ -101,6 +101,30 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
         await loadSceneInto(modelLoader, scene.slug);
         setIsLoading(false);
 
+        // Disable user interaction but keep auto-rotate spinning
+        try {
+          const { OrbitControls } = await import('@needle-tools/engine');
+          const orbit = GameObject.findObjectOfType(OrbitControls);
+          if (orbit) {
+            orbit.autoRotate = true;
+            orbit.autoRotateSpeed = 1;
+            // Disable all user interaction
+            (orbit as any).enableRotate = false;
+            (orbit as any).enableZoom = false;
+            (orbit as any).enablePan = false;
+            // Also try the underlying three.js controls
+            const ctrl = (orbit as any)._controls ?? (orbit as any).controls;
+            if (ctrl) {
+              ctrl.enableRotate = false;
+              ctrl.enableZoom = false;
+              ctrl.enablePan = false;
+            }
+            console.log('[AR] OrbitControls: auto-rotate ON, user interaction OFF');
+          }
+        } catch (e) {
+          console.warn('[AR] Could not configure OrbitControls:', e);
+        }
+
         // Auto-trigger AR session if ?autostart=1 (from QR scan)
         // AsturiasAROverlay also handles autostart; this is a backup.
         if (autostart) {
@@ -235,8 +259,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
         ref={needleRef as any}
         src="/assets/scene.glb"
         loading-background="#000000"
-        camera-controls="false"
-        auto-rotate="false"
+        auto-rotate="1"
         no-menu
         style={{ width: '100%', height: '100%', minHeight: 500, display: 'block' }}
       >
