@@ -129,9 +129,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
 
   if (!point) return null;
 
-  console.log(' mi punto ', point);
   const content = point.content;
-  console.log(' content ', content);
   const hasAR = !!content.arExperience;
   const has360 = !!content.tour360;
   const hasVideo = !!content.video;
@@ -152,7 +150,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
     <>
       <AnimatePresence>
         <motion.div key="overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[60]" onClick={onClose} />
+          className="fixed inset-0 z-[60] pointer-events-none" />
         <motion.div key="sheet"
           initial={{ x: '100%', opacity: 0.8 }} animate={{ x: 0, opacity: 1 }} exit={{ x: '100%', opacity: 0.8 }}
           transition={{ type: 'spring', damping: 28, stiffness: 200, mass: 0.9, opacity: { duration: 0.2, ease: 'easeOut' } }}
@@ -208,6 +206,10 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                       ) : (
                         <span className="text-xs text-muted-foreground truncate max-w-[100px]">{routeTitle}</span>
                       )}
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage className="text-xs truncate max-w-[120px]">{point.order}</BreadcrumbPage>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>

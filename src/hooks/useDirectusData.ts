@@ -68,7 +68,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
           allowFullscreen: true,
         };
       }
-      console.log(' este es mi poi ', poi);
+      
       if (Array.isArray(poi.gallery)) {
         const photos: { url: string }[] = [];
         poi.gallery.forEach((photo: any) => {

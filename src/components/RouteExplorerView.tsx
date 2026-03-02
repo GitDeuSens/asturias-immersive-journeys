@@ -72,6 +72,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   const navigate = useNavigate();
   const shareUrl = window.location.href;
   let isCopy = false;
+  console.log(' selected ', selectedPoint);
 
   const progress = route.points.length > 0
     ? Math.round((visitedPoints.size / route.points.length) * 100)
@@ -122,10 +123,10 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   const nearestPoint = nextRoutePoint;
 
   const handlePointClick = (point: RoutePoint) => {
-    if (!visitedPoints.has(point.id)) {
+    /*if (!visitedPoints.has(point.id)) {
       trackPOIViewed(point.id, getText(point.title, lang), route.id);
     }
-    setVisitedPoints(prev => new Set([...prev, point.id]));
+    setVisitedPoints(prev => new Set([...prev, point.id]));*/
     onSelectPoint(point);
   };
 
@@ -149,7 +150,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   };
 
   const handleCopyLink = async () => {
-    navigator.clipboard.writeText(shareUrl + `/${route.id}`);
+    navigator.clipboard.writeText(shareUrl);
     setCopied(true);
   };
 
@@ -199,6 +200,12 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
                 <BreadcrumbItem>
                   <BreadcrumbPage className="text-xs truncate max-w-[100px]">
                     {getText(selectedPoint.title, lang)}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="text-xs truncate max-w-[100px]">
+                    Nuevo Elemento
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </>

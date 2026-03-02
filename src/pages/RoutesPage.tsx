@@ -116,7 +116,8 @@ export const RoutesPage = React.memo(function RoutesPage() {
     });
     if (matched) {
       setSelectedRoute(matched);
-      setShowRouteDetail(true);
+      setExploringRoute(matched);
+      setShowRouteDetail(false);
       routeCodeHandledRef.current = true;
 
       // If a point ID is in the URL, find and select the point
@@ -342,6 +343,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
     }
 
     if (exploringRoute) {
+      console.log('entras??');
       // Show route polyline only if we have at least 2 valid points
       let positions = exploringRoute.polyline.map((p) => [p.lat, p.lng] as [number, number]);
       if (positions.length >= 2) {
@@ -372,7 +374,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
           icon: createPointMarkerIcon(point, idx, pointName),
         })
           .addTo(mapRef.current!)
-          .on("click", () => setSelectedPoint(point));
+          .on("click", () => handleSelectPoint(point));
         markersRef.current.push(marker);
       });
 
@@ -386,7 +388,9 @@ export const RoutesPage = React.memo(function RoutesPage() {
           icon: createRouteMarkerIcon(route, routeName),
         }).on("click", () => {
           setSelectedRoute(route);
-          setShowRouteDetail(true);
+          setExploringRoute(route);
+          setShowRouteDetail(false);
+          navigate(`/routes/${route.id}`, { replace: false });
         });
 
         clusterGroupRef.current?.addLayer(marker);
@@ -449,11 +453,14 @@ export const RoutesPage = React.memo(function RoutesPage() {
 
   // Helper: update URL when selecting a point
   const handleSelectPoint = (point: RoutePoint) => {
-    setSelectedPoint(point);
-    const routeId = exploringRoute?.id || selectedRoute?.id;
-    if (routeId) {
-      navigate(`/routes/${routeId}/${point.id}`, { replace: false });
-    }
+    setSelectedPoint(null);
+    setTimeout(() => {
+      setSelectedPoint(point);
+      const routeId = exploringRoute?.id || selectedRoute?.id;
+      if (routeId) {
+        navigate(`/routes/${routeId}/${point.id}`, { replace: false });
+      }
+    }, 0);
   };
 
   const handleClosePoint = () => {
@@ -641,8 +648,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                         onClick={() => {
                           setSelectedRoute(route);
                           setExploringRoute(route);
-                        //  setShowRouteDetail(true);
-                         // navigate(`/routes/${route.id}`, { replace: false });
+                          navigate(`/routes/${route.id}`, { replace: false });
                         }}
                       />
                       </motion.div>
@@ -709,6 +715,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
       <AnimatePresence>
       {selectedPoint && (
         <PointDetailSheet
+          key={selectedPoint.id}
           point={selectedPoint}
           onClose={handleClosePoint}
           routeTitle={exploringRoute ? (typeof exploringRoute.title === 'string' ? exploringRoute.title : (exploringRoute.title as any)[lang] || (exploringRoute.title as any).es || '') : selectedRoute ? (typeof selectedRoute.title === 'string' ? selectedRoute.title : (selectedRoute.title as any)[lang] || (selectedRoute.title as any).es || '') : undefined}
