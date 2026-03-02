@@ -15,6 +15,7 @@ import { trackPOITimeSpent } from '@/lib/analytics';
 import { openNavigation } from '@/lib/mapUtils';
 import { getARScenesByPOI } from '@/lib/api/directus-client';
 import { ShareButtons } from '@/components/ShareButtons';
+import { AudioGuidePlayer } from '@/components/AudioGuidePlayer';
 import {
   Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage,
 } from '@/components/ui/breadcrumb';
@@ -72,7 +73,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
   const [loadedARScene, setLoadedARScene] = useState<ARScene | null>(null);
   const [arSceneError, setArSceneError] = useState<string | null>(null);
   const [arSceneLoading, setArSceneLoading] = useState(false);
-  const poiStartTime = useRef<number>(Date.now());
+    const poiStartTime = useRef<number>(Date.now());
   const prevUrlRef = useRef<string>(window.location.pathname);
 
   const loadARScene = useCallback(async () => {
@@ -344,17 +345,33 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                         <span className="flex items-center gap-2"><Play className="w-4 h-4" />{t(texts.playVideo)}</span><ChevronRight className="w-4 h-4" />
                       </Button>
                     )}
-                    {hasAudio && content.audioGuide?.[language as keyof typeof content.audioGuide] && (
-                      <Button variant="outline" className="w-full justify-between" onClick={() => window.open(content.audioGuide![language as keyof typeof content.audioGuide]!.url, '_blank', 'noopener,noreferrer')}>
-                        <span className="flex items-center gap-2"><Headphones className="w-4 h-4" />{t(texts.listenAudio)}</span><ChevronRight className="w-4 h-4" />
-                      </Button>
-                    )}
                     {hasPDF && (
                       <Button variant="outline" className="w-full justify-between" onClick={() => window.open(content.pdf!.url, '_blank', 'noopener,noreferrer')}>
                         <span className="flex items-center gap-2"><FileText className="w-4 h-4" />{t(texts.downloadPDF)}</span><ChevronRight className="w-4 h-4" />
                       </Button>
                     )}
                   </div>
+                </div>
+              )}
+
+              {/* Embedded Audio Player */}
+              {hasAudio && content.audioGuide && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Headphones className="w-5 h-5 text-primary" />
+                    <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">{t(texts.listenAudio)}</h3>
+                  </div>
+                  <AudioGuidePlayer
+                    tracks={(['es', 'en', 'fr'] as Language[])
+                      .filter(lang => content.audioGuide![lang as keyof typeof content.audioGuide])
+                      .map(lang => ({
+                        language: lang,
+                        url: content.audioGuide![lang as keyof typeof content.audioGuide]!.url,
+                        durationSec: content.audioGuide![lang as keyof typeof content.audioGuide]!.durationSec
+                      }))}
+                    currentLocale={language as Language}
+                    autoPlay={false}
+                  />
                 </div>
               )}
 

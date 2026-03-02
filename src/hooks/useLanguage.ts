@@ -6,7 +6,9 @@ export type Language = 'es' | 'en' | 'fr';
 
 export function useLanguage() {
   const { i18n } = useTranslation();
-  const language = (i18n.language as Language) || 'es';
+  const langFromI18n = i18n.language || 'es';
+  const normalized = (langFromI18n.split('-')[0] || 'es') as Language;
+  const language: Language = normalized === 'es' || normalized === 'en' || normalized === 'fr' ? normalized : 'es';
 
   const setLanguage = useCallback((lang: Language) => {
     i18n.changeLanguage(lang);

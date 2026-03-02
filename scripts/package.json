@@ -1,0 +1,13 @@
+{
+  "name": "update-audio-durations",
+  "version": "1.0.0",
+  "description": "Script to update audio durations for existing files in Directus",
+  "main": "update-audio-durations.js",
+  "scripts": {
+    "start": "node update-audio-durations.js"
+  },
+  "dependencies": {
+    "music-metadata": "^7.14.0",
+    "axios": "^1.6.0"
+  }
+}

@@ -13,7 +13,9 @@ export function LCPOptimizer({ heroImage }: { heroImage?: string }) {
       document.head.appendChild(preloadLink);
       
       return () => {
-        document.head.removeChild(preloadLink);
+        if (document.head.contains(preloadLink)) {
+          document.head.removeChild(preloadLink);
+        }
       };
     }
   }, [heroImage]);
@@ -40,8 +42,12 @@ export function LCPOptimizer({ heroImage }: { heroImage?: string }) {
     document.head.appendChild(fontStyle);
 
     return () => {
-      document.head.removeChild(fontPreload);
-      document.head.removeChild(fontStyle);
+      if (document.head.contains(fontPreload)) {
+        document.head.removeChild(fontPreload);
+      }
+      if (document.head.contains(fontStyle)) {
+        document.head.removeChild(fontStyle);
+      }
     };
   }, []);
 

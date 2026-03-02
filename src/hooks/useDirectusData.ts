@@ -90,16 +90,32 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
         };
       }
 
-      content.audioGuide = {
-        es: {
-          url: 'https://back.asturias.digitalmetaverso.com/assets/' + poi.audio_es
-        },
-        en: {
-          url: 'https://back.asturias.digitalmetaverso.com/assets/' + poi.audio_en
-        },
-        fr: {
-          url: 'https://back.asturias.digitalmetaverso.com/assets/' + poi.audio_fr
-        },
+      // Map audio guides — audio_es/en/fr may be a plain string ID or an expanded object {id, duration}
+      const getAudioFileId = (f: any): string | undefined =>
+        typeof f === 'object' && f?.id ? f.id : (typeof f === 'string' ? f : undefined);
+      const getAudioDuration = (f: any): number | undefined =>
+        typeof f === 'object' && f?.duration ? f.duration : undefined;
+
+      if (poi.audio_es || poi.audio_en || poi.audio_fr) {
+        content.audioGuide = {};
+        if (poi.audio_es) {
+          content.audioGuide.es = {
+            url: getFileUrl(getAudioFileId(poi.audio_es)),
+            durationSec: getAudioDuration(poi.audio_es),
+          };
+        }
+        if (poi.audio_en) {
+          content.audioGuide.en = {
+            url: getFileUrl(getAudioFileId(poi.audio_en)),
+            durationSec: getAudioDuration(poi.audio_en),
+          };
+        }
+        if (poi.audio_fr) {
+          content.audioGuide.fr = {
+            url: getFileUrl(getAudioFileId(poi.audio_fr)),
+            durationSec: getAudioDuration(poi.audio_fr),
+          };
+        }
       }
 
       // Map cover image
