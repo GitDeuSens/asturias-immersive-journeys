@@ -73,8 +73,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
   const [loadedARScene, setLoadedARScene] = useState<ARScene | null>(null);
   const [arSceneError, setArSceneError] = useState<string | null>(null);
   const [arSceneLoading, setArSceneLoading] = useState(false);
-  const [showAudioPlayer, setShowAudioPlayer] = useState(false);
-  const poiStartTime = useRef<number>(Date.now());
+    const poiStartTime = useRef<number>(Date.now());
   const prevUrlRef = useRef<string>(window.location.pathname);
 
   const loadARScene = useCallback(async () => {
@@ -344,17 +343,32 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                         <span className="flex items-center gap-2"><Play className="w-4 h-4" />{t(texts.playVideo)}</span><ChevronRight className="w-4 h-4" />
                       </Button>
                     )}
-                    {hasAudio && content.audioGuide?.[language as keyof typeof content.audioGuide] && (
-                      <Button variant="outline" className="w-full justify-between" onClick={() => setShowAudioPlayer(true)}>
-                        <span className="flex items-center gap-2"><Headphones className="w-4 h-4" />{t(texts.listenAudio)}</span><ChevronRight className="w-4 h-4" />
-                      </Button>
-                    )}
                     {hasPDF && (
                       <Button variant="outline" className="w-full justify-between" onClick={() => window.open(content.pdf!.url, '_blank', 'noopener,noreferrer')}>
                         <span className="flex items-center gap-2"><FileText className="w-4 h-4" />{t(texts.downloadPDF)}</span><ChevronRight className="w-4 h-4" />
                       </Button>
                     )}
                   </div>
+                </div>
+              )}
+
+              {/* Embedded Audio Player */}
+              {hasAudio && content.audioGuide?.[language as keyof typeof content.audioGuide] && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Headphones className="w-5 h-5 text-primary" />
+                    <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">{t(texts.listenAudio)}</h3>
+                  </div>
+                  <AudioGuidePlayer
+                    audioTracks={[
+                      {
+                        language: language as Language,
+                        url: content.audioGuide[language as keyof typeof content.audioGuide]!.url,
+                        durationSec: content.audioGuide[language as keyof typeof content.audioGuide]!.durationSec
+                      }
+                    ]}
+                    autoPlay={false}
+                  />
                 </div>
               )}
 
@@ -425,50 +439,6 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative max-w-4xl max-h-[80vh] w-full">
               <img src={selectedGalleryImage} alt="Gallery fullscreen" className="w-full h-full object-contain rounded-lg" />
               <button onClick={() => setSelectedGalleryImage(null)} className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"><X className="w-5 h-5" /></button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Audio Player Modal */}
-      <AnimatePresence>
-        {showAudioPlayer && content.audioGuide?.[language as keyof typeof content.audioGuide] && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[70] bg-black/50 flex items-end justify-center"
-            onClick={() => setShowAudioPlayer(false)}
-          >
-            <motion.div
-              initial={{ y: '100%', opacity: 0.8 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: '100%', opacity: 0.8 }}
-              transition={{ type: 'spring', damping: 28, stiffness: 200 }}
-              className="w-full max-w-lg bg-background rounded-t-3xl shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold">{t(texts.listenAudio)}</h3>
-                  <button
-                    onClick={() => setShowAudioPlayer(false)}
-                    className="p-2 rounded-full hover:bg-muted transition-colors"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-                <AudioGuidePlayer
-                  audioTracks={[
-                    {
-                      language: language as Language,
-                      url: content.audioGuide[language as keyof typeof content.audioGuide]!.url,
-                      durationSec: content.audioGuide[language as keyof typeof content.audioGuide]!.durationSec
-                    }
-                  ]}
-                  autoPlay={true}
-                />
-              </div>
             </motion.div>
           </motion.div>
         )}
