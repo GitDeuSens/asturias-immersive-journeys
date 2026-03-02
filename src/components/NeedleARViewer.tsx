@@ -101,23 +101,28 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
         await loadSceneInto(modelLoader, scene.slug);
         setIsLoading(false);
 
-        // Disable ALL user interaction and auto-rotate — preview is fully static
+        // Disable ALL user interaction — preview is fully static, AR uses device movement only
         try {
           const { OrbitControls } = await import('@needle-tools/engine');
           const orbit = GameObject.findObjectOfType(OrbitControls);
           if (orbit) {
+            // Disable the component entirely so it doesn't intercept touch/mouse in AR either
+            orbit.enabled = false;
             orbit.autoRotate = false;
             (orbit as any).enableRotate = false;
             (orbit as any).enableZoom = false;
             (orbit as any).enablePan = false;
             const ctrl = (orbit as any)._controls ?? (orbit as any).controls;
             if (ctrl) {
+              ctrl.enabled = false;
               ctrl.enableRotate = false;
               ctrl.enableZoom = false;
               ctrl.enablePan = false;
               ctrl.autoRotate = false;
+              // Dispose touch/mouse listeners if possible
+              if (typeof ctrl.dispose === 'function') ctrl.dispose();
             }
-            console.log('[AR] OrbitControls: fully static preview, no interaction');
+            console.log('[AR] OrbitControls: fully disabled, no interaction in preview or AR');
           }
         } catch (e) {
           console.warn('[AR] Could not configure OrbitControls:', e);
