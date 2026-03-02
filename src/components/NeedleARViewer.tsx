@@ -101,25 +101,23 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
         await loadSceneInto(modelLoader, scene.slug);
         setIsLoading(false);
 
-        // Disable user interaction but keep auto-rotate spinning
+        // Disable ALL user interaction and auto-rotate — preview is fully static
         try {
           const { OrbitControls } = await import('@needle-tools/engine');
           const orbit = GameObject.findObjectOfType(OrbitControls);
           if (orbit) {
-            orbit.autoRotate = true;
-            orbit.autoRotateSpeed = 1;
-            // Disable all user interaction
+            orbit.autoRotate = false;
             (orbit as any).enableRotate = false;
             (orbit as any).enableZoom = false;
             (orbit as any).enablePan = false;
-            // Also try the underlying three.js controls
             const ctrl = (orbit as any)._controls ?? (orbit as any).controls;
             if (ctrl) {
               ctrl.enableRotate = false;
               ctrl.enableZoom = false;
               ctrl.enablePan = false;
+              ctrl.autoRotate = false;
             }
-            console.log('[AR] OrbitControls: auto-rotate ON, user interaction OFF');
+            console.log('[AR] OrbitControls: fully static preview, no interaction');
           }
         } catch (e) {
           console.warn('[AR] Could not configure OrbitControls:', e);
@@ -259,7 +257,8 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
         ref={needleRef as any}
         src="/assets/scene.glb"
         loading-background="#000000"
-        auto-rotate="1"
+        camera-controls="false"
+        auto-rotate="false"
         no-menu
         style={{ width: '100%', height: '100%', minHeight: 500, display: 'block' }}
       >
