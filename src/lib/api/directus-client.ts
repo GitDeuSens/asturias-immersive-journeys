@@ -52,10 +52,9 @@ function transformMuseum(museum: DirectusMuseum): Museum {
 }
 
 function getBuildUrl(buildPath: string | null | undefined, slug: string, buildSubdir: string): string {
-  // build_path is like "/tours-builds/slug/" — serve from frontend origin (public/ folder)
-  // When Directus serve-builds extension is deployed, switch to: `${DIRECTUS_URL}/builds${buildPath}`
+  // build_path is like "/tours-builds/slug/" — serve via Directus serve-builds endpoint
   if (buildPath) {
-    return `${buildPath}`;
+    return `${DIRECTUS_URL}/builds${buildPath}`;
   }
   return '';
 }
