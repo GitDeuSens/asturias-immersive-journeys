@@ -121,6 +121,8 @@ export const hasAnalyticsConsent = (): boolean => {
 
 // Initialize GA4 (only if consent given)
 export const initGA = () => {
+  // Avoid loading GA in development to prevent CSP/report-only noise
+  if (import.meta.env.DEV) return;
   if (!GA4_ID || !hasAnalyticsConsent()) {
     return;
   }
