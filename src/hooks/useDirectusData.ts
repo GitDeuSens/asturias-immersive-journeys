@@ -51,10 +51,15 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
         const arSlug = (arScene as any).slug || '';
         const buildPath = (arScene as any).build_path || '';
         const baseUrl = window.location.origin;
+        const directusUrl = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
+        // Resolve AR build URL from Directus server
+        const arBuildUrl = buildPath
+          ? `${directusUrl}/builds${buildPath}`
+          : (arSlug ? `${directusUrl}/builds/ar-builds/${arSlug}/` : undefined);
         content.arExperience = {
           launchUrl: arSlug ? `${baseUrl}/ar/${arSlug}` : '',
           qrValue: arSlug ? `${baseUrl}/ar/${arSlug}` : '',
-          iframe3dUrl: buildPath || undefined,
+          iframe3dUrl: arBuildUrl,
           arSlug,
         };
       }
@@ -62,9 +67,15 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       // Map 360 tour if linked (tour_360_id is expanded object from Directus deep query)
       const tour360 = typeof poi.tour_360_id === 'object' && poi.tour_360_id ? poi.tour_360_id : null;
       if (tour360) {
-        const buildPath = (tour360 as any).build_path || '';
+        const tourBuildPath = (tour360 as any).build_path || '';
+        const tourSlug = (tour360 as any).slug || '';
+        const directusUrl = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
+        // Resolve tour build URL from Directus server
+        const tourBuildUrl = tourBuildPath
+          ? `${directusUrl}/builds${tourBuildPath}`
+          : (tourSlug ? `${directusUrl}/builds/tours-builds/${tourSlug}/` : '');
         content.tour360 = {
-          iframe360Url: buildPath,
+          iframe360Url: tourBuildUrl,
           allowFullscreen: true,
         };
       }

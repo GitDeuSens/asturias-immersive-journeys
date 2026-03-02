@@ -1,0 +1,12 @@
+{
+  "name": "directus-extension-serve-builds",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Serve extracted tour and AR build files via HTTP",
+  "directus:extension": {
+    "type": "endpoint",
+    "path": "index.js",
+    "source": "index.js",
+    "host": "^10.0.0"
+  }
+}
