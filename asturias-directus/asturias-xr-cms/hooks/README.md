@@ -21,7 +21,15 @@ EXTENSIONS_PATH=./extensions
 HOOKS_PATH=./hooks
 ```
 
-### 3. Restart Directus
+### 3. Add ADMIN_TOKEN to environment
+
+The hook needs a static admin token to download audio files:
+
+```env
+ADMIN_TOKEN=asturias-creator-hub-admin-2024
+```
+
+### 4. Restart Directus
 Restart your Directus instance for the hook to be loaded:
 
 ```bash

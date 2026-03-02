@@ -1,94 +1,83 @@
-const { createReadStream } = require('fs');
-const { parseFile } = require('music-metadata');
+const { parseBuffer } = require('music-metadata');
 const axios = require('axios');
 
-module.exports = function registerHook({ filter }, { services, getSchema }) {
-  // Hook: когда файл загружается или обновляется
-  filter('files.update', async (payload, meta) => {
-    return await processFile(payload, meta, services);
+module.exports = function registerHook({ action }, { services, getSchema }) {
+  // action срабатывает ПОСЛЕ сохранения файла — ID уже доступен
+  action('files.upload', async ({ payload, key }) => {
+    await processFile(key, payload, services);
   });
 
-  filter('files.create', async (payload, meta) => {
-    return await processFile(payload, meta, services);
+  action('files.update', async ({ payload, keys }) => {
+    const fileId = Array.isArray(keys) ? keys[0] : keys;
+    if (fileId) await processFile(fileId, payload, services);
   });
 
-  // Helper функция для обработки файла
-  async function processFile(payload, meta, services) {
-    // Проверяем, что это аудиофайл
-    if (!payload.type || !payload.type.startsWith('audio/')) {
-      return payload;
-    }
-
+  async function processFile(fileId, payload, services) {
+    // Проверяем тип по payload или перечитываем файл
     try {
-      // Получаем полный путь к файлу
-      const fileId = payload.id || meta.key;
-      const file = await services.Files.readOne(fileId);
-      
-      // Если длительность уже установлена, пропускаем
+      const schema = await getSchema();
+      const filesService = new services.FilesService({ schema });
+      const file = await filesService.readOne(fileId);
+
+      if (!file) return;
+      if (!file.type || !file.type.startsWith('audio/')) return;
+
+      // Если длительность уже установлена — пропускаем
       if (file.duration) {
-        return payload;
+        console.log(`[Audio Hook] Duration already set for ${fileId}: ${file.duration}s`);
+        return;
       }
 
-      // Получаем URL файла
-      const fileUrl = `${process.env.PUBLIC_URL || 'https://back.asturias.digitalmetaverso.com'}/assets/${file.id}`;
-      
-      // Скачиваем файл во временный буфер
-      const response = await axios.get(fileUrl, { responseType: 'stream' });
-      const chunks = [];
-      
-      for await (const chunk of response.data) {
-        chunks.push(chunk);
-      }
-      
-      const buffer = Buffer.concat(chunks);
-      
-      // Извлекаем метаданные
-      const metadata = await parseFile(buffer);
-      
+      const fileUrl = `${process.env.PUBLIC_URL || 'https://back.asturias.digitalmetaverso.com'}/assets/${fileId}`;
+
+      // Скачиваем файл в буфер
+      const response = await axios.get(fileUrl, {
+        responseType: 'arraybuffer',
+        headers: { Authorization: `Bearer ${process.env.ADMIN_TOKEN || ''}` },
+        timeout: 30000,
+      });
+
+      const buffer = Buffer.from(response.data);
+
+      // Извлекаем метаданные (parseBuffer принимает буфер, parseFile — путь)
+      const metadata = await parseBuffer(buffer, file.type);
+
       if (metadata.format.duration) {
-        // Обновляем поле duration в файле
-        payload.duration = Math.round(metadata.format.duration);
-        
-        console.log(`[Audio Hook] Updated duration for file ${file.id}: ${payload.duration}s`);
-        
-        // Ищем связанные POI и обновляем audio_duration_seconds
-        await updateRelatedPOIs(file.id, payload.duration, services);
+        const durationSec = Math.round(metadata.format.duration);
+
+        // Обновляем duration у файла
+        await filesService.updateOne(fileId, { duration: durationSec });
+        console.log(`[Audio Hook] Updated duration for file ${fileId}: ${durationSec}s`);
+
+        // Обновляем audio_duration_seconds у связанных POI
+        await updateRelatedPOIs(fileId, durationSec, services, schema);
       }
     } catch (error) {
-      console.error('[Audio Hook] Error processing audio file:', error);
+      console.error('[Audio Hook] Error processing audio file:', error.message || error);
     }
-    
-    return payload;
   }
 
-  // Helper функция для обновления связанных POI
-  async function updateRelatedPOIs(fileId, duration, services) {
+  async function updateRelatedPOIs(fileId, duration, services, schema) {
     try {
-      const { ItemsService } = services;
-      const poisService = new ItemsService('pois', { schema: await getSchema() });
-      
-      // Ищем POI где этот аудиофайл используется
+      const poisService = new services.ItemsService('pois', { schema });
+
       const pois = await poisService.readByQuery({
         filter: {
           _or: [
             { audio_es: { _eq: fileId } },
             { audio_en: { _eq: fileId } },
-            { audio_fr: { _eq: fileId } }
-          ]
+            { audio_fr: { _eq: fileId } },
+          ],
         },
-        fields: ['id', 'audio_es', 'audio_en', 'audio_fr', 'audio_duration_seconds']
+        fields: ['id'],
       });
 
       for (const poi of pois) {
-        // Обновляем audio_duration_seconds
-        await poisService.updateOne(poi.id, {
-          audio_duration_seconds: duration
-        });
-        
+        await poisService.updateOne(poi.id, { audio_duration_seconds: duration });
         console.log(`[Audio Hook] Updated POI ${poi.id} audio_duration_seconds: ${duration}s`);
       }
     } catch (error) {
-      console.error('[Audio Hook] Error updating related POIs:', error);
+      console.error('[Audio Hook] Error updating related POIs:', error.message || error);
     }
   }
 };
