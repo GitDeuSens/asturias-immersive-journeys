@@ -45,8 +45,6 @@ import {
   BreadcrumbPage,
 } from '@/components/ui/breadcrumb';
 import { calculateRouteDistance, formatDistance, openNavigation } from '@/lib/mapUtils';
-import { useNavigate } from 'react-router-dom';
-
 
 interface RouteExplorerViewProps {
   route: ImmersiveRoute;
