@@ -51,12 +51,27 @@ function transformMuseum(museum: DirectusMuseum): Museum {
   };
 }
 
+function getBuildUrl(buildPath: string | null | undefined, slug: string, buildSubdir: string): string {
+  // If explicit build_path is set, resolve it against Directus server
+  // build_path is like "/tours-builds/slug/" — serve via Directus endpoint /builds/
+  if (buildPath) {
+    return `${DIRECTUS_URL}/builds${buildPath}`;
+  }
+  // Fallback: if slug exists, construct the expected path on Directus server
+  if (slug) {
+    return `${DIRECTUS_URL}/builds/${buildSubdir}/${slug}/`;
+  }
+  return '';
+}
+
 function transformTour360(tour: DirectusTour360): KuulaTour {
-  const embedUrl = tour.build_path || '';
+  const slug = (tour as any).slug || '';
+  const hasBuild = !!tour.build_path || !!(tour as any).build_zip;
+  const embedUrl = hasBuild ? getBuildUrl(tour.build_path, slug, 'tours-builds') : '';
   const buildZipUrl = (tour as any).build_zip ? getDirectusFileUrl((tour as any).build_zip) : '';
   return {
     id: tour.id,
-    slug: (tour as any).slug,
+    slug,
     title: toMultilingual(tour.translations, 'title'),
     description: toMultilingual(tour.translations, 'description'),
     kuula_embed_url: embedUrl,
@@ -75,9 +90,9 @@ function transformARScene(scene: DirectusARScene): ARScene {
     slug: scene.slug,
     title: toMultilingual(scene.translations, 'title'),
     description: toMultilingual(scene.translations, 'description'),
-    needle_scene_url: scene.build_path || '',
+    needle_scene_url: getBuildUrl(scene.build_path, scene.slug, 'ar-builds'),
     needle_type: scene.ar_type,
-    build_path: scene.build_path || undefined,
+    build_path: scene.build_path ? getBuildUrl(scene.build_path, scene.slug, 'ar-builds') : undefined,
 
     // Dynamic mode — GLB from Directus
     scene_mode: scene.scene_mode ?? 'build',
