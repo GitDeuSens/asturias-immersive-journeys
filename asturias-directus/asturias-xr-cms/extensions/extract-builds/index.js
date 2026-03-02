@@ -1,13 +1,29 @@
 import AdmZip from 'adm-zip';
 import path from 'path';
 import fs from 'fs/promises';
-import { existsSync } from 'fs';
+import { existsSync, createReadStream } from 'fs';
+import { parseFile } from 'music-metadata';
 
 // Base path inside the Docker container (mapped via volume)
 const BUILDS_ROOT = '/directus/builds';
 
-export default ({ action }, { services, logger }) => {
+export default ({ action }, { services, logger, getSchema }) => {
   const { FilesService, ItemsService } = services;
+
+  // ============================================
+  // TRIGGER: Audio file upload → extract duration
+  // ============================================
+  action('files.upload', async (input, context) => {
+    await processAudioDuration(input.payload, input.key, context, { services, logger, getSchema });
+  });
+
+  // Also handle file update (re-upload)
+  action('files.update', async (input, context) => {
+    const ids = Array.isArray(input.keys) ? input.keys : [input.keys];
+    for (const id of ids) {
+      await processAudioDuration(input.payload, id, context, { services, logger, getSchema });
+    }
+  });
 
   // ============================================
   // TRIGGER: Создание tours_360 / ar_scenes
@@ -82,6 +98,69 @@ export default ({ action }, { services, logger }) => {
     }
   });
 };
+
+// ============================================
+// AUDIO DURATION EXTRACTOR
+// ============================================
+async function processAudioDuration(payload, fileId, context, { services, logger, getSchema }) {
+  if (!fileId) return;
+
+  try {
+    const schema = context?.schema || (await getSchema());
+    const filesService = new services.FilesService({ schema, accountability: null });
+    const file = await filesService.readOne(fileId);
+
+    if (!file || !file.type || !file.type.startsWith('audio/')) return;
+    if (file.duration) {
+      logger.info(`[AUDIO-DURATION] Already set for ${fileId}: ${file.duration}s — syncing POIs`);
+      await syncPOIDurations(fileId, file.duration, schema, services, logger);
+      return;
+    }
+
+    const filePath = path.join('/directus/uploads', file.filename_disk);
+    if (!existsSync(filePath)) {
+      logger.warn(`[AUDIO-DURATION] File not found on disk: ${filePath}`);
+      return;
+    }
+
+    const metadata = await parseFile(filePath);
+    if (!metadata.format.duration) {
+      logger.warn(`[AUDIO-DURATION] Could not extract duration from ${file.filename_download}`);
+      return;
+    }
+
+    const durationSec = Math.round(metadata.format.duration);
+    await filesService.updateOne(fileId, { duration: durationSec });
+    logger.info(`[AUDIO-DURATION] Set ${file.filename_download} → ${durationSec}s`);
+
+    await syncPOIDurations(fileId, durationSec, schema, services, logger);
+  } catch (err) {
+    logger.error(`[AUDIO-DURATION] Error for ${fileId}: ${err.message}`);
+  }
+}
+
+async function syncPOIDurations(fileId, durationSec, schema, services, logger) {
+  try {
+    const poisService = new services.ItemsService('pois', { schema, accountability: null });
+    const langMap = [
+      ['audio_es', 'audio_duration_seconds'],
+      ['audio_en', 'audio_duration_seconds_en'],
+      ['audio_fr', 'audio_duration_seconds_fr'],
+    ];
+    for (const [audioField, durationField] of langMap) {
+      const pois = await poisService.readByQuery({
+        filter: { [audioField]: { _eq: fileId } },
+        fields: ['id'],
+      });
+      for (const poi of pois) {
+        await poisService.updateOne(poi.id, { [durationField]: durationSec });
+        logger.info(`[AUDIO-DURATION] POI ${poi.id} ${durationField}=${durationSec}s`);
+      }
+    }
+  } catch (err) {
+    logger.error(`[AUDIO-DURATION] syncPOIDurations error: ${err.message}`);
+  }
+}
 
 // ============================================
 // UNIVERSAL BUILD EXTRACTOR
