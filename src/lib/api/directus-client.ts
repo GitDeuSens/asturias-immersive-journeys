@@ -52,11 +52,13 @@ function transformMuseum(museum: DirectusMuseum): Museum {
 }
 
 function transformTour360(tour: DirectusTour360): KuulaTour {
-  const embedUrl = tour.build_path || '';
+  const slug = (tour as any).slug || '';
+  // Prefer explicit build_path; fallback to /tours-builds/{slug}/ if slug exists
+  const embedUrl = tour.build_path || (slug ? `/tours-builds/${slug}/` : '');
   const buildZipUrl = (tour as any).build_zip ? getDirectusFileUrl((tour as any).build_zip) : '';
   return {
     id: tour.id,
-    slug: (tour as any).slug,
+    slug,
     title: toMultilingual(tour.translations, 'title'),
     description: toMultilingual(tour.translations, 'description'),
     kuula_embed_url: embedUrl,

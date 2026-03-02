@@ -205,89 +205,70 @@ export function AudioGuidePlayer({
         </div>
       )}
 
-      {/* Main controls */}
-      <div className="flex items-center gap-3">
-        {/* Skip back */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => skip(-10)}
-          className="text-muted-foreground hover:text-foreground"
-          aria-label="Retroceder 10 segundos"
-        >
-          <SkipBack className="w-4 h-4" />
-        </Button>
+      {/* Main controls — stacks on small screens */}
+      <div className="flex flex-col gap-3">
+        {/* Play row */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Skip back */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => skip(-10)}
+            className="text-muted-foreground hover:text-foreground h-8 w-8 sm:h-9 sm:w-9 shrink-0"
+            aria-label="Retroceder 10 segundos"
+          >
+            <SkipBack className="w-4 h-4" />
+          </Button>
 
-        {/* Play/Pause */}
-        <Button
-          variant="default"
-          size="icon"
-          onClick={togglePlay}
-          className="w-12 h-12 rounded-full"
-          aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
-        >
-          {isPlaying ? (
-            <Pause className="w-5 h-5" />
-          ) : (
-            <Play className="w-5 h-5 ml-0.5" />
-          )}
-        </Button>
+          {/* Play/Pause */}
+          <Button
+            variant="default"
+            size="icon"
+            onClick={togglePlay}
+            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full shrink-0"
+            aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
+          >
+            {isPlaying ? (
+              <Pause className="w-4 h-4 sm:w-5 sm:h-5" />
+            ) : (
+              <Play className="w-4 h-4 sm:w-5 sm:h-5 ml-0.5" />
+            )}
+          </Button>
 
-        {/* Skip forward */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => skip(10)}
-          className="text-muted-foreground hover:text-foreground"
-          aria-label="Avanzar 10 segundos"
-        >
-          <SkipForward className="w-4 h-4" />
-        </Button>
+          {/* Skip forward */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => skip(10)}
+            className="text-muted-foreground hover:text-foreground h-8 w-8 sm:h-9 sm:w-9 shrink-0"
+            aria-label="Avanzar 10 segundos"
+          >
+            <SkipForward className="w-4 h-4" />
+          </Button>
 
-        {/* Progress bar */}
-        <div className="flex-1 flex items-center gap-2">
-          <span className="text-xs text-muted-foreground w-10 text-right">
-            {formatTime(currentTime)}
-          </span>
-          <Slider
-            ref={progressRef}
-            value={[currentTime]}
-            max={duration || 100}
-            step={1}
-            onValueChange={handleSeek}
-            className="flex-1"
-            aria-label="Progreso del audio"
-          />
-          <span className="text-xs text-muted-foreground w-10">
-            {formatTime(duration)}
-          </span>
+          {/* Progress bar */}
+          <div className="flex-1 flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <span className="text-[10px] sm:text-xs text-muted-foreground w-8 sm:w-10 text-right shrink-0">
+              {formatTime(currentTime)}
+            </span>
+            <Slider
+              ref={progressRef}
+              value={[currentTime]}
+              max={duration || 100}
+              step={1}
+              onValueChange={handleSeek}
+              className="flex-1 min-w-0"
+              aria-label="Progreso del audio"
+            />
+            <span className="text-[10px] sm:text-xs text-muted-foreground w-8 sm:w-10 shrink-0">
+              {formatTime(duration)}
+            </span>
+          </div>
         </div>
-
-        {/* Speed control */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={cycleSpeed}
-          className="text-xs font-mono text-muted-foreground hover:text-foreground min-w-[3rem]"
-          aria-label="Cambiar velocidad"
-        >
-          {playbackRate}x
-        </Button>
-
-        {/* Volume */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setIsMuted(!isMuted)}
-          className="text-muted-foreground hover:text-foreground"
-          aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
-        >
-          {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-        </Button>
       </div>
 
-      {/* Language selector & extras */}
-      <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
+      {/* Bottom row: language + extras — wraps on small screens */}
+      <div className="flex flex-wrap items-center justify-between gap-2 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-border">
         {/* Language buttons */}
         <div className="flex items-center gap-1">
           {tracks.map((track) => (
@@ -296,7 +277,7 @@ export function AudioGuidePlayer({
               variant={currentLang === track.language ? 'default' : 'ghost'}
               size="sm"
               onClick={() => changeLanguage(track.language)}
-              className="text-xs uppercase"
+              className="text-xs uppercase h-7 px-2 sm:h-8 sm:px-3"
             >
               {track.language}
             </Button>
@@ -305,15 +286,37 @@ export function AudioGuidePlayer({
 
         {/* Extra controls */}
         <div className="flex items-center gap-1">
+          {/* Speed */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={cycleSpeed}
+            className="text-xs font-mono text-muted-foreground hover:text-foreground h-7 px-1.5 sm:h-8 sm:px-2 min-w-[2.5rem]"
+            aria-label="Cambiar velocidad"
+          >
+            {playbackRate}x
+          </Button>
+
+          {/* Volume */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsMuted(!isMuted)}
+            className="text-muted-foreground hover:text-foreground h-7 w-7 sm:h-8 sm:w-8"
+            aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
+          >
+            {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+          </Button>
+
           {/* Download */}
           <Button
             variant="ghost"
             size="icon"
             onClick={handleDownload}
-            className="text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground h-7 w-7 sm:h-8 sm:w-8"
             aria-label="Descargar audio"
           >
-            <Download className="w-4 h-4" />
+            <Download className="w-3.5 h-3.5" />
           </Button>
 
           {/* Transcript toggle */}
@@ -322,10 +325,10 @@ export function AudioGuidePlayer({
               variant="ghost"
               size="icon"
               onClick={() => setShowTranscript(!showTranscript)}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground h-7 w-7 sm:h-8 sm:w-8"
               aria-label="Ver transcripción"
             >
-              <FileText className="w-4 h-4" />
+              <FileText className="w-3.5 h-3.5" />
             </Button>
           )}
         </div>
