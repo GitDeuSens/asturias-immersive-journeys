@@ -315,10 +315,10 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
           </p>
         </div>
         <div className='flex' style={{ justifyContent: 'flex-end', gap: '10px' }}>
-          <div onClick={handleNavigateToStart}>
+          <div className='cursor-pointer' onClick={handleNavigateToStart}>
             <span className='flex' style={{ alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}><Navigation className="w-6 h-6" /> {t('routes.howToGet')}</span>
           </div>
-          <div onClick={handleCopyLink}>
+          <div className='cursor-pointer' onClick={handleCopyLink}>
             <span className='flex' style={{ alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}><Share2 className="w-6 h-6" /> {t('share.title')}</span>
           </div>
         </div>
