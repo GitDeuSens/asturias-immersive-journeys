@@ -84,12 +84,15 @@ export default {
         res.setHeader('Cache-Control', 'no-cache');
       }
 
-      // Allow embedding in iframes
-      res.setHeader('X-Frame-Options', 'ALLOWALL');
+      // Allow embedding in iframes — override Directus CSP
       res.removeHeader('X-Frame-Options');
+      res.removeHeader('Content-Security-Policy');
+      res.setHeader('Content-Security-Policy', "frame-ancestors *");
+      res.setHeader('X-Frame-Options', 'ALLOWALL');
 
       // CORS for cross-origin iframe loading
       res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
 
       // Stream the file
       const stat = statSync(resolvedPath);
