@@ -125,19 +125,19 @@ export function AudioGuidePlayer({
 
   const changeLanguage = useCallback((lang: Language) => {
     const wasPlaying = isPlaying;
-    const position = currentTime;
 
     if (audioRef.current) {
       audioRef.current.pause();
     }
 
     setCurrentLang(lang);
+    setCurrentTime(0);
     setIsPlaying(false);
 
-    // Restore position after language change
+    // Start from the beginning on the new language
     setTimeout(() => {
       if (audioRef.current) {
-        audioRef.current.currentTime = position;
+        audioRef.current.currentTime = 0;
         if (wasPlaying) {
           audioRef.current.play();
           setIsPlaying(true);
@@ -146,7 +146,7 @@ export function AudioGuidePlayer({
     }, 100);
 
     trackEvent('audio_language_changed', { language: lang });
-  }, [isPlaying, currentTime]);
+  }, [isPlaying]);
 
   const cycleSpeed = useCallback(() => {
     const currentIndex = PLAYBACK_SPEEDS.indexOf(playbackRate);

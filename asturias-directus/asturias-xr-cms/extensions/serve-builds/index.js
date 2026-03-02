@@ -39,7 +39,7 @@ const MIME_TYPES = {
 };
 
 export default {
-  id: 'serve-builds',
+  id: 'builds',
   handler: (router) => {
     // Serve: GET /builds/tours-builds/{slug}/{...filepath}
     // Serve: GET /builds/ar-builds/{slug}/{...filepath}
