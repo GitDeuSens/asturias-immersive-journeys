@@ -1,18 +1,33 @@
 import AdmZip from 'adm-zip';
 import path from 'path';
 import fs from 'fs/promises';
-import { existsSync } from 'fs';
+import { existsSync, createReadStream } from 'fs';
+import { parseFile } from 'music-metadata';
 
 // Base path inside the Docker container (mapped via volume)
 const BUILDS_ROOT = '/directus/builds';
 
-export default ({ action }, { services, logger }) => {
+export default ({ action }, { services, logger, getSchema }) => {
   const { FilesService, ItemsService } = services;
 
   // ============================================
-  // TRIGGER: Создание tours_360 / ar_scenes
+  // TRIGGER: Audio file upload → extract duration
+  // ============================================
+  action('files.upload', async (input, context) => {
+    await processAudioDuration(input.payload, input.key, context, { services, logger, getSchema });
+  });
+
+  // ============================================
+  // TRIGGER: Создание items — pois/museums/routes/ar_scenes + tours_360/ar_scenes builds
   // ============================================
   action('items.create', async ({ payload, key, collection }, context) => {
+    if (collection === 'pois') {
+      await syncAudioFieldsForPOI(key, payload, context, { services, logger, getSchema });
+      await syncPostGIS(collection, key, payload, context, { services, logger, getSchema });
+    }
+    if (collection === 'museums' || collection === 'routes' || collection === 'ar_scenes') {
+      await syncPostGIS(collection, key, payload, context, { services, logger, getSchema });
+    }
     if (collection === 'tours_360' && payload.build_zip) {
       await extractBuild({
         item: { ...payload, id: key },
@@ -38,9 +53,27 @@ export default ({ action }, { services, logger }) => {
   });
 
   // ============================================
-  // TRIGGER: Обновление tours_360 / ar_scenes
+  // TRIGGER: Обновление tours_360 / ar_scenes / pois
   // ============================================
   action('items.update', async ({ payload, keys, collection }, context) => {
+    if (collection === 'pois') {
+      for (const key of keys) {
+        await syncAudioFieldsForPOI(key, null, context, { services, logger, getSchema });
+        if ('lat' in payload || 'lng' in payload) {
+          await syncPostGIS(collection, key, payload, context, { services, logger, getSchema });
+        }
+      }
+      return;
+    }
+    if (collection === 'museums' || collection === 'routes' || collection === 'ar_scenes') {
+      const geoFields = { museums: ['lat','lng'], routes: ['center_lat','center_lng'], ar_scenes: ['location_lat','location_lng'] };
+      const fields = geoFields[collection] || [];
+      if (fields.some(f => f in payload)) {
+        for (const key of keys) {
+          await syncPostGIS(collection, key, payload, context, { services, logger, getSchema });
+        }
+      }
+    }
     const configs = {
       tours_360:  { buildSubdir: 'tours-builds', logPrefix: 'EXTRACT-TOUR' },
       ar_scenes:  { buildSubdir: 'ar-builds',    logPrefix: 'EXTRACT-AR' },
@@ -82,6 +115,128 @@ export default ({ action }, { services, logger }) => {
     }
   });
 };
+
+// ============================================
+// AUDIO DURATION EXTRACTOR — writes duration to directus_files on upload
+// Frontend reads duration directly via M2O expand: audio_es.duration
+// ============================================
+async function processAudioDuration(payload, fileId, context, { services, logger, getSchema }) {
+  if (!fileId) return;
+  try {
+    const schema = context?.schema || (await getSchema());
+    const filesService = new services.FilesService({ schema, accountability: null });
+    const file = await filesService.readOne(fileId);
+
+    if (!file || !file.type || !file.type.startsWith('audio/')) return;
+    if (file.duration) {
+      logger.info(`[AUDIO-DURATION] Already set: ${file.filename_download} = ${file.duration}s`);
+      return;
+    }
+
+    const filePath = path.join('/directus/uploads', file.filename_disk);
+    if (!existsSync(filePath)) {
+      logger.warn(`[AUDIO-DURATION] File not on disk: ${filePath}`);
+      return;
+    }
+
+    const metadata = await parseFile(filePath);
+    if (!metadata.format.duration) return;
+
+    const durationSec = Math.round(metadata.format.duration);
+    await filesService.updateOne(fileId, { duration: durationSec });
+    logger.info(`[AUDIO-DURATION] ${file.filename_download} → ${durationSec}s`);
+  } catch (err) {
+    logger.error(`[AUDIO-DURATION] Error for ${fileId}: ${err.message}`);
+  }
+}
+
+// ============================================
+// POSTGIS SYNC — updates geometry column from lat/lng fields
+// ============================================
+async function syncPostGIS(collection, itemId, payload, context, { services, logger, getSchema }) {
+  const colMap = {
+    pois:     { lngField: 'lng', latField: 'lat',          geomCol: 'location' },
+    museums:  { lngField: 'lng', latField: 'lat',          geomCol: 'location' },
+    routes:   { lngField: 'center_lng', latField: 'center_lat', geomCol: 'center_location' },
+    ar_scenes:{ lngField: 'location_lng', latField: 'location_lat', geomCol: 'location' },
+  };
+  const cfg = colMap[collection];
+  if (!cfg) return;
+
+  try {
+    const schema = context?.schema || (await getSchema());
+    const svc = new services.ItemsService(collection, { schema, accountability: null });
+    const item = await svc.readOne(itemId, { fields: [cfg.latField, cfg.lngField] });
+    const lat = item[cfg.latField];
+    const lng = item[cfg.lngField];
+    if (lat == null || lng == null) return;
+
+    // Use raw DB query via knex to set geometry (ItemsService can't handle geometry type)
+    const knex = schema.knex || context?.database;
+    if (!knex) return;
+    await knex(collection).where({ id: itemId }).update({
+      [cfg.geomCol]: knex.raw('ST_SetSRID(ST_MakePoint(?, ?), 4326)', [lng, lat]),
+    });
+    logger.info(`[POSTGIS] ${collection} ${itemId} → location(${lng},${lat})`);
+  } catch (err) {
+    logger.error(`[POSTGIS] syncPostGIS error for ${collection}/${itemId}: ${err.message}`);
+  }
+}
+
+// ============================================
+// POI AUDIO SYNC — reads full POI from DB, extracts duration for all audio fields
+// Called on items.create/update for pois collection
+// Payload is ignored — we always read from DB so unchanged fields are included too
+// ============================================
+async function syncAudioFieldsForPOI(poiId, _payload, context, { services, logger, getSchema }) {
+  const langMap = [
+    ['audio_es', 'audio_duration_seconds'],
+    ['audio_en', 'audio_duration_seconds_en'],
+    ['audio_fr', 'audio_duration_seconds_fr'],
+  ];
+  try {
+    const schema = context?.schema || (await getSchema());
+    const filesService = new services.FilesService({ schema, accountability: null });
+    const poisService = new services.ItemsService('pois', { schema, accountability: null });
+
+    const poi = await poisService.readOne(poiId, { fields: ['audio_es', 'audio_en', 'audio_fr'] });
+    const update = {};
+
+    for (const [audioField, durationField] of langMap) {
+      const fileId = poi[audioField];
+      if (!fileId) continue;
+      try {
+        const file = await filesService.readOne(fileId);
+        if (!file || !file.type || !file.type.startsWith('audio/')) continue;
+
+        let durationSec = file.duration;
+        if (!durationSec) {
+          const filePath = path.join('/directus/uploads', file.filename_disk);
+          if (!existsSync(filePath)) {
+            logger.warn(`[AUDIO-DURATION] File not on disk: ${filePath}`);
+            continue;
+          }
+          const metadata = await parseFile(filePath);
+          if (metadata.format.duration) {
+            durationSec = Math.round(metadata.format.duration);
+            await filesService.updateOne(fileId, { duration: durationSec });
+            logger.info(`[AUDIO-DURATION] Extracted ${file.filename_download} → ${durationSec}s`);
+          }
+        }
+        if (durationSec) update[durationField] = durationSec;
+      } catch (err) {
+        logger.error(`[AUDIO-DURATION] Error for file ${fileId}: ${err.message}`);
+      }
+    }
+
+    if (Object.keys(update).length > 0) {
+      await poisService.updateOne(poiId, update);
+      logger.info(`[AUDIO-DURATION] POI ${poiId} updated: ${JSON.stringify(update)}`);
+    }
+  } catch (err) {
+    logger.error(`[AUDIO-DURATION] syncAudioFieldsForPOI error: ${err.message}`);
+  }
+}
 
 // ============================================
 // UNIVERSAL BUILD EXTRACTOR

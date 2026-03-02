@@ -1,103 +1,91 @@
-const { createReadStream } = require('fs');
-const { parseFile } = require('music-metadata');
+const { parseBuffer } = require('music-metadata');
 const axios = require('axios');
 
-// Directus API configuration
 const DIRECTUS_URL = 'https://back.asturias.digitalmetaverso.com';
-const STATIC_TOKEN = 'asturias-creator-hub-admin-2024';
+const TOKEN = 'asturias-creator-hub-admin-2024';
 
-// Helper function to get file URL
-function getFileUrl(fileId) {
-  return `${DIRECTUS_URL}/assets/${fileId}`;
+const api = axios.create({
+  baseURL: DIRECTUS_URL,
+  headers: { Authorization: `Bearer ${TOKEN}`, 'Content-Type': 'application/json' },
+  timeout: 60000,
+});
+
+async function getDuration(fileId, mimeType) {
+  const response = await axios.get(`${DIRECTUS_URL}/assets/${fileId}`, {
+    responseType: 'arraybuffer',
+    headers: { Authorization: `Bearer ${TOKEN}` },
+    timeout: 60000,
+  });
+  const buffer = Buffer.from(response.data);
+  const metadata = await parseBuffer(buffer, { mimeType });
+  return metadata.format.duration ? Math.round(metadata.format.duration) : null;
 }
 
-// Helper function to make API requests
-async function makeRequest(endpoint, method = 'GET', data = null) {
-  const config = {
-    method,
-    url: `${DIRECTUS_URL}${endpoint}`,
-    headers: {
-      'Authorization': `Bearer ${STATIC_TOKEN}`,
-      'Content-Type': 'application/json'
-    }
-  };
-  
-  if (data) {
-    config.data = data;
-  }
-  
-  try {
-    const response = await axios(config);
-    return response.data;
-  } catch (error) {
-    console.error(`API Error for ${endpoint}:`, error.response?.data || error.message);
-    throw error;
-  }
-}
+async function run() {
+  console.log('Fetching all POIs with audio files...');
 
-// Main function to update existing audio files
-async function updateExistingAudioFiles() {
-  console.log('Starting update of existing audio files...');
-  
-  try {
-    // Get all audio files without duration
-    const files = await makeRequest('/files?filter[type][_starts_with]=audio&filter[duration][_null]=true&limit=-1');
-    console.log(`Found ${files.data.length} audio files without duration`);
-    
-    for (const file of files.data) {
-      console.log(`\nProcessing file: ${file.filename_download} (${file.id})`);
-      
+  // Get all POIs that have at least one audio file
+  const { data: poisResp } = await api.get('/items/pois', {
+    params: {
+      'filter[_or][0][audio_es][_nnull]': true,
+      'filter[_or][1][audio_en][_nnull]': true,
+      'filter[_or][2][audio_fr][_nnull]': true,
+      'fields[]': ['id', 'audio_es', 'audio_en', 'audio_fr',
+        'audio_duration_seconds_es', 'audio_duration_seconds_en', 'audio_duration_seconds_fr'],
+      limit: -1,
+    },
+  });
+
+  const pois = poisResp.data;
+  console.log(`Found ${pois.length} POIs with audio\n`);
+
+  for (const poi of pois) {
+    const update = {};
+
+    for (const [lang, fileId, durationField] of [
+      ['es', poi.audio_es, 'audio_duration_seconds_es'],
+      ['en', poi.audio_en, 'audio_duration_seconds_en'],
+      ['fr', poi.audio_fr, 'audio_duration_seconds_fr'],
+    ]) {
+      if (!fileId) continue;
+      if (poi[durationField]) {
+        console.log(`  [${lang}] POI ${poi.id}: already has ${poi[durationField]}s — skipping`);
+        continue;
+      }
+
       try {
-        // Download file
-        const fileUrl = getFileUrl(file.id);
-        const response = await axios.get(fileUrl, { responseType: 'stream' });
-        const chunks = [];
-        
-        for await (const chunk of response.data) {
-          chunks.push(chunk);
+        // Get file info to check type
+        const { data: fileResp } = await api.get(`/files/${fileId}`, {
+          params: { 'fields[]': ['id', 'type', 'filename_download'] },
+        });
+        const file = fileResp.data;
+
+        if (!file.type?.startsWith('audio/')) {
+          console.log(`  [${lang}] POI ${poi.id}: file ${fileId} is not audio (${file.type}) — skipping`);
+          continue;
         }
-        
-        const buffer = Buffer.concat(chunks);
-        
-        // Extract metadata
-        const metadata = await parseFile(buffer);
-        
-        if (metadata.format.duration) {
-          const duration = Math.round(metadata.format.duration);
-          
-          // Update file duration
-          await makeRequest(`/files/${file.id}`, 'PATCH', {
-            duration: duration
-          });
-          
-          console.log(`  ✓ Updated duration: ${duration}s`);
-          
-          // Find and update related POIs
-          const pois = await makeRequest(`/items/pois?filter[_or][audio_es][_eq]=${file.id}&filter[_or][audio_en][_eq]=${file.id}&filter[_or][audio_fr][_eq]=${file.id}`);
-          
-          for (const poi of pois.data) {
-            await makeRequest(`/items/pois/${poi.id}`, 'PATCH', {
-              audio_duration_seconds: duration
-            });
-            console.log(`  ✓ Updated POI: ${poi.id}`);
-          }
-          
-          // Small delay to avoid overwhelming the server
-          await new Promise(resolve => setTimeout(resolve, 100));
+
+        const durationSec = await getDuration(fileId, file.type);
+        if (durationSec) {
+          update[durationField] = durationSec;
+          // Also update file's own duration field
+          await api.patch(`/files/${fileId}`, { duration: durationSec });
+          console.log(`  [${lang}] POI ${poi.id}: ${file.filename_download} → ${durationSec}s ✓`);
         } else {
-          console.log(`  ⚠ No duration found in metadata`);
+          console.log(`  [${lang}] POI ${poi.id}: could not extract duration from ${file.filename_download}`);
         }
-      } catch (error) {
-        console.error(`  ✗ Error processing file ${file.id}:`, error.message);
+      } catch (err) {
+        console.error(`  [${lang}] POI ${poi.id}: error processing file ${fileId}: ${err.message}`);
       }
     }
-    
-    console.log('\n✅ Update completed!');
-  } catch (error) {
-    console.error('❌ Fatal error:', error);
-    process.exit(1);
+
+    if (Object.keys(update).length > 0) {
+      await api.patch(`/items/pois/${poi.id}`, update);
+      console.log(`  → POI ${poi.id} updated: ${JSON.stringify(update)}\n`);
+    }
   }
+
+  console.log('\n✅ Done!');
 }
 
-// Run the script
-updateExistingAudioFiles();
+run().catch(err => { console.error('Fatal:', err.message); process.exit(1); });
