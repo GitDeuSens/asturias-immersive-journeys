@@ -27,6 +27,7 @@ export interface KuulaTour {
     en?: string;
     fr?: string;
   };
+  categories?: (string | { id?: string; categories_id?: string })[];
   created_at?: string;
   updated_at?: string;
   published: boolean;

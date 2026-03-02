@@ -217,17 +217,19 @@ export function NavigationView({ destination, onClose }: NavigationViewProps) {
     }
   }, [userPosition, isNavigating]);
 
+  const speechLang = i18n.language === 'en' ? 'en-GB' : i18n.language === 'fr' ? 'fr-FR' : 'es-ES';
+
   // Voice announcements for step changes
   useEffect(() => {
     if (!voiceEnabled || !currentStep || !isNavigating) return;
 
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(currentStep.instruction);
-      utterance.lang = 'es-ES';
+      utterance.lang = speechLang;
       utterance.rate = 0.9;
       window.speechSynthesis.speak(utterance);
     }
-  }, [currentStepIndex, voiceEnabled, currentStep, isNavigating]);
+  }, [currentStepIndex, voiceEnabled, currentStep, isNavigating, speechLang]);
 
   // Handle navigation start
   const handleStart = async () => {

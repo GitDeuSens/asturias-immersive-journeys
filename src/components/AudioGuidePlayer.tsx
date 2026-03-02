@@ -38,11 +38,6 @@ export function AudioGuidePlayer({
   currentLocale = 'es',
   compact = false,
 }: AudioGuidePlayerProps) {
-  // Return null if no tracks available
-  if (!tracks || tracks.length === 0) {
-    return null;
-  }
-  
   const [currentLang, setCurrentLang] = useState<Language>(currentLocale);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);

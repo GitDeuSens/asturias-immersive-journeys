@@ -80,7 +80,12 @@ export function Tours360Page() {
 
   const filteredTours = useMemo(() => {
     if (selectedCategories.length === 0) return kuulaTours;
-    return kuulaTours;
+    return kuulaTours.filter((tour) =>
+      tour.categories?.some((cat: any) => {
+        const catId = typeof cat === 'object' ? (cat.categories_id ?? cat.id) : cat;
+        return selectedCategories.includes(String(catId));
+      })
+    );
   }, [selectedCategories, kuulaTours]);
 
   const localSearchData: LocalSearchItem[] = useMemo(() => {
@@ -196,14 +201,6 @@ export function Tours360Page() {
               </div>
               <p className="text-lg text-white/90 max-w-2xl mx-auto mb-6">{t(texts.subtitle)}</p>
 
-              {/* Search toggle */}
-              <button
-                onClick={() => setShowSearch(!showSearch)}
-                className="hidden inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
-              >
-                <Search className="w-4 h-4" />
-                <span>{t(texts.searchPlaceholder)}</span>
-              </button>
             </motion.div>
           </div>
         </div>
@@ -216,10 +213,6 @@ export function Tours360Page() {
             transition={{ delay: 0.1 }}
             className="mb-8"
           >
-            <div className="hidden flex items-center gap-3 mb-4">
-              <Filter className="w-5 h-5 text-muted-foreground" />
-              <span className="font-semibold text-foreground">{t(texts.allCategories)}</span>
-            </div>
             <div className="flex">
               <CategoryChips categories={categories} selectedIds={selectedCategories} onToggle={toggleCategory} />
               <div style={{ marginLeft: '25px' }}>

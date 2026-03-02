@@ -92,7 +92,7 @@ export function ModeSelector({ onSelect }: ModeSelectorProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           style={{ fontWeight: 'lighter'}}
-          className="sm:text-sm md:text-4xl lg:text-7xl text-white text-center mb-5 drop-shadow-lg max-w-3xl initial-title"
+          className="text-3xl sm:text-3xl md:text-4xl lg:text-7xl text-white text-center mb-5 drop-shadow-lg max-w-3xl initial-title"
         >
           {t(texts.title)}
         </motion.h1>
