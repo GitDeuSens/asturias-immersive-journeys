@@ -169,7 +169,8 @@ export function ARScenePage() {
   }
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
-  const instructions = texts.instructions[scene.needle_type][locale as Language];
+  const instructionSet = texts.instructions[scene.needle_type as keyof typeof texts.instructions];
+  const instructions = instructionSet?.[locale as Language] ?? texts.instructions.slam[locale as Language];
 
   return (
     <div className="min-h-screen bg-background">
@@ -231,8 +232,8 @@ export function ARScenePage() {
                 <Badge variant="secondary" className="bg-card/90">
                   <Clock className="w-3 h-3 mr-1" />{scene.duration_minutes} {texts.duration[locale as Language]}
                 </Badge>
-                <Badge variant="secondary" className="bg-card/90">{texts.arType[scene.needle_type][locale as Language]}</Badge>
-                <Badge variant="secondary" className="bg-card/90">{texts.difficulty[scene.difficulty][locale as Language]}</Badge>
+                <Badge variant="secondary" className="bg-card/90">{texts.arType[scene.needle_type as keyof typeof texts.arType]?.[locale as Language] ?? scene.needle_type}</Badge>
+                <Badge variant="secondary" className="bg-card/90">{texts.difficulty[scene.difficulty as keyof typeof texts.difficulty]?.[locale as Language] ?? scene.difficulty}</Badge>
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
                 {scene.title[locale as Language] || scene.title.es}
