@@ -235,6 +235,8 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
         ref={needleRef as any}
         src="/assets/scene.glb"
         loading-background="#000000"
+        camera-controls="false"
+        auto-rotate="false"
         no-menu
         style={{ width: '100%', height: '100%', minHeight: 500, display: 'block' }}
       >
