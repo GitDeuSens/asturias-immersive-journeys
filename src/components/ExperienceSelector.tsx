@@ -27,7 +27,7 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
 
   return (
     <>
-      <div style={{ height: '90vh' }} className="experiences-container relative z-10 flex flex-col items-center justify-center px-4 pt-16 pb-4">
+      <div style={{ height: '110vh' }} className="experiences-container relative z-10 flex flex-col items-center justify-center px-4 pt-16 pb-4">
         {/* Title */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
