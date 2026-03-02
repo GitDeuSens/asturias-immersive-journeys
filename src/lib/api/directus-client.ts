@@ -52,14 +52,9 @@ function transformMuseum(museum: DirectusMuseum): Museum {
 }
 
 function getBuildUrl(buildPath: string | null | undefined, slug: string, buildSubdir: string): string {
-  // If explicit build_path is set, resolve it against Directus server
-  // build_path is like "/tours-builds/slug/" — serve via Directus endpoint /builds/
+  // Only use explicit build_path — don't guess from slug (build may not be extracted yet)
   if (buildPath) {
     return `${DIRECTUS_URL}/builds${buildPath}`;
-  }
-  // Fallback: if slug exists, construct the expected path on Directus server
-  if (slug) {
-    return `${DIRECTUS_URL}/builds/${buildSubdir}/${slug}/`;
   }
   return '';
 }
@@ -79,7 +74,7 @@ function transformTour360(tour: DirectusTour360): KuulaTour {
     museum_id: tour.museum_id,
     thumbnail_url: getDirectusFileUrl(tour.thumbnail),
     duration_minutes: tour.duration_minutes,
-    total_panoramas: tour.total_panoramas || 0,
+    total_panoramas: tour.total_panoramas || (hasBuild ? 1 : 0),
     published: tour.status === 'published',
   };
 }
