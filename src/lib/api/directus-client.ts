@@ -473,6 +473,43 @@ class DirectusApiClient {
       return events as any[];
     } catch (error) { logger.error('[DirectusClient] Error fetching analytics:', error); return []; }
   }
+
+  // Geo search: find POIs within radiusKm of given coordinates using PostGIS
+  async getNearbyPOIs(lat: number, lng: number, radiusKm = 2, _locale: Language = 'es') {
+    try {
+      const pois = await this.getClient().request(readItems('pois', {
+        filter: {
+          status: { _in: API_CONFIG.getStatusFilter() },
+          location: { _intersects_bbox: {
+            type: 'Polygon',
+            coordinates: [[
+              [lng - radiusKm / 111, lat - radiusKm / 111],
+              [lng + radiusKm / 111, lat - radiusKm / 111],
+              [lng + radiusKm / 111, lat + radiusKm / 111],
+              [lng - radiusKm / 111, lat + radiusKm / 111],
+              [lng - radiusKm / 111, lat - radiusKm / 111],
+            ]],
+          }},
+        } as any,
+        fields: ['*', ...TRANSLATIONS_DEEP, 'audio_es.id', 'audio_es.duration', 'audio_en.id', 'audio_en.duration', 'audio_fr.id', 'audio_fr.duration'],
+        sort: ['order'],
+        limit: 20,
+      }));
+      return (pois as unknown as DirectusPOI[]).map(p => ({
+        ...transformPOI(p),
+        distanceKm: calcDistanceKm(lat, lng, (p as any).lat, (p as any).lng),
+      })).sort((a, b) => a.distanceKm - b.distanceKm);
+    } catch (error) { logger.error('[DirectusClient] Error fetching nearby POIs:', error); return []; }
+  }
+}
+
+// Haversine distance in km
+function calcDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 export const directus = new DirectusApiClient();
@@ -497,3 +534,4 @@ export const getVRExperiences = (locale?: Language) => directus.getVRExperiences
 export const getCategories = (locale?: Language) => directus.getCategories(locale);
 export const searchContent = (query: string, locale?: Language) => directus.search(query, locale);
 export const trackAnalyticsEvent = (eventData: any) => directus.trackAnalyticsEvent(eventData);
+export const getNearbyPOIs = (lat: number, lng: number, radiusKm?: number, locale?: Language) => directus.getNearbyPOIs(lat, lng, radiusKm, locale);

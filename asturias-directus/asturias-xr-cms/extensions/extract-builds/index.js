@@ -18,11 +18,15 @@ export default ({ action }, { services, logger, getSchema }) => {
   });
 
   // ============================================
-  // TRIGGER: Создание tours_360 / ar_scenes / pois
+  // TRIGGER: Создание items — pois/museums/routes/ar_scenes + tours_360/ar_scenes builds
   // ============================================
   action('items.create', async ({ payload, key, collection }, context) => {
     if (collection === 'pois') {
       await syncAudioFieldsForPOI(key, payload, context, { services, logger, getSchema });
+      await syncPostGIS(collection, key, payload, context, { services, logger, getSchema });
+    }
+    if (collection === 'museums' || collection === 'routes' || collection === 'ar_scenes') {
+      await syncPostGIS(collection, key, payload, context, { services, logger, getSchema });
     }
     if (collection === 'tours_360' && payload.build_zip) {
       await extractBuild({
@@ -55,8 +59,20 @@ export default ({ action }, { services, logger, getSchema }) => {
     if (collection === 'pois') {
       for (const key of keys) {
         await syncAudioFieldsForPOI(key, null, context, { services, logger, getSchema });
+        if ('lat' in payload || 'lng' in payload) {
+          await syncPostGIS(collection, key, payload, context, { services, logger, getSchema });
+        }
       }
       return;
+    }
+    if (collection === 'museums' || collection === 'routes' || collection === 'ar_scenes') {
+      const geoFields = { museums: ['lat','lng'], routes: ['center_lat','center_lng'], ar_scenes: ['location_lat','location_lng'] };
+      const fields = geoFields[collection] || [];
+      if (fields.some(f => f in payload)) {
+        for (const key of keys) {
+          await syncPostGIS(collection, key, payload, context, { services, logger, getSchema });
+        }
+      }
     }
     const configs = {
       tours_360:  { buildSubdir: 'tours-builds', logPrefix: 'EXTRACT-TOUR' },
@@ -131,6 +147,39 @@ async function processAudioDuration(payload, fileId, context, { services, logger
     logger.info(`[AUDIO-DURATION] ${file.filename_download} → ${durationSec}s`);
   } catch (err) {
     logger.error(`[AUDIO-DURATION] Error for ${fileId}: ${err.message}`);
+  }
+}
+
+// ============================================
+// POSTGIS SYNC — updates geometry column from lat/lng fields
+// ============================================
+async function syncPostGIS(collection, itemId, payload, context, { services, logger, getSchema }) {
+  const colMap = {
+    pois:     { lngField: 'lng', latField: 'lat',          geomCol: 'location' },
+    museums:  { lngField: 'lng', latField: 'lat',          geomCol: 'location' },
+    routes:   { lngField: 'center_lng', latField: 'center_lat', geomCol: 'center_location' },
+    ar_scenes:{ lngField: 'location_lng', latField: 'location_lat', geomCol: 'location' },
+  };
+  const cfg = colMap[collection];
+  if (!cfg) return;
+
+  try {
+    const schema = context?.schema || (await getSchema());
+    const svc = new services.ItemsService(collection, { schema, accountability: null });
+    const item = await svc.readOne(itemId, { fields: [cfg.latField, cfg.lngField] });
+    const lat = item[cfg.latField];
+    const lng = item[cfg.lngField];
+    if (lat == null || lng == null) return;
+
+    // Use raw DB query via knex to set geometry (ItemsService can't handle geometry type)
+    const knex = schema.knex || context?.database;
+    if (!knex) return;
+    await knex(collection).where({ id: itemId }).update({
+      [cfg.geomCol]: knex.raw('ST_SetSRID(ST_MakePoint(?, ?), 4326)', [lng, lat]),
+    });
+    logger.info(`[POSTGIS] ${collection} ${itemId} → location(${lng},${lat})`);
+  } catch (err) {
+    logger.error(`[POSTGIS] syncPostGIS error for ${collection}/${itemId}: ${err.message}`);
   }
 }
 
