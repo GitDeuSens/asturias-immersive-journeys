@@ -439,11 +439,14 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
       <AnimatePresence>
         {selectedGalleryImage && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4"
+            className={`fixed inset-0 bg-black/90 flex items-center justify-center p-4 ${isMobile ? '' : 'z-[60]'}`}
+            style={isMobile ? { zIndex: 600000000000 } : undefined}
             onClick={() => setSelectedGalleryImage(null)}>
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative flex items-center justify-center">
-              <img src={selectedGalleryImage} alt="Gallery fullscreen" style={{maxWidth: '96vw', maxHeight: '96vh', width: 'auto', height: 'auto'}} />
-              <button onClick={() => setSelectedGalleryImage(null)} className="absolute top-2 right-2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"><X className="w-5 h-5" /></button>
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+              className={isMobile ? "relative flex items-center justify-center" : ""}
+              style={isMobile ? undefined : {position: 'fixed', left: '5px', top: '10px'}}>
+              <img src={selectedGalleryImage} alt="Gallery fullscreen" style={isMobile ? {maxWidth: '96vw', maxHeight: '96vh', width: 'auto', height: 'auto'} : {width: '96vh', height: '98vh'}} />
+              <button onClick={() => setSelectedGalleryImage(null)} className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"><X className="w-5 h-5" /></button>
             </motion.div>
           </motion.div>
         )}
