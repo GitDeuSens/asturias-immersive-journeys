@@ -45,14 +45,13 @@ import {
   BreadcrumbPage,
 } from '@/components/ui/breadcrumb';
 import { calculateRouteDistance, formatDistance, openNavigation } from '@/lib/mapUtils';
-import { useNavigate } from 'react-router-dom';
 
 
 interface RouteExplorerViewProps {
-  route: ImmersiveRoute;
-  onBack: () => void;
-  onSelectPoint: (point: RoutePoint) => void;
-  selectedPoint: RoutePoint | null;
+  route?: ImmersiveRoute;
+  onBack?: () => void;
+  onSelectPoint?: (point: RoutePoint) => void;
+  selectedPoint?: RoutePoint | null;
 }
 
 // Helper: safely get string from multilingual field or plain string
@@ -118,7 +117,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
     hard: 'bg-destructive/20 text-destructive border-destructive',
   };
 
-const calculatedDistance = calculateRouteDistance(route.polyline);
+  const calculatedDistance = calculateRouteDistance(route.polyline);
   const distance = route.distanceKm || calculatedDistance;
   const nearestPoint = nextRoutePoint;
 
@@ -242,7 +241,7 @@ const calculatedDistance = calculateRouteDistance(route.polyline);
             </div>
           </div>
         </div>
-        <div className="flex flex-wrap gap-2" style={{marginTop: '35px', marginBottom: '25px'}}>
+        <div className="flex flex-wrap gap-2" style={{ marginTop: '35px', marginBottom: '25px' }}>
           {/* Duration */}
           {route.duration && (
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
@@ -526,6 +525,11 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
                 {hasAudio && <Headphones className="w-3.5 h-3.5 text-muted-foreground" />}
                 {hasPDF && <FileText className="w-3.5 h-3.5 text-muted-foreground" />}
               </div>
+
+              <button onClick={(e) => {
+                e.stopPropagation();
+                onToggleVisited();
+              }} className='inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3 text-xs'>{t('poi.visited')}</button>
 
               {distanceInfo && (
                 <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground font-medium">

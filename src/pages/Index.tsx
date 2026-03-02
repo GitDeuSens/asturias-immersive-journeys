@@ -40,7 +40,7 @@ const Index = () => {
       <ResourceOptimizer />
       <div className="min-h-screen bg-background">
         {/* Dynamic blurred background */}
-        <DynamicBackground blur={10} interval={8000} />
+        <DynamicBackground blur={5} interval={8000} />
         
         {/* Header with language selector */}
         <OnboardingHeader />

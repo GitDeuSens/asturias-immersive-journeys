@@ -115,7 +115,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
     const content = point.content;
     if (!content.arExperience?.iframe3dUrl) return null;
     return {
-      id: point.id, 
+      id: point.id,
       slug: `poi-${point.id}`, // Temporary slug - will be replaced by loadedARScene
       title: typeof point.title === 'string' ? { es: point.title, en: point.title, fr: point.title } : point.title,
       description: (point as any).shortDescription || { es: '', en: '', fr: '' },
@@ -128,7 +128,9 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
 
   if (!point) return null;
 
+  console.log(' mi punto ', point);
   const content = point.content;
+  console.log(' content ', content);
   const hasAR = !!content.arExperience;
   const has360 = !!content.tour360;
   const hasVideo = !!content.video;
@@ -153,8 +155,8 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
         <motion.div key="sheet"
           initial={{ x: '100%', opacity: 0.8 }} animate={{ x: 0, opacity: 1 }} exit={{ x: '100%', opacity: 0.8 }}
           transition={{ type: 'spring', damping: 28, stiffness: 200, mass: 0.9, opacity: { duration: 0.2, ease: 'easeOut' } }}
-          className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-background z-[60] shadow-2xl flex flex-col overflow-hidden md:rounded-l-3xl"
-          style={{zIndex: 500000000000}}
+          className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-background z-[60] shadow-2xl flex flex-col overflow-hidden"
+          style={{ zIndex: 500000000000 }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Hero image */}
@@ -420,8 +422,8 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4"
             onClick={() => setSelectedGalleryImage(null)}>
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative max-w-4xl max-h-[80vh] w-full">
-              <img src={selectedGalleryImage} alt="Gallery fullscreen" className="w-full h-full object-contain rounded-lg" />
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} style={{position: 'fixed', left: '5px', top: '10px'}}>
+              <img src={selectedGalleryImage} alt="Gallery fullscreen" style={{width: '96vh', height: '98vh'}} />
               <button onClick={() => setSelectedGalleryImage(null)} className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"><X className="w-5 h-5" /></button>
             </motion.div>
           </motion.div>

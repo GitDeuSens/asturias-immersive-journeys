@@ -28,10 +28,14 @@ export function DynamicBackground({ blur = 8, interval = 7000 }: DynamicBackgrou
 
   return (
     <div className="inset-0 overflow-hidden">
-      <AnimatePresence mode="popLayout">
+      <AnimatePresence mode="sync">
         <motion.div
           key={currentIndex}
           className="absolute inset-0"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.5, ease: 'easeInOut' }}
         >
           <div
             className="absolute inset-0 bg-cover bg-center"
@@ -46,7 +50,7 @@ export function DynamicBackground({ blur = 8, interval = 7000 }: DynamicBackgrou
       <div className="absolute inset-0 bg-black/50" />
       
       {/* Gradient overlay for depth */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50" />
     </div>
   );
 }

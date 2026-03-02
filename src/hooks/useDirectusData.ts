@@ -7,11 +7,11 @@ import { useTranslation } from "react-i18next";
 import type { ImmersiveRoute, RoutePoint, RoutePointContent, Category, POI } from "@/data/types";
 import type { Language } from "@/data/types";
 import type { KuulaTour } from "@/lib/types";
-import { 
-  getRoutes, 
-  getRoutePoints, 
-  getVirtualTours, 
-  getCategories, 
+import {
+  getRoutes,
+  getRoutePoints,
+  getVirtualTours,
+  getCategories,
   getPOIs,
 } from "@/lib/api/directus-client";
 import { toMultilingual } from "@/lib/directus-types";
@@ -68,12 +68,12 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
           allowFullscreen: true,
         };
       }
-
+      console.log(' este es mi poi ', poi);
       if (Array.isArray(poi.gallery)) {
-        const photos: {url: string}[] = [];
+        const photos: { url: string }[] = [];
         poi.gallery.forEach((photo: any) => {
           if (photo?.directus_files_id) {
-            photos.push({url: DIRECTUS_URL + '/assets/' + photo.directus_files_id});
+            photos.push({ url: DIRECTUS_URL + '/assets/' + photo.directus_files_id });
           }
         });
         if (photos.length > 0) content.gallery = photos;
@@ -90,6 +90,18 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
         };
       }
 
+      content.audioGuide = {
+        es: {
+          url: 'https://back.asturias.digitalmetaverso.com/assets/' + poi.audio_es
+        },
+        en: {
+          url: 'https://back.asturias.digitalmetaverso.com/assets/' + poi.audio_en
+        },
+        fr: {
+          url: 'https://back.asturias.digitalmetaverso.com/assets/' + poi.audio_fr
+        },
+      }
+
       // Map cover image
       if (poi.cover_image) {
         content.image = { url: getFileUrl(poi.cover_image) };
@@ -100,6 +112,11 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       // TODO meter gallery aqui
       return {
         id: poi.slug || poi.id || `point-${idx}`, // Use slug first for clean URLs
+        audioGuides: {
+          es: 'https://back.asturias.digitalmetaverso.com/' + poi.audio_es,
+          en: 'https://back.asturias.digitalmetaverso.com/' + poi.audio_en,
+          fr: 'https://back.asturias.digitalmetaverso.com/' + poi.audio_fr,
+        },
         poiUUID: poi.id, // Keep original UUID for API queries
         order: poi.order ?? idx + 1,
         title: toMultilingual(poi.translations, 'title') || { es: '', en: '', fr: '' },
@@ -115,8 +132,8 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
         tags: poi.tags || [],
       };
     });
-    // Filter out points with invalid coordinates — they can't be shown on the map
-   // .filter(p => isValidCoord(p.location.lat, p.location.lng));
+  // Filter out points with invalid coordinates — they can't be shown on the map
+  // .filter(p => isValidCoord(p.location.lat, p.location.lng));
 
   // Build polyline: prefer DB polyline if valid, otherwise generate from POI points
   let polyline: { lat: number; lng: number }[] = [];
@@ -198,10 +215,10 @@ export function useImmersiveRoutes(language: Language = 'es') {
   const loadRoutes = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const directusRoutes = await getRoutes(language);
-      
+
       // Points are now loaded with deep relations, no need for separate requests
       const immersiveRoutes: ImmersiveRoute[] = directusRoutes.map((route: any) => {
         // Points are already included in the route data

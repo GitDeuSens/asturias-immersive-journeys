@@ -101,6 +101,7 @@ const resources = {
       "poi.prices": "Precios",
       "poi.contact": "Contacto",
       "poi.contentAvailable": "Contenido disponible",
+      "poi.visited": "Marcar como visitado",
 
       // Tours 360
       "tours360.title": "Tours Virtuales 360°",
@@ -334,6 +335,7 @@ const resources = {
       "poi.prices": "Prices",
       "poi.contact": "Contact",
       "poi.contentAvailable": "Available content",
+      "poi.visited": "Mark as visited",
 
       // Tours 360
       "tours360.title": "360° Virtual Tours",
@@ -568,6 +570,7 @@ const resources = {
       "poi.prices": "Prix",
       "poi.contact": "Contact",
       "poi.contentAvailable": "Contenu disponible",
+      "poi.visited": "Marquer comme visité",
 
       // Tours 360
       "tours360.title": "Visites Virtuelles 360°",
