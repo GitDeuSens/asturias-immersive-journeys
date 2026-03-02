@@ -410,7 +410,7 @@ class DirectusApiClient {
     try {
       const pois = await this.getClient().request(readItems('pois', {
         filter: { route_id: { _eq: routeId }, status: { _in: ['published', 'draft'] } },
-        fields: ['*', ...TRANSLATIONS_DEEP, 'ar_scene_id.slug', 'ar_scene_id.build_path', 'ar_scene_id.translations.*', 'ar_scene_id.scene_mode', 'ar_scene_id.glb_model', 'ar_scene_id.glb_scale', 'ar_scene_id.glb_rotation_y', 'tour_360_id.slug', 'tour_360_id.build_path', 'tour_360_id.translations.*', 'audio_es.id', 'audio_es.duration', 'audio_en.id', 'audio_en.duration', 'audio_fr.id', 'audio_fr.duration'],
+        fields: ['*', ...TRANSLATIONS_DEEP, 'ar_scene_id.slug', 'ar_scene_id.build_path', 'ar_scene_id.translations.*', 'ar_scene_id.scene_mode', 'ar_scene_id.glb_model', 'ar_scene_id.glb_scale', 'ar_scene_id.glb_rotation_y', 'tour_360_id.slug', 'tour_360_id.build_path', 'tour_360_id.translations.*'],
         sort: ['order'],
       }));
       return (pois as unknown as DirectusPOI[]).map(transformPOI);
