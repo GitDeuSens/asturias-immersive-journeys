@@ -116,13 +116,19 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
     // Fallback: create temporary scene only if iframe3dUrl exists
     const content = point.content;
     if (!content.arExperience?.iframe3dUrl) return null;
+    const arExp = content.arExperience;
     return {
-      id: point.id,
-      slug: `poi-${point.id}`, // Temporary slug - will be replaced by loadedARScene
+      id: arExp.arSceneId || point.id,
+      slug: arExp.arSlug || point.id,
       title: typeof point.title === 'string' ? { es: point.title, en: point.title, fr: point.title } : point.title,
       description: (point as any).shortDescription || { es: '', en: '', fr: '' },
-      needle_scene_url: content.arExperience.iframe3dUrl,
-      needle_type: 'slam' as const, scene_mode: 'build' as const, build_path: undefined,
+      needle_scene_url: arExp.iframe3dUrl,
+      needle_type: 'slam' as const,
+      scene_mode: (arExp.scene_mode as any) || 'build',
+      build_path: undefined,
+      glb_model: arExp.glb_model,
+      glb_scale: arExp.glb_scale ?? 1,
+      glb_rotation_y: arExp.glb_rotation_y ?? 0,
       preview_image: point.coverImage || '', difficulty: 'easy' as const,
       duration_minutes: 5, requires_outdoors: false, published: true,
     };
@@ -156,7 +162,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
           initial={{ x: '100%', opacity: 0.8 }} animate={{ x: 0, opacity: 1 }} exit={{ x: '100%', opacity: 0.8 }}
           transition={{ type: 'spring', damping: 28, stiffness: 200, mass: 0.9, opacity: { duration: 0.2, ease: 'easeOut' } }}
           className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-background z-[60] shadow-2xl flex flex-col overflow-hidden"
-          style={{ zIndex: 500000000000 }}
+          style={{ zIndex: 60 }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Hero image */}

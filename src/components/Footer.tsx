@@ -22,7 +22,7 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
       className="text-muted-foreground"
       role="contentinfo"
       aria-label={t("footer.ariaLabel", "Pie de página")}
-      style={{ backgroundColor: 'white', width: '100%', zIndex: '999999', position: 'relative'}}
+      style={{ backgroundColor: 'white', width: '100%', position: 'relative'}}
     >
       <div className="container mx-auto px-4 py-4 md:py-4">
         {/* Institutional logos - Row 1 */}

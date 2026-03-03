@@ -135,6 +135,11 @@ export interface RoutePointContent {
     qrValue: string;
     iframe3dUrl?: string;
     arSlug?: string;
+    arSceneId?: string;
+    glb_model?: string;
+    glb_scale?: number;
+    glb_rotation_y?: number;
+    scene_mode?: string;
     instructions?: Record<Language, string>;
   };
   tour360?: {
