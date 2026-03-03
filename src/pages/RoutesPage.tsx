@@ -13,7 +13,7 @@ import { PointDetailSheet } from "@/components/PointDetailSheet";
 import { SEOHead } from "@/components/SEOHead";
 import { Footer } from "@/components/Footer";
 import type { ImmersiveRoute, RoutePoint } from "@/data/types";
-import { useImmersiveRoutes, useDirectusCategories } from "@/hooks/useDirectusData";
+import { useImmersiveRoutes, useDirectusCategories, useDirectusPOIs, directusRouteToImmersive } from "@/hooks/useDirectusData";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import {
   createUserPositionMarker,
@@ -89,9 +89,10 @@ export const RoutesPage = React.memo(function RoutesPage() {
   const userMarkerRef = useRef<L.Marker | null>(null);
   const clusterGroupRef = useRef<L.MarkerClusterGroup | null>(null);
 
-  // Load routes and categories from Directus
+  // Load routes, categories and ALL POIs from Directus
   const { routes: immersiveRoutes, loading: routesLoading } = useImmersiveRoutes(lang);
   const { categories } = useDirectusCategories(lang);
+  const { pois: allDirectusPOIs, loading: poisLoading } = useDirectusPOIs(lang);
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedDifficulties, setSelectedDifficulties] = useState<('easy' | 'medium' | 'hard')[]>([]);
@@ -274,12 +275,85 @@ export const RoutesPage = React.memo(function RoutesPage() {
     });
   }, [filteredRoutes]);
 
-  // All points from filtered routes for "Points" view
+  // All points for "Ubicaciones" view — includes ALL POIs from DB, not just route-attached ones
   const allPoints = useMemo(() => {
-    return filteredRoutes.flatMap((route) =>
-      route.points.map((point) => ({ ...point, routeTitle: route.title, routeId: route.id }))
-    );
-  }, [filteredRoutes]);
+    if (viewMode !== 'points') {
+      // In routes mode, just return route points for backwards compat
+      return filteredRoutes.flatMap((route) =>
+        route.points.map((point) => ({ ...point, routeTitle: route.title, routeId: route.id }))
+      );
+    }
+    
+    // In Ubicaciones mode: load ALL POIs from the dedicated endpoint
+    // Build a map of route-attached POI IDs to their route info
+    const routePointIds = new Set<string>();
+    const routeInfoByPointId = new Map<string, { routeTitle: any; routeId: string }>();
+    for (const route of immersiveRoutes) {
+      for (const pt of route.points) {
+        routePointIds.add(pt.poiUUID || pt.id);
+        routeInfoByPointId.set(pt.poiUUID || pt.id, { routeTitle: route.title, routeId: route.id });
+      }
+    }
+    
+    // Transform all Directus POIs into RoutePoint format
+    const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
+    const points = allDirectusPOIs.map((poi: any, idx: number) => {
+      const lat = Number(poi.lat) || 0;
+      const lng = Number(poi.lng) || 0;
+      const routeInfo = routeInfoByPointId.get(poi.id);
+      
+      // Check for route-attached points — reuse the already-transformed version
+      const routeMatch = immersiveRoutes.find(r => r.points.some(p => (p.poiUUID || p.id) === poi.id));
+      if (routeMatch) {
+        const existingPoint = routeMatch.points.find(p => (p.poiUUID || p.id) === poi.id);
+        if (existingPoint) {
+          return { ...existingPoint, routeTitle: routeMatch.title, routeId: routeMatch.id };
+        }
+      }
+      
+      // Build content for standalone POIs
+      const content: any = {};
+      const arScene = typeof poi.ar_scene_id === 'object' && poi.ar_scene_id ? poi.ar_scene_id : null;
+      if (arScene) {
+        const arSlug = arScene.slug || '';
+        const buildPath = arScene.build_path || '';
+        const baseUrl = window.location.origin;
+        const arBuildUrl = buildPath ? `${DIRECTUS_URL}/builds${buildPath}` : (arSlug ? `${DIRECTUS_URL}/builds/ar-builds/${arSlug}/` : undefined);
+        content.arExperience = { launchUrl: arSlug ? `${baseUrl}/ar/${arSlug}` : '', qrValue: arSlug ? `${baseUrl}/ar/${arSlug}` : '', iframe3dUrl: arBuildUrl, arSlug };
+      }
+      const tour360 = typeof poi.tour_360_id === 'object' && poi.tour_360_id ? poi.tour_360_id : null;
+      if (tour360) {
+        const tourBuildPath = tour360.build_path || '';
+        const tourSlug = tour360.slug || '';
+        const tourBuildUrl = tourBuildPath ? `${DIRECTUS_URL}/builds${tourBuildPath}` : (tourSlug ? `${DIRECTUS_URL}/builds/tours-builds/${tourSlug}/` : '');
+        content.tour360 = { iframe360Url: tourBuildUrl, allowFullscreen: true };
+      }
+      if (poi.cover_image) content.image = { url: `${DIRECTUS_URL}/assets/${poi.cover_image}` };
+      
+      return {
+        id: poi.slug || poi.id || `point-${idx}`,
+        poiUUID: poi.id,
+        order: poi.order ?? idx + 1,
+        title: poi.title || { es: '', en: '', fr: '' },
+        shortDescription: poi.short_description || { es: '', en: '', fr: '' },
+        location: { lat, lng, address: poi.address },
+        coverImage: poi.cover_image || '',
+        content,
+        gallery: poi.gallery,
+        tags: poi.tags || [],
+        routeTitle: routeInfo?.routeTitle || { es: '', en: '', fr: '' },
+        routeId: routeInfo?.routeId || '',
+      };
+    });
+    
+    // Apply search filter
+    const searchLower = searchQuery.toLowerCase();
+    return searchQuery === '' ? points : points.filter((p: any) => {
+      const title = p.title[lang] || p.title.es || '';
+      return title.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().includes(searchLower) ||
+             title.toLowerCase().includes(searchLower);
+    });
+  }, [viewMode, filteredRoutes, immersiveRoutes, allDirectusPOIs, searchQuery, lang]);
 
 
   const getPanelOffset = useCallback(() => {
