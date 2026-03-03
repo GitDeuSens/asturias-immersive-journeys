@@ -1,8 +1,7 @@
 import React from 'react';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { X, Maximize2 } from 'lucide-react';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { X, View, Share2, Maximize2, Info } from 'lucide-react';
 
 interface FullscreenModalProps {
   isOpen: boolean;
@@ -17,39 +16,86 @@ const FullscreenModal: React.FC<FullscreenModalProps> = ({
   iframeUrl,
   title,
 }) => {
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[100vw] max-h-[100vh] w-screen h-screen p-0 border-0 bg-black">
-        <VisuallyHidden>
-          <DialogTitle>{title}</DialogTitle>
-        </VisuallyHidden>
-        
-        {/* Header */}
-        <div className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-gradient-to-b from-black/80 to-transparent">
-          <div className="flex items-center gap-2 text-white">
-            <Maximize2 className="w-5 h-5" />
-            <span className="font-medium">{title}</span>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="text-white hover:bg-white/20 rounded-full"
-          >
-            <X className="w-6 h-6" />
-          </Button>
-        </div>
+  const handleFullscreen = () => {
+    const el = document.querySelector('.fullscreen-tour-container');
+    if (el) {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        el.requestFullscreen?.();
+      }
+    }
+  };
 
-        {/* Iframe */}
-        <iframe
-          src={iframeUrl}
-          className="w-full h-full"
-          allowFullScreen
-          allow="xr-spatial-tracking; gyroscope; accelerometer"
-          title={title}
-        />
-      </DialogContent>
-    </Dialog>
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, url: window.location.href });
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+      }
+    } catch {}
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[80] bg-black flex flex-col overflow-hidden"
+        >
+          {/* Header — same style as Tours360Page */}
+          <div className="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-black/90 shrink-0">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
+                <View className="w-4 h-4 text-white" />
+              </div>
+              <h2 className="text-base font-bold text-white truncate">{title}</h2>
+            </div>
+            <div className="flex items-center gap-1 shrink-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleShare}
+                className="text-white hover:bg-white/20 h-8 w-8"
+              >
+                <Share2 className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleFullscreen}
+                className="text-white hover:bg-white/20 h-8 w-8"
+              >
+                <Maximize2 className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClose}
+                className="text-white hover:bg-white/20 gap-1 h-8 px-3"
+              >
+                <X className="w-4 h-4" />
+                <span className="hidden sm:inline text-sm">Cerrar</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* Tour iframe — fills remaining space */}
+          <div className="fullscreen-tour-container flex-1 min-h-0">
+            <iframe
+              src={iframeUrl}
+              className="w-full h-full"
+              allowFullScreen
+              allow="xr-spatial-tracking; gyroscope; accelerometer; fullscreen"
+              title={title}
+            />
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

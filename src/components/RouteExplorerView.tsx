@@ -198,14 +198,8 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
               <>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="text-xs truncate max-w-[100px]">
+                  <BreadcrumbPage className="text-xs truncate max-w-[120px]">
                     {getText(selectedPoint.title, lang)}
-                  </BreadcrumbPage>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage className="text-xs truncate max-w-[100px]">
-                    Nuevo Elemento
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </>

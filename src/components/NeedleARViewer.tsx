@@ -99,7 +99,12 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
           throw new Error('Could not create ModelLoading — no suitable GameObject found.');
         }
 
-        await loadSceneInto(modelLoader, scene.slug);
+        // If glb_model UUID is already available from deep fetch, use it directly
+        // to avoid a redundant slug lookup that may fail with "Scene not found"
+        const glbOverride = scene.glb_model
+          ? `${DIRECTUS_URL}/assets/${scene.glb_model}`
+          : undefined;
+        await loadSceneInto(modelLoader, scene.slug, glbOverride);
         setIsLoading(false);
 
         // Disable ALL user interaction — preview is fully static, AR uses device movement only
