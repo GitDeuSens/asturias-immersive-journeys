@@ -12,6 +12,7 @@ export interface KuulaTour {
   title: Record<Language, string>;
   description: Record<Language, string>;
   kuula_embed_url: string;
+  build_path?: string;
   build_zip_url?: string;
   museum_id?: string;
   thumbnail_url: string;

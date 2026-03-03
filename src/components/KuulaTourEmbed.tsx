@@ -2,6 +2,7 @@
 // Enhanced Kuula integration with branding, analytics, fullscreen
 
 import { useState, useRef, useEffect } from 'react';
+import { DIRECTUS_URL } from '@/lib/directus-url';
 import { motion } from 'framer-motion';
 import { Maximize2, Minimize2, Share2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -44,8 +45,10 @@ export function KuulaTourEmbed({
   const startTimeRef = useRef<number>(0);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // build_path points to deployed 3DVista dist in public/tours-builds/
-  const embedUrl = tour.kuula_embed_url || null;
+  // Build URL from build_path (preferred) or fallback to kuula_embed_url
+  const embedUrl = tour.build_path
+    ? `${DIRECTUS_URL}/builds${tour.build_path}`
+    : (tour.kuula_embed_url || null);
   const { t, i18n } = useTranslation();
 
   // Pre-validate the build URL with a HEAD request to avoid CSP/404 iframe errors
