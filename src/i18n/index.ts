@@ -104,6 +104,7 @@ const resources = {
       "poi.contact": "Contacto",
       "poi.contentAvailable": "Contenido disponible",
       "poi.visited": "Marcar como visitado",
+      "poi.unvisited": "Desmarcar",
 
       // Tours 360
       "tours360.title": "Tours Virtuales 360°",
@@ -340,6 +341,7 @@ const resources = {
       "poi.contact": "Contact",
       "poi.contentAvailable": "Available content",
       "poi.visited": "Mark as visited",
+      "poi.unvisited": "Uncheck",
 
       // Tours 360
       "tours360.title": "360° Virtual Tours",
@@ -577,6 +579,7 @@ const resources = {
       "poi.contact": "Contact",
       "poi.contentAvailable": "Contenu disponible",
       "poi.visited": "Marquer comme visité",
+      "poi.unvisited": "Décochez",
 
       // Tours 360
       "tours360.title": "Visites Virtuelles 360°",

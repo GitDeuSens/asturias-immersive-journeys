@@ -72,7 +72,6 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   const navigate = useNavigate();
   const shareUrl = window.location.href;
   let isCopy = false;
-  console.log(' selected ', selectedPoint);
 
   const progress = route.points.length > 0
     ? Math.round((visitedPoints.size / route.points.length) * 100)
@@ -314,7 +313,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
             {route.fullDescription ? route.fullDescription[lang] : route.shortDescription[lang]}
           </p>
         </div>
-        <div className='flex' style={{ justifyContent: 'flex-end', gap: '10px' }}>
+        <div className='flex' style={{ justifyContent: 'flex-end', gap: '10px', marginTop: '30px' }}>
           <div className='cursor-pointer' onClick={handleNavigateToStart}>
             <span className='flex' style={{ alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}><Navigation className="w-6 h-6" /> {t('routes.howToGet')}</span>
           </div>
@@ -533,10 +532,14 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
                 {hasPDF && <FileText className="w-3.5 h-3.5 text-muted-foreground" />}
               </div>
 
-              <button onClick={(e) => {
+              {isVisited ? <button onClick={(e) => {
                 e.stopPropagation();
                 onToggleVisited();
-              }} className='inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3 text-xs'>{t('poi.visited')}</button>
+              }} className='text-xs text-base'>{t('poi.unvisited')}</button>
+                : <button onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleVisited();
+                }} className='text-xs text-primary'>{t('poi.visited')}</button>}
 
               {distanceInfo && (
                 <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground font-medium">
