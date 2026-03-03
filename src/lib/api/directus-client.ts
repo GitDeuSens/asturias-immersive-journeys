@@ -61,7 +61,7 @@ function getBuildUrl(buildPath: string | null | undefined, slug: string, buildSu
 
 function transformTour360(tour: DirectusTour360): KuulaTour {
   const slug = (tour as any).slug || '';
-  const hasBuild = !!tour.build_path || !!(tour as any).build_zip;
+  const hasBuild = !!tour.build_path; // Only count as having build if files are extracted (build_path set)
   const embedUrl = hasBuild ? getBuildUrl(tour.build_path, slug, 'tours-builds') : '';
   const buildZipUrl = (tour as any).build_zip ? getDirectusFileUrl((tour as any).build_zip) : '';
   return {

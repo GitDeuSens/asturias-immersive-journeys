@@ -40,12 +40,51 @@ export function KuulaTourEmbed({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-    const startTimeRef = useRef<number>(0);
+  const [urlValidated, setUrlValidated] = useState<boolean | null>(null);
+  const startTimeRef = useRef<number>(0);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // build_path points to deployed 3DVista dist in public/tours-builds/
   const embedUrl = tour.kuula_embed_url || null;
   const { t, i18n } = useTranslation();
+
+  // Pre-validate the build URL with a HEAD request to avoid CSP/404 iframe errors
+  useEffect(() => {
+    if (!embedUrl) {
+      setUrlValidated(false);
+      setIsLoading(false);
+      return;
+    }
+    setUrlValidated(null);
+    setIsLoading(true);
+    setHasError(false);
+
+    const controller = new AbortController();
+    fetch(embedUrl, { method: 'HEAD', mode: 'no-cors', signal: controller.signal })
+      .then(() => {
+        // no-cors always resolves with opaque response; use a timeout fallback
+        setUrlValidated(true);
+      })
+      .catch(() => {
+        setUrlValidated(false);
+        setIsLoading(false);
+        setHasError(true);
+      });
+
+    // Timeout: if iframe doesn't load in 15s, assume error
+    const timeout = setTimeout(() => {
+      if (isLoading) {
+        setIsLoading(false);
+        setHasError(true);
+      }
+    }, 15000);
+
+    return () => {
+      controller.abort();
+      clearTimeout(timeout);
+    };
+  }, [embedUrl]);
+
   useEffect(() => {
     // Track tour started
     trackTourStarted(tour.id, tour.title[locale] || tour.title.es);
@@ -62,6 +101,7 @@ export function KuulaTourEmbed({
 
   const handleIframeLoad = () => {
     setIsLoading(false);
+    setHasError(false);
     trackEvent('tour_loaded', { tour_id: tour.id });
   };
 
@@ -127,7 +167,7 @@ export function KuulaTourEmbed({
       )}
 
       {/* 3DVista / Tour iframe */}
-      {embedUrl ? (
+      {embedUrl && urlValidated !== false && !hasError ? (
         <iframe
           ref={iframeRef}
           src={embedUrl}
@@ -146,8 +186,23 @@ export function KuulaTourEmbed({
               {locale === 'es' ? 'Tour no disponible' : locale === 'fr' ? 'Visite non disponible' : 'Tour not available'}
             </p>
             <p className="text-sm text-white/50">
-              {locale === 'es' ? 'El archivo del tour aún no ha sido desplegado' : locale === 'fr' ? 'Le fichier de la visite n\'a pas encore été déployé' : 'Tour files have not been deployed yet'}
+              {hasError
+                ? (locale === 'es' ? 'Error al cargar el tour. Los archivos pueden no estar desplegados en el servidor.' 
+                   : locale === 'fr' ? 'Erreur de chargement. Les fichiers n\'ont peut-être pas été déployés.' 
+                   : 'Failed to load tour. Build files may not be deployed on the server.')
+                : (locale === 'es' ? 'El archivo del tour aún no ha sido desplegado' 
+                   : locale === 'fr' ? 'Le fichier de la visite n\'a pas encore été déployé' 
+                   : 'Tour files have not been deployed yet')}
             </p>
+            {hasError && embedUrl && (
+              <Button 
+                variant="outline" 
+                className="mt-4"
+                onClick={() => { setHasError(false); setUrlValidated(null); setIsLoading(true); }}
+              >
+                {texts.retry[locale]}
+              </Button>
+            )}
           </div>
         </div>
       )}
