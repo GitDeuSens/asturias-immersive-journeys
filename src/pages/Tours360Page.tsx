@@ -260,11 +260,6 @@ export function Tours360Page() {
 
                   {/* Metadata badges */}
                   <div className="absolute top-3 right-3 flex gap-2">
-                    {tour.total_panoramas > 0 && (
-                      <span className="bg-black/60 text-white text-xs px-2 py-1 rounded-full">
-                        {tour.total_panoramas} {t(texts.scenes)}
-                      </span>
-                    )}
                     {tour.duration_minutes && (
                       <span className="bg-black/60 text-white text-xs px-2 py-1 rounded-full">
                         {tour.duration_minutes} {t(texts.duration)}
@@ -287,7 +282,10 @@ export function Tours360Page() {
                   {tour.description[language] && (
                     <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{tour.description[language]}</p>
                   )}
-                <div className="flex items-center justify-end">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">
+                      {tour.total_panoramas} {t(texts.scenes)}
+                    </span>
                     <span className="text-primary font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
                       {t(texts.startTour)}
                       <ChevronRight className="w-4 h-4" />
