@@ -287,10 +287,7 @@ export function Tours360Page() {
                   {tour.description[language] && (
                     <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{tour.description[language]}</p>
                   )}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      {tour.total_panoramas} {t(texts.scenes)}
-                    </span>
+                <div className="flex items-center justify-end">
                     <span className="text-primary font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
                       {t(texts.startTour)}
                       <ChevronRight className="w-4 h-4" />
