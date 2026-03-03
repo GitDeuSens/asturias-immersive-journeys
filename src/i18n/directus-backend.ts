@@ -3,12 +3,12 @@
 // Falls back to bundled translations if Directus is unavailable
 
 import i18n from 'i18next';
+import { DIRECTUS_URL } from '@/lib/directus-url';
 
-const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
 const BASE_URL = import.meta.env.DEV ? '/directus-api' : DIRECTUS_URL;
 
 // Fallback URL for development
-const FALLBACK_URL = 'https://back.asturias.digitalmetaverso.com';
+const FALLBACK_URL = DIRECTUS_URL;
 const CACHE_KEY = 'asturias-ui-translations';
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 

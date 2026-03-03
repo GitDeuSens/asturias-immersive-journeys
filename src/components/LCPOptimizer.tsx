@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { DIRECTUS_URL } from '@/lib/directus-url';
 
 // Component for optimizing Largest Contentful Paint (LCP)
 export function LCPOptimizer({ heroImage }: { heroImage?: string }) {
@@ -143,7 +144,7 @@ export function useLCPOptimization() {
 export function ResourceOptimizer() {
   useEffect(() => {
     // Add DNS prefetch for external domains
-    const directusHost = new URL(import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com').host;
+    const directusHost = new URL(DIRECTUS_URL).host;
     const domains = [
       directusHost,
       'fonts.googleapis.com',
@@ -158,7 +159,7 @@ export function ResourceOptimizer() {
     });
 
     // Add preconnect for critical domains
-    const preconnectDomains = [import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com'];
+    const preconnectDomains = [DIRECTUS_URL];
     preconnectDomains.forEach(url => {
       const link = document.createElement('link');
       link.rel = 'preconnect';

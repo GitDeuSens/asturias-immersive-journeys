@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { ImmersiveRoute, RoutePoint } from '@/data/types';
+import { DIRECTUS_URL } from '@/lib/directus-url';
 import { useDirectusCategories } from '@/hooks/useDirectusData';
 import { calculateRouteDistance, formatDistance, openNavigation } from '@/lib/mapUtils';
 import { Button } from '@/components/ui/button';
@@ -340,7 +341,7 @@ function PointPreviewCard({ point, index, lang, onClick }: { point: RoutePoint; 
       <div className="relative flex-shrink-0">
         <div
           className="w-12 h-12 rounded-lg bg-cover bg-center border-2 border-primary/30"
-          style={{ backgroundImage: point.coverImage ? `url(${import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com'}/assets/${point.coverImage})` : undefined }}
+          style={{ backgroundImage: point.coverImage ? `url(${DIRECTUS_URL}/assets/${point.coverImage})` : undefined }}
           role="img"
           aria-label={typeof pointTitle === 'string' ? pointTitle : (pointTitle as any)?.es || ''}
         />

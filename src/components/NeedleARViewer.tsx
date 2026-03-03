@@ -11,6 +11,7 @@ import '../generated/register_types';
 import { GameObject } from '@needle-tools/engine';
 import { ModelLoading, loadSceneInto } from '@/utils/DirectusLoader';
 import type { ARScene, Language } from '@/lib/types';
+import { DIRECTUS_URL } from '@/lib/directus-url';
 
 interface NeedleARViewerProps {
   scene: ARScene;
@@ -63,7 +64,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
     && new URLSearchParams(window.location.search).get('autostart') === '1';
 
   useEffect(() => {
-    (window as any).__DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL ?? 'https://back.asturias.digitalmetaverso.com';
+    (window as any).__DIRECTUS_URL = DIRECTUS_URL;
   }, []);
 
   useEffect(() => {

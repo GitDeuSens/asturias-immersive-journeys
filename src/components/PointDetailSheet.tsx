@@ -2,6 +2,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MapPin, Camera, Play, FileText, Headphones, Smartphone, ExternalLink, ChevronRight, Maximize2, Sparkles, Image as ImageIcon, Phone, Mail, Globe, Clock, Euro, Info, Navigation, Footprints, Car, Eye, Download, Share2, Home } from 'lucide-react';
 import type { RoutePoint } from '@/data/types';
+import { DIRECTUS_URL } from '@/lib/directus-url';
 import { useLanguage, useExplorationMode } from '@/hooks/useLanguage';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { NeedleARViewer } from '@/components/NeedleARViewer';
@@ -161,7 +162,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
           {/* Hero image */}
           <div
             className="relative h-56 bg-cover bg-center flex-shrink-0"
-            style={{ backgroundImage: point.coverImage ? `url(${import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com'}/assets/${point.coverImage})` : undefined }}
+            style={{ backgroundImage: point.coverImage ? `url(${DIRECTUS_URL}/assets/${point.coverImage})` : undefined }}
           >
             <div className="absolute inset-0 from-background via-background/40 to-transparent" />
             <button

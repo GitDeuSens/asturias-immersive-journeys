@@ -10,6 +10,7 @@
 //   - is_returning, session duration, completion %
 
 import { directus } from '@/lib/api/directus-client';
+import { DIRECTUS_URL } from '@/lib/directus-url';
 
 declare global {
   interface Window {
@@ -238,7 +239,6 @@ export const trackSessionEnd = () => {
     created_at: new Date().toISOString(),
   };
 
-  const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
   const BASE_URL = import.meta.env.DEV ? '/directus-api' : DIRECTUS_URL;
   const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
   navigator.sendBeacon(`${BASE_URL}/items/analytics_events`, blob);

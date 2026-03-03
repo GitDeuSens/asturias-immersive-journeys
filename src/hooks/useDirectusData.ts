@@ -16,9 +16,8 @@ import {
 } from "@/lib/api/directus-client";
 import { toMultilingual } from "@/lib/directus-types";
 import { logger } from "@/lib/logger";
+import { DIRECTUS_URL } from "@/lib/directus-url";
 import { dataCache } from "./useCachedData";
-
-const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
 
 function getFileUrl(fileId: string | undefined): string {
   if (!fileId) return '';
@@ -51,11 +50,10 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
         const arSlug = (arScene as any).slug || '';
         const buildPath = (arScene as any).build_path || '';
         const baseUrl = window.location.origin;
-        const directusUrl = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
         // Resolve AR build URL from Directus server
         const arBuildUrl = buildPath
-          ? `${directusUrl}/builds${buildPath}`
-          : (arSlug ? `${directusUrl}/builds/ar-builds/${arSlug}/` : undefined);
+          ? `${DIRECTUS_URL}/builds${buildPath}`
+          : (arSlug ? `${DIRECTUS_URL}/builds/ar-builds/${arSlug}/` : undefined);
         content.arExperience = {
           launchUrl: arSlug ? `${baseUrl}/ar/${arSlug}` : '',
           qrValue: arSlug ? `${baseUrl}/ar/${arSlug}` : '',
@@ -69,11 +67,10 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       if (tour360) {
         const tourBuildPath = (tour360 as any).build_path || '';
         const tourSlug = (tour360 as any).slug || '';
-        const directusUrl = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
         // Resolve tour build URL from Directus server
         const tourBuildUrl = tourBuildPath
-          ? `${directusUrl}/builds${tourBuildPath}`
-          : (tourSlug ? `${directusUrl}/builds/tours-builds/${tourSlug}/` : '');
+          ? `${DIRECTUS_URL}/builds${tourBuildPath}`
+          : (tourSlug ? `${DIRECTUS_URL}/builds/tours-builds/${tourSlug}/` : '');
         content.tour360 = {
           iframe360Url: tourBuildUrl,
           allowFullscreen: true,
@@ -141,9 +138,9 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       return {
         id: poi.slug || poi.id || `point-${idx}`, // Use slug first for clean URLs
         audioGuides: {
-          es: 'https://back.asturias.digitalmetaverso.com/' + poi.audio_es,
-          en: 'https://back.asturias.digitalmetaverso.com/' + poi.audio_en,
-          fr: 'https://back.asturias.digitalmetaverso.com/' + poi.audio_fr,
+          es: DIRECTUS_URL + '/' + poi.audio_es,
+          en: DIRECTUS_URL + '/' + poi.audio_en,
+          fr: DIRECTUS_URL + '/' + poi.audio_fr,
         },
         poiUUID: poi.id, // Keep original UUID for API queries
         order: poi.order ?? idx + 1,

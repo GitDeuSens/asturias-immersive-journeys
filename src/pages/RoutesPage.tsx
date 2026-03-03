@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { trackRouteStarted } from "@/lib/analytics";
 import { BREAKPOINTS, MAP_PANEL_OFFSETS, ASTURIAS_BOUNDS, DEFAULT_COORDINATES } from "@/constants/breakpoints";
+import { DIRECTUS_URL } from "@/lib/directus-url";
 import "leaflet/dist/leaflet.css";
 import { matchesSlug } from "@/lib/slugify";
 // Create route bubble marker with name label
@@ -64,7 +65,7 @@ const createPointMarkerIcon = (point: RoutePoint, index: number, pointName: stri
       <div style="display: flex; flex-direction: column; align-items: center; cursor: pointer;" role="button" aria-label="${pointName}">
         <div style="position: relative; width: 48px; height: 48px;">
           <div style="width: 48px; height: 48px; border-radius: 50%; border: 4px solid ${borderColor}; overflow: hidden; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-            ${point.coverImage ? `<img src="${(import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com')}/assets/${point.coverImage}" style="width: 100%; height: 100%; object-fit: cover;" alt="${pointName}"/>` : `<div style="width: 100%; height: 100%; background: ${borderColor}20;"></div>`}
+            ${point.coverImage ? `<img src="${DIRECTUS_URL}/assets/${point.coverImage}" style="width: 100%; height: 100%; object-fit: cover;" alt="${pointName}"/>` : `<div style="width: 100%; height: 100%; background: ${borderColor}20;"></div>`}
           </div>
           <div style="position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; background: ${borderColor}; border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: ${hasAR ? "#1a1a1a" : "white"}; box-shadow: 0 2px 8px rgba(0,0,0,0.25); font-family: 'Montserrat', sans-serif;">${index + 1}</div>
         </div>
@@ -296,7 +297,6 @@ export const RoutesPage = React.memo(function RoutesPage() {
     }
     
     // Transform all Directus POIs into RoutePoint format
-    const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
     const points = allDirectusPOIs.map((poi: any, idx: number) => {
       const lat = Number(poi.lat) || 0;
       const lng = Number(poi.lng) || 0;
@@ -747,9 +747,8 @@ export const RoutesPage = React.memo(function RoutesPage() {
                   ) : (
                     <motion.div key="points-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="space-y-3">
                     {allPoints.map((point, i) => {
-                      const directusUrl = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
                       const imgSrc = point.coverImage
-                        ? `${directusUrl}/assets/${point.coverImage}`
+                        ? `${DIRECTUS_URL}/assets/${point.coverImage}`
                         : '/placeholder-route.jpg';
                       const pointTitle = point.title[lang] || point.title.es || '';
                       const pointDesc = point.shortDescription[lang] || point.shortDescription.es || '';

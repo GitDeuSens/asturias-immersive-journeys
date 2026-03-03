@@ -25,6 +25,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { ImmersiveRoute, RoutePoint } from '@/data/types';
+import { DIRECTUS_URL } from '@/lib/directus-url';
 import { useExplorationMode } from '@/hooks/useLanguage';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { Button } from '@/components/ui/button';
@@ -500,7 +501,7 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
           {point.coverImage && (
             <div
               className="w-full h-24 bg-cover bg-center"
-              style={{ backgroundImage: `url(${import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com'}/assets/${point.coverImage})` }}
+              style={{ backgroundImage: `url(${DIRECTUS_URL}/assets/${point.coverImage})` }}
             />
           )}
 

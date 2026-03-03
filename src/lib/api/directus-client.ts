@@ -5,8 +5,7 @@ import type { DirectusSchema, DirectusMuseum, DirectusTour360, DirectusARScene, 
 import { toMultilingual } from '@/lib/directus-types';
 import { logger } from "@/lib/logger";
 import { API_CONFIG } from "@/constants/api";
-
-const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
+import { DIRECTUS_URL } from "@/lib/directus-url";
 
 const directusClient = createDirectus<DirectusSchema>(DIRECTUS_URL).with(rest());
 

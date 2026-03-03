@@ -128,7 +128,7 @@ function getDirectusUrl(): string {
     // Try to read from window (set by React app) or fallback
     return (window as any).__DIRECTUS_URL
         ?? (window as any).VITE_DIRECTUS_URL
-        ?? 'https://back.asturias.digitalmetaverso.com';
+        ?? (import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com');
 }
 
 function getAssetUrl(uuid: string): string {

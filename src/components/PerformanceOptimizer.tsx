@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { DIRECTUS_URL } from '@/lib/directus-url';
 
 // Hook for preloading critical images
 export function usePreloadImages(srcs: string[]) {
@@ -95,13 +96,13 @@ export function useResourceHints() {
     // DNS prefetch for external domains
     const dnsPrefetch = document.createElement('link');
     dnsPrefetch.rel = 'dns-prefetch';
-    dnsPrefetch.href = '//' + new URL(import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com').host;
+    dnsPrefetch.href = '//' + new URL(DIRECTUS_URL).host;
     document.head.appendChild(dnsPrefetch);
 
     // Preconnect to Directus API
     const preconnect = document.createElement('link');
     preconnect.rel = 'preconnect';
-    preconnect.href = import.meta.env.VITE_DIRECTUS_URL || 'https://back.asturias.digitalmetaverso.com';
+    preconnect.href = DIRECTUS_URL;
     document.head.appendChild(preconnect);
 
     return () => {
