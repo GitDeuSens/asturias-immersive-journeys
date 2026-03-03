@@ -44,6 +44,7 @@ export function KuulaTourEmbed({
   const [urlValidated, setUrlValidated] = useState<boolean | null>(null);
   const startTimeRef = useRef<number>(0);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const loadedRef = useRef(false);
 
   // Build URL from build_path (preferred) or fallback to kuula_embed_url
   const embedUrl = tour.build_path
@@ -58,6 +59,7 @@ export function KuulaTourEmbed({
       setIsLoading(false);
       return;
     }
+    loadedRef.current = false;
     setUrlValidated(null);
     setIsLoading(true);
     setHasError(false);
@@ -65,7 +67,6 @@ export function KuulaTourEmbed({
     const controller = new AbortController();
     fetch(embedUrl, { method: 'HEAD', mode: 'no-cors', signal: controller.signal })
       .then(() => {
-        // no-cors always resolves with opaque response; use a timeout fallback
         setUrlValidated(true);
       })
       .catch(() => {
@@ -74,13 +75,14 @@ export function KuulaTourEmbed({
         setHasError(true);
       });
 
-    // Timeout: if iframe doesn't load in 15s, assume error
+    // Timeout: if iframe doesn't load in 30s, assume error
+    // Use ref to avoid stale closure — only error if still loading
     const timeout = setTimeout(() => {
-      if (isLoading) {
+      if (!loadedRef.current) {
         setIsLoading(false);
         setHasError(true);
       }
-    }, 15000);
+    }, 30000);
 
     return () => {
       controller.abort();
@@ -103,6 +105,7 @@ export function KuulaTourEmbed({
   }, [tour.id, tour.title, locale]);
 
   const handleIframeLoad = () => {
+    loadedRef.current = true;
     setIsLoading(false);
     setHasError(false);
     trackEvent('tour_loaded', { tour_id: tour.id });
