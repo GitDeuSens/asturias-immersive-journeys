@@ -59,6 +59,11 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
           qrValue: arSlug ? `${baseUrl}/ar/${arSlug}` : '',
           iframe3dUrl: arBuildUrl,
           arSlug,
+          arSceneId: (arScene as any).id,
+          glb_model: (arScene as any).glb_model || undefined,
+          glb_scale: (arScene as any).glb_scale,
+          glb_rotation_y: (arScene as any).glb_rotation_y,
+          scene_mode: (arScene as any).scene_mode || 'build',
         };
       }
 
