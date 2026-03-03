@@ -46,11 +46,10 @@ const FullscreenModal: React.FC<FullscreenModalProps> = ({
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-[100] bg-black fullscreen-tour-container"
         >
-          {/* Iframe fills entire screen */}
+          {/* Iframe fills entire screen — z-0 so controls float above */}
           <iframe
             src={iframeUrl}
-            className="absolute inset-0 w-full h-full"
-            allowFullScreen
+            className="absolute inset-0 w-full h-full z-0"
             allow="xr-spatial-tracking; gyroscope; accelerometer; fullscreen"
             title={title}
           />
