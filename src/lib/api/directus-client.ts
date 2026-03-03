@@ -69,6 +69,7 @@ function transformTour360(tour: DirectusTour360): KuulaTour {
     title: toMultilingual(tour.translations, 'title'),
     description: toMultilingual(tour.translations, 'description'),
     kuula_embed_url: embedUrl,
+    build_path: tour.build_path || undefined,
     build_zip_url: buildZipUrl,
     museum_id: tour.museum_id,
     thumbnail_url: getDirectusFileUrl(tour.thumbnail),
