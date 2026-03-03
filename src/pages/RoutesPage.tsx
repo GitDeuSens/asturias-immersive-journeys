@@ -319,7 +319,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
         const buildPath = arScene.build_path || '';
         const baseUrl = window.location.origin;
         const arBuildUrl = buildPath ? `${DIRECTUS_URL}/builds${buildPath}` : (arSlug ? `${DIRECTUS_URL}/builds/ar-builds/${arSlug}/` : undefined);
-        content.arExperience = { launchUrl: arSlug ? `${baseUrl}/ar/${arSlug}` : '', qrValue: arSlug ? `${baseUrl}/ar/${arSlug}` : '', iframe3dUrl: arBuildUrl, arSlug };
+        content.arExperience = { launchUrl: arSlug ? `${baseUrl}/ar/${arSlug}` : '', qrValue: arSlug ? `${baseUrl}/ar/${arSlug}` : '', iframe3dUrl: arBuildUrl, arSlug, arSceneId: arScene.id, glb_model: arScene.glb_model || undefined, glb_scale: arScene.glb_scale, glb_rotation_y: arScene.glb_rotation_y, scene_mode: arScene.scene_mode || 'build' };
       }
       const tour360 = typeof poi.tour_360_id === 'object' && poi.tour_360_id ? poi.tour_360_id : null;
       if (tour360) {
