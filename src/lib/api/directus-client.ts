@@ -392,6 +392,7 @@ class DirectusApiClient {
         filter: { status: { _in: API_CONFIG.getStatusFilter() } },
         fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.slug', 'ar_scene_id.*', 'ar_scene_id.translations.*', 'tour_360_id.*', 'tour_360_id.translations.*', 'gallery.*'] as any,
         sort: ['order'] as any,
+        limit: -1,
       }));
       return (pois as unknown as DirectusPOI[]).map(transformPOI);
     } catch (error) { logger.error('[DirectusClient] Error fetching POIs:', error); return []; }

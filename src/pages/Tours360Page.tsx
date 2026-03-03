@@ -260,11 +260,6 @@ export function Tours360Page() {
 
                   {/* Metadata badges */}
                   <div className="absolute top-3 right-3 flex gap-2">
-                    {tour.total_panoramas > 0 && (
-                      <span className="bg-black/60 text-white text-xs px-2 py-1 rounded-full">
-                        {tour.total_panoramas} {t(texts.scenes)}
-                      </span>
-                    )}
                     {tour.duration_minutes && (
                       <span className="bg-black/60 text-white text-xs px-2 py-1 rounded-full">
                         {tour.duration_minutes} {t(texts.duration)}
