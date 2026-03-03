@@ -37,7 +37,7 @@ const difficultyColors: Record<Difficulty, string> = {
 
 const viewModeLabels: Record<ViewMode, Record<string, string>> = {
   routes: { es: 'Rutas', en: 'Routes', fr: 'Itinéraires' },
-  points: { es: 'Puntos', en: 'Points', fr: 'Points' },
+  points: { es: 'Ubicaciones', en: 'Locations', fr: 'Emplacements' },
 };
 
 export function CategoryChips({ categories, selectedIds, onToggle, selectedDifficulties = [], onToggleDifficulty, viewMode, onViewModeChange, className = '' }: CategoryChipsProps) {

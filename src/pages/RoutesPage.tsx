@@ -379,6 +379,20 @@ export const RoutesPage = React.memo(function RoutesPage() {
       });
 
       fitToRoute(exploringRoute);
+    } else if (viewMode === 'points') {
+      // Show individual point markers in Ubicaciones mode
+      allPoints.forEach((point) => {
+        if (point.location.lat === 0 && point.location.lng === 0) return;
+        const ptTitle = point.title as any;
+        const pointName = typeof ptTitle === 'string' ? ptTitle : (ptTitle?.[lang] || ptTitle?.es || '');
+        const idx = allPoints.indexOf(point);
+        const marker = L.marker([point.location.lat, point.location.lng], {
+          icon: createPointMarkerIcon(point, idx, pointName),
+        }).on("click", () => handleSelectPoint(point));
+
+        clusterGroupRef.current?.addLayer(marker);
+        markersRef.current.push(marker);
+      });
     } else {
       // Add all routes to cluster group — skip routes without real coordinates
       filteredRoutes.forEach((route) => {
@@ -397,7 +411,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
         markersRef.current.push(marker);
       });
     }
-  }, [mapReady, exploringRoute, filteredRoutes, fitToRoute, lang]);
+  }, [mapReady, exploringRoute, filteredRoutes, fitToRoute, lang, viewMode, allPoints]);
 
   // Re-center when filters change
   useEffect(() => {
@@ -578,7 +592,9 @@ export const RoutesPage = React.memo(function RoutesPage() {
               >
                 {/* Header */}
                 <div className="flex items-center justify-between">
-                  <h2 className="text-3xl font-bold text-foreground">{t("routes.title")}</h2>
+                  <h2 className="text-3xl font-bold text-foreground">
+                    {viewMode === 'points' ? t("routes.pointsTitle") : t("routes.title")}
+                  </h2>
                   <span className="text-xs text-muted-foreground" aria-live="polite">
                     {viewMode === 'routes' ? sortedFilteredRoutes.length : allPoints.length} {t("common.results")}
                   </span>
@@ -592,11 +608,11 @@ export const RoutesPage = React.memo(function RoutesPage() {
                   />
                   <input
                     type="search"
-                    placeholder={t("routes.search")}
+                    placeholder={viewMode === 'points' ? t("routes.searchPoints") : t("routes.search")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-muted/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
-                    aria-label={t("routes.search")}
+                    aria-label={viewMode === 'points' ? t("routes.searchPoints") : t("routes.search")}
                   />
                 </div>
 
