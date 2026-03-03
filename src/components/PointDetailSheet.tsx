@@ -210,10 +210,6 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                      <BreadcrumbPage className="text-xs truncate max-w-[120px]">{point.order}</BreadcrumbPage>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
                       <BreadcrumbPage className="text-xs truncate max-w-[120px]">{title}</BreadcrumbPage>
                     </BreadcrumbItem>
                   </BreadcrumbList>
