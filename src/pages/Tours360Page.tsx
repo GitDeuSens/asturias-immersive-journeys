@@ -320,8 +320,6 @@ export function Tours360Page() {
                 <iframe
                   src={embedUrl}
                   className="absolute inset-0 w-full h-full z-0"
-                  allowFullScreen
-                  sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
                   allow="xr-spatial-tracking; gyroscope; accelerometer; fullscreen"
                   title={t(activeTour.title)}
                 />
