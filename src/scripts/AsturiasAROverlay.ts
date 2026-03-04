@@ -494,18 +494,12 @@ export class AsturiasAROverlay extends Behaviour {
         try {
             const { DeviceUtilities } = await import('@needle-tools/engine');
             
-            // On iOS: only autostart if we're in an AppClip
-            // Otherwise, show the pre-panel so user can tap the AR button
             if (DeviceUtilities.isiOS()) {
-                if (DeviceUtilities.isNeedleAppClip && DeviceUtilities.isNeedleAppClip()) {
-                    // We're in an AppClip - autostart is safe
-                    console.log('[AsturiasAROverlay] iOS AppClip detected, autostarting AR');
-                    setTimeout(() => this._startAR(), 0);
-                } else {
-                    // Regular Safari - show pre-panel, user must tap AR button
-                    console.log('[AsturiasAROverlay] iOS Safari detected, showing AR button instead of autostart');
-                    this._showPrePanel();
-                }
+                // iOS Safari: WebXR not supported, Needle uses USDZ Quick Look fallback.
+                // Quick Look requires a user gesture, so we show a minimal "tap to start" overlay
+                // instead of the full pre-panel, reducing friction to a single tap.
+                console.log('[AsturiasAROverlay] iOS detected with autostart, showing minimal start prompt');
+                this._showMinimalIOSStartPrompt();
                 return;
             }
             
@@ -523,6 +517,40 @@ export class AsturiasAROverlay extends Behaviour {
             console.warn('[AsturiasAROverlay] DeviceUtilities not available, falling back to autostart', e);
             setTimeout(() => this._startAR(), 0);
         }
+    }
+
+    /** Minimal iOS prompt — just a big "tap to start" button that satisfies user gesture requirement */
+    private _showMinimalIOSStartPrompt() {
+        const root = this._ensureRoot();
+        const overlay = document.createElement('div');
+        overlay.id = 'ast-ios-start';
+        overlay.style.cssText = `
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            z-index: ${ASTURIAS.zIndex.panel}; pointer-events: auto;
+            cursor: pointer; -webkit-tap-highlight-color: transparent;
+        `;
+        overlay.innerHTML = `
+            <div style="text-align:center;animation:ast-scale-in 0.3s ease forwards;">
+                <div style="width:80px;height:80px;border-radius:50%;background:${ASTURIAS.colors.primary};
+                    display:flex;align-items:center;justify-content:center;margin:0 auto 16px;
+                    box-shadow:${ASTURIAS.shadow.green};animation:ast-pulse 2s ease infinite;">
+                    ${this._icon('ar')}
+                </div>
+                <div style="font-family:${ASTURIAS.fonts.family};font-size:18px;font-weight:700;color:#fff;">
+                    ${t('startAR', this._lang)}
+                </div>
+                <div style="font-family:${ASTURIAS.fonts.family};font-size:13px;color:rgba(255,255,255,0.6);margin-top:6px;">
+                    Tap to start
+                </div>
+            </div>
+        `;
+        overlay.addEventListener('click', () => {
+            overlay.remove();
+            this._startAR();
+        }, { once: true });
+        root.appendChild(overlay);
     }
 
     private async _startAR() {
