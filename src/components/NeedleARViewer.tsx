@@ -65,7 +65,11 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
 
   useEffect(() => {
     (window as any).__DIRECTUS_URL = DIRECTUS_URL;
-  }, []);
+    // Pass scene info to DOM overlay (AsturiasAROverlay reads this)
+    (window as any).__AR_SCENE_SLUG = scene.slug;
+    (window as any).__AR_SCENE_TITLE = scene.title;
+    (window as any).__AR_SCENE_DESCRIPTION = scene.description;
+  }, [scene]);
 
   useEffect(() => {
     const el = needleRef.current;
