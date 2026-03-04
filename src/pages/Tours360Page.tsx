@@ -301,16 +301,19 @@ export function Tours360Page() {
       </main>
 
       {/* Tour Viewer Modal — z-[70] per layering conventions */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {activeTour && (
           <motion.div
+            key={activeTour.id}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             className="fixed inset-0 z-[80] bg-black flex flex-col overflow-hidden"
+            style={{ isolation: 'isolate' }}
           >
             {/* Viewer header — compact, no scroll */}
-            <div className="relative z-20 flex items-center justify-between px-4 py-2 border-b border-white/10 bg-black/90 shrink-0">
+            <div className="relative z-20 flex items-center justify-between px-4 py-2 border-b border-white/10 bg-black/90 shrink-0" style={{ position: 'relative' }}>
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
                   <View className="w-4 h-4 text-white" />
@@ -386,7 +389,7 @@ export function Tours360Page() {
             </AnimatePresence>
 
             {/* Tour viewer — fills remaining space, no scroll */}
-            <div className="tour-viewer-container relative z-0 flex-1 min-h-0 overflow-hidden">
+            <div className="tour-viewer-container relative z-0 flex-1 min-h-0 overflow-hidden" style={{ contain: 'strict' }}>
               <KuulaTourEmbed
                 tour={activeTour}
                 locale={language as Language}
