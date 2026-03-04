@@ -132,10 +132,10 @@ const NotFound = () => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="mb-8"
+            className="mb-4 sm:mb-8"
           >
             <div className="relative inline-block">
-              <span className="text-[150px] sm:text-[200px] font-bold text-primary/20 leading-none select-none">
+              <span className="text-[100px] sm:text-[150px] md:text-[200px] font-bold text-primary/20 leading-none select-none">
                 404
               </span>
               <motion.div
@@ -151,7 +151,7 @@ const NotFound = () => {
                 className="absolute inset-0 flex items-center justify-center"
                 aria-hidden="true"
               >
-                <Compass className="w-20 h-20 sm:w-28 sm:h-28 text-primary" />
+                <Compass className="w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 text-primary" />
               </motion.div>
             </div>
           </motion.div>
