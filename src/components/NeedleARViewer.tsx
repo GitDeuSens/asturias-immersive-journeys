@@ -81,6 +81,24 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
         onStart?.();
         trackARStarted(scene.id, scene.needle_type, scene.title[locale!] || scene.title.es);
 
+        // Auto-instantiate AsturiasAROverlay if not already in the scene
+        try {
+          const { GameObject } = await import('@needle-tools/engine');
+          const { AsturiasAROverlay } = await import('../scripts/AsturiasAROverlay');
+          const existing = GameObject.findObjectOfType(AsturiasAROverlay);
+          if (!existing) {
+            const { Context } = await import('@needle-tools/engine');
+            const ctx = Context.Current;
+            const root = ctx?.scene?.children?.[0] as any;
+            if (root?.addComponent) {
+              root.addComponent(AsturiasAROverlay);
+              console.log('[AR] Auto-instantiated AsturiasAROverlay');
+            }
+          }
+        } catch (e) {
+          console.warn('[AR] Could not auto-instantiate AsturiasAROverlay:', e);
+        }
+
         let modelLoader = GameObject.findObjectOfType(ModelLoading);
 
         const { Context } = await import('@needle-tools/engine');
