@@ -309,22 +309,10 @@ export function Tours360Page() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[80] bg-black overflow-hidden"
+            className="fixed inset-0 z-[80] bg-black flex flex-col overflow-hidden"
           >
-            {/* Tour viewer — below header, z-[1] so controls stay on top */}
-            <div className="absolute inset-0 z-[1]" style={{ pointerEvents: 'none' }}>
-              <div className="w-full h-full" style={{ pointerEvents: 'auto' }}>
-                <KuulaTourEmbed
-                  tour={activeTour}
-                  locale={language as Language}
-                  showControls={false}
-                  onClose={closeTour}
-                />
-              </div>
-            </div>
-
-            {/* Viewer header — overlaid on top of iframe */}
-            <div className="absolute top-0 left-0 right-0 z-[100] flex items-center justify-between px-4 py-2 border-b border-white/10 bg-black/90" style={{ pointerEvents: 'auto' }}>
+            {/* Viewer header — flex row, always on top */}
+            <div className="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-black/90 shrink-0">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
                   <View className="w-4 h-4 text-white" />
@@ -383,15 +371,14 @@ export function Tours360Page() {
               </div>
             </div>
 
-            {/* Info panel — collapsible, overlaid below header */}
+            {/* Info panel — collapsible */}
             <AnimatePresence>
               {showInfo && activeTour.description[language] && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  className="absolute top-[49px] left-0 right-0 z-[100] bg-black/80 border-b border-white/10 overflow-hidden"
-                  style={{ pointerEvents: 'auto' }}
+                  className="bg-black/80 border-b border-white/10 overflow-hidden shrink-0"
                 >
                   <p className="px-4 py-3 text-sm text-white/70 max-w-4xl">
                     {activeTour.description[language]}
@@ -399,6 +386,16 @@ export function Tours360Page() {
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {/* Tour viewer — fills remaining space */}
+            <div className="tour-viewer-container flex-1 min-h-0">
+              <KuulaTourEmbed
+                tour={activeTour}
+                locale={language as Language}
+                showControls={false}
+                onClose={closeTour}
+              />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
