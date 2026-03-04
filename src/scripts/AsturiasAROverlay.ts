@@ -689,7 +689,7 @@ export class AsturiasAROverlay extends Behaviour {
                     <div style="font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                         ${title}
                     </div>
-                    <div style="font-size:11px;color:rgba(255,255,255,0.5);">${description || title}</div>
+                    <div style="font-size:11px;color:rgba(255,255,255,0.5);">${title}</div>
                 </div>
             </div>
             <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
