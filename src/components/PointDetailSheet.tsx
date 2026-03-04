@@ -1,4 +1,4 @@
-﻿import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MapPin, Camera, Play, FileText, Headphones, Smartphone, ExternalLink, ChevronRight, Maximize2, Sparkles, Image as ImageIcon, Phone, Mail, Globe, Clock, Euro, Info, Navigation, Footprints, Car, Eye, Download, Share2, Home } from 'lucide-react';
 import type { RoutePoint } from '@/data/types';
@@ -16,6 +16,7 @@ import { trackPOITimeSpent } from '@/lib/analytics';
 import { openNavigation } from '@/lib/mapUtils';
 import { getARScenesByPOI } from '@/lib/api/directus-client';
 import { ShareButtons } from '@/components/ShareButtons';
+import FullscreenModal from '@/components/poi/FullscreenModal';
 import { AudioGuidePlayer } from '@/components/AudioGuidePlayer';
 import {
   Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage,
@@ -74,6 +75,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
   const [loadedARScene, setLoadedARScene] = useState<ARScene | null>(null);
   const [arSceneError, setArSceneError] = useState<string | null>(null);
   const [arSceneLoading, setArSceneLoading] = useState(false);
+  const [show360Modal, setShow360Modal] = useState(false);
     const poiStartTime = useRef<number>(Date.now());
   const prevUrlRef = useRef<string>(window.location.pathname);
 
@@ -327,14 +329,14 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                       title="Tour 360"
                     />
                     <button
-                      onClick={() => window.open(content.tour360!.iframe360Url, '_blank', 'noopener,noreferrer')}
+                      onClick={() => setShow360Modal(true)}
                       className="absolute top-3 right-3 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors backdrop-blur-sm"
                       aria-label="Fullscreen"
                     >
                       <Maximize2 className="w-4 h-4" />
                     </button>
                   </div>
-                  <Button variant="outline" className="w-full justify-between" onClick={() => window.open(content.tour360!.iframe360Url, '_blank', 'noopener,noreferrer')}>
+                  <Button variant="outline" className="w-full justify-between" onClick={() => setShow360Modal(true)}>
                     <span className="flex items-center gap-2"><Camera className="w-4 h-4" />{t(texts.open360)}</span>
                     <Maximize2 className="w-4 h-4" />
                   </Button>
@@ -454,6 +456,16 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* 360 Fullscreen Modal */}
+      {content.tour360?.iframe360Url && (
+        <FullscreenModal
+          isOpen={show360Modal}
+          onClose={() => setShow360Modal(false)}
+          iframeUrl={content.tour360.iframe360Url}
+          title={point ? getText(point.title, language) : ''}
+        />
+      )}
 
     </>
   );
