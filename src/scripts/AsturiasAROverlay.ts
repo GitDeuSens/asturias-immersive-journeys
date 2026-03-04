@@ -211,6 +211,7 @@ export class AsturiasAROverlay extends Behaviour {
 
     // ── DOM references ─────────────────────────────────────────────────────
     private _root?:         HTMLElement;
+    private _headerBar?:    HTMLElement;
     private _prePanel?:     HTMLElement;
     private _arControls?:   HTMLElement;
     private _desktopPanel?: HTMLElement;
@@ -254,6 +255,7 @@ export class AsturiasAROverlay extends Behaviour {
             this._arUrl = url.toString();
         }
 
+        this._buildHeaderBar();
         this._buildPreARPanel();
 
         // If ?autostart=1 (from QR scan), skip the pre-AR panel and launch AR immediately
@@ -267,7 +269,8 @@ export class AsturiasAROverlay extends Behaviour {
         // Use Needle-native XR hooks — work on Android WebXR AND iOS AppClips
         this._xrStartHandler = () => {
             this._isAR = true;
-            this._hidePrePanel(); // Hide web overlay when XR session actually starts
+            this._hidePrePanel();
+            this._hideHeaderBar();
             this._buildARControls();
         };
         this._xrEndHandler = () => {
@@ -275,6 +278,7 @@ export class AsturiasAROverlay extends Behaviour {
             this._removeARControls();
             this._removeAllPopups();
             this._showPrePanel();
+            this._showHeaderBar();
             this._audio.stop();
             this._hideSubtitle();
         };
@@ -286,6 +290,7 @@ export class AsturiasAROverlay extends Behaviour {
     override onDestroy() {
         this._audio.stop();
         this._root?.remove();
+        this._headerBar?.remove();
         this._prePanel?.remove();
         this._arControls?.remove();
         this._desktopPanel?.remove();
@@ -622,6 +627,99 @@ export class AsturiasAROverlay extends Behaviour {
         `;
         document.head.appendChild(s);
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // HEADER BAR (floating top bar — same style as 360 tours)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private _buildHeaderBar() {
+        const root = this._ensureRoot();
+        const bar = document.createElement('div');
+        this._headerBar = bar;
+        bar.style.cssText = `
+            position: absolute; top: 0; left: 0; right: 0;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 12px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            pointer-events: auto; z-index: ${ASTURIAS.zIndex.controls};
+            animation: ast-fade-up 0.3s ease forwards;
+            font-family: ${ASTURIAS.fonts.family};
+        `;
+
+        const title = this._getTitle();
+
+        const shareIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>`;
+        const fullscreenIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>`;
+        const closeIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+
+        const btnStyle = `
+            display:inline-flex;align-items:center;justify-content:center;
+            width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;
+            background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);
+            color:#fff;transition:all 0.15s ease;
+        `;
+
+        bar.innerHTML = `
+            <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;">
+                <div style="width:32px;height:32px;border-radius:8px;background:${ASTURIAS.colors.primary};
+                    display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    ${this._icon('ar')}
+                </div>
+                <div style="min-width:0;flex:1;">
+                    <div style="font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                        ${title}
+                    </div>
+                    <div style="font-size:11px;color:rgba(255,255,255,0.5);">Asturias AR</div>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+                <button id="ast-hdr-info" title="${t('info', this._lang)}" style="${btnStyle}">${this._icon('info')}</button>
+                <button id="ast-hdr-share" title="Share" style="${btnStyle}">${shareIcon}</button>
+                <button id="ast-hdr-fullscreen" title="Fullscreen" style="${btnStyle}">${fullscreenIcon}</button>
+                <button id="ast-hdr-close" title="${t('close', this._lang)}" style="${btnStyle}gap:4px;width:auto;padding:0 12px;font-size:12px;font-weight:600;">
+                    ${closeIcon}<span style="display:none;font-family:${ASTURIAS.fonts.family};">${t('close', this._lang)}</span>
+                </button>
+            </div>
+        `;
+
+        // Show close label on wider screens
+        if (window.innerWidth >= 640) {
+            const closeSpan = bar.querySelector('#ast-hdr-close span') as HTMLElement;
+            if (closeSpan) closeSpan.style.display = 'inline';
+        }
+
+        root.appendChild(bar);
+
+        // Event listeners
+        bar.querySelector('#ast-hdr-info')?.addEventListener('click', () => this._showInfoPanel());
+        bar.querySelector('#ast-hdr-share')?.addEventListener('click', async () => {
+            const url = `${window.location.origin}/ar/${this._slug}`;
+            try {
+                if (navigator.share) {
+                    await navigator.share({ title, url });
+                } else {
+                    await navigator.clipboard.writeText(url);
+                }
+            } catch {}
+        });
+        bar.querySelector('#ast-hdr-fullscreen')?.addEventListener('click', () => {
+            const container = this._root?.closest('.ar-fullscreen-container')
+                ?? document.querySelector('.ar-fullscreen-container')
+                ?? document.querySelector('needle-engine')?.parentElement
+                ?? document.documentElement;
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                container?.requestFullscreen?.();
+            }
+        });
+        bar.querySelector('#ast-hdr-close')?.addEventListener('click', () => {
+            window.history.back();
+        });
+    }
+
+    private _showHeaderBar() { if (this._headerBar) this._headerBar.style.display = 'flex'; }
+    private _hideHeaderBar() { if (this._headerBar) this._headerBar.style.display = 'none'; }
 
     // ─────────────────────────────────────────────────────────────────────────
     // PRE-AR PANEL (mobile, before entering AR)

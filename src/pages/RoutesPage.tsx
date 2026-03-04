@@ -325,7 +325,10 @@ export const RoutesPage = React.memo(function RoutesPage() {
       if (tour360) {
         const tourBuildPath = tour360.build_path || '';
         const tourSlug = tour360.slug || '';
-        const tourBuildUrl = tourBuildPath ? `${DIRECTUS_URL}/builds${tourBuildPath}` : (tourSlug ? `${DIRECTUS_URL}/builds/tours-builds/${tourSlug}/` : '');
+        // Use relative path for local builds to avoid redirect on mobile
+        const tourBuildUrl = tourBuildPath
+          ? (tourBuildPath.startsWith('/tours-builds/') ? tourBuildPath : `${DIRECTUS_URL}/builds${tourBuildPath}`)
+          : (tourSlug ? `/tours-builds/${tourSlug}/` : '');
         content.tour360 = { iframe360Url: tourBuildUrl, allowFullscreen: true };
       }
       if (poi.cover_image) content.image = { url: `${DIRECTUS_URL}/assets/${poi.cover_image}` };
