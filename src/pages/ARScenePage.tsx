@@ -81,6 +81,7 @@ export function ARScenePage() {
   const [scene, setScene] = useState<ARScene | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     async function loadScene() {
@@ -221,28 +222,28 @@ export function ARScenePage() {
           >
             {scene.preview_video
               ? <video src={scene.preview_video} autoPlay loop muted playsInline className="w-full aspect-video object-cover" poster={scene.preview_image || undefined} />
-              : scene.preview_image
-                ? <img src={scene.preview_image} alt={scene.title[locale as Language] || scene.title.es} className="w-full aspect-video object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                : <div className="w-full aspect-video bg-gradient-to-br from-primary/20 via-accent/10 to-muted flex items-center justify-center">
+              : (scene.preview_image && !imageError)
+                ? <img src={scene.preview_image} alt={scene.title[locale as Language] || scene.title.es} className="w-full aspect-video object-cover" onError={() => setImageError(true)} />
+                : <div className="w-full aspect-video bg-gradient-to-br from-[hsl(var(--primary)/0.3)] via-[hsl(var(--accent)/0.2)] to-[hsl(var(--muted))] flex items-center justify-center">
                     <Sparkles className="w-16 h-16 text-primary/40" />
                   </div>
             }
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
             <div className="absolute bottom-0 left-0 right-0 p-6">
               <div className="flex flex-wrap gap-2 mb-3">
                 <Badge className="bg-primary text-primary-foreground border-primary shadow-md">
                   <Sparkles className="w-3 h-3 mr-1" />AR
                 </Badge>
-                <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
+                <Badge className="bg-black/50 text-white border-white/20 backdrop-blur-md shadow-sm">
                   <Clock className="w-3 h-3 mr-1" />{scene.duration_minutes} {texts.duration[locale as Language]}
                 </Badge>
-                <Badge className="bg-accent/80 text-accent-foreground border-accent/60 backdrop-blur-sm">
+                <Badge className="bg-blue-600/80 text-white border-blue-500/60 backdrop-blur-md shadow-sm">
                   {texts.arType[scene.needle_type as keyof typeof texts.arType]?.[locale as Language] ?? scene.needle_type}
                 </Badge>
-                <Badge className={`backdrop-blur-sm border ${
-                  scene.difficulty === 'easy' ? 'bg-emerald-500/80 text-white border-emerald-400/60' :
-                  scene.difficulty === 'moderate' ? 'bg-amber-500/80 text-white border-amber-400/60' :
-                  'bg-red-500/80 text-white border-red-400/60'
+                <Badge className={`backdrop-blur-md shadow-sm border ${
+                  scene.difficulty === 'easy' ? 'bg-emerald-600/80 text-white border-emerald-500/60' :
+                  scene.difficulty === 'moderate' ? 'bg-amber-600/80 text-white border-amber-500/60' :
+                  'bg-red-600/80 text-white border-red-500/60'
                 }`}>
                   {texts.difficulty[scene.difficulty as keyof typeof texts.difficulty]?.[locale as Language] ?? scene.difficulty}
                 </Badge>
