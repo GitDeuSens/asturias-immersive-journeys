@@ -250,7 +250,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
   }, [scene, locale, onStart, onError]);
 
   return (
-    <div className="relative rounded-2xl border border-border bg-black overflow-hidden" style={{ minHeight: 500 }}>
+    <div className="relative rounded-2xl border border-border bg-black overflow-hidden h-full" style={{ minHeight: 500 }}>
       {isLoading && (
         <div style={{
           position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
@@ -291,7 +291,7 @@ export function NeedleARViewer({ scene, locale = 'es', onStart, onError }: Needl
   const containerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <motion.div ref={containerRef} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative space-y-4">
+    <motion.div ref={containerRef} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative space-y-4 h-full">
       {/* 3D Preview with built-in AR button inside needle-engine */}
       <DynamicNeedleViewer scene={scene} locale={locale} onStart={onStart} onError={onError} />
 

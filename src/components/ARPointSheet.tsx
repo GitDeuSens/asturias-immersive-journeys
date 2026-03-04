@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Navigation, Footprints, Car, MapPin, Eye, Download } from 'lucide-react';
+import { X, Navigation, Footprints, Car, MapPin, Eye, Download, Maximize2, Share2, Info, Sparkles } from 'lucide-react';
 import { NeedleARViewer } from '@/components/NeedleARViewer';
 import { NavigationButton } from '@/components/NavigationButton';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -10,6 +10,7 @@ import { getARSceneBySlug } from '@/lib/api/directus-client';
 import { calculateDistanceTo, formatTime } from '@/lib/navigationService';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useLanguage } from '@/hooks/useLanguage';
+import { trackShare } from '@/lib/analytics';
 import type { ARScene, Language } from '@/lib/types';
 
 interface ARPointSheetProps {
@@ -42,6 +43,20 @@ const texts = {
     },
   },
   back: { es: 'Volver al recorrido', en: 'Back to route', fr: 'Retour au parcours' },
+  share: { es: 'Compartir', en: 'Share', fr: 'Partager' },
+  fullscreen: { es: 'Pantalla completa', en: 'Fullscreen', fr: 'Plein écran' },
+  close: { es: 'Cerrar', en: 'Close', fr: 'Fermer' },
+  arType: {
+    slam: { es: 'Superficie', en: 'Surface', fr: 'Surface' },
+    'image-tracking': { es: 'Marcador', en: 'Marker', fr: 'Marqueur' },
+    geo: { es: 'GPS', en: 'GPS', fr: 'GPS' },
+  },
+  difficulty: {
+    easy: { es: 'Fácil', en: 'Easy', fr: 'Facile' },
+    moderate: { es: 'Moderado', en: 'Moderate', fr: 'Modéré' },
+    advanced: { es: 'Avanzado', en: 'Advanced', fr: 'Avancé' },
+  },
+  duration: { es: 'min', en: 'min', fr: 'min' },
 };
 
 export function ARPointSheet({ arSlug, routeId, onClose }: ARPointSheetProps) {
@@ -51,6 +66,8 @@ export function ARPointSheet({ arSlug, routeId, onClose }: ARPointSheetProps) {
   const { latitude, longitude, hasLocation } = useGeolocation();
   const [scene, setScene] = useState<ARScene | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -62,13 +79,39 @@ export function ARPointSheet({ arSlug, routeId, onClose }: ARPointSheetProps) {
   }, [arSlug, lang]);
 
   const handleClose = () => {
-    // Restore URL to route
     if (routeId) {
       navigate(`/routes/${routeId}`, { replace: true });
     } else {
       navigate(-1);
     }
     onClose();
+  };
+
+  const handleFullscreenToggle = () => setIsFullscreen(!isFullscreen);
+
+  const handleBrowserFullscreen = () => {
+    const el = document.querySelector('.ar-fullscreen-container');
+    if (el) {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        el.requestFullscreen?.();
+      }
+    }
+  };
+
+  const handleShare = async () => {
+    if (!scene) return;
+    try {
+      const url = `${window.location.origin}/ar/${scene.slug}`;
+      if (navigator.share) {
+        await navigator.share({ title: scene.title[lang] || scene.title.es, url });
+        trackShare('native', 'ar_scene', scene.id);
+      } else {
+        await navigator.clipboard.writeText(url);
+        trackShare('clipboard', 'ar_scene', scene.id);
+      }
+    } catch {}
   };
 
   const distInfo = scene?.location && hasLocation && latitude !== null && longitude !== null
@@ -81,6 +124,82 @@ export function ARPointSheet({ arSlug, routeId, onClose }: ARPointSheetProps) {
       })
     : null;
 
+  // ── Fullscreen AR Viewer (same pattern as 360 tours) ──
+  if (isFullscreen && scene) {
+    const title = scene.title[lang] || scene.title.es;
+    const description = scene.description[lang] || scene.description.es;
+    const arTypeName = texts.arType[scene.needle_type as keyof typeof texts.arType]?.[lang] ?? scene.needle_type;
+    const difficultyName = texts.difficulty[scene.difficulty as keyof typeof texts.difficulty]?.[lang] ?? scene.difficulty;
+
+    return (
+      <motion.div
+        key="ar-fullscreen"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[100] bg-black ar-fullscreen-container"
+      >
+        {/* NeedleARViewer fills entire screen */}
+        <div className="absolute inset-0 z-0">
+          <NeedleARViewer scene={scene} locale={lang} />
+        </div>
+
+        {/* Floating header — z-10 */}
+        <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2 bg-gradient-to-b from-black/80 to-transparent pointer-events-auto">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
+              <Sparkles className="w-4 h-4 text-white" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-base font-bold text-white truncate">{title}</h2>
+              <p className="text-xs text-white/50">
+                {arTypeName}
+                {scene.difficulty && ` · ${difficultyName}`}
+                {scene.duration_minutes && ` · ${scene.duration_minutes} ${texts.duration[lang]}`}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            {description && (
+              <Button
+                variant="ghost" size="icon"
+                onClick={() => setShowInfo(!showInfo)}
+                className={`text-white hover:bg-white/20 h-8 w-8 ${showInfo ? 'bg-white/20' : ''}`}
+              >
+                <Info className="w-4 h-4" />
+              </Button>
+            )}
+            <Button variant="ghost" size="icon" onClick={handleShare} className="text-white hover:bg-white/20 h-8 w-8">
+              <Share2 className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={handleBrowserFullscreen} className="text-white hover:bg-white/20 h-8 w-8">
+              <Maximize2 className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={handleFullscreenToggle} className="text-white hover:bg-white/20 gap-1 h-8 px-3">
+              <X className="w-4 h-4" />
+              <span className="hidden sm:inline text-sm">{texts.close[lang]}</span>
+            </Button>
+          </div>
+        </div>
+
+        {/* Info panel */}
+        <AnimatePresence>
+          {showInfo && description && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="absolute top-[49px] left-0 right-0 z-10 bg-black/80 border-b border-white/10 overflow-hidden"
+            >
+              <p className="px-4 py-3 text-sm text-white/70 max-w-4xl">{description}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    );
+  }
+
+  // ── Side-panel (default) ──
   return (
     <AnimatePresence>
       <motion.div
@@ -109,6 +228,17 @@ export function ARPointSheet({ arSlug, routeId, onClose }: ARPointSheetProps) {
             <X className="w-4 h-4" />
             {texts.back[lang]}
           </button>
+          {scene && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleFullscreenToggle}
+              className="text-muted-foreground hover:text-foreground gap-1.5 h-8"
+            >
+              <Maximize2 className="w-4 h-4" />
+              <span className="text-xs">{texts.fullscreen[lang]}</span>
+            </Button>
+          )}
         </div>
 
         {isLoading && (
@@ -181,18 +311,20 @@ export function ARPointSheet({ arSlug, routeId, onClose }: ARPointSheetProps) {
                 </div>
               )}
 
-              {/* Address */}
-              {(scene as any).address && (
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/30 border border-border/50">
-                  <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-muted-foreground">{(scene as any).address}</p>
-                </div>
-              )}
-
               {/* AR Viewer */}
               <div>
                 <NeedleARViewer scene={scene} locale={lang} />
               </div>
+
+              {/* Fullscreen button below viewer */}
+              <Button
+                onClick={handleFullscreenToggle}
+                variant="outline"
+                className="w-full gap-2"
+              >
+                <Maximize2 className="w-4 h-4" />
+                {texts.fullscreen[lang]}
+              </Button>
 
               {/* Instructions */}
               <div className="bg-card border border-border rounded-xl p-4">
