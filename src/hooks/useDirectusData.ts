@@ -110,25 +110,49 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       const getAudioDuration = (f: any): number | undefined =>
         typeof f === 'object' && f?.duration ? f.duration : undefined;
 
+      // Debug: log raw audio field values for troubleshooting
       if (poi.audio_es || poi.audio_en || poi.audio_fr) {
+        console.log(`[Audio Debug] POI "${poi.slug || poi.id}" audio fields:`, {
+          audio_es: poi.audio_es,
+          audio_en: poi.audio_en,
+          audio_fr: poi.audio_fr,
+          resolved_es: getAudioId(poi.audio_es),
+          resolved_en: getAudioId(poi.audio_en),
+          resolved_fr: getAudioId(poi.audio_fr),
+        });
+
         content.audioGuide = {};
         if (poi.audio_es) {
-          content.audioGuide.es = {
-            url: getFileUrl(getAudioId(poi.audio_es)),
-            durationSec: getAudioDuration(poi.audio_es),
-          };
+          const audioId = getAudioId(poi.audio_es);
+          if (audioId) {
+            content.audioGuide.es = {
+              url: getFileUrl(audioId),
+              durationSec: getAudioDuration(poi.audio_es),
+            };
+          }
         }
         if (poi.audio_en) {
-          content.audioGuide.en = {
-            url: getFileUrl(getAudioId(poi.audio_en)),
-            durationSec: getAudioDuration(poi.audio_en),
-          };
+          const audioId = getAudioId(poi.audio_en);
+          if (audioId) {
+            content.audioGuide.en = {
+              url: getFileUrl(audioId),
+              durationSec: getAudioDuration(poi.audio_en),
+            };
+          }
         }
         if (poi.audio_fr) {
-          content.audioGuide.fr = {
-            url: getFileUrl(getAudioId(poi.audio_fr)),
-            durationSec: getAudioDuration(poi.audio_fr),
-          };
+          const audioId = getAudioId(poi.audio_fr);
+          if (audioId) {
+            content.audioGuide.fr = {
+              url: getFileUrl(audioId),
+              durationSec: getAudioDuration(poi.audio_fr),
+            };
+          }
+        }
+        // If no valid audio IDs resolved, remove the empty audioGuide
+        if (Object.keys(content.audioGuide).length === 0) {
+          delete content.audioGuide;
+          console.warn(`[Audio Debug] POI "${poi.slug || poi.id}" had audio fields but no valid IDs resolved`);
         }
       }
 
@@ -139,13 +163,18 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
 
       const lat = Number(poi.lat) || 0;
       const lng = Number(poi.lng) || 0;
+      // Build audioGuides URLs correctly (handle both string UUIDs and expanded objects)
+      const buildAudioUrl = (f: any): string => {
+        const id = getAudioId(f);
+        return id ? `${DIRECTUS_URL}/assets/${id}` : '';
+      };
       // TODO meter gallery aqui
       return {
         id: poi.slug || poi.id || `point-${idx}`, // Use slug first for clean URLs
         audioGuides: {
-          es: DIRECTUS_URL + '/' + poi.audio_es,
-          en: DIRECTUS_URL + '/' + poi.audio_en,
-          fr: DIRECTUS_URL + '/' + poi.audio_fr,
+          es: buildAudioUrl(poi.audio_es),
+          en: buildAudioUrl(poi.audio_en),
+          fr: buildAudioUrl(poi.audio_fr),
         },
         poiUUID: poi.id, // Keep original UUID for API queries
         order: poi.order ?? idx + 1,

@@ -42,8 +42,8 @@ export function useFontOptimization() {
     document.head.appendChild(style);
 
     return () => {
-      document.head.removeChild(fontLink);
-      document.head.removeChild(style);
+      if (fontLink.parentNode) document.head.removeChild(fontLink);
+      if (style.parentNode) document.head.removeChild(style);
     };
   }, []);
 }
@@ -106,8 +106,8 @@ export function useResourceHints() {
     document.head.appendChild(preconnect);
 
     return () => {
-      document.head.removeChild(dnsPrefetch);
-      document.head.removeChild(preconnect);
+      if (dnsPrefetch.parentNode) document.head.removeChild(dnsPrefetch);
+      if (preconnect.parentNode) document.head.removeChild(preconnect);
     };
   }, []);
 }
