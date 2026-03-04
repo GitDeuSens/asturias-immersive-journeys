@@ -276,7 +276,7 @@ export function Tours360Page() {
         </div>
 
         {/* Hero section */}
-        <div className="bg-primary pt-8 sm:pt-12 mb-8 mt-2">
+        <div className="bg-primary pt-6 sm:pt-12 mb-6 sm:mb-8 mt-2">
           <div className="container mx-auto pb-5 px-4 max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}

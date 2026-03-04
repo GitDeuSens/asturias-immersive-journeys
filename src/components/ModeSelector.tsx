@@ -82,7 +82,7 @@ export function ModeSelector({ onSelect }: ModeSelectorProps) {
 
   return (
     <>
-      <div style={{ height: '90vh' }} className="relative z-10 flex flex-col items-center justify-center px-4 pt-0 pb-4">
+      <div className="relative z-10 flex flex-col items-center justify-center px-4 pt-0 pb-4 min-h-[calc(100dvh-60px)]">
         {/* Geolocation Error Alert */}
         <GeolocationErrorAlert error={geoError} onDismiss={handleDismissError} onRetry={handleRetryLocation} />
 
