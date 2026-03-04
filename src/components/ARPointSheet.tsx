@@ -144,8 +144,8 @@ export function ARPointSheet({ arSlug, routeId, onClose }: ARPointSheetProps) {
           <NeedleARViewer scene={scene} locale={lang} />
         </div>
 
-        {/* Floating header — z-10 */}
-        <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2 bg-gradient-to-b from-black/80 to-transparent pointer-events-auto">
+        {/* Floating header — must be above needle-engine canvas (z-index ~2147483640) */}
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 py-2 bg-gradient-to-b from-black/80 to-transparent pointer-events-auto" style={{ zIndex: 2147483645 }}>
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
               <Sparkles className="w-4 h-4 text-white" />
@@ -189,7 +189,7 @@ export function ARPointSheet({ arSlug, routeId, onClose }: ARPointSheetProps) {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="absolute top-[49px] left-0 right-0 z-10 bg-black/80 border-b border-white/10 overflow-hidden"
+              className="absolute top-[49px] left-0 right-0 bg-black/80 border-b border-white/10 overflow-hidden" style={{ zIndex: 2147483645 }}
             >
               <p className="px-4 py-3 text-sm text-white/70 max-w-4xl">{description}</p>
             </motion.div>
