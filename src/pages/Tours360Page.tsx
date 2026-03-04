@@ -72,7 +72,7 @@ function TourViewerModal({ tour, language, showInfo, onToggleInfo, onShare, onFu
         />
       )}
 
-      <div className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-2 bg-black pointer-events-auto" style={{ isolation: 'isolate' }}>
+      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2 bg-black pointer-events-auto">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
             <View className="w-4 h-4 text-white" />
@@ -389,7 +389,7 @@ export function Tours360Page() {
       </main>
 
       {/* Tour Viewer Modal — same approach as FullscreenModal in /routes */}
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {activeTour && activeTour.id && (
           <TourViewerModal
             key={activeTour.id}
