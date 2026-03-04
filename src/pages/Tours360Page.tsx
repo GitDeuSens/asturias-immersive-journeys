@@ -313,7 +313,7 @@ export function Tours360Page() {
             style={{ isolation: 'isolate' }}
           >
             {/* Viewer header — compact, no scroll */}
-            <div className="relative z-20 flex items-center justify-between px-4 py-2 border-b border-white/10 bg-black/90 shrink-0" style={{ position: 'relative' }}>
+            <div className="relative z-50 flex items-center justify-between px-4 py-2 border-b border-white/10 bg-black/90 shrink-0">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
                   <View className="w-4 h-4 text-white" />
