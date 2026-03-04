@@ -311,14 +311,16 @@ export function Tours360Page() {
             transition={{ duration: 0.2 }}
             className="fixed inset-0 z-[80] bg-black overflow-hidden"
           >
-            {/* Tour viewer — full screen, behind controls */}
-            <div className="absolute inset-0">
-              <KuulaTourEmbed
-                tour={activeTour}
-                locale={language as Language}
-                showControls={false}
-                onClose={closeTour}
-              />
+            {/* Tour viewer — below header, z-[1] so controls stay on top */}
+            <div className="absolute inset-0 z-[1]" style={{ pointerEvents: 'none' }}>
+              <div className="w-full h-full" style={{ pointerEvents: 'auto' }}>
+                <KuulaTourEmbed
+                  tour={activeTour}
+                  locale={language as Language}
+                  showControls={false}
+                  onClose={closeTour}
+                />
+              </div>
             </div>
 
             {/* Viewer header — overlaid on top of iframe */}
