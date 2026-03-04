@@ -388,14 +388,16 @@ export function Tours360Page() {
               )}
             </AnimatePresence>
 
-            {/* Tour viewer — fills remaining space, no scroll */}
-            <div className="tour-viewer-container relative z-0 flex-1 min-h-0 overflow-hidden" style={{ contain: 'strict' }}>
-              <KuulaTourEmbed
-                tour={activeTour}
-                locale={language as Language}
-                showControls={false}
-                onClose={closeTour}
-              />
+            {/* Tour viewer — fills remaining space, absolutely positioned so it cannot cover header */}
+            <div className="relative flex-1 min-h-0">
+              <div className="absolute inset-0 overflow-hidden">
+                <KuulaTourEmbed
+                  tour={activeTour}
+                  locale={language as Language}
+                  showControls={false}
+                  onClose={closeTour}
+                />
+              </div>
             </div>
           </motion.div>
         )}
