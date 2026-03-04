@@ -323,7 +323,10 @@ export class AsturiasAROverlay extends Behaviour {
     }
 
     private _detectSlug() {
-        // /ar/{slug}
+        // 1. React app passes slug via window global
+        const globalSlug = (window as any).__AR_SCENE_SLUG;
+        if (globalSlug) { this._slug = globalSlug; return; }
+        // 2. /ar/{slug} in URL path
         const parts = window.location.pathname.split('/');
         const idx = parts.indexOf('ar');
         this._slug = idx >= 0 ? (parts[idx + 1] ?? '') : '';
@@ -440,17 +443,32 @@ export class AsturiasAROverlay extends Behaviour {
     }
 
     private _getTitle(): string {
-        if (!this._sceneInfo) return escapeHtml(this._slug);
-        const t = this._sceneInfo.title;
-        if (typeof t === 'string') return escapeHtml(t);
-        return escapeHtml(t?.[this._lang] ?? t?.['es'] ?? this._slug);
+        // Try sceneInfo first, then window global from React, then slug
+        if (this._sceneInfo) {
+            const t = this._sceneInfo.title;
+            if (typeof t === 'string') return escapeHtml(t);
+            return escapeHtml(t?.[this._lang] ?? t?.['es'] ?? this._slug);
+        }
+        const globalTitle = (window as any).__AR_SCENE_TITLE;
+        if (globalTitle) {
+            if (typeof globalTitle === 'string') return escapeHtml(globalTitle);
+            return escapeHtml(globalTitle[this._lang] ?? globalTitle['es'] ?? this._slug);
+        }
+        return escapeHtml(this._slug);
     }
 
     private _getDescription(): string {
         const d = this._sceneInfo?.description;
-        if (!d) return '';
-        if (typeof d === 'string') return escapeHtml(d);
-        return escapeHtml(d?.[this._lang] ?? d?.['es'] ?? '');
+        if (d) {
+            if (typeof d === 'string') return escapeHtml(d);
+            return escapeHtml(d?.[this._lang] ?? d?.['es'] ?? '');
+        }
+        const globalDesc = (window as any).__AR_SCENE_DESCRIPTION;
+        if (globalDesc) {
+            if (typeof globalDesc === 'string') return escapeHtml(globalDesc);
+            return escapeHtml(globalDesc[this._lang] ?? globalDesc['es'] ?? '');
+        }
+        return '';
     }
 
     private _hasAudio(): boolean {
