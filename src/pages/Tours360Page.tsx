@@ -313,7 +313,7 @@ export function Tours360Page() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-[80] bg-black tours360-fullscreen-container"
+              className="fixed inset-0 z-[100] bg-black tours360-fullscreen-container"
             >
               {/* Iframe fills entire screen — z-0 */}
               {embedUrl && (
