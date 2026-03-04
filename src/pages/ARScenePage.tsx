@@ -1,37 +1,29 @@
 // ============ AR SCENE PAGE ============
-// Individual AR scene page with QR code and WebXR support
+// Fullscreen AR viewer page with floating header controls (same pattern as 360 tours)
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowLeft, Clock, Download, Share2,
-  Smartphone, Eye, Navigation, Sparkles, AlertCircle, Footprints, Car, Home,
+  ArrowLeft, Share2, Maximize2, X, Info, Sparkles, AlertCircle,
 } from "lucide-react";
-import { useGeolocation } from "@/hooks/useGeolocation";
-import { calculateDistanceTo, formatTime } from "@/lib/navigationService";
-import { NavigationButton } from "@/components/NavigationButton";
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { NeedleARViewer } from "@/components/NeedleARViewer";
-import { ShareButtons } from "@/components/ShareButtons";
 import { SEOHead } from "@/components/SEOHead";
 import { getARSceneBySlug } from "@/lib/api/directus-client";
 import { trackEvent, trackShare } from "@/lib/analytics";
 import { useLanguage } from "@/hooks/useLanguage";
 import type { ARScene, Language } from "@/lib/types";
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbSeparator,
-  BreadcrumbPage,
-} from "@/components/ui/breadcrumb";
 
 const texts = {
   back: { es: "Volver", en: "Back", fr: "Retour" },
+  notFound: { es: "Experiencia no encontrada", en: "Experience not found", fr: "Expérience non trouvée" },
+  loading: { es: "Cargando...", en: "Loading...", fr: "Chargement..." },
+  share: { es: "Compartir", en: "Share", fr: "Partager" },
+  fullscreen: { es: "Pantalla completa", en: "Fullscreen", fr: "Plein écran" },
+  close: { es: "Cerrar", en: "Close", fr: "Fermer" },
+  info: { es: "Información", en: "Info", fr: "Info" },
   duration: { es: "min", en: "min", fr: "min" },
   difficulty: {
     easy: { es: "Fácil", en: "Easy", fr: "Facile" },
@@ -43,32 +35,6 @@ const texts = {
     "image-tracking": { es: "Marcador", en: "Marker", fr: "Marqueur" },
     geo: { es: "GPS", en: "GPS", fr: "GPS" },
   },
-  howToUse: {
-    es: "Cómo usar esta experiencia",
-    en: "How to use this experience",
-    fr: "Comment utiliser cette expérience",
-  },
-  downloadQR: { es: "Descargar código QR", en: "Download QR code", fr: "Télécharger le code QR" },
-  shareExperience: { es: "Comparte esta experiencia", en: "Share this experience", fr: "Partagez cette expérience" },
-  instructions: {
-    slam: {
-      es: ["Asegúrate de estar en un espacio abierto con buena iluminación", "Permite el acceso a la cámara cuando se solicite", "Apunta la cámara al suelo y muévela lentamente", "Cuando aparezca un punto, toca para colocar el contenido"],
-      en: ["Make sure you are in an open space with good lighting", "Allow camera access when prompted", "Point the camera at the floor and move it slowly", "When a point appears, tap to place the content"],
-      fr: ["Assurez-vous d'être dans un espace ouvert bien éclairé", "Autorisez l'accès à la caméra lorsque demandé", "Pointez la caméra vers le sol et déplacez-la lentement", "Lorsqu'un point apparaît, touchez pour placer le contenu"],
-    },
-    "image-tracking": {
-      es: ["Imprime el marcador en tamaño A4", "Colócalo en una superficie plana", "Apunta la cámara al marcador", "El contenido AR aparecerá sobre el marcador"],
-      en: ["Print the marker in A4 size", "Place it on a flat surface", "Point the camera at the marker", "The AR content will appear over the marker"],
-      fr: ["Imprimez le marqueur au format A4", "Placez-le sur une surface plane", "Pointez la caméra vers le marqueur", "Le contenu AR apparaîtra sur le marqueur"],
-    },
-    geo: {
-      es: ["Ve a la ubicación marcada en el mapa", "La experiencia AR se activará automáticamente al acercarte", "Permite el acceso a tu ubicación cuando se solicite"],
-      en: ["Go to the location marked on the map", "The AR experience will activate automatically when you approach", "Allow location access when prompted"],
-      fr: ["Rendez-vous à l'emplacement indiqué sur la carte", "L'expérience AR s'activera automatiquement à l'approche", "Autorisez l'accès à votre position lorsque demandé"],
-    },
-  },
-  notFound: { es: "Experiencia no encontrada", en: "Experience not found", fr: "Expérience non trouvée" },
-  loading: { es: "Cargando...", en: "Loading...", fr: "Chargement..." },
 };
 
 export function ARScenePage() {
@@ -77,18 +43,19 @@ export function ARScenePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const fromRoute = (location.state as any)?.fromRoute as string | undefined;
-  const { latitude, longitude, hasLocation } = useGeolocation();
   const [scene, setScene] = useState<ARScene | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [imageError, setImageError] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
+
+  const lang = locale as Language;
 
   useEffect(() => {
     async function loadScene() {
       if (!slug) return;
       setIsLoading(true);
       try {
-        const data = await getARSceneBySlug(slug, locale as Language);
+        const data = await getARSceneBySlug(slug, lang);
         setScene(data);
         if (data) trackEvent("ar_scene_viewed", { ar_id: data.id, ar_slug: slug });
       } catch {
@@ -98,32 +65,32 @@ export function ARScenePage() {
       }
     }
     loadScene();
-  }, [slug, locale]);
+  }, [slug, lang]);
 
-  const handleDownloadQR = () => {
-    const svg = document.getElementById("ar-qr-code");
-    if (!svg) return;
-    const svgData = new XMLSerializer().serializeToString(svg);
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
-    img.onload = () => {
-      canvas.width = 1024; canvas.height = 1024;
-      ctx?.drawImage(img, 0, 0, 1024, 1024);
-      const link = document.createElement("a");
-      link.download = `qr-${slug}.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-      trackEvent("qr_downloaded", { ar_id: scene?.id, ar_slug: slug });
-    };
-    img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
+  const handleClose = () => {
+    if (fromRoute) {
+      navigate(`/routes/${fromRoute}`);
+    } else {
+      navigate(-1);
+    }
+  };
+
+  const handleFullscreen = () => {
+    const el = document.querySelector('.ar-fullscreen-container');
+    if (el) {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        el.requestFullscreen?.();
+      }
+    }
   };
 
   const handleShare = async () => {
     if (!scene) return;
     const shareData = {
-      title: scene.title[locale as Language] || scene.title.es,
-      text: scene.description[locale as Language] || scene.description.es,
+      title: scene.title[lang] || scene.title.es,
+      text: scene.description[lang] || scene.description.es,
       url: window.location.href,
     };
     try {
@@ -137,226 +104,111 @@ export function ARScenePage() {
     } catch { /* cancelled */ }
   };
 
+  // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <AppHeader variant="light" />
-        <div className="pt-20 flex items-center justify-center min-h-[60vh]">
-          <div className="flex items-center gap-3 text-muted-foreground">
-            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            <span>{texts.loading[locale as Language]}</span>
-          </div>
+      <div className="fixed inset-0 z-[80] bg-black flex items-center justify-center">
+        <div className="flex items-center gap-3 text-white/70">
+          <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          <span>{texts.loading[lang]}</span>
         </div>
       </div>
     );
   }
 
+  // Error / not found
   if (!scene || error) {
     return (
       <div className="min-h-screen bg-background">
         <AppHeader variant="light" />
         <div className="pt-20 flex flex-col items-center justify-center min-h-[60vh]">
           <AlertCircle className="w-12 h-12 text-muted-foreground mb-4" />
-          <h1 className="text-xl font-semibold text-foreground mb-2">{texts.notFound[locale as Language]}</h1>
+          <h1 className="text-xl font-semibold text-foreground mb-2">{texts.notFound[lang]}</h1>
           <button
-            onClick={() => fromRoute ? navigate(`/routes/${fromRoute}`) : navigate(-1)}
+            onClick={handleClose}
             className="inline-flex items-center text-muted-foreground hover:text-foreground"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />{texts.back[locale as Language]}
+            <ArrowLeft className="w-4 h-4 mr-2" />{texts.back[lang]}
           </button>
         </div>
       </div>
     );
   }
 
-  const currentUrl = typeof window !== "undefined" ? window.location.href : "";
-  const instructionSet = texts.instructions[scene.needle_type as keyof typeof texts.instructions];
-  const instructions = instructionSet?.[locale as Language] ?? texts.instructions.slam[locale as Language];
+  const title = scene.title[lang] || scene.title.es;
+  const description = scene.description[lang] || scene.description.es;
+  const arTypeName = texts.arType[scene.needle_type as keyof typeof texts.arType]?.[lang] ?? scene.needle_type;
+  const difficultyName = texts.difficulty[scene.difficulty as keyof typeof texts.difficulty]?.[lang] ?? scene.difficulty;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="fixed inset-0 z-[80] bg-black ar-fullscreen-container">
       <SEOHead
-        title={scene.title[locale as Language] || scene.title.es}
-        description={scene.description[locale as Language] || scene.description.es}
+        title={title}
+        description={description}
         image={scene.preview_image}
         type="article"
       />
-      <AppHeader variant="light" />
 
-      <main className="pt-20">
-        <div className="container mx-auto px-4 max-w-4xl">
-          {/* Breadcrumb */}
-          <div className="mb-4">
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/" className="flex items-center gap-1 text-xs">
-                    <Home className="w-3 h-3" />
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  {fromRoute ? (
-                    <BreadcrumbLink href="#" onClick={(e) => { e.preventDefault(); navigate(`/routes/${fromRoute}`); }} className="text-xs">
-                      {locale === 'es' ? 'Rutas' : locale === 'en' ? 'Routes' : 'Itinéraires'}
-                    </BreadcrumbLink>
-                  ) : (
-                    <BreadcrumbLink href="/ar" className="text-xs">
-                      {locale === 'es' ? 'Experiencias AR' : locale === 'en' ? 'AR Experiences' : 'Expériences AR'}
-                    </BreadcrumbLink>
-                  )}
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage className="text-xs truncate max-w-[150px]">
-                    {scene.title[locale as Language] || scene.title.es}
-                  </BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+      {/* NeedleARViewer fills the entire screen */}
+      <div className="absolute inset-0 z-0">
+        <NeedleARViewer scene={scene} locale={lang} />
+      </div>
+
+      {/* Floating header bar — z-10 above viewer */}
+      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2 bg-gradient-to-b from-black/80 to-transparent pointer-events-auto">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
+            <Sparkles className="w-4 h-4 text-white" />
           </div>
-
-          {/* Hero */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            className="relative rounded-2xl overflow-hidden mb-8"
-          >
-            {scene.preview_video
-              ? <video src={scene.preview_video} autoPlay loop muted playsInline className="w-full aspect-video object-cover" poster={scene.preview_image || undefined} />
-              : (scene.preview_image && !imageError)
-                ? <img src={scene.preview_image} alt={scene.title[locale as Language] || scene.title.es} className="w-full aspect-video object-cover" onError={() => setImageError(true)} />
-                : <div className="w-full aspect-video bg-gradient-to-br from-[hsl(var(--primary)/0.3)] via-[hsl(var(--accent)/0.2)] to-[hsl(var(--muted))] flex items-center justify-center">
-                    <Sparkles className="w-16 h-16 text-primary/40" />
-                  </div>
-            }
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
-            <div className="absolute bottom-0 left-0 right-0 p-6">
-              <div className="flex flex-wrap gap-2 mb-3">
-                <Badge className="bg-primary text-primary-foreground border-primary shadow-md">
-                  <Sparkles className="w-3 h-3 mr-1" />AR
-                </Badge>
-                <Badge className="bg-black/50 text-white border-white/20 backdrop-blur-md shadow-sm">
-                  <Clock className="w-3 h-3 mr-1" />{scene.duration_minutes} {texts.duration[locale as Language]}
-                </Badge>
-                <Badge className="bg-blue-600/80 text-white border-blue-500/60 backdrop-blur-md shadow-sm">
-                  {texts.arType[scene.needle_type as keyof typeof texts.arType]?.[locale as Language] ?? scene.needle_type}
-                </Badge>
-                <Badge className={`backdrop-blur-md shadow-sm border ${
-                  scene.difficulty === 'easy' ? 'bg-emerald-600/80 text-white border-emerald-500/60' :
-                  scene.difficulty === 'moderate' ? 'bg-amber-600/80 text-white border-amber-500/60' :
-                  'bg-red-600/80 text-white border-red-500/60'
-                }`}>
-                  {texts.difficulty[scene.difficulty as keyof typeof texts.difficulty]?.[locale as Language] ?? scene.difficulty}
-                </Badge>
-              </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                {scene.title[locale as Language] || scene.title.es}
-              </h1>
-              <p className="text-white/80">{scene.description[locale as Language] || scene.description.es}</p>
-            </div>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="md:col-span-2 space-y-8">
-              {/* 
-                AR Viewer — NeedleARViewer handles all 3 modes internally:
-                  • scene_mode === "dynamic" → inline needle-engine + GLB from Directus
-                  • build_path set          → iframe with deployed Needle build
-                  • fallback               → launch button + iframe on click
-              */}
-              <section>
-                <NeedleARViewer scene={scene} locale={locale as Language} />
-              </section>
-
-              {/* Instructions */}
-              <section className="bg-card border border-border rounded-xl p-6">
-                <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Eye className="w-5 h-5 text-primary" />{texts.howToUse[locale as Language]}
-                </h2>
-                <ol className="space-y-3">
-                  {instructions.map((instruction, idx) => (
-                    <li key={idx} className="flex items-start gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary text-sm font-medium flex items-center justify-center">{idx + 1}</span>
-                      <span className="text-muted-foreground">{instruction}</span>
-                    </li>
-                  ))}
-                </ol>
-
-                {scene.needle_type === "image-tracking" && scene.tracking_image_url && (
-                  <div className="mt-6 pt-6 border-t border-border">
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {locale === "es" ? "Marcador para imprimir:" : locale === "en" ? "Marker to print:" : "Marqueur à imprimer:"}
-                    </p>
-                    <img src={scene.tracking_image_url} alt="AR Marker" className="w-32 h-32 border border-border rounded-lg mb-3" />
-                    <a href={scene.tracking_image_url} download={`marcador-${scene.slug}.png`}
-                      className="inline-flex items-center text-sm text-primary hover:underline"
-                    >
-                      <Download className="w-4 h-4 mr-1" />
-                      {locale === "es" ? "Descargar marcador (A4)" : locale === "en" ? "Download marker (A4)" : "Télécharger le marqueur (A4)"}
-                    </a>
-                  </div>
-                )}
-
-                {scene.location && (
-                  <div className="mt-6 pt-6 border-t border-border">
-                    <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2 mb-3">
-                      <Navigation className="w-4 h-4 text-primary" />
-                      {locale === "es" ? "Cómo llegar" : locale === "en" ? "How to get there" : "Comment y arriver"}
-                    </h3>
-                    {hasLocation && latitude !== null && longitude !== null && (() => {
-                      const dist = calculateDistanceTo(latitude, longitude, {
-                        id: scene.id, name: scene.title[locale as Language] || scene.title.es,
-                        lat: scene.location!.lat, lng: scene.location!.lng, type: 'route-point',
-                      });
-                      return (
-                        <div className="flex items-center gap-4 mb-4 p-3 rounded-lg bg-muted/50">
-                          <p className="text-2xl font-bold text-primary">{dist.distanceFormatted}</p>
-                          <div className="flex-1 grid grid-cols-2 gap-2 text-sm">
-                            <div className="flex items-center gap-1.5 text-muted-foreground">
-                              <Footprints className="w-4 h-4" /><span>{formatTime(dist.estimatedWalkingTime)}</span>
-                            </div>
-                            <div className="flex items-center gap-1.5 text-muted-foreground">
-                              <Car className="w-4 h-4" /><span>{formatTime(dist.estimatedDrivingTime)}</span>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-                    <NavigationButton
-                      destination={{ id: scene.id, name: scene.title[locale as Language] || scene.title.es, lat: scene.location.lat, lng: scene.location.lng, type: 'route-point' }}
-                      variant="primary"
-                      className="w-full"
-                    />
-                  </div>
-                )}
-              </section>
-
-              {/* Share */}
-              <section className="bg-card border border-border rounded-xl p-6">
-                <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Share2 className="w-5 h-5 text-primary" />{texts.shareExperience[locale as Language]}
-                </h2>
-                <ShareButtons
-                  url={currentUrl}
-                  title={scene.title[locale as Language] || scene.title.es}
-                  description={scene.description[locale as Language] || scene.description.es}
-                  variant="inline"
-                />
-              </section>
-
-              <div className="bg-muted/50 border border-border rounded-xl p-4">
-                <div className="flex items-start gap-3">
-                  <Smartphone className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
-                  <p className="text-xs text-muted-foreground">
-                    {locale === "es" ? "Esta experiencia funciona mejor en dispositivos móviles con ARCore (Android) o ARKit (iOS)."
-                      : locale === "en" ? "This experience works best on mobile devices with ARCore (Android) or ARKit (iOS)."
-                      : "Cette expérience fonctionne mieux sur les appareils mobiles avec ARCore (Android) ou ARKit (iOS)."}
-                  </p>
-                </div>
-              </div>
-            </div>
+          <div className="min-w-0">
+            <h1 className="text-base font-bold text-white truncate">{title}</h1>
+            <p className="text-xs text-white/50">
+              {arTypeName}
+              {scene.difficulty && ` · ${difficultyName}`}
+              {scene.duration_minutes && ` · ${scene.duration_minutes} ${texts.duration[lang]}`}
+            </p>
           </div>
         </div>
-      </main>
+        <div className="flex items-center gap-1 shrink-0">
+          {description && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowInfo(!showInfo)}
+              className={`text-white hover:bg-white/20 h-8 w-8 ${showInfo ? 'bg-white/20' : ''}`}
+              title={texts.info[lang]}
+            >
+              <Info className="w-4 h-4" />
+            </Button>
+          )}
+          <Button variant="ghost" size="icon" onClick={handleShare} className="text-white hover:bg-white/20 h-8 w-8" title={texts.share[lang]}>
+            <Share2 className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={handleFullscreen} className="text-white hover:bg-white/20 h-8 w-8" title={texts.fullscreen[lang]}>
+            <Maximize2 className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleClose} className="text-white hover:bg-white/20 gap-1 h-8 px-3">
+            <X className="w-4 h-4" />
+            <span className="hidden sm:inline text-sm">{texts.close[lang]}</span>
+          </Button>
+        </div>
+      </div>
+
+      {/* Info panel */}
+      <AnimatePresence>
+        {showInfo && description && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="absolute top-[49px] left-0 right-0 z-10 bg-black/80 border-b border-white/10 overflow-hidden"
+          >
+            <p className="px-4 py-3 text-sm text-white/70 max-w-4xl">
+              {description}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
