@@ -163,14 +163,10 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
             try {
               const { DeviceUtilities } = await import('@needle-tools/engine');
               
-              // On iOS: only autostart if we're in an AppClip
+              // On iOS: let AsturiasAROverlay handle the minimal start prompt
+              // (requires user gesture for Quick Look / USDZ)
               if (DeviceUtilities.isiOS()) {
-                if (DeviceUtilities.isNeedleAppClip && DeviceUtilities.isNeedleAppClip()) {
-                  console.log('[NeedleARViewer] iOS AppClip detected, autostarting AR');
-                  setTimeout(() => tryStartAR(), 0);
-                } else {
-                  console.log('[NeedleARViewer] iOS Safari detected, skipping autostart');
-                }
+                console.log('[NeedleARViewer] iOS detected, deferring to AsturiasAROverlay');
                 return;
               }
               
