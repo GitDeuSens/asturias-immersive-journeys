@@ -163,16 +163,8 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
             try {
               const { DeviceUtilities } = await import('@needle-tools/engine');
               
-              // On iOS: let AsturiasAROverlay handle the minimal start prompt
-              // (requires user gesture for Quick Look / USDZ)
-              if (DeviceUtilities.isiOS()) {
-                console.log('[NeedleARViewer] iOS detected, deferring to AsturiasAROverlay');
-                return;
-              }
-              
-              // On Android: autostart immediately
-              if (DeviceUtilities.isAndroidDevice()) {
-                console.log('[NeedleARViewer] Android detected, autostarting AR');
+              if (DeviceUtilities.isiOS() || DeviceUtilities.isAndroidDevice()) {
+                console.log('[NeedleARViewer] Mobile detected, autostarting AR');
                 setTimeout(() => tryStartAR(), 0);
                 return;
               }
