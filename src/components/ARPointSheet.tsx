@@ -219,26 +219,41 @@ export function ARPointSheet({ arSlug, routeId, onClose }: ARPointSheetProps) {
         className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-background z-50 shadow-2xl flex flex-col overflow-hidden md:rounded-l-3xl"
         onClick={e => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border/50 flex-shrink-0">
-          <button
-            onClick={handleClose}
-            className="flex items-center gap-2 text-sm text-primary font-medium hover:text-primary/80 transition-colors"
-          >
-            <X className="w-4 h-4" />
-            {texts.back[lang]}
-          </button>
-          {scene && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleFullscreenToggle}
-              className="text-muted-foreground hover:text-foreground gap-1.5 h-8"
-            >
-              <Maximize2 className="w-4 h-4" />
-              <span className="text-xs">{texts.fullscreen[lang]}</span>
+        {/* Header — styled like 360 tours */}
+        <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-black/90 to-black/70 flex-shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
+              <Sparkles className="w-4 h-4 text-white" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-base font-bold text-white truncate">
+                {scene ? (scene.title[lang] || scene.title.es) : (lang === 'es' ? 'Experiencia AR' : 'AR Experience')}
+              </h2>
+              {scene && (
+                <p className="text-xs text-white/50">
+                  {texts.arType[scene.needle_type as keyof typeof texts.arType]?.[lang] ?? scene.needle_type}
+                  {scene.difficulty && ` · ${texts.difficulty[scene.difficulty as keyof typeof texts.difficulty]?.[lang] ?? scene.difficulty}`}
+                  {scene.duration_minutes && ` · ${scene.duration_minutes} ${texts.duration[lang]}`}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            {scene && (
+              <>
+                <Button variant="ghost" size="icon" onClick={handleShare} className="text-white hover:bg-white/20 h-8 w-8">
+                  <Share2 className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={handleFullscreenToggle} className="text-white hover:bg-white/20 h-8 w-8" title={texts.fullscreen[lang]}>
+                  <Maximize2 className="w-4 h-4" />
+                </Button>
+              </>
+            )}
+            <Button variant="ghost" size="sm" onClick={handleClose} className="text-white hover:bg-white/20 gap-1 h-8 px-3">
+              <X className="w-4 h-4" />
+              <span className="hidden sm:inline text-sm">{texts.close[lang]}</span>
             </Button>
-          )}
+          </div>
         </div>
 
         {isLoading && (
