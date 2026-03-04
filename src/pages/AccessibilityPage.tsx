@@ -197,29 +197,29 @@ export function AccessibilityPage() {
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             {/* Header */}
-            <div className="mb-12 text-center">
-              <div className="w-16 h-16 mx-auto mb-6 bg-primary/10 rounded-2xl flex items-center justify-center">
-                <Eye className="w-8 h-8 text-primary" aria-hidden="true" />
+            <div className="mb-6 sm:mb-12 text-center">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 bg-primary/10 rounded-2xl flex items-center justify-center">
+                <Eye className="w-6 h-6 sm:w-8 sm:h-8 text-primary" aria-hidden="true" />
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">{content.title}</h1>
-              <p className="text-lg text-muted-foreground">{content.subtitle}</p>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">{content.title}</h1>
+              <p className="text-base sm:text-lg text-muted-foreground">{content.subtitle}</p>
             </div>
 
             {/* Intro */}
-            <section className="mb-12">
+            <section className="mb-6 sm:mb-12">
               <p className="text-foreground/80 leading-relaxed">{content.intro}</p>
             </section>
 
             {/* Conformance */}
-            <section className="mb-12 p-6 bg-muted/50 rounded-xl">
-              <h2 className="text-xl font-semibold text-foreground mb-4">{content.conformance.title}</h2>
+            <section className="mb-6 sm:mb-12 p-4 sm:p-6 bg-muted/50 rounded-xl">
+              <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4">{content.conformance.title}</h2>
               <p className="text-muted-foreground">{content.conformance.text}</p>
             </section>
 
             {/* Features Grid */}
-            <section className="mb-12">
-              <h2 className="text-xl font-semibold text-foreground mb-6">{content.features.title}</h2>
-              <div className="grid sm:grid-cols-2 gap-4">
+            <section className="mb-6 sm:mb-12">
+              <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4 sm:mb-6">{content.features.title}</h2>
+              <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                 {content.features.list.map((feature, index) => {
                   const IconComponent = iconMap[feature.icon] || Eye;
                   return (
@@ -246,9 +246,9 @@ export function AccessibilityPage() {
             </section>
 
             {/* Contact */}
-            <section className="mb-12 p-6 bg-primary/5 rounded-xl border border-primary/20">
-              <h2 className="text-xl font-semibold text-foreground mb-4">{content.contact.title}</h2>
-              <p className="text-muted-foreground mb-4">{content.contact.text}</p>
+            <section className="mb-6 sm:mb-12 p-4 sm:p-6 bg-primary/5 rounded-xl border border-primary/20">
+              <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4">{content.contact.title}</h2>
+              <p className="text-muted-foreground mb-3 sm:mb-4">{content.contact.text}</p>
               <a
                 href={`mailto:${content.contact.email}`}
                 className="inline-flex items-center gap-2 text-primary font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
@@ -258,8 +258,8 @@ export function AccessibilityPage() {
             </section>
 
             {/* Enforcement */}
-            <section className="mb-12">
-              <h2 className="text-xl font-semibold text-foreground mb-4">{content.enforcement.title}</h2>
+            <section className="mb-6 sm:mb-12">
+              <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4">{content.enforcement.title}</h2>
               <p className="text-muted-foreground">{content.enforcement.text}</p>
             </section>
 

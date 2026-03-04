@@ -55,20 +55,20 @@ export function VRExperiencesPage() {
       
       <main id="main-content" className="pt-20 pb-12">
         {/* Hero section */}
-        <div className="bg-gradient-to-r from-accent to-accent/80 py-12 mb-8">
+        <div className="bg-gradient-to-r from-accent to-accent/80 py-6 sm:py-12 mb-6 sm:mb-8">
           <div className="container mx-auto px-4 max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-center text-white"
             >
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <Glasses className="w-10 h-10" aria-hidden="true" />
-                <h1 className="text-4xl md:text-5xl font-bold">
+              <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <Glasses className="w-8 h-8 sm:w-10 sm:h-10 shrink-0" aria-hidden="true" />
+                <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold">
                   {t('vr.title')}
                 </h1>
               </div>
-              <p className="text-lg text-white/90 max-w-2xl mx-auto">
+              <p className="text-sm sm:text-lg text-white/90 max-w-2xl mx-auto px-2">
                 {t('vr.subtitle')}
               </p>
             </motion.div>

@@ -242,7 +242,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
             </div>
           </div>
         </div>
-        <div className="flex flex-wrap gap-2" style={{ marginTop: '35px', marginBottom: '25px' }}>
+        <div className="flex flex-wrap gap-2 mt-4 sm:mt-6 mb-3 sm:mb-4">
           {/* Duration */}
           {route.duration && (
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
@@ -308,7 +308,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
             {route.fullDescription ? route.fullDescription[lang] : route.shortDescription[lang]}
           </p>
         </div>
-        <div className='flex' style={{ justifyContent: 'flex-end', gap: '10px', marginTop: '30px' }}>
+        <div className='flex mt-4 sm:mt-6' style={{ justifyContent: 'flex-end', gap: '10px' }}>
           <div className='cursor-pointer' onClick={handleNavigateToStart}>
             <span className='flex' style={{ alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}><Navigation className="w-6 h-6" /> {t('routes.howToGet')}</span>
           </div>

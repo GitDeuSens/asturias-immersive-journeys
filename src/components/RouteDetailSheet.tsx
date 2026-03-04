@@ -130,7 +130,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
       >
         {/* Hero image */}
         <div
-          className="relative h-56 bg-cover bg-center flex-shrink-0"
+          className="relative h-40 sm:h-56 bg-cover bg-center flex-shrink-0"
           style={{ backgroundImage: `url(${route.coverImage})` }}
           role="img"
           aria-label={route.title[lang]}

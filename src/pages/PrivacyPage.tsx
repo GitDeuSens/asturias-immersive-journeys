@@ -157,16 +157,16 @@ export function PrivacyPage() {
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             {/* Header */}
-            <div className="mb-12 text-center">
-              <div className="w-16 h-16 mx-auto mb-6 bg-primary/10 rounded-2xl flex items-center justify-center">
-                <Shield className="w-8 h-8 text-primary" aria-hidden="true" />
+            <div className="mb-6 sm:mb-12 text-center">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 bg-primary/10 rounded-2xl flex items-center justify-center">
+                <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-primary" aria-hidden="true" />
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">{content.title}</h1>
-              <p className="text-lg text-muted-foreground">{content.subtitle}</p>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">{content.title}</h1>
+              <p className="text-base sm:text-lg text-muted-foreground">{content.subtitle}</p>
             </div>
 
             {/* Intro */}
-            <section className="mb-8 p-6 bg-muted/50 rounded-xl">
+            <section className="mb-6 sm:mb-8 p-4 sm:p-6 bg-muted/50 rounded-xl">
               <p className="text-foreground/80 leading-relaxed">{content.intro}</p>
             </section>
 

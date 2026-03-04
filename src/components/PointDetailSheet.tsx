@@ -169,7 +169,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
         >
           {/* Hero image */}
           <div
-            className="relative h-56 bg-cover bg-center flex-shrink-0"
+            className="relative h-40 sm:h-56 bg-cover bg-center flex-shrink-0"
             style={{ backgroundImage: point.coverImage ? `url(${DIRECTUS_URL}/assets/${point.coverImage})` : undefined }}
           >
             <div className="absolute inset-0 from-background via-background/40 to-transparent" />
