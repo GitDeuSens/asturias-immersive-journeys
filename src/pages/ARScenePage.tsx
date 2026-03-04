@@ -162,10 +162,8 @@ export function ARScenePage() {
           </div>
           <div className="min-w-0">
             <h1 className="text-base font-bold text-white truncate">{title}</h1>
-            <p className="text-xs text-white/50">
-              {arTypeName}
-              {scene.difficulty && ` · ${difficultyName}`}
-              {scene.duration_minutes && ` · ${scene.duration_minutes} ${texts.duration[lang]}`}
+            <p className="text-xs text-white/50 truncate">
+              {description || `${arTypeName}${scene.difficulty ? ` · ${difficultyName}` : ''}${scene.duration_minutes ? ` · ${scene.duration_minutes} ${texts.duration[lang]}` : ''}`}
             </p>
           </div>
         </div>
@@ -186,10 +184,6 @@ export function ARScenePage() {
           </Button>
           <Button variant="ghost" size="icon" onClick={handleFullscreen} className="text-white hover:bg-white/20 h-8 w-8" title={texts.fullscreen[lang]}>
             <Maximize2 className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={handleClose} className="text-white hover:bg-white/20 gap-1 h-8 px-3">
-            <X className="w-4 h-4" />
-            <span className="hidden sm:inline text-sm">{texts.close[lang]}</span>
           </Button>
         </div>
       </div>

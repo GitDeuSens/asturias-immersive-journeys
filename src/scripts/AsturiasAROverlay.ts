@@ -659,6 +659,8 @@ export class AsturiasAROverlay extends Behaviour {
             color:#fff;transition:all 0.15s ease;
         `;
 
+        const description = this._getDescription();
+
         bar.innerHTML = `
             <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;">
                 <div style="width:32px;height:32px;border-radius:8px;background:${ASTURIAS.colors.primary};
@@ -669,24 +671,15 @@ export class AsturiasAROverlay extends Behaviour {
                     <div style="font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                         ${title}
                     </div>
-                    <div style="font-size:11px;color:rgba(255,255,255,0.5);">Asturias AR</div>
+                    <div style="font-size:11px;color:rgba(255,255,255,0.5);">${description || 'Asturias AR'}</div>
                 </div>
             </div>
             <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
                 <button id="ast-hdr-info" title="${t('info', this._lang)}" style="${btnStyle}">${this._icon('info')}</button>
                 <button id="ast-hdr-share" title="Share" style="${btnStyle}">${shareIcon}</button>
                 <button id="ast-hdr-fullscreen" title="Fullscreen" style="${btnStyle}">${fullscreenIcon}</button>
-                <button id="ast-hdr-close" title="${t('close', this._lang)}" style="${btnStyle}gap:4px;width:auto;padding:0 12px;font-size:12px;font-weight:600;">
-                    ${closeIcon}<span style="display:none;font-family:${ASTURIAS.fonts.family};">${t('close', this._lang)}</span>
-                </button>
             </div>
         `;
-
-        // Show close label on wider screens
-        if (window.innerWidth >= 640) {
-            const closeSpan = bar.querySelector('#ast-hdr-close span') as HTMLElement;
-            if (closeSpan) closeSpan.style.display = 'inline';
-        }
 
         root.appendChild(bar);
 
@@ -712,9 +705,6 @@ export class AsturiasAROverlay extends Behaviour {
             } else {
                 container?.requestFullscreen?.();
             }
-        });
-        bar.querySelector('#ast-hdr-close')?.addEventListener('click', () => {
-            window.history.back();
         });
     }
 

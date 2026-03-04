@@ -152,10 +152,8 @@ export function ARPointSheet({ arSlug, routeId, onClose }: ARPointSheetProps) {
             </div>
             <div className="min-w-0">
               <h2 className="text-base font-bold text-white truncate">{title}</h2>
-              <p className="text-xs text-white/50">
-                {arTypeName}
-                {scene.difficulty && ` · ${difficultyName}`}
-                {scene.duration_minutes && ` · ${scene.duration_minutes} ${texts.duration[lang]}`}
+              <p className="text-xs text-white/50 truncate">
+                {description || `${arTypeName}${scene.difficulty ? ` · ${difficultyName}` : ''}${scene.duration_minutes ? ` · ${scene.duration_minutes} ${texts.duration[lang]}` : ''}`}
               </p>
             </div>
           </div>
@@ -174,10 +172,6 @@ export function ARPointSheet({ arSlug, routeId, onClose }: ARPointSheetProps) {
             </Button>
             <Button variant="ghost" size="icon" onClick={handleBrowserFullscreen} className="text-white hover:bg-white/20 h-8 w-8">
               <Maximize2 className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="sm" onClick={handleFullscreenToggle} className="text-white hover:bg-white/20 gap-1 h-8 px-3">
-              <X className="w-4 h-4" />
-              <span className="hidden sm:inline text-sm">{texts.close[lang]}</span>
             </Button>
           </div>
         </div>
@@ -230,10 +224,8 @@ export function ARPointSheet({ arSlug, routeId, onClose }: ARPointSheetProps) {
                 {scene ? (scene.title[lang] || scene.title.es) : (lang === 'es' ? 'Experiencia AR' : 'AR Experience')}
               </h2>
               {scene && (
-                <p className="text-xs text-white/50">
-                  {texts.arType[scene.needle_type as keyof typeof texts.arType]?.[lang] ?? scene.needle_type}
-                  {scene.difficulty && ` · ${texts.difficulty[scene.difficulty as keyof typeof texts.difficulty]?.[lang] ?? scene.difficulty}`}
-                  {scene.duration_minutes && ` · ${scene.duration_minutes} ${texts.duration[lang]}`}
+                <p className="text-xs text-white/50 truncate">
+                  {(scene.description[lang] || scene.description.es) || `${texts.arType[scene.needle_type as keyof typeof texts.arType]?.[lang] ?? scene.needle_type}${scene.difficulty ? ` · ${texts.difficulty[scene.difficulty as keyof typeof texts.difficulty]?.[lang] ?? scene.difficulty}` : ''}${scene.duration_minutes ? ` · ${scene.duration_minutes} ${texts.duration[lang]}` : ''}`}
                 </p>
               )}
             </div>
