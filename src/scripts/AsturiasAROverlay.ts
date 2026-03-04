@@ -494,24 +494,14 @@ export class AsturiasAROverlay extends Behaviour {
         try {
             const { DeviceUtilities } = await import('@needle-tools/engine');
             
-            if (DeviceUtilities.isiOS()) {
-                // iOS Safari: WebXR not supported, Needle uses USDZ Quick Look fallback.
-                // Quick Look requires a user gesture, so we show a minimal "tap to start" overlay
-                // instead of the full pre-panel, reducing friction to a single tap.
-                console.log('[AsturiasAROverlay] iOS detected with autostart, showing minimal start prompt');
-                this._showMinimalIOSStartPrompt();
-                return;
-            }
-            
-            // On Android: autostart immediately (WebXR works)
-            if (DeviceUtilities.isAndroidDevice()) {
-                console.log('[AsturiasAROverlay] Android detected, autostarting AR');
+            if (DeviceUtilities.isiOS() || DeviceUtilities.isAndroidDevice()) {
+                console.log('[AsturiasAROverlay] Mobile detected, autostarting AR');
                 setTimeout(() => this._startAR(), 0);
                 return;
             }
             
-            // Desktop or unknown: show pre-panel
-            console.log('[AsturiasAROverlay] Desktop/unknown device, showing pre-panel');
+            // Desktop: show pre-panel
+            console.log('[AsturiasAROverlay] Desktop detected, showing pre-panel');
             this._showPrePanel();
         } catch (e) {
             console.warn('[AsturiasAROverlay] DeviceUtilities not available, falling back to autostart', e);
