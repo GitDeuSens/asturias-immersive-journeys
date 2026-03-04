@@ -101,18 +101,18 @@ export function ARExperiencesPage() {
         </div>
 
         {/* Hero section */}
-        <div className="bg-primary py-12 mb-8 mt-2">
+        <div className="bg-primary py-6 sm:py-12 mb-6 sm:mb-8 mt-2">
           <div className="container mx-auto px-4 pb-5 max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-center text-white"
             >
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <Sparkles className="w-10 h-10" />
-                <h1 className="text-4xl md:text-5xl font-bold">{texts.title[locale]}</h1>
+              <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 shrink-0" />
+                <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold">{texts.title[locale]}</h1>
               </div>
-              <p className="text-lg text-white/90 max-w-2xl mx-auto">{texts.subtitle[locale]}</p>
+              <p className="text-sm sm:text-lg text-white/90 max-w-2xl mx-auto px-2">{texts.subtitle[locale]}</p>
             </motion.div>
           </div>
         </div>

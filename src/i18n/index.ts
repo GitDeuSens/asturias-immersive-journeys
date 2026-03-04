@@ -78,6 +78,8 @@ const resources = {
       "routes.exploreMore": "Explorar más rutas",
       "routes.nextPoint": "Siguiente punto",
       "routes.visitPoint": "Visitar punto",
+      "routes.seeAllRoutes": "Ver todas las rutas",
+      "routes.seeAllPoints": "Ver todas las ubicaciones",
 
       // Difficulty
       "difficulty.easy": "Fácil",
@@ -315,6 +317,8 @@ const resources = {
       "routes.exploreMore": "Explore more routes",
       "routes.nextPoint": "Next point",
       "routes.visitPoint": "Visit point",
+      "routes.seeAllRoutes": "See all routes",
+      "routes.seeAllPoints": "See all locations",
 
       // Difficulty
       "difficulty.easy": "Easy",
@@ -552,6 +556,8 @@ const resources = {
       "routes.exploreMore": "Explorer plus d'itinéraires",
       "routes.nextPoint": "Point suivant",
       "routes.visitPoint": "Point de visite",
+      "routes.seeAllRoutes": "Voir tous les itinéraires",
+      "routes.seeAllPoints": "Voir tous les emplacements",
 
       // Difficulty
       "difficulty.easy": "Facile",

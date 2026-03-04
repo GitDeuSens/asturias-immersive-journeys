@@ -102,7 +102,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
   const [showRouteDetail, setShowRouteDetail] = useState(false);
   const [exploringRoute, setExploringRoute] = useState<ImmersiveRoute | null>(null);
   const [selectedPoint, setSelectedPoint] = useState<RoutePoint | null>(null);
-  const [panelExpanded, setPanelExpanded] = useState(true);
+  const [panelExpanded, setPanelExpanded] = useState(() => window.innerWidth >= BREAKPOINTS.MOBILE);
   const [viewMode, setViewMode] = useState<'routes' | 'points'>('routes');
   const selectedCategoriesSet = useMemo(() => new Set(selectedCategories), [selectedCategories]);
 
@@ -630,14 +630,17 @@ export const RoutesPage = React.memo(function RoutesPage() {
           {/* Mobile handle */}
           <button
             onClick={() => setPanelExpanded(!panelExpanded)}
-            className="w-full p-4 flex items-center justify-between border-b border-border/50 md:hidden"
+            className="w-full p-3 flex items-center justify-between border-b border-border/50 md:hidden"
             aria-expanded={panelExpanded}
             aria-controls="routes-panel"
           >
+            <span className="text-sm font-semibold text-foreground">
+              {viewMode === 'points' ? t("routes.seeAllPoints") : t("routes.seeAllRoutes")}
+            </span>
             {panelExpanded ? (
-              <ChevronDown className="w-8 h-8" aria-hidden="true" />
+              <ChevronDown className="w-6 h-6" aria-hidden="true" />
             ) : (
-              <ChevronUp className="w-8 h-8" aria-hidden="true" />
+              <ChevronUp className="w-6 h-6" aria-hidden="true" />
             )}
           </button>
 
