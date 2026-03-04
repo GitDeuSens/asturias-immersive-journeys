@@ -88,6 +88,7 @@ export function AudioGuidePlayer({
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = isMuted ? 0 : volume;
+      audioRef.current.muted = isMuted;
     }
   }, [volume, isMuted]);
 
@@ -190,8 +191,13 @@ export function AudioGuidePlayer({
       <audio
         ref={audioRef}
         src={currentTrack.url}
+        muted={isMuted}
         onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
-        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+        onLoadedMetadata={(e) => {
+          setDuration(e.currentTarget.duration);
+          e.currentTarget.volume = isMuted ? 0 : volume;
+          e.currentTarget.muted = isMuted;
+        }}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
         preload="metadata"
