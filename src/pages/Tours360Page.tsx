@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { View, ChevronRight, X, Filter, Search, Home, Maximize2, Share2, Info, Minimize2 } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { CategoryChips } from "@/components/CategoryChips";
-import { KuulaTourEmbed } from "@/components/KuulaTourEmbed";
+import { DIRECTUS_URL } from '@/lib/directus-url';
 import { GlobalSearch, LocalSearchItem } from "@/components/GlobalSearch";
 import { Footer } from "@/components/Footer";
 import { useDirectusTours, useDirectusCategories } from "@/hooks/useDirectusData";
@@ -133,7 +133,7 @@ export function Tours360Page() {
   };
 
   const handleFullscreen = () => {
-    const el = document.querySelector('.tour-viewer-container');
+    const el = document.querySelector('.tours360-fullscreen-container');
     if (el) {
       if (document.fullscreenElement) {
         document.exitFullscreen();
@@ -300,104 +300,90 @@ export function Tours360Page() {
         <Footer />
       </main>
 
-      {/* Tour Viewer Modal — z-[70] per layering conventions */}
+      {/* Tour Viewer Modal — same approach as FullscreenModal in /routes */}
       <AnimatePresence mode="wait">
-        {activeTour && (
-          <motion.div
-            key={activeTour.id}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[80] bg-black flex flex-col overflow-hidden"
-          >
-            {/* Viewer header — flex row, always on top */}
-            <div className="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-black/90 shrink-0">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
-                  <View className="w-4 h-4 text-white" />
-                </div>
-                <div className="min-w-0">
-                  <h2 className="text-base font-bold text-white truncate">{t(activeTour.title)}</h2>
-                  <p className="text-xs text-white/50">
-                    {activeTour.total_panoramas} {t(texts.panoramas)}
-                    {activeTour.duration_minutes && ` · ${activeTour.duration_minutes} ${t(texts.duration)}`}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-1 shrink-0">
-                {/* Info toggle */}
-                {activeTour.description[language] && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setShowInfo(!showInfo)}
-                    className={`text-white hover:bg-white/20 h-8 w-8 ${showInfo ? 'bg-white/20' : ''}`}
-                    title={language === 'es' ? 'Información' : 'Info'}
-                  >
-                    <Info className="w-4 h-4" />
-                  </Button>
-                )}
-                {/* Share */}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleShare}
-                  className="text-white hover:bg-white/20 h-8 w-8"
-                  title={t(texts.share)}
-                >
-                  <Share2 className="w-4 h-4" />
-                </Button>
-                {/* Fullscreen */}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleFullscreen}
-                  className="text-white hover:bg-white/20 h-8 w-8"
-                  title={t(texts.fullscreen)}
-                >
-                  <Maximize2 className="w-4 h-4" />
-                </Button>
-                {/* Close */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={closeTour}
-                  className="text-white hover:bg-white/20 gap-1 h-8 px-3"
-                >
-                  <X className="w-4 h-4" />
-                  <span className="hidden sm:inline text-sm">{t(texts.close)}</span>
-                </Button>
-              </div>
-            </div>
-
-            {/* Info panel — collapsible */}
-            <AnimatePresence>
-              {showInfo && activeTour.description[language] && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="bg-black/80 border-b border-white/10 overflow-hidden shrink-0"
-                >
-                  <p className="px-4 py-3 text-sm text-white/70 max-w-4xl">
-                    {activeTour.description[language]}
-                  </p>
-                </motion.div>
+        {activeTour && (() => {
+          const embedUrl = activeTour.build_path
+            ? `${DIRECTUS_URL}/builds${activeTour.build_path}`
+            : (activeTour.kuula_embed_url || '');
+          return (
+            <motion.div
+              key={activeTour.id}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[80] bg-black tours360-fullscreen-container"
+            >
+              {/* Iframe fills entire screen — z-0 */}
+              {embedUrl && (
+                <iframe
+                  src={embedUrl}
+                  className="absolute inset-0 w-full h-full z-0"
+                  allowFullScreen
+                  sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                  allow="xr-spatial-tracking; gyroscope; accelerometer; fullscreen"
+                  title={t(activeTour.title)}
+                />
               )}
-            </AnimatePresence>
 
-            {/* Tour viewer — fills remaining space */}
-            <div className="tour-viewer-container flex-1 min-h-0">
-              <KuulaTourEmbed
-                tour={activeTour}
-                locale={language as Language}
-                showControls={false}
-                onClose={closeTour}
-              />
-            </div>
-          </motion.div>
-        )}
+              {/* Floating header bar — z-10 above iframe */}
+              <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2 bg-gradient-to-b from-black/80 to-transparent">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
+                    <View className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="text-base font-bold text-white truncate">{t(activeTour.title)}</h2>
+                    <p className="text-xs text-white/50">
+                      {activeTour.total_panoramas} {t(texts.panoramas)}
+                      {activeTour.duration_minutes && ` · ${activeTour.duration_minutes} ${t(texts.duration)}`}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  {activeTour.description[language] && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setShowInfo(!showInfo)}
+                      className={`text-white hover:bg-white/20 h-8 w-8 ${showInfo ? 'bg-white/20' : ''}`}
+                      title={language === 'es' ? 'Información' : 'Info'}
+                    >
+                      <Info className="w-4 h-4" />
+                    </Button>
+                  )}
+                  <Button variant="ghost" size="icon" onClick={handleShare} className="text-white hover:bg-white/20 h-8 w-8" title={t(texts.share)}>
+                    <Share2 className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={handleFullscreen} className="text-white hover:bg-white/20 h-8 w-8" title={t(texts.fullscreen)}>
+                    <Maximize2 className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={closeTour} className="text-white hover:bg-white/20 gap-1 h-8 px-3">
+                    <X className="w-4 h-4" />
+                    <span className="hidden sm:inline text-sm">{t(texts.close)}</span>
+                  </Button>
+                </div>
+              </div>
+
+              {/* Info panel */}
+              <AnimatePresence>
+                {showInfo && activeTour.description[language] && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="absolute top-[49px] left-0 right-0 z-10 bg-black/80 border-b border-white/10 overflow-hidden"
+                  >
+                    <p className="px-4 py-3 text-sm text-white/70 max-w-4xl">
+                      {activeTour.description[language]}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          );
+        })()}
       </AnimatePresence>
     </div>
   );
