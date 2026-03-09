@@ -65,6 +65,9 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
     import('@needle-tools/engine');
     import('../generated/register_types');
   }, []);
+
+  useEffect(() => {
+    (window as any).__DIRECTUS_URL = DIRECTUS_URL;
     (window as any).__AR_SCENE_SLUG = scene.slug;
     (window as any).__AR_SCENE_TITLE = scene.title;
     (window as any).__AR_SCENE_DESCRIPTION = scene.description;
