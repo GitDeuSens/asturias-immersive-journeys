@@ -76,13 +76,13 @@ const TourViewerModal = React.forwardRef<HTMLDivElement, {
         className="absolute top-0 left-0 right-0 flex items-center justify-between px-2 sm:px-4 py-2 bg-black"
         style={{ zIndex: 9999, pointerEvents: 'auto' }}
       >
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
-            <View className="w-4 h-4 text-white" />
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
+            <View className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
           </div>
           <div className="min-w-0">
-            <h2 className="text-base font-bold text-white truncate">{t(tour.title)}</h2>
-            <p className="text-xs text-white/50">
+            <h2 className="text-sm sm:text-base font-bold text-white truncate">{t(tour.title)}</h2>
+            <p className="text-[10px] sm:text-xs text-white/50 truncate">
               {tour.total_panoramas} {texts.panoramas[language as Language] || texts.panoramas.es}
               {tour.duration_minutes && ` · ${tour.duration_minutes} ${texts.duration[language as Language] || texts.duration.es}`}
             </p>
