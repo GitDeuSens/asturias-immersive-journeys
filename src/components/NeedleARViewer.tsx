@@ -6,10 +6,7 @@ import { motion } from 'framer-motion';
 import { AlertTriangle, RefreshCw, Smartphone, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { trackEvent, trackARStarted, trackARCompleted, trackARError } from '@/lib/analytics';
-import '@needle-tools/engine';
-import '../generated/register_types';
-import { GameObject } from '@needle-tools/engine';
-import { ModelLoading, loadSceneInto } from '@/utils/DirectusLoader';
+// All needle-tools/engine imports are dynamic to avoid pulling three.js+rapier into non-AR pages
 import type { ARScene, Language } from '@/lib/types';
 import { DIRECTUS_URL } from '@/lib/directus-url';
 
@@ -63,9 +60,14 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
   const autostart = typeof window !== 'undefined'
     && new URLSearchParams(window.location.search).get('autostart') === '1';
 
+  // Initialize needle engine and register types on first mount
+  useEffect(() => {
+    import('@needle-tools/engine');
+    import('../generated/register_types');
+  }, []);
+
   useEffect(() => {
     (window as any).__DIRECTUS_URL = DIRECTUS_URL;
-    // Pass scene info to DOM overlay (AsturiasAROverlay reads this)
     (window as any).__AR_SCENE_SLUG = scene.slug;
     (window as any).__AR_SCENE_TITLE = scene.title;
     (window as any).__AR_SCENE_DESCRIPTION = scene.description;
@@ -102,6 +104,9 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
         } catch (e) {
           console.warn('[AR] Could not auto-instantiate AsturiasAROverlay:', e);
         }
+
+        const { GameObject } = await import('@needle-tools/engine');
+        const { ModelLoading, loadSceneInto } = await import('@/utils/DirectusLoader');
 
         let modelLoader = GameObject.findObjectOfType(ModelLoading);
 
