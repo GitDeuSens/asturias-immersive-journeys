@@ -124,7 +124,7 @@ export function LegalPage() {
       <SEOHead title={content.title} description={content.purpose.text} />
       <AppHeader showRestart={false} />
 
-      <main id="main-content" className="pt-20" role="main">
+      <main id="main-content" className="pt-14 md:pt-[122px]" role="main">
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             {/* Header */}

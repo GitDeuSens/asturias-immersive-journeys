@@ -39,7 +39,8 @@ const texts = {
   panoramas: { es: "panoramas", en: "panoramas", fr: "panoramas" },
   duration: { es: "min", en: "min", fr: "min" },
 };
-// Extracted as a proper component to avoid forwardRef warnings with AnimatePresence
+
+// Tour viewer rendered as a plain div (no framer-motion) to avoid SPA rendering issues
 function TourViewerModal({ tour, language, showInfo, onToggleInfo, onShare, onFullscreen, onClose, t }: {
   tour: KuulaTour;
   language: string;
@@ -55,24 +56,26 @@ function TourViewerModal({ tour, language, showInfo, onToggleInfo, onShare, onFu
     : (tour.kuula_embed_url || '');
 
   return (
-    <motion.div
-      key={tour.id}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-[100] bg-black tours360-fullscreen-container"
+    <div
+      className="fixed inset-0 bg-black tours360-fullscreen-container"
+      style={{ zIndex: 100, isolation: 'isolate' }}
     >
+      {/* Iframe — lowest layer */}
       {embedUrl && (
         <iframe
           src={embedUrl}
-          className="absolute inset-0 w-full h-full z-0"
+          className="absolute inset-0 w-full h-full"
+          style={{ zIndex: 1 }}
           allow="xr-spatial-tracking; gyroscope; accelerometer; fullscreen"
           title={t(tour.title)}
         />
       )}
 
-      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2 bg-black pointer-events-auto">
+      {/* Control bar — always on top of iframe */}
+      <div
+        className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 py-2 bg-black"
+        style={{ zIndex: 9999, pointerEvents: 'auto' }}
+      >
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
             <View className="w-4 h-4 text-white" />
@@ -110,13 +113,15 @@ function TourViewerModal({ tour, language, showInfo, onToggleInfo, onShare, onFu
         </div>
       </div>
 
+      {/* Info panel */}
       <AnimatePresence>
         {showInfo && tour.description[language as Language] && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="absolute top-[49px] left-0 right-0 z-10 bg-black/80 border-b border-white/10 overflow-hidden"
+            className="absolute top-[49px] left-0 right-0 bg-black/80 border-b border-white/10 overflow-hidden"
+            style={{ zIndex: 9999 }}
           >
             <p className="px-4 py-3 text-sm text-white/70 max-w-4xl">
               {tour.description[language as Language]}
@@ -124,7 +129,7 @@ function TourViewerModal({ tour, language, showInfo, onToggleInfo, onShare, onFu
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </div>
   );
 }
 
@@ -243,7 +248,7 @@ export function Tours360Page() {
     <div className="min-h-screen bg-background">
       <AppHeader variant="light" />
 
-      <main className="pt-20">
+      <main className="pt-14 md:pt-[122px]">
         {/* Breadcrumb */}
         <div className="container mx-auto px-4 max-w-6xl pt-4">
           <Breadcrumb>
@@ -388,22 +393,20 @@ export function Tours360Page() {
         <Footer />
       </main>
 
-      {/* Tour Viewer Modal — same approach as FullscreenModal in /routes */}
-      <AnimatePresence>
-        {activeTour && activeTour.id && (
-          <TourViewerModal
-            key={activeTour.id}
-            tour={activeTour}
-            language={language}
-            showInfo={showInfo}
-            onToggleInfo={() => setShowInfo(!showInfo)}
-            onShare={handleShare}
-            onFullscreen={handleFullscreen}
-            onClose={closeTour}
-            t={t}
-          />
-        )}
-      </AnimatePresence>
+      {/* Tour Viewer Modal — rendered as plain div for reliable SPA rendering */}
+      {activeTour && activeTour.id && (
+        <TourViewerModal
+          key={activeTour.id}
+          tour={activeTour}
+          language={language}
+          showInfo={showInfo}
+          onToggleInfo={() => setShowInfo(!showInfo)}
+          onShare={handleShare}
+          onFullscreen={handleFullscreen}
+          onClose={closeTour}
+          t={t}
+        />
+      )}
     </div>
   );
 }
