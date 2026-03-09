@@ -210,6 +210,8 @@ export function Tours360Page() {
     trackTourViewed(tour.id, tourTitle, language, 'desktop');
     setActiveTour(tour);
     setShowInfo(false);
+    // Scroll to top so the modal always appears correctly
+    window.scrollTo(0, 0);
     navigate(`/tours/${getTourSlug(tour)}`);
   };
 
