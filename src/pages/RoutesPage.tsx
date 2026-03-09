@@ -575,7 +575,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
       <SEOHead title={t("routes.title")} description={t("routes.title")} />
       <AppHeader routes={filteredRoutes} markerRoute={markersRef} mapReference={mapRef} variant="light" />
 
-      <main id="main-content" className="flex-1 relative pt-14">
+      <main id="main-content" className="flex-1 relative pt-14 md:pt-[122px]">
         {/* Map view */}
         <div
           ref={mapContainerRef}

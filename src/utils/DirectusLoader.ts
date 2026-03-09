@@ -5,7 +5,7 @@ import {
   DragControls,
   GameObject,
 } from "@needle-tools/engine";
-import { Box3, MathUtils, Object3D, Vector3 } from "three";
+import { AnimationAction, AnimationMixer, Box3, Clock, MathUtils, Object3D, Vector3 } from "three";
 import { DIRECTUS_URL } from '@/lib/directus-url';
 export { DIRECTUS_URL };
 
@@ -58,12 +58,18 @@ export function getAssetUrl(uuid: string): string {
 
 // ─────────────────────────────────────────────
 // MODEL LOADING — Needle Behaviour
-// No decorators — not needed without Unity inspector
+// With AnimationMixer support for GLB animations
 // ─────────────────────────────────────────────
 export class ModelLoading extends Behaviour {
   public parent: GameObject | undefined = undefined;
   public loadedModels: Object3D[] = [];
   private currentIndex = 0;
+
+  // Animation support
+  private mixer: AnimationMixer | null = null;
+  private actions: AnimationAction[] = [];
+  private clock = new Clock();
+  private animationFrameId: number | null = null;
 
   public async load(url: string, name: string): Promise<void> {
     this.clearAll();
@@ -72,6 +78,7 @@ export class ModelLoading extends Behaviour {
   }
 
   public clearAll(): void {
+    this.stopAnimations();
     this.loadedModels.forEach((obj) => {
       this.disposeObject(obj);
       obj.removeFromParent();
@@ -115,6 +122,76 @@ export class ModelLoading extends Behaviour {
 
     parentObj.add(instance);
     this.loadedModels.push(instance);
+
+    // Setup animations if the asset has them
+    this.setupAnimations(asset, instance);
+  }
+
+  /**
+   * Setup AnimationMixer for GLB animations.
+   * Standard Three.js pattern: create mixer, extract actions, start render loop.
+   */
+  private setupAnimations(asset: AssetReference, instance: Object3D): void {
+    // Try to get animations from the loaded asset
+    const assetAny = asset as any;
+    const animations = assetAny.asset?.animations
+      ?? assetAny.animations
+      ?? (instance as any).animations
+      ?? [];
+
+    if (!animations || animations.length === 0) {
+      console.log('[ModelLoading] No animations found in GLB');
+      return;
+    }
+
+    console.log(`[ModelLoading] Found ${animations.length} animation(s), setting up mixer`);
+
+    // Create AnimationMixer on the loaded scene
+    this.mixer = new AnimationMixer(instance);
+    this.actions = animations.map((clip: any) => this.mixer!.clipAction(clip));
+
+    // Start all animations
+    this.playAnimations();
+
+    // Start the animation update loop
+    this.startAnimationLoop();
+  }
+
+  /** Play all animation actions */
+  public playAnimations(): void {
+    this.actions.forEach(action => {
+      action.reset();
+      action.play();
+    });
+  }
+
+  /** Stop all animation actions */
+  public stopAnimations(): void {
+    this.actions.forEach(action => action.stop());
+    if (this.animationFrameId !== null) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+    if (this.mixer) {
+      this.mixer.stopAllAction();
+      this.mixer = null;
+    }
+    this.actions = [];
+  }
+
+  /** Update mixer every frame — essential for animations to play */
+  private startAnimationLoop(): void {
+    if (!this.mixer) return;
+    this.clock = new Clock();
+
+    const animate = () => {
+      if (!this.mixer) return;
+      const delta = this.clock.getDelta();
+      this.mixer.update(delta);
+      this.animationFrameId = requestAnimationFrame(animate);
+    };
+
+    this.animationFrameId = requestAnimationFrame(animate);
   }
 
   public showModelAt(i: number): void {
@@ -126,6 +203,12 @@ export class ModelLoading extends Behaviour {
     const model = this.loadedModels[this.currentIndex];
     if (!model) return null;
     return new Box3().setFromObject(model).getSize(new Vector3());
+  }
+
+  /** Clean up on destroy */
+  onDestroy(): void {
+    this.stopAnimations();
+    this.clearAll();
   }
 }
 

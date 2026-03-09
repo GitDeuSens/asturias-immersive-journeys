@@ -1,5 +1,6 @@
 // ============ AR SCENE PAGE ============
 // Fullscreen AR viewer page with floating header controls (same pattern as 360 tours)
+// On iOS: shows POI sheet instead of full AR viewer (iOS uses Quick Look natively)
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -8,6 +9,7 @@ import {
 } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { NeedleARViewer } from "@/components/NeedleARViewer";
+import { ARPointSheet } from "@/components/ARPointSheet";
 import { SEOHead } from "@/components/SEOHead";
 import { getARSceneBySlug } from "@/lib/api/directus-client";
 import { trackEvent } from "@/lib/analytics";
@@ -20,6 +22,13 @@ const texts = {
   loading: { es: "Cargando...", en: "Loading...", fr: "Chargement..." },
 };
 
+// Detect iOS devices
+function isIOSDevice(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
 export function ARScenePage() {
   const { slug } = useParams<{ slug: string }>();
   const { language: locale } = useLanguage();
@@ -29,7 +38,7 @@ export function ARScenePage() {
   const [scene, setScene] = useState<ARScene | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+  const [isIOS] = useState(() => isIOSDevice());
 
   const lang = locale as Language;
 
@@ -58,6 +67,24 @@ export function ARScenePage() {
     }
   };
 
+  // iOS: Show mobile sheet with POI info instead of full AR viewer
+  if (isIOS && slug) {
+    return (
+      <>
+        <SEOHead
+          title={scene?.title[lang] || scene?.title.es || 'AR Experience'}
+          description={scene?.description[lang] || scene?.description.es || ''}
+          image={scene?.preview_image}
+          type="article"
+        />
+        <ARPointSheet
+          arSlug={slug}
+          routeId={fromRoute}
+          onClose={handleClose}
+        />
+      </>
+    );
+  }
 
   // Loading state
   if (isLoading) {
@@ -102,9 +129,7 @@ export function ARScenePage() {
         type="article"
       />
 
-      {/* NeedleARViewer fills the entire screen.
-          AsturiasAROverlay (injected by Needle Engine) handles the header bar,
-          share, fullscreen, info panel — no React header needed here. */}
+      {/* NeedleARViewer fills the entire screen. */}
       <div className="absolute inset-0 z-0">
         <NeedleARViewer scene={scene} locale={lang} />
       </div>
