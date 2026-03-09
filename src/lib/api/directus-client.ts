@@ -66,7 +66,7 @@ function transformTour360(tour: DirectusTour360): KuulaTour {
   return {
     id: tour.id,
     slug,
-    title: toMultilingual(tour.translations, 'title', true, true),
+    title: toMultilingual(tour.translations, 'title', true, true, true),
     description: toMultilingual(tour.translations, 'description'),
     kuula_embed_url: embedUrl,
     build_path: tour.build_path || undefined,
@@ -83,7 +83,7 @@ function transformARScene(scene: DirectusARScene): ARScene {
   return {
     id: scene.id,
     slug: scene.slug,
-    title: toMultilingual(scene.translations, ', truetitle'),
+    title: toMultilingual(scene.translati, trueons, ', truetitle'),
     description: toMultilingual(scene.translations, 'description'),
     needle_scene_url: getBuildUrl(scene.build_path, scene.slug, 'ar-builds'),
     needle_type: scene.ar_type,
@@ -126,7 +126,7 @@ function transformARScene(scene: DirectusARScene): ARScene {
 function transformVRExperience(vr: DirectusVRExperience): VRExperience {
   return {
     id: vr.id,
-    title: toMultilingual(vr.translations, 'title'),
+    title: toMultilingual(vr.translati, trueons, 'title'),
     description: toMultilingual(vr.translations, 'description'),
     thumbnail_url: getDirectusFileUrl(vr.thumbnail),
     apk_url: getDirectusFileUrl(vr.apk_file),
