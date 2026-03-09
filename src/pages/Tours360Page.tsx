@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { View, ChevronRight, X, Filter, Search, Home, Maximize2, Share2, Info, Minimize2 } from "lucide-react";
@@ -41,7 +41,7 @@ const texts = {
 };
 
 // Tour viewer rendered as a plain div (no framer-motion) to avoid SPA rendering issues
-function TourViewerModal({ tour, language, showInfo, onToggleInfo, onShare, onFullscreen, onClose, t }: {
+const TourViewerModal = React.forwardRef<HTMLDivElement, {
   tour: KuulaTour;
   language: string;
   showInfo: boolean;
@@ -50,7 +50,7 @@ function TourViewerModal({ tour, language, showInfo, onToggleInfo, onShare, onFu
   onFullscreen: () => void;
   onClose: () => void;
   t: (v: any) => string;
-}) {
+}>(function TourViewerModal({ tour, language, showInfo, onToggleInfo, onShare, onFullscreen, onClose, t }, ref) {
   const embedUrl = tour.build_path
     ? `${DIRECTUS_URL}/builds${tour.build_path}`
     : (tour.kuula_embed_url || '');
@@ -131,7 +131,7 @@ function TourViewerModal({ tour, language, showInfo, onToggleInfo, onShare, onFu
       </AnimatePresence>
     </div>
   );
-}
+});
 
 export function Tours360Page() {
   const { t, language } = useLanguage();
