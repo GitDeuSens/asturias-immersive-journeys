@@ -368,20 +368,20 @@ export function Tours360Page() {
                   </div>
                 </div>
 
-                <div className="p-5">
-                  <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                <div className="p-3 sm:p-5">
+                  <h3 className="text-base sm:text-xl font-bold text-foreground mb-1 sm:mb-2 group-hover:text-primary transition-colors line-clamp-1">
                     {t(tour.title)}
                   </h3>
                   {tour.description[language] && (
-                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{tour.description[language]}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3 line-clamp-2">{tour.description[language]}</p>
                   )}
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-xs sm:text-sm text-muted-foreground">
                       {tour.total_panoramas} {t(texts.scenes)}
                     </span>
-                    <span className="text-primary font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                    <span className="text-primary font-semibold text-xs sm:text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
                       {t(texts.startTour)}
-                      <ChevronRight className="w-4 h-4" />
+                      <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </span>
                   </div>
                 </div>
