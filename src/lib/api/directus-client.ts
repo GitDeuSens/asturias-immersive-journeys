@@ -126,7 +126,7 @@ function transformARScene(scene: DirectusARScene): ARScene {
 function transformVRExperience(vr: DirectusVRExperience): VRExperience {
   return {
     id: vr.id,
-    title: toMultilingual(, truevr.translati, trueons, 'title'),
+    title: toMultilingual(vr.translations, 'title', true),
     description: toMultilingual(vr.translations, 'description'),
     thumbnail_url: getDirectusFileUrl(vr.thumbnail),
     apk_url: getDirectusFileUrl(vr.apk_file),
