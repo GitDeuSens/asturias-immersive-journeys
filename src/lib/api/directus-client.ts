@@ -66,7 +66,7 @@ function transformTour360(tour: DirectusTour360): KuulaTour {
   return {
     id: tour.id,
     slug,
-    title: toMultilingual(tour.translations, 'title'),
+    title: toMultilingual(tour.translations, 'title', true),
     description: toMultilingual(tour.translations, 'description'),
     kuula_embed_url: embedUrl,
     build_path: tour.build_path || undefined,
@@ -83,7 +83,7 @@ function transformARScene(scene: DirectusARScene): ARScene {
   return {
     id: scene.id,
     slug: scene.slug,
-    title: toMultilingual(scene.translations, 'title'),
+    title: toMultilingual(scene.translations, 'title', true),
     description: toMultilingual(scene.translations, 'description'),
     needle_scene_url: getBuildUrl(scene.build_path, scene.slug, 'ar-builds'),
     needle_type: scene.ar_type,
@@ -126,7 +126,7 @@ function transformARScene(scene: DirectusARScene): ARScene {
 function transformVRExperience(vr: DirectusVRExperience): VRExperience {
   return {
     id: vr.id,
-    title: toMultilingual(vr.translations, 'title'),
+    title: toMultilingual(vr.translations, 'title', true),
     description: toMultilingual(vr.translations, 'description'),
     thumbnail_url: getDirectusFileUrl(vr.thumbnail),
     apk_url: getDirectusFileUrl(vr.apk_file),
@@ -152,7 +152,7 @@ function extractCategoryIds(categories: any): string[] {
 function transformRoute(route: DirectusRoute) {
   return {
     ...route,
-    title: toMultilingual(route.translations, 'title'),
+    title: toMultilingual(route.translations, 'title', true),
     short_description: toMultilingual(route.translations, 'short_description'),
     description: toMultilingual(route.translations, 'description'),
     theme: toMultilingual(route.translations, 'theme'),
@@ -195,7 +195,7 @@ function transformPOI(poi: DirectusPOI) {
   }
   return {
     ...poi,
-    title: toMultilingual(poi.translations, 'title'),
+    title: toMultilingual(poi.translations, 'title', true),
     short_description: toMultilingual(poi.translations, 'short_description'),
     description: toMultilingual(poi.translations, 'description'),
     how_to_get: toMultilingual(poi.translations, 'how_to_get'),

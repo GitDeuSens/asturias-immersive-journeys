@@ -305,9 +305,21 @@ export function getTranslation<T extends TranslationRow>(
     || translations[0];
 }
 
+/**
+ * Strip leading route/tour codes like "B6 ", "AR-N ", "A1 " from display titles.
+ * Matches patterns: 1-2 uppercase letters + optional digits + optional dash + letters/digits, followed by space.
+ * Examples: "B6 Pozo Sotón" → "Pozo Sotón", "AR-N Ruta Norte" → "Ruta Norte"
+ */
+export function stripLeadingCode(text: string): string {
+  if (!text) return text;
+  // Match: start, 1-4 alphanumeric+dash code, space, then rest
+  return text.replace(/^[A-Z]{1,3}[\d]*[-]?[A-Z]?\d*\s+/i, '');
+}
+
 export function toMultilingual(
   translations: TranslationRow[] | undefined,
-  field: string
+  field: string,
+  stripCodes: boolean = false
 ): Record<Language, string> {
   const result: Record<string, string> = { es: '', en: '', fr: '' };
   if (!translations) return result as Record<Language, string>;
@@ -317,6 +329,9 @@ export function toMultilingual(
       const div = document.createElement('div');
       div.innerHTML = value;
       value = div.textContent || div.innerText || '';
+      if (stripCodes) {
+        value = stripLeadingCode(value);
+      }
     }
     result[t.languages_code] = value;
   }
