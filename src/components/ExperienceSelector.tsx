@@ -94,7 +94,7 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
             </p>
 
             {/* CTA hint on hover */}
-            <div className="mt-3 md:mt-6 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="mt-3 md:mt-6 hidden md:block opacity-0 group-hover:opacity-100 transition-opacity">
               <span className="text-white font-semibold uppercase tracking-wider text-xs md:text-sm">
               {t({ es: 'Explorar →', en: 'Explore →', fr: 'Explorer →' })}
               </span>

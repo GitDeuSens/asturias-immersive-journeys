@@ -545,7 +545,7 @@
   }
 
   .initial-title {
-    margin-top: 9rem;
+    margin-top: 4rem;
   }
 
   .icons {
@@ -565,20 +565,16 @@
   .experiences-container {
     min-height: calc(100dvh - 56px);
     overflow-y: auto;
-    padding-top: 1rem;
+    padding-top: 0.5rem;
 
-    h1 {
+    .initial-title {
+      margin-top: 1rem;
       font-size: 20px;
-      margin-top: 0;
     }
 
     .description {
       font-weight: lighter;
       font-size: 13px;
     }
-  }
-
-  .experiences-container .initial-title {
-    margin-top: 2rem;
   }
 }
