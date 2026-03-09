@@ -107,8 +107,8 @@ export default defineConfig(({ mode }) => {
             if (id.includes('framer-motion')) return 'animations';
             // i18n
             if (id.includes('i18next') || id.includes('react-i18next')) return 'i18n';
-            // Analytics (recharts + d3) — only on analytics page
-            if (id.includes('recharts') || id.includes('d3-')) return 'analytics';
+            // Analytics (recharts) — only on analytics page; d3 stays with recharts naturally
+            if (id.includes('recharts')) return 'charts';
             // Directus SDK
             if (id.includes('@directus')) return 'directus';
             // React Query
