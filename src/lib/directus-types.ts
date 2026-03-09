@@ -312,9 +312,8 @@ export function getTranslation<T extends TranslationRow>(
  */
 export function stripLeadingCode(text: string): string {
   if (!text) return text;
-  // Pattern: 1-3 letters, optional space/dash, then digits (and optional trailing alphanumeric), then space
-  // Examples: "B6 ", "AR 8 ", "AR-15 ", "VR1 "
-  return text.replace(/^[A-Z]{1,3}[\s-]?\d[\w-]*\s+/i, '');
+  // Strip code like "B6", "AR 8", "AR-15", then any separator (dash, colon, dot) and whitespace
+  return text.replace(/^[A-Z]{1,3}[\s-]?\d[\w-]*[\s\-–—:.\s]*/i, '').trim();
 }
 
 export function toMultilingual(
