@@ -463,9 +463,8 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
             className="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-[200]"
             onClick={() => setSelectedGalleryImage(null)}>
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-              className={isMobile ? "relative flex items-center justify-center" : ""}
-              style={isMobile ? undefined : {position: 'fixed', left: '5px', top: '10px'}}>
-              <img src={selectedGalleryImage} alt="Gallery fullscreen" style={isMobile ? {maxWidth: '96vw', maxHeight: '96vh', width: 'auto', height: 'auto'} : {width: '96vh', height: '98vh'}} />
+              className="relative flex items-center justify-center">
+              <img src={selectedGalleryImage} alt="Gallery fullscreen" className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain rounded-lg" />
               <button onClick={() => setSelectedGalleryImage(null)} className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"><X className="w-5 h-5" /></button>
             </motion.div>
           </motion.div>
