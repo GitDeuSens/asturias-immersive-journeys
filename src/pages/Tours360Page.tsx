@@ -73,7 +73,7 @@ const TourViewerModal = React.forwardRef<HTMLDivElement, {
 
       {/* Control bar — always on top of iframe */}
       <div
-        className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 py-2 bg-black"
+        className="absolute top-0 left-0 right-0 flex items-center justify-between px-2 sm:px-4 py-2 bg-black"
         style={{ zIndex: 9999, pointerEvents: 'auto' }}
       >
         <div className="flex items-center gap-3 min-w-0">
