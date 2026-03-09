@@ -306,15 +306,15 @@ export function getTranslation<T extends TranslationRow>(
 }
 
 /**
- * Strip leading route/tour codes like "B6 ", "AR-N ", "A1 " from display titles.
- * Only matches codes that contain at least one digit (to avoid stripping real words like "Ruta").
- * Examples: "B6 Pozo Sotón" → "Pozo Sotón", "A1 Ruta Norte" → "Ruta Norte"
- * Does NOT strip: "Ruta del Cares", "El Camino"
+ * Strip leading route/tour codes from display titles.
+ * Matches codes that contain at least one digit: "B6 ", "AR 8 ", "AR-15 ", "A1 "
+ * Does NOT strip pure words: "Ruta del Cares", "El Camino", "Senda Costera"
  */
 export function stripLeadingCode(text: string): string {
   if (!text) return text;
-  // Match: 1-4 uppercase alphanumeric+dash code that MUST contain at least one digit, followed by space
-  return text.replace(/^([A-Z]{1,3}\d[\w-]*|[A-Z]-\d+)\s+/i, '');
+  // Pattern: 1-3 letters, optional space/dash, then digits (and optional trailing alphanumeric), then space
+  // Examples: "B6 ", "AR 8 ", "AR-15 ", "VR1 "
+  return text.replace(/^[A-Z]{1,3}[\s-]?\d[\w-]*\s+/i, '');
 }
 
 export function toMultilingual(
