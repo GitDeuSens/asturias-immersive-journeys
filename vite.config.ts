@@ -91,38 +91,14 @@ export default defineConfig(({ mode }) => {
           assetFileNames: 'assets/[name]-[hash][extname]',
           chunkFileNames: 'assets/[name]-[hash].js',
           entryFileNames: 'assets/[name]-[hash].js',
-          manualChunks(id) {
-            // Core vendor
-            if (id.includes('react-dom')) return 'vendor';
-            if (id.includes('node_modules/react/')) return 'vendor';
-            // Router
-            if (id.includes('react-router')) return 'router';
-            // UI primitives — group all radix
-            if (id.includes('@radix-ui')) return 'ui';
-            // Maps
-            if (id.includes('leaflet')) return 'maps';
-            // Icons — large, rarely changes
-            if (id.includes('lucide-react')) return 'icons';
-            // Animations
-            if (id.includes('framer-motion')) return 'animations';
-            // i18n
-            if (id.includes('i18next') || id.includes('react-i18next')) return 'i18n';
-            // Analytics (recharts) — only on analytics page; d3 stays with recharts naturally
-            if (id.includes('recharts')) return 'charts';
-            // Directus SDK
-            if (id.includes('@directus')) return 'directus';
-            // React Query
-            if (id.includes('@tanstack')) return 'query';
-            // Rapier physics — separate from three.js
-            if (id.includes('rapier')) return 'rapier';
-            // Three.js / Needle — heavy, lazy loaded only for AR
-            if (id.includes('three') || id.includes('needle')) return 'three';
-          },
         },
       },
       chunkSizeWarningLimit: 300,
-      // Enable minification optimizations
-      minify: 'esbuild',
+      // Use terser to avoid esbuild edge cases (e.g., recharts init errors)
+      minify: 'terser',
+      terserOptions: {
+        mangle: false, // avoid TDZ issues in recharts bundle
+      },
       target: 'es2020',
       cssMinify: true,
     },

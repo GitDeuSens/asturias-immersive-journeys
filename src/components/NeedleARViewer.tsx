@@ -71,6 +71,9 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
     (window as any).__AR_SCENE_SLUG = scene.slug;
     (window as any).__AR_SCENE_TITLE = scene.title;
     (window as any).__AR_SCENE_DESCRIPTION = scene.description;
+    (window as any).__AR_SCENE_AUDIO_ES = scene.audio_es;
+    (window as any).__AR_SCENE_AUDIO_EN = scene.audio_en;
+    (window as any).__AR_SCENE_AUDIO_FR = scene.audio_fr;
   }, [scene]);
 
   useEffect(() => {

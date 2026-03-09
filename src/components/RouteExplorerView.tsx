@@ -72,7 +72,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   const [copied, setCopied] = useState(false);
   const navigate = useNavigate();
   const shareUrl = window.location.href;
-  let isCopy = false;
+  const isCopy = false;
 
   const progress = route.points.length > 0
     ? Math.round((visitedPoints.size / route.points.length) * 100)
@@ -169,6 +169,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
 
   return (
     <div className="flex flex-col h-full">
+
       {/* Breadcrumb */}
       <div className="px-4 pt-3 pb-1">
         <Breadcrumb>
@@ -209,7 +210,8 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
       </div>
 
       {/* Header */}
-      <div className="p-4 border-b border-border/50 space-y-3">
+      <div className="p-3 sm:p-4 border-b border-border/50 space-y-3 sm:space-y-4">
+
         <button
           onClick={onBack}
           className="flex items-center gap-2 text-sm text-primary font-medium hover:text-primary/80 transition-colors"
@@ -219,6 +221,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
         </button>
 
         <div className="flex items-start gap-3">
+
           <div
             className="w-14 h-14 rounded-xl bg-cover bg-center flex-shrink-0 border-2 border-primary/30"
             style={{ backgroundImage: `url(${route.coverImage})` }}
@@ -242,78 +245,81 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
             </div>
           </div>
         </div>
-        <div className="flex flex-wrap gap-2 mt-4 sm:mt-6 mb-3 sm:mb-4">
-          {/* Duration */}
-          {route.duration && (
+        <div className="mt-4 sm:mt-6 mb-3 sm:mb-4">
+          <div className="flex gap-2 overflow-x-auto pb-1 -mx-3 px-3 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible">
+            {/* Duration */}
+            {route.duration && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
+                <Clock className="w-4 h-4 text-primary" aria-hidden="true" />
+                {route.duration[lang]}
+              </span>
+            )}
+
+            {/* Distance */}
+            {distance > 0 && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
+                <Ruler className="w-4 h-4 text-primary" aria-hidden="true" />
+                {route.distanceKm ? `${route.distanceKm} km` : formatDistance(distance)}
+              </span>
+            )}
+
+            {/* Elevation */}
+            {route.elevationGainMeters && route.elevationGainMeters > 0 && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
+                <Mountain className="w-4 h-4 text-primary" aria-hidden="true" />
+                ↑ {route.elevationGainMeters} m
+              </span>
+            )}
+
+            {/* Surface type */}
+            {route.surfaceType && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
+                <Footprints className="w-4 h-4 text-primary" aria-hidden="true" />
+                {surfaceLabels[route.surfaceType]?.[lang] || route.surfaceType}
+              </span>
+            )}
+
+            {/* Points */}
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
-              <Clock className="w-4 h-4 text-primary" aria-hidden="true" />
-              {route.duration[lang]}
+              <MapPin className="w-4 h-4 text-primary" aria-hidden="true" />
+              {route.points.length} {t('routes.points')}
             </span>
-          )}
 
-          {/* Distance */}
-          {distance > 0 && (
+            {/* Difficulty */}
+            {route.difficulty && (
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-medium ${difficultyColors[route.difficulty]}`}>
+                <Mountain className="w-4 h-4" aria-hidden="true" />
+                {t(`difficulty.${route.difficulty}`)}
+              </span>
+            )}
+
+            {/* Circular/Linear */}
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
-              <Ruler className="w-4 h-4 text-primary" aria-hidden="true" />
-              {route.distanceKm ? `${route.distanceKm} km` : formatDistance(distance)}
+              <RotateCw className={`w-4 h-4 ${route.isCircular ? 'text-primary' : 'text-muted-foreground'}`} aria-hidden="true" />
+              {route.isCircular ? t('routes.circular') : t('routes.linear')}
             </span>
-          )}
 
-          {/* Elevation */}
-          {route.elevationGainMeters && route.elevationGainMeters > 0 && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
-              <Mountain className="w-4 h-4 text-primary" aria-hidden="true" />
-              ↑ {route.elevationGainMeters} m
-            </span>
-          )}
-
-          {/* Surface type */}
-          {route.surfaceType && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
-              <Footprints className="w-4 h-4 text-primary" aria-hidden="true" />
-              {surfaceLabels[route.surfaceType]?.[lang] || route.surfaceType}
-            </span>
-          )}
-
-          {/* Points */}
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
-            <MapPin className="w-4 h-4 text-primary" aria-hidden="true" />
-            {route.points.length} {t('routes.points')}
-          </span>
-
-          {/* Difficulty */}
-          {route.difficulty && (
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-medium ${difficultyColors[route.difficulty]}`}>
-              <Mountain className="w-4 h-4" aria-hidden="true" />
-              {t(`difficulty.${route.difficulty}`)}
-            </span>
-          )}
-
-          {/* Circular/Linear */}
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
-            <RotateCw className={`w-4 h-4 ${route.isCircular ? 'text-primary' : 'text-muted-foreground'}`} aria-hidden="true" />
-            {route.isCircular ? t('routes.circular') : t('routes.linear')}
-          </span>
-
-          {/* 360 tour */}
-          {route.tour360?.available && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/20 text-primary text-sm font-bold border border-primary/30">
-              <Camera className="w-4 h-4" aria-hidden="true" />
-              360°
-            </span>
-          )}
+            {/* 360 tour */}
+            {route.tour360?.available && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/20 text-primary text-sm font-bold border border-primary/30">
+                <Camera className="w-4 h-4" aria-hidden="true" />
+                360°
+              </span>
+            )}
+          </div>
         </div>
         <div>
           <p className='text-muted-foreground leading-relaxed'>
             {route.fullDescription ? route.fullDescription[lang] : route.shortDescription[lang]}
           </p>
         </div>
-        <div className='flex mt-4 sm:mt-6' style={{ justifyContent: 'flex-end', gap: '10px' }}>
+        <div className='flex flex-wrap gap-3 justify-end mt-4 sm:mt-6'>
           <div className='cursor-pointer' onClick={handleNavigateToStart}>
             <span className='flex' style={{ alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}><Navigation className="w-6 h-6" /> {t('routes.howToGet')}</span>
           </div>
           <div className='cursor-pointer' onClick={handleCopyLink}>
             <span className='flex' style={{ alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}><Share2 className="w-6 h-6" /> {t('share.title')}</span>
+
           </div>
         </div>
         {copied ? (

@@ -302,8 +302,8 @@ export function Tours360Page() {
         </div>
 
         {/* Hero section */}
-        <div className="bg-primary pt-6 sm:pt-12 mb-6 sm:mb-8 mt-2">
-          <div className="container mx-auto pb-5 px-4 max-w-6xl">
+        <div className="bg-primary pt-5 sm:pt-12 mb-5 sm:mb-8 mt-1">
+          <div className="container mx-auto pb-4 px-4 max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -311,9 +311,9 @@ export function Tours360Page() {
             >
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4">
                 <View className="w-8 h-8 sm:w-10 sm:h-10 shrink-0" />
-                <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold">{t(texts.title)}</h1>
+                <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold leading-tight">{t(texts.title)}</h1>
               </div>
-              <p className="text-sm sm:text-lg text-white/90 max-w-2xl mx-auto mb-6 px-2">{t(texts.subtitle)}</p>
+              <p className="text-sm sm:text-lg text-white/90 max-w-2xl mx-auto mb-5 px-2">{t(texts.subtitle)}</p>
 
             </motion.div>
           </div>
@@ -325,7 +325,7 @@ export function Tours360Page() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mb-8"
+            className="mb-6"
           >
             <div className="flex flex-col sm:flex-row gap-3">
               <CategoryChips categories={categories} selectedIds={selectedCategories} onToggle={toggleCategory} />

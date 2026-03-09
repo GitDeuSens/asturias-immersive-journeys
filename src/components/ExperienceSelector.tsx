@@ -27,19 +27,19 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
 
   return (
     <>
-      <div className="experiences-container relative z-10 flex flex-col items-center justify-center px-4 py-4 min-h-[calc(100dvh-56px)] md:min-h-[calc(100dvh-60px)]">
+      <div className="experiences-container relative z-10 flex flex-col items-center justify-center px-4 py-3 min-h-[calc(100dvh-48px)] md:min-h-[calc(100dvh-60px)]">
         {/* Title */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }} style={{ fontWeight: 'lighter' }}
-          className="text-xl sm:text-xl md:text-4xl lg:text-7xl text-white text-center mb-3 sm:mb-5 drop-shadow-lg max-w-3xl initial-title"
+          className="text-lg sm:text-xl md:text-4xl lg:text-6xl text-white text-center mb-2 sm:mb-5 drop-shadow-lg max-w-3xl initial-title"
         >
           {t(texts.title)}
         </motion.h1>
 
-        <div className="mb-3 sm:mb-5 w-16 sm:w-24 h-px bg-white/40" />
-        <span style={{ fontWeight: 'bold' }} className="description text-white mb-4 sm:mb-8 text-sm sm:text-base text-center px-2">{t(texts.homeDescription)}</span>
+        <div className="mb-2 sm:mb-5 w-16 sm:w-24 h-px bg-white/40" />
+        <span style={{ fontWeight: 'bold' }} className="description text-white mb-4 sm:mb-8 text-xs sm:text-base text-center px-2 leading-relaxed max-w-3xl">{t(texts.homeDescription)}</span>
 
 
         {/* Experience Cards */}
@@ -50,13 +50,13 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             onClick={() => onSelect('tours')}
-            className="experience-buttons flex-1 group relative overflow-hidden rounded-2xl bg-white/10  border border-white/20 p-5 md:p-8 text-left transition-all duration-300 hover:bg-white/20 hover:border-primary/50 hover:scale-[1.02]"
+            className="experience-buttons flex-1 group relative overflow-hidden rounded-2xl bg-white/10  border border-white/20 p-4 md:p-8 text-left transition-all duration-300 hover:bg-white/20 hover:border-primary/50 hover:scale-[1.02]"
           >
             {/* Icon */}
             <img className='icons' src='./assets/panoramas.svg' />
 
             {/* Content */}
-            <h2 className="text-lg md:text-3xl font-bold text-white mb-1 md:mb-3 drop-shadow-md">
+            <h2 className="text-lg md:text-3xl font-bold text-white mb-1 md:mb-3 drop-shadow-md leading-tight">
               {t(texts.toursTitle)}
             </h2>
             <p className="text-white/80 text-sm md:text-lg leading-relaxed line-clamp-2 md:line-clamp-none">
@@ -80,13 +80,13 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
             onClick={() => onSelect('routes')}
-            className="experience-buttons flex-1 group relative overflow-hidden rounded-2xl bg-white/10  border border-white/20 p-5 md:p-8 text-left transition-all duration-300 hover:bg-white/20 hover:border-accent/50 hover:scale-[1.02]"
+            className="experience-buttons flex-1 group relative overflow-hidden rounded-2xl bg-white/10  border border-white/20 p-4 md:p-8 text-left transition-all duration-300 hover:bg-white/20 hover:border-accent/50 hover:scale-[1.02]"
           >
             {/* Icon */}
             <img className='icons' src='./assets/rutas.svg' />
 
             {/* Content */}
-            <h2 className="text-lg md:text-3xl font-bold text-white mb-1 md:mb-3 drop-shadow-md">
+            <h2 className="text-lg md:text-3xl font-bold text-white mb-1 md:mb-3 drop-shadow-md leading-tight">
               {t(texts.routesTitle)}
             </h2>
             <p className="text-white/80 text-sm md:text-lg leading-relaxed line-clamp-2 md:line-clamp-none">
@@ -110,7 +110,7 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
           onClick={onBack}
-          className="mt-6 flex items-center text-md gap-2 text-white/70 hover:text-white transition-colors"
+          className="mt-4 sm:mt-6 flex items-center text-md gap-2 text-white/70 hover:text-white transition-colors"
         >
           <ArrowLeft className="w-7 h-7" />
           <span className="font-medium text-xl">{t(texts.back)}</span>

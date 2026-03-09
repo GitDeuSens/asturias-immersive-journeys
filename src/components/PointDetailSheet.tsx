@@ -76,8 +76,11 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
   const [arSceneError, setArSceneError] = useState<string | null>(null);
   const [arSceneLoading, setArSceneLoading] = useState(false);
   const [show360Modal, setShow360Modal] = useState(false);
-    const poiStartTime = useRef<number>(Date.now());
+  const [show360Inline, setShow360Inline] = useState(false);
+  const poiStartTime = useRef<number>(Date.now());
   const prevUrlRef = useRef<string>(window.location.pathname);
+
+  useEffect(() => { setShow360Inline(false); }, [point?.id]);
 
   const loadARScene = useCallback(async () => {
     if (!point?.content?.arExperience) return;
@@ -320,16 +323,32 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                   <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2">
                     <Camera className="w-4 h-4 text-primary" />Tour 360°
                   </h3>
-                  {/* Inline 360 preview */}
-                  <div className="relative rounded-2xl overflow-hidden border border-border bg-black" style={{ minHeight: 250 }}>
-                    <iframe
-                      src={content.tour360.iframe360Url}
-                      className="w-full rounded-2xl"
-                      style={{ height: 250, border: 'none' }}
-                      allowFullScreen
-                      allow="xr-spatial-tracking; gyroscope; accelerometer"
-                      title="Tour 360"
-                    />
+                  {/* Inline 360 preview with Play gate */}
+                  <div
+                    className="relative rounded-2xl overflow-hidden border border-border bg-black"
+                    style={{ minHeight: 210 }}
+                  >
+                    {show360Inline ? (
+                      <iframe
+                        src={content.tour360.iframe360Url}
+                        className="w-full rounded-2xl"
+                        style={{ height: 210, border: 'none' }}
+                        allowFullScreen
+                        allow="xr-spatial-tracking; gyroscope; accelerometer"
+                        title="Tour 360"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-black/70 via-black/60 to-black/80 text-white">
+                        <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/40">
+                          <Play className="w-6 h-6 ml-0.5" />
+                        </div>
+                        <p className="text-sm font-semibold">{t(texts.open360)}</p>
+                        <Button variant="secondary" size="sm" onClick={() => setShow360Inline(true)} className="gap-2">
+                          <Play className="w-4 h-4" />
+                          {language === 'es' ? 'Play' : language === 'fr' ? 'Lire' : 'Play'}
+                        </Button>
+                      </div>
+                    )}
                     <button
                       onClick={() => setShow360Modal(true)}
                       className="absolute top-3 right-3 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors backdrop-blur-sm"
@@ -338,10 +357,17 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                       <Maximize2 className="w-4 h-4" />
                     </button>
                   </div>
-                  <Button variant="outline" className="w-full justify-between" onClick={() => setShow360Modal(true)}>
-                    <span className="flex items-center gap-2"><Camera className="w-4 h-4" />{t(texts.open360)}</span>
-                    <Maximize2 className="w-4 h-4" />
-                  </Button>
+                  <div className="flex gap-2 flex-wrap">
+                    <Button variant="outline" className="flex-1 justify-between min-w-[180px]" onClick={() => setShow360Modal(true)}>
+                      <span className="flex items-center gap-2"><Camera className="w-4 h-4" />{t(texts.open360)}</span>
+                      <Maximize2 className="w-4 h-4" />
+                    </Button>
+                    {!show360Inline && (
+                      <Button variant="secondary" className="flex-none min-w-[120px]" onClick={() => setShow360Inline(true)}>
+                        <Play className="w-4 h-4 mr-1" /> Play
+                      </Button>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -389,7 +415,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                   <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide flex items-center gap-2">
                     <ImageIcon className="w-4 h-4 text-primary" />{t(texts.gallery)}
                   </h3>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-2 justify-items-center md:justify-items-stretch">
                     {(content.gallery || (content.image ? [content.image] : [])).map((img, index) => (
                       <motion.button key={index} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                         onClick={() => setSelectedGalleryImage(img.url)}

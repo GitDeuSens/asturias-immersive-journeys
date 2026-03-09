@@ -79,6 +79,11 @@ export interface ARScene {
   preview_video?: string;
   instructions_image?: string;
 
+  // Audio guides (per language)
+  audio_es?: string;
+  audio_en?: string;
+  audio_fr?: string;
+
   // Settings
   difficulty: ARDifficulty;
   duration_minutes: number;

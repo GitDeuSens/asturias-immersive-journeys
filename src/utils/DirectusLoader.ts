@@ -5,7 +5,8 @@ import {
   DragControls,
   GameObject,
 } from "@needle-tools/engine";
-import { AnimationAction, AnimationMixer, Box3, Clock, MathUtils, Object3D, Vector3 } from "three";
+import { AnimationAction, AnimationClip, AnimationMixer, Box3, Clock, MathUtils, Object3D, Vector3 } from "three";
+import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils.js";
 import { DIRECTUS_URL } from '@/lib/directus-url';
 export { DIRECTUS_URL };
 
@@ -136,7 +137,7 @@ export class ModelLoading extends Behaviour {
     // Needle's AssetReference stores the raw GLTF result in rawAsset, with animations at rawAsset.animations.
     // The asset.asset property returns the scene child, which may also have animations copied over.
     const assetAny = asset as any;
-    const animations = assetAny.rawAsset?.animations
+    const animations: AnimationClip[] = assetAny.rawAsset?.animations
       ?? assetAny._rawAsset?.animations
       ?? assetAny.asset?.animations
       ?? (instance as any).animations
@@ -149,9 +150,68 @@ export class ModelLoading extends Behaviour {
 
     console.log(`[ModelLoading] Found ${animations.length} animation(s), setting up mixer`);
 
+    // Collect material names present on the instantiated object
+    const materialNames: string[] = [];
+    instance.traverse((child: any) => {
+      if (child.isMesh) {
+        const mats = Array.isArray(child.material) ? child.material : [child.material];
+        mats.filter(Boolean).forEach((m: any) => {
+          if (m?.name && !materialNames.includes(m.name)) materialNames.push(m.name);
+        });
+      }
+    });
+
+    // Clone clips and normalize material track targets to actual material names
+    const clonedClips = animations.map((clip) => {
+      const cloned = clip?.clone ? clip.clone() : clip;
+
+      const fixedTracks = (cloned as any).tracks?.map((track: any) => {
+        const path = track?.name as string;
+        if (!path || !path.startsWith('.materials.')) return track;
+
+        const match = path.match(/\.materials\.([^\.]+)(.*)/);
+        if (!match) return track;
+
+        const [, requestedName, rest] = match;
+        if (materialNames.includes(requestedName)) return track;
+
+        const fallback = materialNames.find((n) =>
+          n === requestedName || n.startsWith(requestedName) || n.replace(/\.\d+$/, '') === requestedName
+        );
+
+        if (!fallback) return track;
+
+        const clonedTrack = track.clone ? track.clone() : track;
+        clonedTrack.name = `.materials.${fallback}${rest}`;
+        return clonedTrack;
+      });
+
+      if (fixedTracks) (cloned as any).tracks = fixedTracks;
+      return cloned;
+    });
+
+    let boundClips = clonedClips;
+    const retargetClip = (SkeletonUtils as any).retargetClip as
+      | ((obj: Object3D, clip: AnimationClip) => AnimationClip | undefined)
+      | undefined;
+
+    if (retargetClip) {
+      boundClips = clonedClips.map((clip) => {
+        try {
+          const retargeted = retargetClip(instance, clip as AnimationClip);
+          return (retargeted as AnimationClip) ?? (clip as AnimationClip);
+        } catch (e) {
+          console.warn('[ModelLoading] RetargetClip failed for clip, using cloned clip', e);
+          return clip as AnimationClip;
+        }
+      });
+    }
+
+    (instance as any).animations = boundClips;
+
     // Create AnimationMixer on the loaded scene
     this.mixer = new AnimationMixer(instance);
-    this.actions = animations.map((clip: any) => this.mixer!.clipAction(clip));
+    this.actions = boundClips.map((clip: AnimationClip) => this.mixer!.clipAction(clip));
 
     // Start all animations
     this.playAnimations();
