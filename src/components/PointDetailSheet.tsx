@@ -338,35 +338,23 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                         title="Tour 360"
                       />
                     ) : (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-black/70 via-black/60 to-black/80 text-white">
-                        <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/40">
+                      <button
+                        onClick={() => setShow360Inline(true)}
+                        className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-black/70 via-black/60 to-black/80 text-white cursor-pointer"
+                      >
+                        <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/40 transition-transform hover:scale-110">
                           <Play className="w-6 h-6 ml-0.5" />
                         </div>
                         <p className="text-sm font-semibold">{t(texts.open360)}</p>
-                        <Button variant="secondary" size="sm" onClick={() => setShow360Inline(true)} className="gap-2">
-                          <Play className="w-4 h-4" />
-                          {language === 'es' ? 'Play' : language === 'fr' ? 'Lire' : 'Play'}
-                        </Button>
-                      </div>
+                      </button>
                     )}
                     <button
                       onClick={() => setShow360Modal(true)}
-                      className="absolute top-3 right-3 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors backdrop-blur-sm"
+                      className="absolute top-3 right-3 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors backdrop-blur-sm z-10"
                       aria-label="Fullscreen"
                     >
                       <Maximize2 className="w-4 h-4" />
                     </button>
-                  </div>
-                  <div className="flex gap-2 flex-wrap">
-                    <Button variant="outline" className="flex-1 justify-between min-w-[180px]" onClick={() => setShow360Modal(true)}>
-                      <span className="flex items-center gap-2"><Camera className="w-4 h-4" />{t(texts.open360)}</span>
-                      <Maximize2 className="w-4 h-4" />
-                    </Button>
-                    {!show360Inline && (
-                      <Button variant="secondary" className="flex-none min-w-[120px]" onClick={() => setShow360Inline(true)}>
-                        <Play className="w-4 h-4 mr-1" /> Play
-                      </Button>
-                    )}
                   </div>
                 </div>
               )}
