@@ -57,24 +57,12 @@ const TourViewerModal = React.forwardRef<HTMLDivElement, {
 
   return (
     <div
-      className="fixed inset-0 bg-black tours360-fullscreen-container"
-      style={{ zIndex: 100, isolation: 'isolate' }}
+      className="fixed inset-0 flex flex-col tours360-fullscreen-container"
+      style={{ zIndex: 100, isolation: 'isolate', background: '#111' }}
     >
-      {/* Iframe — lowest layer */}
-      {embedUrl && (
-        <iframe
-          src={embedUrl}
-          className="absolute inset-0 w-full h-full"
-          style={{ zIndex: 1 }}
-          allow="xr-spatial-tracking; gyroscope; accelerometer; fullscreen"
-          title={t(tour.title)}
-        />
-      )}
-
-      {/* Control bar — always on top of iframe */}
+      {/* Control bar — in normal flow, always visible */}
       <div
-        className="absolute top-0 left-0 right-0 flex items-center justify-between px-2 sm:px-4 py-2 bg-black"
-        style={{ zIndex: 9999, pointerEvents: 'auto' }}
+        className="flex items-center justify-between px-3 sm:px-4 py-2 bg-black shrink-0"
       >
         <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
           <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
@@ -120,8 +108,7 @@ const TourViewerModal = React.forwardRef<HTMLDivElement, {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="absolute top-[49px] left-0 right-0 bg-black/80 border-b border-white/10 overflow-hidden"
-            style={{ zIndex: 9999 }}
+            className="bg-black/90 border-b border-white/10 overflow-hidden shrink-0"
           >
             <p className="px-4 py-3 text-sm text-white/70 max-w-4xl">
               {tour.description[language as Language]}
@@ -129,6 +116,18 @@ const TourViewerModal = React.forwardRef<HTMLDivElement, {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Iframe — fills remaining space with border/frame */}
+      <div className="flex-1 min-h-0 p-2 sm:p-3">
+        {embedUrl && (
+          <iframe
+            src={embedUrl}
+            className="w-full h-full rounded-lg border border-white/10"
+            allow="xr-spatial-tracking; gyroscope; accelerometer; fullscreen"
+            title={t(tour.title)}
+          />
+        )}
+      </div>
     </div>
   );
 });
