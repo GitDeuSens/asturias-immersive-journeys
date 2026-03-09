@@ -250,7 +250,9 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                     <h3 className="text-base font-semibold text-foreground">{t(texts.arExperience)}</h3>
                   </div>
 
-                  <NeedleARViewer scene={arScene} locale={language as Language} />
+                  <Suspense fallback={<div className="h-[500px] bg-black rounded-2xl animate-pulse" />}>
+                    <NeedleARViewer scene={arScene} locale={language as Language} />
+                  </Suspense>
 
 
                   <div className="bg-card border border-border rounded-xl p-4">
