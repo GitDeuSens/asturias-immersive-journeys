@@ -467,7 +467,6 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
               <img src={selectedGalleryImage} alt="Gallery fullscreen" className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain rounded-lg" />
               <button onClick={() => setSelectedGalleryImage(null)} className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"><X className="w-5 h-5" /></button>
             </motion.div>
-            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
