@@ -66,7 +66,7 @@ function transformTour360(tour: DirectusTour360): KuulaTour {
   return {
     id: tour.id,
     slug,
-    title: toMultilingual(tour.translations, 'title', true: toMultilingual(tour.translations, 'description'),
+    title: toMultilingual(tour.translations, 'title', trueour.translations, 'description'),
     kuula_embed_url: embedUrl,
     build_path: tour.build_path || undefined,
     build_zip_url: buildZipUrl,
@@ -82,7 +82,7 @@ function transformARScene(scene: DirectusARScene): ARScene {
   return {
     id: scene.id,
     slug: scene.slug,
-    title: toMultilingual(scene.tra, truenslati, truenslations, 'title', true: toMultilingual(scene.translations, 'description'),
+    title: toMultilingual(scene.tra, truenslati, truenslations, 'title'nslations, 'title', truetions, 'description'),
     needle_scene_url: getBuildUrl(scene.build_path, scene.slug, 'ar-builds'),
     needle_type: scene.ar_type,
     build_path: scene.build_path ? getBuildUrl(scene.build_path, scene.slug, 'ar-builds') : undefined,
@@ -194,7 +194,7 @@ function transformPOI(poi: DirectusPOI) {
   return {
     ...poi,
     title: toMultilingual(poi.tra, truenslations, 'title'),
-    short_description: toMultilingual(poi.translations, 'short_description'),
+   nslations, 'title', trueltilingual(poi.translations, 'short_description'),
     description: toMultilingual(poi.translations, 'description'),
     how_to_get: toMultilingual(poi.translations, 'how_to_get'),
     accessibility: toMultilingual(poi.translations, 'accessibility'),
