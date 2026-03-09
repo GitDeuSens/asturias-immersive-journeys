@@ -38,8 +38,8 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
           {t(texts.title)}
         </motion.h1>
 
-        <img className="mb-5" src="./assets/line.png" />
-        <span style={{ fontWeight: 'bold' }} className="description text-white mb-8">{t(texts.homeDescription)}</span>
+        <img className="mb-3 sm:mb-5" src="./assets/line.png" />
+        <span style={{ fontWeight: 'bold' }} className="description text-white mb-4 sm:mb-8 text-sm sm:text-base text-center px-2">{t(texts.homeDescription)}</span>
 
 
         {/* Experience Cards */}

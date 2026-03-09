@@ -88,26 +88,26 @@ const TourViewerModal = React.forwardRef<HTMLDivElement, {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
           {tour.description[language as Language] && (
             <Button
               variant="ghost"
               size="icon"
               onClick={onToggleInfo}
-              className={`text-white hover:bg-white/20 h-8 w-8 ${showInfo ? 'bg-white/20' : ''}`}
+              className={`text-white hover:bg-white/20 h-7 w-7 sm:h-8 sm:w-8 ${showInfo ? 'bg-white/20' : ''}`}
               title={language === 'es' ? 'Información' : 'Info'}
             >
-              <Info className="w-4 h-4" />
+              <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </Button>
           )}
-          <Button variant="ghost" size="icon" onClick={onShare} className="text-white hover:bg-white/20 h-8 w-8" title={texts.share[language as Language] || texts.share.es}>
-            <Share2 className="w-4 h-4" />
+          <Button variant="ghost" size="icon" onClick={onShare} className="text-white hover:bg-white/20 h-7 w-7 sm:h-8 sm:w-8" title={texts.share[language as Language] || texts.share.es}>
+            <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={onFullscreen} className="text-white hover:bg-white/20 h-8 w-8" title={texts.fullscreen[language as Language] || texts.fullscreen.es}>
-            <Maximize2 className="w-4 h-4" />
+          <Button variant="ghost" size="icon" onClick={onFullscreen} className="text-white hover:bg-white/20 h-7 w-7 sm:h-8 sm:w-8" title={texts.fullscreen[language as Language] || texts.fullscreen.es}>
+            <Maximize2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={onClose} className="text-white hover:bg-white/20 gap-1 h-8 px-3">
-            <X className="w-4 h-4" />
+          <Button variant="ghost" size="sm" onClick={onClose} className="text-white hover:bg-white/20 gap-1 h-7 sm:h-8 px-2 sm:px-3">
+            <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline text-sm">{texts.close[language as Language] || texts.close.es}</span>
           </Button>
         </div>

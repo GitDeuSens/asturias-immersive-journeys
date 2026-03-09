@@ -97,8 +97,8 @@ export function ModeSelector({ onSelect }: ModeSelectorProps) {
           {t(texts.title)}
         </motion.h1>
 
-        <img className="mb-5" src="./assets/line.png" />
-        <span className="text-white mb-8">{t(texts.subtitle)}</span>
+        <img className="mb-3 sm:mb-5" src="./assets/line.png" />
+        <span className="text-white mb-4 sm:mb-8 text-sm sm:text-base text-center px-2">{t(texts.subtitle)}</span>
 
         {/* Mode Cards */}
         <div className="flex flex-col md:flex-row gap-3 md:gap-6 w-full max-w-4xl">
