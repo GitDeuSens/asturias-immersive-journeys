@@ -55,14 +55,20 @@ const TourViewerModal = React.forwardRef<HTMLDivElement, {
     ? `${DIRECTUS_URL}/builds${tour.build_path}`
     : (tour.kuula_embed_url || '');
 
+  // Lock body scroll when modal is open
+  React.useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, []);
+
   return (
     <div
       ref={ref}
-      className="fixed inset-0 flex flex-col tours360-fullscreen-container"
-      style={{ zIndex: 100, isolation: 'isolate', background: '#000' }}
+      className="fixed inset-0 flex flex-col tours360-fullscreen-container p-2 sm:p-3"
+      style={{ zIndex: 100, isolation: 'isolate', background: '#111' }}
     >
       {/* Unified frame: controls + iframe — border on ALL sides */}
-      <div className="flex flex-col flex-1 min-h-0 m-2 sm:m-3 border border-white/20 rounded-xl overflow-hidden bg-black/95">
+      <div className="flex flex-col flex-1 min-h-0 border border-white/25 rounded-xl overflow-hidden bg-black">
         {/* Control bar — top of the frame */}
         <div className="flex items-center justify-between px-3 sm:px-4 py-2 bg-black/90 border-b border-white/10 shrink-0">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
