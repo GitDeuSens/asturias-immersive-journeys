@@ -82,7 +82,8 @@ function transformARScene(scene: DirectusARScene): ARScene {
   return {
     id: scene.id,
     slug: scene.slug,
-    title: toMultilingual(scene.tra, truenslati, truenslations, 'title'nslations, 'title', truetions, 'description'),
+    title: toMultilingual(scene.translations, 'title', true),
+    description: toMultilingual(scene.translations, 'description'),
     needle_scene_url: getBuildUrl(scene.build_path, scene.slug, 'ar-builds'),
     needle_type: scene.ar_type,
     build_path: scene.build_path ? getBuildUrl(scene.build_path, scene.slug, 'ar-builds') : undefined,
