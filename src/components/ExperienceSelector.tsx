@@ -33,7 +33,7 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }} style={{ fontWeight: 'lighter' }}
-          className="sm:text-xl md:text-4xl lg:text-7xl text-white text-center mb-5 drop-shadow-lg max-w-3xl initial-title"
+          className="text-xl sm:text-xl md:text-4xl lg:text-7xl text-white text-center mb-3 sm:mb-5 drop-shadow-lg max-w-3xl initial-title"
         >
           {t(texts.title)}
         </motion.h1>
