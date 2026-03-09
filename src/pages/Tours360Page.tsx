@@ -61,8 +61,8 @@ const TourViewerModal = React.forwardRef<HTMLDivElement, {
       className="fixed inset-0 flex flex-col tours360-fullscreen-container"
       style={{ zIndex: 100, isolation: 'isolate', background: '#000' }}
     >
-      {/* Unified frame: controls + iframe */}
-      <div className="flex flex-col flex-1 min-h-0 m-0 sm:m-2 border border-white/15 rounded-none sm:rounded-xl overflow-hidden bg-black">
+      {/* Unified frame: controls + iframe — border on ALL sides */}
+      <div className="flex flex-col flex-1 min-h-0 m-2 sm:m-3 border border-white/20 rounded-xl overflow-hidden bg-black/95">
         {/* Control bar — top of the frame */}
         <div className="flex items-center justify-between px-3 sm:px-4 py-2 bg-black/90 border-b border-white/10 shrink-0">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">

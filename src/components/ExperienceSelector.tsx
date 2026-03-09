@@ -38,7 +38,7 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
           {t(texts.title)}
         </motion.h1>
 
-        <img className="mb-3 sm:mb-5" src="./assets/line.png" />
+        <div className="mb-3 sm:mb-5 w-16 sm:w-24 h-px bg-white/40" />
         <span style={{ fontWeight: 'bold' }} className="description text-white mb-4 sm:mb-8 text-sm sm:text-base text-center px-2">{t(texts.homeDescription)}</span>
 
 

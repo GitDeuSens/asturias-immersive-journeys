@@ -215,16 +215,16 @@ export function ARExperiencesPage() {
                       </div>
                     </div>
 
-                    <div className="p-5">
-                      <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                    <div className="p-3 sm:p-5">
+                      <h3 className="text-base sm:text-xl font-bold text-foreground mb-1 sm:mb-2 group-hover:text-primary transition-colors line-clamp-1">
                         {scene.title[locale] || scene.title.es}
                       </h3>
 
-                      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4 line-clamp-2">
                         {scene.description[locale] || scene.description.es}
                       </p>
 
-                      <div className="flex flex-wrap gap-2 mb-4">
+                      <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2 sm:mb-4">
                         <Badge variant="outline" className="text-xs">
                           <Clock className="w-3 h-3 mr-1" />
                           {scene.duration_minutes} {texts.duration[locale]}
