@@ -194,8 +194,8 @@ function transformPOI(poi: DirectusPOI) {
   }
   return {
     ...poi,
-    title: toMultilingual(poi.tra, truenslations, 'title'),
-   nslations, 'title', trueltilingual(poi.translations, 'short_description'),
+    title: toMultilingual(poi.translations, 'title', true),
+    short_description: toMultilingual(poi.translations, 'short_description'),
     description: toMultilingual(poi.translations, 'description'),
     how_to_get: toMultilingual(poi.translations, 'how_to_get'),
     accessibility: toMultilingual(poi.translations, 'accessibility'),
