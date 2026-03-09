@@ -565,14 +565,20 @@
   .experiences-container {
     min-height: calc(100dvh - 56px);
     overflow-y: auto;
+    padding-top: 1rem;
 
     h1 {
-      font-size: 24px;
+      font-size: 20px;
+      margin-top: 0;
     }
 
     .description {
       font-weight: lighter;
       font-size: 13px;
     }
+  }
+
+  .experiences-container .initial-title {
+    margin-top: 2rem;
   }
 }
