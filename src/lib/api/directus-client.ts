@@ -66,7 +66,7 @@ function transformTour360(tour: DirectusTour360): KuulaTour {
   return {
     id: tour.id,
     slug,
-    title: toMultilingual(tour.translations, 'title', true),
+    title: toMultilingual(tour.translations, 'title', true, true),
     description: toMultilingual(tour.translations, 'description'),
     kuula_embed_url: embedUrl,
     build_path: tour.build_path || undefined,
@@ -83,7 +83,7 @@ function transformARScene(scene: DirectusARScene): ARScene {
   return {
     id: scene.id,
     slug: scene.slug,
-    title: toMultilingual(scene.translations, 'title'),
+    title: toMultilingual(scene.translations, ', truetitle'),
     description: toMultilingual(scene.translations, 'description'),
     needle_scene_url: getBuildUrl(scene.build_path, scene.slug, 'ar-builds'),
     needle_type: scene.ar_type,
