@@ -41,7 +41,7 @@ const texts = {
 };
 
 // Tour viewer rendered as a plain div (no framer-motion) to avoid SPA rendering issues
-function TourViewerModal({ tour, language, showInfo, onToggleInfo, onShare, onFullscreen, onClose, t }: {
+const TourViewerModal = React.forwardRef<HTMLDivElement, {
   tour: KuulaTour;
   language: string;
   showInfo: boolean;
@@ -50,7 +50,7 @@ function TourViewerModal({ tour, language, showInfo, onToggleInfo, onShare, onFu
   onFullscreen: () => void;
   onClose: () => void;
   t: (v: any) => string;
-}) {
+}>(function TourViewerModal({ tour, language, showInfo, onToggleInfo, onShare, onFullscreen, onClose, t }, ref) {
   const embedUrl = tour.build_path
     ? `${DIRECTUS_URL}/builds${tour.build_path}`
     : (tour.kuula_embed_url || '');

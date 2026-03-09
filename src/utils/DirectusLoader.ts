@@ -132,10 +132,13 @@ export class ModelLoading extends Behaviour {
    * Standard Three.js pattern: create mixer, extract actions, start render loop.
    */
   private setupAnimations(asset: AssetReference, instance: Object3D): void {
-    // Try to get animations from the loaded asset
+    // Extract animations from the GLTF root (rawAsset) — this is where Three.js stores clip data.
+    // Needle's AssetReference stores the raw GLTF result in rawAsset, with animations at rawAsset.animations.
+    // The asset.asset property returns the scene child, which may also have animations copied over.
     const assetAny = asset as any;
-    const animations = assetAny.asset?.animations
-      ?? assetAny.animations
+    const animations = assetAny.rawAsset?.animations
+      ?? assetAny._rawAsset?.animations
+      ?? assetAny.asset?.animations
       ?? (instance as any).animations
       ?? [];
 
