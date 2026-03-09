@@ -460,8 +460,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
       <AnimatePresence>
         {selectedGalleryImage && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className={`fixed inset-0 bg-black/90 flex items-center justify-center p-4 ${isMobile ? '' : 'z-[60]'}`}
-            style={isMobile ? { zIndex: 600000000000 } : undefined}
+            className="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-[200]"
             onClick={() => setSelectedGalleryImage(null)}>
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
               className={isMobile ? "relative flex items-center justify-center" : ""}
