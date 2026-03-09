@@ -308,7 +308,7 @@ export class AsturiasAROverlay extends Behaviour {
             this._hideHeaderBar();
             this._buildARControls();
             // _audioPanel is set inside _buildARControls — open immediately if audio exists
-            if (this._hasAudio()) this._openAudioPanel();
+            if (this._hasAudio()) this._toggleAudioPanel();
         });
         onXRSessionEnd(() => {
             this._removeARControls();
