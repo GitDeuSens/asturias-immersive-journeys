@@ -60,9 +60,11 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
   const autostart = typeof window !== 'undefined'
     && new URLSearchParams(window.location.search).get('autostart') === '1';
 
+  // Initialize needle engine and register types on first mount
   useEffect(() => {
-    (window as any).__DIRECTUS_URL = DIRECTUS_URL;
-    // Pass scene info to DOM overlay (AsturiasAROverlay reads this)
+    import('@needle-tools/engine');
+    import('../generated/register_types');
+  }, []);
     (window as any).__AR_SCENE_SLUG = scene.slug;
     (window as any).__AR_SCENE_TITLE = scene.title;
     (window as any).__AR_SCENE_DESCRIPTION = scene.description;
