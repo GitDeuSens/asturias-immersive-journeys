@@ -205,18 +205,27 @@ export function Tours360Page() {
     setSelectedCategories((prev) => (prev.includes(catId) ? prev.filter((id) => id !== catId) : [...prev, catId]));
   };
 
+  // Save scroll position before opening a tour
+  const scrollPositionRef = React.useRef(0);
+
   const handleTourClick = (tour: KuulaTour) => {
     const tourTitle = typeof tour.title === 'string' ? tour.title : tour.title[language] || tour.title.es;
     trackTourViewed(tour.id, tourTitle, language, 'desktop');
+    scrollPositionRef.current = window.scrollY;
     setActiveTour(tour);
     setShowInfo(false);
-    navigate(`/tours/${getTourSlug(tour)}`);
+    navigate(`/tours/${getTourSlug(tour)}`, { replace: true });
   };
 
   const closeTour = () => {
+    const savedScroll = scrollPositionRef.current;
     setActiveTour(null);
     setShowInfo(false);
-    navigate('/tours');
+    navigate('/tours', { replace: true });
+    // Restore scroll position after React re-renders
+    requestAnimationFrame(() => {
+      window.scrollTo(0, savedScroll);
+    });
   };
 
   const handleShare = async () => {

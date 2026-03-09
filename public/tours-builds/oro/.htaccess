@@ -1,0 +1,96 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /calella/
+
+  # HTTPS redirect (опционально, раскомментируй если нужен)
+  # RewriteCond %{HTTPS} off
+  # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Не перенаправлять существующие файлы и директории
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-l
+  
+  # Не перенаправлять ассеты с расширениями
+  RewriteCond %{REQUEST_URI} !\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|json|wasm|glb|gltf)$ [NC]
+
+  # Перенаправлять все запросы на index.html в папке calella
+  RewriteRule . /calella/index.html [L]
+
+  # Кэширование статических ресурсов
+  <IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # Изображения
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    
+    # CSS и JavaScript
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    
+    # Fonts
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    
+    # GLB/GLTF модели
+    ExpiresByType model/gltf-binary "access plus 1 year"
+    ExpiresByType model/gltf+json "access plus 1 year"
+    
+    # HTML (не кэшируем)
+    ExpiresByType text/html "access plus 0 seconds"
+  </IfModule>
+
+  # Сжатие
+  <IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+    AddOutputFilterByType DEFLATE application/javascript application/json
+    AddOutputFilterByType DEFLATE image/svg+xml
+  </IfModule>
+
+  # MIME типы для 3D моделей и современных ассетов
+  <IfModule mod_mime.c>
+    # 3D модели
+    AddType model/gltf-binary .glb
+    AddType model/gltf+json .gltf
+    AddType application/octet-stream .bin
+    
+    # JavaScript модули
+    AddType application/javascript .js
+    AddType application/javascript .mjs
+    
+    # CSS
+    AddType text/css .css
+    
+    # Wasm
+    AddType application/wasm .wasm
+    
+    # JSON
+    AddType application/json .json
+  </IfModule>
+
+  # Security headers
+  <IfModule mod_headers.c>
+    # CORS для 3D моделей и ассетов
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type"
+    
+    # Безопасность
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+  </IfModule>
+</IfModule>
+
+# Отключить листинг директорий
+Options -Indexes
+
+# Защита конфигурационных файлов
+<FilesMatch "\.(htaccess|htpasswd|env|git|gitignore)$">
+  Order Allow,Deny
+  Deny from all
+</FilesMatch>

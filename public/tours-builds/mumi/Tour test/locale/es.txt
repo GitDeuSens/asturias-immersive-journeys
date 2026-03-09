@@ -1,0 +1,23 @@
+#: locale=es
+
+## VR Menu
+
+### Text
+Menu_209811C4_2CA9_D2EB_41A4_BF6D9D464AB5.label = Media
+MenuItem_20E401F0_2CA9_D2AC_41B3_6F4A83C44D58.label = aerial-drone-panorama-view-nature-moldova-sunset-village-wide-fields-valleys
+MenuItem_3E38DCFE_2CB9_5297_41B8_CA721E02E3C1.label = alex-bdnr-GNNoZa8zVwY-unsplash
+MenuItem_3E38DCFE_2CB9_5294_41B7_038793EA8F26.label = timothy-oldfield-luufnHoChRU-unsplash
+
+## Медиа
+
+### Заголовок
+panorama_20BD08C7_2CA9_72F4_41BA_2CBE0FE1E9F4.label = aerial-drone-panorama-view-nature-moldova-sunset-village-wide-fields-valleys
+panorama_3D583843_2CB9_71ED_41B3_18E965D1C638.label = alex-bdnr-GNNoZa8zVwY-unsplash
+panorama_3D3C619E_2CB9_D297_41C3_0845E1D2BDFC.label = timothy-oldfield-luufnHoChRU-unsplash
+
+## Тур
+
+### Заголовок
+tour.name = Sin Título 1
+
+### Описание

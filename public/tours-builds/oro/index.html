@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ca">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="Descobreix Calella en AR - Experiència immersiva de realitat augmentada" />
+    <meta name="theme-color" content="#e57300" />
+    
+    <!-- Preload critical resources -->
+    
+    <!-- Preconnect to critical origins -->
+    <link rel="preconnect" href="https://datacalella.metaversotechnologies.com" crossorigin />
+    <link rel="preconnect" href="https://api.mapbox.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- DNS prefetch for non-critical -->
+    <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
+    
+    <title>Calella AR</title>
+    
+    <!-- Critical CSS inline -->
+    <style>
+      /* Prevent FOUC and ensure contrast */
+      html { background-color: #f3f3f9; }
+      body { 
+        margin: 0; 
+        font-family: system-ui, -apple-system, sans-serif;
+        /* High contrast text colors */
+        color: #1a1a1a;
+      }
+      #root { min-height: 100vh; }
+      
+      /* Loading state */
+      .loading { 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        min-height: 100vh;
+        color: #1a1a1a;
+      }
+    </style>
+    <script type="module" crossorigin src="/calella/assets/index-CcWQktJ4.js"></script>
+    <link rel="modulepreload" crossorigin href="/calella/assets/react-vendor-DDf5lLMV.js">
+    <link rel="modulepreload" crossorigin href="/calella/assets/state-vendor-DDdbs_L0.js">
+    <link rel="modulepreload" crossorigin href="/calella/assets/directus-vendor-CBm5TYxg.js">
+    <link rel="stylesheet" crossorigin href="/calella/assets/index-CNlDuqHx.css">
+  </head>
+  <body>
+    <div id="root">
+      <div class="loading" role="status" aria-live="polite">
+        <span>Loading...</span>
+      </div>
+    </div>
+  </body>
+</html>

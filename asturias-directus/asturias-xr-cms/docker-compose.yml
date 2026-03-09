@@ -95,14 +95,13 @@ services:
       
       # ============ CORS ============
       CORS_ENABLED: true
-      CORS_ORIGIN: https://cms.asturias.digitalmetaverso.com,https://asturias.digitalmetaverso.com,https://4611e08e-7275-4114-b253-46abaf449c60.lovableproject.com,https://id-preview--4611e08e-7275-4114-b253-46abaf449c60.lovable.app,https://cb43bb9a-c8f6-440c-aaba-10e5f1614a41.lovableproject.com,https://id-preview--cb43bb9a-c8f6-440c-aaba-10e5f1614a41.lovable.app
+      CORS_ORIGIN: true
       CORS_CREDENTIALS: true
-      CONTENT_SECURITY_POLICY_DIRECTIVES__FRAME_ANCESTORS: "'self' https://asturias.digitalmetaverso.com"
       
       # ============ FILES ============
       STORAGE_LOCATIONS: local
       STORAGE_LOCAL_ROOT: /directus/uploads
-      FILES_MAX_UPLOAD_SIZE: 3221225472
+      FILES_MAX_UPLOAD_SIZE: 524288000
       ASSETS_TRANSFORM_MAX_CONCURRENT: 4
       ASSETS_CACHE_TTL: 30d
       ASSETS_TRANSFORM_IMAGE_MAX_DIMENSION: 6000
