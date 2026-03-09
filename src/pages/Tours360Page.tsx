@@ -131,7 +131,7 @@ const TourViewerModal = React.forwardRef<HTMLDivElement, {
       </AnimatePresence>
     </div>
   );
-}
+});
 
 export function Tours360Page() {
   const { t, language } = useLanguage();
