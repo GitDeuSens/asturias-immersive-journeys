@@ -563,15 +563,16 @@
   }
 
   .experiences-container {
-    height: 115vh;
-    overflow: scroll;
+    min-height: calc(100dvh - 56px);
+    overflow-y: auto;
 
     h1 {
-      font-size: 30px;
+      font-size: 24px;
     }
 
     .description {
       font-weight: lighter;
+      font-size: 13px;
     }
   }
 }
