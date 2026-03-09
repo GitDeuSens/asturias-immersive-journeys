@@ -125,13 +125,14 @@ const TourViewerModal = React.forwardRef<HTMLDivElement, {
         </AnimatePresence>
 
         {/* Iframe — fills rest of the frame */}
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 relative">
           {embedUrl && (
             <iframe
               src={embedUrl}
-              className="w-full h-full"
+              className="absolute inset-0 w-full h-full border-0"
               allow="xr-spatial-tracking; gyroscope; accelerometer; fullscreen"
               title={t(tour.title)}
+              style={{ display: 'block' }}
             />
           )}
         </div>
