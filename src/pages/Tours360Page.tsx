@@ -55,10 +55,14 @@ const TourViewerModal = React.forwardRef<HTMLDivElement, {
     ? `${DIRECTUS_URL}/builds${tour.build_path}`
     : (tour.kuula_embed_url || '');
 
-  // Lock body scroll when modal is open
+  // Lock scroll on both html and body when modal is open
   React.useEffect(() => {
+    document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    };
   }, []);
 
   return (
