@@ -27,19 +27,19 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
 
   return (
     <>
-      <div className="experiences-container relative z-10 flex flex-col items-center justify-center px-4 pt-16 pb-4 min-h-[calc(100dvh-60px)]">
+      <div className="experiences-container relative z-10 flex flex-col items-center justify-center px-4 py-4 min-h-[calc(100dvh-56px)] md:min-h-[calc(100dvh-60px)]">
         {/* Title */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }} style={{ fontWeight: 'lighter' }}
-          className="sm:text-xl md:text-4xl lg:text-7xl text-white text-center mb-5 drop-shadow-lg max-w-3xl initial-title"
+          className="text-xl sm:text-xl md:text-4xl lg:text-7xl text-white text-center mb-3 sm:mb-5 drop-shadow-lg max-w-3xl initial-title"
         >
           {t(texts.title)}
         </motion.h1>
 
-        <img className="mb-5" src="./assets/line.png" />
-        <span style={{ fontWeight: 'bold' }} className="description text-white mb-8">{t(texts.homeDescription)}</span>
+        <img className="mb-3 sm:mb-5" src="./assets/line.png" />
+        <span style={{ fontWeight: 'bold' }} className="description text-white mb-4 sm:mb-8 text-sm sm:text-base text-center px-2">{t(texts.homeDescription)}</span>
 
 
         {/* Experience Cards */}

@@ -82,7 +82,7 @@ export function ModeSelector({ onSelect }: ModeSelectorProps) {
 
   return (
     <>
-      <div className="relative z-10 flex flex-col items-center justify-center px-4 pt-0 pb-4 min-h-[calc(100dvh-60px)]">
+      <div className="relative z-10 flex flex-col items-center justify-center px-4 py-4 min-h-[calc(100dvh-56px)] md:min-h-[calc(100dvh-60px)]">
         {/* Geolocation Error Alert */}
         <GeolocationErrorAlert error={geoError} onDismiss={handleDismissError} onRetry={handleRetryLocation} />
 
@@ -92,13 +92,13 @@ export function ModeSelector({ onSelect }: ModeSelectorProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           style={{ fontWeight: 'lighter'}}
-          className="text-3xl sm:text-3xl md:text-4xl lg:text-7xl text-white text-center mb-5 drop-shadow-lg max-w-3xl initial-title"
+          className="text-2xl sm:text-3xl md:text-4xl lg:text-7xl text-white text-center mb-3 sm:mb-5 drop-shadow-lg max-w-3xl initial-title"
         >
           {t(texts.title)}
         </motion.h1>
 
-        <img className="mb-5" src="./assets/line.png" />
-        <span className="text-white mb-8">{t(texts.subtitle)}</span>
+        <img className="mb-3 sm:mb-5" src="./assets/line.png" />
+        <span className="text-white mb-4 sm:mb-8 text-sm sm:text-base text-center px-2">{t(texts.subtitle)}</span>
 
         {/* Mode Cards */}
         <div className="flex flex-col md:flex-row gap-3 md:gap-6 w-full max-w-4xl">
