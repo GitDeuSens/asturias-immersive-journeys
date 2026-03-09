@@ -152,7 +152,7 @@ function extractCategoryIds(categories: any): string[] {
 function transformRoute(route: DirectusRoute) {
   return {
     ...route,
-    title: toMultilingual(route.translations, 'title'),
+    title: toMultilingual(route.translations, 'title', true),
     short_description: toMultilingual(route.translations, 'short_description'),
     description: toMultilingual(route.translations, 'description'),
     theme: toMultilingual(route.translations, 'theme'),
