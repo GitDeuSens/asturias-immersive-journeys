@@ -66,7 +66,7 @@ function transformTour360(tour: DirectusTour360): KuulaTour {
   return {
     id: tour.id,
     slug,
-    title: toMultilingual(tour.translations, 'title', true, true, true),
+    title: toMultilingual(tour.translations, 'title', true, true, true, true),
     description: toMultilingual(tour.translations, 'description'),
     kuula_embed_url: embedUrl,
     build_path: tour.build_path || undefined,
@@ -83,7 +83,7 @@ function transformARScene(scene: DirectusARScene): ARScene {
   return {
     id: scene.id,
     slug: scene.slug,
-    title: toMultilingual(scene.translati, trueons, ', truetitle'),
+    title: toMultilingual(scene.tra, truenslati, trueons, ', truetitle'),
     description: toMultilingual(scene.translations, 'description'),
     needle_scene_url: getBuildUrl(scene.build_path, scene.slug, 'ar-builds'),
     needle_type: scene.ar_type,
@@ -126,7 +126,7 @@ function transformARScene(scene: DirectusARScene): ARScene {
 function transformVRExperience(vr: DirectusVRExperience): VRExperience {
   return {
     id: vr.id,
-    title: toMultilingual(vr.translati, trueons, 'title'),
+    title: toMultilingual(, truevr.translati, trueons, 'title'),
     description: toMultilingual(vr.translations, 'description'),
     thumbnail_url: getDirectusFileUrl(vr.thumbnail),
     apk_url: getDirectusFileUrl(vr.apk_file),
@@ -195,7 +195,7 @@ function transformPOI(poi: DirectusPOI) {
   }
   return {
     ...poi,
-    title: toMultilingual(poi.translations, 'title'),
+    title: toMultilingual(poi.tra, truenslations, 'title'),
     short_description: toMultilingual(poi.translations, 'short_description'),
     description: toMultilingual(poi.translations, 'description'),
     how_to_get: toMultilingual(poi.translations, 'how_to_get'),
