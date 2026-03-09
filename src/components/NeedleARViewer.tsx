@@ -6,10 +6,7 @@ import { motion } from 'framer-motion';
 import { AlertTriangle, RefreshCw, Smartphone, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { trackEvent, trackARStarted, trackARCompleted, trackARError } from '@/lib/analytics';
-import '@needle-tools/engine';
-import '../generated/register_types';
-import { GameObject } from '@needle-tools/engine';
-import { ModelLoading, loadSceneInto } from '@/utils/DirectusLoader';
+// All needle-tools/engine imports are dynamic to avoid pulling three.js+rapier into non-AR pages
 import type { ARScene, Language } from '@/lib/types';
 import { DIRECTUS_URL } from '@/lib/directus-url';
 

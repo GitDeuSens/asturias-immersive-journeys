@@ -107,13 +107,15 @@ export default defineConfig(({ mode }) => {
             if (id.includes('framer-motion')) return 'animations';
             // i18n
             if (id.includes('i18next') || id.includes('react-i18next')) return 'i18n';
-            // Analytics (recharts) — only on analytics page
+            // Analytics (recharts + d3) — only on analytics page
             if (id.includes('recharts') || id.includes('d3-')) return 'analytics';
             // Directus SDK
             if (id.includes('@directus')) return 'directus';
             // React Query
             if (id.includes('@tanstack')) return 'query';
-            // Three.js / Needle — heavy, lazy loaded
+            // Rapier physics — separate from three.js
+            if (id.includes('rapier')) return 'rapier';
+            // Three.js / Needle — heavy, lazy loaded only for AR
             if (id.includes('three') || id.includes('needle')) return 'three';
           },
         },
