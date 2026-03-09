@@ -88,28 +88,41 @@ export default defineConfig(({ mode }) => {
     build: {
       rollupOptions: {
         output: {
-          // Ensure assets use relative paths for subdirectory deployment
           assetFileNames: 'assets/[name]-[hash][extname]',
           chunkFileNames: 'assets/[name]-[hash].js',
           entryFileNames: 'assets/[name]-[hash].js',
-          // Enhanced manual chunk splitting for better performance
-          manualChunks: {
-            // Vendor chunks
-            vendor: ['react', 'react-dom'],
-            router: ['react-router-dom'],
-            ui: ['@radix-ui/react-dialog', '@radix-ui/react-scroll-area', '@radix-ui/react-tooltip'],
-            maps: ['leaflet'],
-            icons: ['lucide-react'],
-            animations: ['framer-motion'],
-            i18n: ['react-i18next'],
-            // Heavy libraries
-            analytics: ['recharts'],
-            directus: ['@directus/sdk'],
-            query: ['@tanstack/react-query'],
+          manualChunks(id) {
+            // Core vendor
+            if (id.includes('react-dom')) return 'vendor';
+            if (id.includes('node_modules/react/')) return 'vendor';
+            // Router
+            if (id.includes('react-router')) return 'router';
+            // UI primitives — group all radix
+            if (id.includes('@radix-ui')) return 'ui';
+            // Maps
+            if (id.includes('leaflet')) return 'maps';
+            // Icons — large, rarely changes
+            if (id.includes('lucide-react')) return 'icons';
+            // Animations
+            if (id.includes('framer-motion')) return 'animations';
+            // i18n
+            if (id.includes('i18next') || id.includes('react-i18next')) return 'i18n';
+            // Analytics (recharts) — only on analytics page
+            if (id.includes('recharts') || id.includes('d3-')) return 'analytics';
+            // Directus SDK
+            if (id.includes('@directus')) return 'directus';
+            // React Query
+            if (id.includes('@tanstack')) return 'query';
+            // Three.js / Needle — heavy, lazy loaded
+            if (id.includes('three') || id.includes('needle')) return 'three';
           },
         },
       },
-      chunkSizeWarningLimit: 300, // Lower warning threshold
+      chunkSizeWarningLimit: 300,
+      // Enable minification optimizations
+      minify: 'esbuild',
+      target: 'es2020',
+      cssMinify: true,
     },
   };
 });
