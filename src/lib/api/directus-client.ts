@@ -66,7 +66,8 @@ function transformTour360(tour: DirectusTour360): KuulaTour {
   return {
     id: tour.id,
     slug,
-    title: toMultilingual(tour.translations, 'title', trueour.translations, 'description'),
+    title: toMultilingual(tour.translations, 'title', true),
+    description: toMultilingual(tour.translations, 'description'),
     kuula_embed_url: embedUrl,
     build_path: tour.build_path || undefined,
     build_zip_url: buildZipUrl,
