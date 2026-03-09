@@ -105,6 +105,9 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
           console.warn('[AR] Could not auto-instantiate AsturiasAROverlay:', e);
         }
 
+        const { GameObject } = await import('@needle-tools/engine');
+        const { ModelLoading, loadSceneInto } = await import('@/utils/DirectusLoader');
+
         let modelLoader = GameObject.findObjectOfType(ModelLoading);
 
         const { Context } = await import('@needle-tools/engine');
