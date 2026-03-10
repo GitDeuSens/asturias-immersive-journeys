@@ -114,10 +114,16 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
   }, [loadARScene]);
 
   useEffect(() => {
+    if (!point) return;
+
+    const poiId = point.poiUUID || point.id;
+    poiStartTime.current = Date.now();
+    trackPOIViewed(poiId, getText(point.title, language));
+
     return () => {
-      if (point) {
-        const durationSec = Math.round((Date.now() - poiStartTime.current) / 1000);
-        if (durationSec > 2) trackPOITimeSpent(point.id, getText(point.title, language), durationSec);
+      const durationSec = Math.round((Date.now() - poiStartTime.current) / 1000);
+      if (durationSec > 2) {
+        trackPOITimeSpent(poiId, getText(point.title, language), durationSec);
       }
     };
   }, [point, language]);
