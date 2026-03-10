@@ -25,9 +25,10 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { ImmersiveRoute, RoutePoint } from '@/data/types';
-import { DIRECTUS_URL } from '@/lib/directus-url';
+import { DIRECTUS_URL, getDirectusAssetUrl } from '@/lib/directus-url';
 import { useDirectusCategories } from '@/hooks/useDirectusData';
 import { calculateRouteDistance, formatDistance, openNavigation } from '@/lib/mapUtils';
+import { trackGPXDownloaded } from '@/lib/analytics';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ShareButtons } from '@/components/ShareButtons';

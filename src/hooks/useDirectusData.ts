@@ -250,6 +250,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
     distanceKm: route.distance_km,
     elevationGainMeters: route.elevation_gain_meters,
     surfaceType: route.surface_type,
+    gpxFile: route.gpx_file || undefined,
   };
 }
 
