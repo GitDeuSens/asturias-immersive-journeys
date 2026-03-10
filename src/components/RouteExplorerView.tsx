@@ -549,7 +549,7 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
                 <button onClick={(e) => {
                   e.stopPropagation();
                   onToggleVisited();
-                }} className='text-xs text-muted-foreground'>{t('poi.markVisited')}</button>
+                }} className='text-xs text-muted-foreground'>{t('poi.visited')}</button>
               )}
 
               {distanceInfo && (
