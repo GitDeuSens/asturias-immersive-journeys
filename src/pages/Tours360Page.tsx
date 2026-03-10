@@ -9,6 +9,7 @@ import { Footer } from "@/components/Footer";
 import { TourCardSkeleton } from "@/components/SkeletonCard";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { PopularityBadge } from "@/components/PopularityBadge";
 import { useDirectusTours, useDirectusCategories } from "@/hooks/useDirectusData";
 import { useLanguage } from "@/hooks/useLanguage";
 import { trackTourViewed, trackEvent } from "@/lib/analytics";

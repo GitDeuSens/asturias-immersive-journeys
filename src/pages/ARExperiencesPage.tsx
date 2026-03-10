@@ -8,6 +8,7 @@ import { UnifiedSearchBar, type CustomFilter } from "@/components/UnifiedSearchB
 import { TourCardSkeleton } from "@/components/SkeletonCard";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { PopularityBadge } from "@/components/PopularityBadge";
 import { AppHeader } from "@/components/AppHeader";
 import { Badge } from "@/components/ui/badge";
 import { SEOHead } from "@/components/SEOHead";
