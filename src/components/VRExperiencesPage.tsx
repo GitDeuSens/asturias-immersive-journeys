@@ -51,6 +51,7 @@ const texts = {
     fr: 'Rechercher des expériences VR...',
   },
   downloadAPK: { es: 'Descargar APK', en: 'Download APK', fr: "Télécharger l'APK" },
+  openWeb: { es: 'Abrir en navegador', en: 'Open in browser', fr: 'Ouvrir dans le navigateur' },
   apkNotAvailable: {
     es: 'APK no disponible aún',
     en: 'APK not available yet',
