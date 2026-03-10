@@ -41,7 +41,7 @@ interface ShareButtonsProps {
   variant?: 'inline' | 'modal';
 }
 
-export function ShareButtons({ 
+export const ShareButtons = forwardRef<HTMLDivElement, ShareButtonsProps>(function ShareButtons({ 
   url, 
   title, 
   description = '', 
@@ -49,7 +49,7 @@ export function ShareButtons({
   hashtags = ['AsturiasParaisoNatural', 'AsturiasInmersivo'],
   className = '',
   variant = 'inline'
-}: ShareButtonsProps) {
+}, ref) {
   const { t } = useTranslation();
   const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
