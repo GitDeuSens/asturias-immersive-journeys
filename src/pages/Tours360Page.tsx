@@ -266,10 +266,10 @@ export function Tours360Page() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
       <AppHeader variant="light" />
 
-      <main className="pt-14 md:pt-[122px]">
+      <main className="flex-1 pt-14 md:pt-[122px]">
         {/* Breadcrumb */}
         <div className="container mx-auto px-4 max-w-6xl pt-4">
           <Breadcrumb>
