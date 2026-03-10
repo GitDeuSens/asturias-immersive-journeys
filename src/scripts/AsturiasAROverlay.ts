@@ -618,7 +618,24 @@ export class AsturiasAROverlay extends Behaviour {
         (document.querySelector('[ar-button]') as HTMLElement)?.click();
     }
 
-    private async _stopAR() {
+    private async _startVR() {
+        // Start immersive-vr session via Needle Engine (for VR headsets)
+        try {
+            const { NeedleXRSession, Context } = await import('@needle-tools/engine');
+            const ctx = Context.Current;
+            if (NeedleXRSession && ctx) {
+                await NeedleXRSession.start("immersive-vr", undefined, ctx);
+                return;
+            }
+        } catch (err) { console.warn('[AsturiasAROverlay] NeedleXRSession.start immersive-vr failed', err); }
+        // Fallback: try requestSession directly
+        try {
+            const session = await navigator.xr!.requestSession('immersive-vr');
+            (window as any).__currentXRSession = session;
+        } catch (err) { console.warn('[AsturiasAROverlay] Direct immersive-vr session failed', err); }
+    }
+
+
         try {
             const session = (window as any).__currentXRSession
                 ?? document.querySelector('needle-engine')?.['context']?.xrSession
