@@ -233,6 +233,7 @@ export class AsturiasAROverlay extends Behaviour {
 
     private _lang      = 'es';
     private _isDesktop = false;
+    private _isVRHeadset = false;
     private _sceneInfo: SceneInfo | null = null;
     private _slug      = '';
 
