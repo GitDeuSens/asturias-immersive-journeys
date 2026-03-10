@@ -71,21 +71,12 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   const [routeStartTime] = useState(Date.now());
   const navigate = useNavigate();
 
-  // Early return if no route
-  if (!route) {
-    return (
-      <div className="flex items-center justify-center h-full p-8">
-        <p className="text-muted-foreground">{t('routes.noRouteSelected')}</p>
-      </div>
-    );
-  }
-
-  const routeProgress = route.points.length > 0
+  const routeProgress = route?.points?.length
     ? Math.round((visitedPoints.size / route.points.length) * 100)
     : 0;
 
   const pointDistances = useMemo(() => {
-    if (mode !== 'here' || !hasLocation || latitude === null || longitude === null) {
+    if (!route || mode !== 'here' || !hasLocation || latitude === null || longitude === null) {
       return new Map<string, { distance: string; walkTime: number }>();
     }
     const distances = new Map<string, { distance: string; walkTime: number }>();
