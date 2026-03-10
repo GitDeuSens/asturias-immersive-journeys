@@ -76,8 +76,7 @@ function RedirectToAR() {
 const CookieConsent = lazy(() => import("./components/CookieConsent").then(m => ({ default: m.CookieConsent })));
 const WelcomeOnboarding = lazy(() => import("./components/WelcomeOnboarding").then(m => ({ default: m.WelcomeOnboarding })));
 const AnalyticsDashboard = lazy(() => import("./pages/AnalyticsDashboard").then(m => ({ default: m.AnalyticsDashboard })));
-const ARExperiencesPage = lazy(() => import("./pages/ARExperiencesPage").then(m => ({ default: m.ARExperiencesPage })));
-const VRExperiencesPage = lazy(() => import("./components/VRExperiencesPage").then(m => ({ default: m.VRExperiencesPage })));
+const XRExperiencesPage = lazy(() => import("./pages/XRExperiencesPage").then(m => ({ default: m.XRExperiencesPage })));
 const Tours360Page = lazy(() => import("./pages/Tours360Page").then(m => ({ default: m.Tours360Page })));
 const RoutesPage = lazy(() => import("./pages/RoutesPage").then(m => ({ default: m.RoutesPage })));
 const FavoritesPage = lazy(() => import("./pages/FavoritesPage").then(m => ({ default: m.FavoritesPage })));
@@ -111,9 +110,10 @@ function AppWithOptimizations() {
             <Route path="/routes" element={<RoutesPage />} />
             <Route path="/routes/:routeCode" element={<RoutesPage />} />
             <Route path="/routes/:routeCode/:id" element={<RoutesPage />} />
-            <Route path="/vr" element={<VRExperiencesPage />} />
+            <Route path="/xr" element={<XRExperiencesPage />} />
+            <Route path="/ar" element={<XRExperiencesPage />} />
+            <Route path="/vr" element={<XRExperiencesPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
-            <Route path="/ar" element={<ARExperiencesPage />} />
             <Route path="/ar/:slug" element={<ARScenePage />} />
             {/* Redirects for relative navigation from /tours/:slug */}
             <Route path="/tours/ar/:slug" element={<RedirectToAR />} />

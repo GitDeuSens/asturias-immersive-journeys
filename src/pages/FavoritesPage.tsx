@@ -31,8 +31,8 @@ const texts = {
 const typeConfig: Record<FavoriteType, { icon: any; label: Record<string, string>; path: string }> = {
   tour: { icon: View, label: { es: 'Tours', en: 'Tours', fr: 'Visites' }, path: '/tours' },
   route: { icon: Map, label: { es: 'Rutas', en: 'Routes', fr: 'Itinéraires' }, path: '/routes' },
-  ar: { icon: Sparkles, label: { es: 'AR', en: 'AR', fr: 'AR' }, path: '/ar' },
-  vr: { icon: Glasses, label: { es: 'VR', en: 'VR', fr: 'VR' }, path: '/vr' },
+  ar: { icon: Sparkles, label: { es: 'AR', en: 'AR', fr: 'AR' }, path: '/xr' },
+  vr: { icon: Glasses, label: { es: 'VR', en: 'VR', fr: 'VR' }, path: '/xr' },
   poi: { icon: MapPin, label: { es: 'Puntos', en: 'Points', fr: 'Points' }, path: '/routes' },
 };
 
@@ -50,7 +50,7 @@ export function FavoritesPage() {
       case 'tour': return `/tours/${item.id}`;
       case 'route': return `/routes/${item.id}`;
       case 'ar': return `/ar/${item.id}`;
-      case 'vr': return '/vr';
+      case 'vr': return '/xr';
       case 'poi': return '/routes';
       default: return '/';
     }
@@ -147,8 +147,8 @@ export function FavoritesPage() {
                 <Link to="/routes">
                   <Button variant="outline"><Map className="w-4 h-4 mr-2" />{language === 'es' ? 'Rutas' : 'Routes'}</Button>
                 </Link>
-                <Link to="/ar">
-                  <Button variant="outline"><Sparkles className="w-4 h-4 mr-2" />AR</Button>
+                <Link to="/xr">
+                  <Button variant="outline"><Sparkles className="w-4 h-4 mr-2" />XR</Button>
                 </Link>
               </div>
             </motion.div>

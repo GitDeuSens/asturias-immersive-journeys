@@ -22,11 +22,8 @@ const NotFound = () => {
     if (path.includes("ruta") || path.includes("route") || path.includes("camino")) {
       newSuggestions.push("/routes");
     }
-    if (path.includes("ar") || path.includes("realidad")) {
-      newSuggestions.push("/ar");
-    }
-    if (path.includes("vr") || path.includes("virtual")) {
-      newSuggestions.push("/vr");
+    if (path.includes("ar") || path.includes("realidad") || path.includes("vr") || path.includes("virtual") || path.includes("xr")) {
+      newSuggestions.push("/xr");
     }
 
     if (newSuggestions.length === 0) {
@@ -49,8 +46,7 @@ const NotFound = () => {
       suggestionsMap: {
         "/tours": "Tours Virtuales 360°",
         "/routes": "Rutas Inmersivas",
-        "/ar": "Experiencias AR",
-        "/vr": "Experiencias VR",
+        "/xr": "Experiencias XR",
         "/": "Página de inicio",
       },
     },
@@ -66,8 +62,7 @@ const NotFound = () => {
       suggestionsMap: {
         "/tours": "Virtual 360° Tours",
         "/routes": "Immersive Routes",
-        "/ar": "AR Experiences",
-        "/vr": "VR Experiences",
+        "/xr": "XR Experiences",
         "/": "Home page",
       },
     },
@@ -83,8 +78,7 @@ const NotFound = () => {
       suggestionsMap: {
         "/tours": "Visites Virtuelles 360°",
         "/routes": "Routes Immersives",
-        "/ar": "Expériences AR",
-        "/vr": "Expériences VR",
+        "/xr": "Expériences XR",
         "/": "Page d'accueil",
       },
     },

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Facebook, Twitter, Menu, X, View, Map, Sparkles, Glasses, Home, ArrowLeftRight, HelpCircle, Heart, MapPin } from "lucide-react";
+import { Facebook, Twitter, Menu, X, View, Map, Sparkles, Home, ArrowLeftRight, HelpCircle, Heart, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SettingsDropdown } from "@/components/SettingsDropdown";
 import { GlossaryDialog } from "@/components/GlossaryDialog";
@@ -20,8 +20,7 @@ const navItems = [
   { key: "nav.home", path: "/experience", icon: Home },
   { key: "nav.tours360", path: "/tours", icon: View },
   { key: "nav.routes", path: "/routes", icon: Map },
-  { key: "nav.arExperiences", path: "/ar", icon: Sparkles },
-  { key: "nav.vrExperiences", path: "/vr", icon: Glasses },
+  { key: "nav.xrExperiences", path: "/xr", icon: Sparkles },
   { key: "nav.favorites", path: "/favorites", icon: Heart },
 ];
 
