@@ -310,9 +310,13 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
           </p>
         </div>
         <div className='flex flex-wrap gap-3 justify-end mt-4 sm:mt-6'>
-          <div className='cursor-pointer' onClick={handleNavigateToStart}>
-            <span className='flex items-center gap-1.5'><Navigation className="w-6 h-6" /> {t('routes.howToGet')}</span>
-          </div>
+          <button
+            onClick={handleNavigateToStart}
+            className='inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-muted/50 transition-colors'
+          >
+            <Navigation className="w-4 h-4" />
+            {t('routes.howToGet')}
+          </button>
         </div>
 
         {/* Share */}
