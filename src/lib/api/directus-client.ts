@@ -520,13 +520,19 @@ class DirectusApiClient {
 
   async getPOIs(_locale: Language = 'es') {
     try {
-      const pois = await this.getClient().request(readItems('pois', {
-        filter: { status: { _in: API_CONFIG.getStatusFilter() } },
-        fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.slug', 'ar_scene_id.*', 'ar_scene_id.translations.*', 'tour_360_id.*', 'tour_360_id.translations.*', 'gallery.*'] as any,
-        sort: ['order'] as any,
-        limit: -1,
-      }));
-      return (pois as unknown as DirectusPOI[]).map(transformPOI);
+      const [pois, analyticsCounts] = await Promise.all([
+        this.getClient().request(readItems('pois', {
+          filter: { status: { _in: API_CONFIG.getStatusFilter() } },
+          fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.slug', 'ar_scene_id.*', 'ar_scene_id.translations.*', 'tour_360_id.*', 'tour_360_id.translations.*', 'gallery.*'] as any,
+          sort: ['order'] as any,
+          limit: -1,
+        })),
+        this.getAnalyticsCountMap('poi', ['poi_viewed']),
+      ]);
+      return (pois as unknown as DirectusPOI[]).map((poi) => transformPOI({
+        ...poi,
+        view_count: Math.max(Number((poi as any).view_count ?? 0), analyticsCounts.get(poi.id) ?? 0),
+      } as DirectusPOI));
     } catch (error) { logger.error('[DirectusClient] Error fetching POIs:', error); return []; }
   }
 

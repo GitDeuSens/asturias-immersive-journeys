@@ -520,7 +520,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
                 </div>
               </div>
             )}
-          </ScrollArea>
+          </div>
         </motion.div>
       </AnimatePresence>
 

@@ -169,6 +169,8 @@ export interface RoutePoint {
   coverImage?: string;
   content: RoutePointContent;
   tags?: string[];
+  viewCount?: number;
+  createdAt?: string;
 }
 
 export interface ImmersiveRoute {
