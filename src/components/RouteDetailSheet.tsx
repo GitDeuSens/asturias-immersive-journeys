@@ -139,14 +139,23 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
         >
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" aria-hidden="true" />
 
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors shadow-lg"
-            aria-label={t('common.close')}
-          >
-            <X className="w-5 h-5" />
-          </button>
+          {/* Favorite + Close buttons */}
+          <div className="absolute top-4 right-4 flex items-center gap-2">
+            <FavoriteButton
+              id={route.id}
+              type="route"
+              title={route.title[lang]}
+              image={route.coverImage}
+              size="sm"
+            />
+            <button
+              onClick={onClose}
+              className="p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors shadow-lg"
+              aria-label={t('common.close')}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Scrollable content */}
