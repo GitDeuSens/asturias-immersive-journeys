@@ -194,7 +194,7 @@ class InlineAudioPlayer {
 export class AsturiasAROverlay extends Behaviour {
     constructor() {
         super();
-        console.log('[Overlay] CONSTRUCTOR called');
+        _log('[Overlay] CONSTRUCTOR called');
   }
     // ── Internal state ─────────────────────────────────────────────────────
     private _lang:     string = 'es';
