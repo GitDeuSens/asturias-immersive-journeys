@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Share2, Link, Check, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
