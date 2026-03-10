@@ -145,7 +145,7 @@ export class ModelLoading extends Behaviour {
       ?? [];
 
     if (!animations || animations.length === 0) {
-      console.log('[ModelLoading] No animations found in GLB');
+      logger.log('[ModelLoading] No animations found in GLB');
       return;
     }
 
