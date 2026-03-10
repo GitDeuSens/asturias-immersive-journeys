@@ -39,6 +39,15 @@ function PageLoader() {
   );
 }
 
+// Scroll restoration on route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 // Analytics tracker component
 function AnalyticsTracker() {
   const location = useLocation();
@@ -88,6 +97,7 @@ function AppWithOptimizations() {
       <Toaster />
       <Sonner />
       <>
+        <ScrollToTop />
         <AnalyticsTracker />
         <Suspense fallback={<PageLoader />}>
           <Routes>

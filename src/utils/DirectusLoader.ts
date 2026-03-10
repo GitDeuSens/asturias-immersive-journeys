@@ -8,6 +8,7 @@ import {
 import { AnimationAction, AnimationClip, AnimationMixer, Box3, Clock, MathUtils, Object3D, Vector3 } from "three";
 import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils.js";
 import { DIRECTUS_URL } from '@/lib/directus-url';
+import { logger } from '@/lib/logger';
 export { DIRECTUS_URL };
 
 // ─────────────────────────────────────────────
@@ -144,11 +145,11 @@ export class ModelLoading extends Behaviour {
       ?? [];
 
     if (!animations || animations.length === 0) {
-      console.log('[ModelLoading] No animations found in GLB');
+      logger.log('[ModelLoading] No animations found in GLB');
       return;
     }
 
-    console.log(`[ModelLoading] Found ${animations.length} animation(s), setting up mixer`);
+    logger.log(`[ModelLoading] Found ${animations.length} animation(s), setting up mixer`);
 
     // Collect material names present on the instantiated object
     const materialNames: string[] = [];
@@ -297,7 +298,7 @@ export async function loadSceneInto(
   if (glbOverride) {
     glbUrl = glbOverride;
     name = slug ?? "override";
-    console.log("[Directus] GLB override:", glbUrl);
+    logger.log("[Directus] GLB override:", glbUrl);
   } else if (slug) {
     const scene = await fetchSceneBySlug(slug);
     if (!scene) {
@@ -312,7 +313,7 @@ export async function loadSceneInto(
     scale = scene.glb_scale ?? DEFAULT_SCALE;
     ry = scene.glb_rotation_y ?? DEFAULT_RY;
     name = scene.slug;
-    console.log(`[Directus] Loading '${name}':`, glbUrl);
+    logger.log(`[Directus] Loading '${name}':`, glbUrl);
   } else {
     console.warn("[Directus] No slug or glb param provided");
     return;
@@ -324,7 +325,7 @@ export async function loadSceneInto(
   if (model) {
     model.scale.setScalar(scale);
     model.rotation.y = MathUtils.degToRad(ry);
-    console.log(`[Directus] Ready. scale=${scale}, rotY=${ry}°`);
+    logger.log(`[Directus] Ready. scale=${scale}, rotY=${ry}°`);
   }
 }
 

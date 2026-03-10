@@ -84,7 +84,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
       if (initialized.current) return;
       initialized.current = true;
 
-      console.log('[AR] loadfinished event fired');
+      // loadfinished event fired
 
       try {
         onStart?.();
@@ -101,7 +101,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
             const root = ctx?.scene?.children?.[0] as any;
             if (root?.addComponent) {
               root.addComponent(AsturiasAROverlay);
-              console.log('[AR] Auto-instantiated AsturiasAROverlay');
+              // AsturiasAROverlay auto-instantiated
             }
           }
         } catch (e) {
@@ -158,7 +158,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
               // Dispose touch/mouse listeners if possible
               if (typeof ctrl.dispose === 'function') ctrl.dispose();
             }
-            console.log('[AR] OrbitControls: fully disabled, no interaction in preview or AR');
+            // OrbitControls fully disabled
           }
         } catch (e) {
           console.warn('[AR] Could not configure OrbitControls:', e);
@@ -172,13 +172,13 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
               const { DeviceUtilities } = await import('@needle-tools/engine');
               
               if (DeviceUtilities.isiOS() || DeviceUtilities.isAndroidDevice()) {
-                console.log('[NeedleARViewer] Mobile detected, autostarting AR');
+                // Mobile detected, autostarting AR
                 setTimeout(() => tryStartAR(), 0);
                 return;
               }
               
               // Desktop: skip autostart
-              console.log('[NeedleARViewer] Desktop detected, skipping autostart');
+              // Desktop detected, skipping autostart
             } catch (e) {
               console.warn('[NeedleARViewer] DeviceUtilities not available, falling back to autostart', e);
               setTimeout(() => tryStartAR(), 0);

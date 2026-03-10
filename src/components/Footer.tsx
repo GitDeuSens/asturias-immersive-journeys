@@ -1,28 +1,47 @@
-import { forwardRef } from "react";
+import { forwardRef, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 // Import institutional logos
 import nextgenEuLogo from "@/assets/logos/nextgen-eu.png";
 import planRecuperacionLogo from "@/assets/logos/plan-recuperacion.png";
 import ministerioTurismoLogo from "@/assets/logos/ministerio-turismo.png";
 import principadoAsturiasLogo from "@/assets/logos/principado-asturias.png";
+function ScrollToTopButton({ label }: { label: string }) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setVisible(window.scrollY > 300);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <Button
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      variant="default"
+      size="icon"
+      className="fixed bottom-6 right-6 z-50 rounded-md shadow-lg"
+      aria-label={label}
+    >
+      <ChevronUp className="h-5 w-5" aria-hidden="true" />
+    </Button>
+  );
+}
 
 export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
   const { t } = useTranslation();
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   return (
     <footer
       ref={ref}
-      className="text-muted-foreground"
+      className="text-muted-foreground bg-background w-full relative"
       role="contentinfo"
       aria-label={t("footer.ariaLabel", "Pie de página")}
-      style={{ backgroundColor: 'white', width: '100%', position: 'relative'}}
     >
       <div className="container mx-auto px-4 py-4 md:py-4">
         {/* Institutional logos - Row 1 */}
@@ -85,36 +104,36 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
         <nav aria-label={t("footer.legalNav", "Enlaces legales")} className="mb-2">
           <ul className="flex flex-wrap items-center justify-center gap-2 md:gap-2">
             <li>
-              <a
-                href="/legal"
+              <Link
+                to="/legal"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded uppercase tracking-wide"
               >
                 {t("footer.legal")}
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="/accessibility"
+              <Link
+                to="/accessibility"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded uppercase tracking-wide"
               >
                 {t("footer.accessibility")}
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="/privacy"
+              <Link
+                to="/privacy"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded uppercase tracking-wide"
               >
                 {t("footer.privacy")}
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="/cookies"
+              <Link
+                to="/cookies"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded uppercase tracking-wide"
               >
                 {t("footer.cookies")}
-              </a>
+              </Link>
             </li>
           </ul>
         </nav>
@@ -123,16 +142,7 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
         <p className="text-center text-sm text-muted-foreground/80">{t("footer.copyright")}</p>
       </div>
 
-      {/* Scroll to top button */}
-      <Button
-        onClick={scrollToTop}
-        variant="default"
-        size="icon"
-        className="fixed bottom-6 right-6 z-50 rounded-md shadow-lg"
-        aria-label={t("footer.scrollToTop", "Volver arriba")}
-      >
-        <ChevronUp className="h-5 w-5" aria-hidden="true" />
-      </Button>
+      <ScrollToTopButton label={t("footer.scrollToTop", "Volver arriba")} />
     </footer>
   );
 });

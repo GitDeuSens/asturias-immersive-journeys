@@ -7,6 +7,9 @@ import {
 } from "@needle-tools/engine";
 import QRCode from 'qrcode';
 
+// Dev-only logging — silent in production builds
+const _log = (...args: any[]) => { if (import.meta.env.DEV) console.log(...args); };
+
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────────────────────────────────────
@@ -518,13 +521,13 @@ export class AsturiasAROverlay extends Behaviour {
         if (this._isiOS()) {
             // Redirect to App Clip with CLEAN _sceneUrl — no autostart param,
             // so the App Clip opens the page normally without re-triggering autostart.
-            console.log('[AsturiasAROverlay] iOS autostart → App Clip');
+            _log('[AsturiasAROverlay] iOS autostart → App Clip');
             window.location.href = this._getAppClipUrl();
             return;
         }
         if (DeviceUtilities.isAndroidDevice()) {
             // WebXR requires a user gesture on Android — show tap-to-start overlay
-            console.log('[AsturiasAROverlay] Android autostart → tap prompt');
+            _log('[AsturiasAROverlay] Android autostart → tap prompt');
             this._showAndroidTapPrompt();
             return;
         }

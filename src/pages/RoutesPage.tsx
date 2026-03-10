@@ -420,7 +420,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
     }
 
     if (exploringRoute) {
-      console.log('entras??');
+      
       // Show route polyline only if we have at least 2 valid points
       let positions = exploringRoute.polyline.map((p) => [p.lat, p.lng] as [number, number]);
       if (positions.length >= 2) {
@@ -624,8 +624,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
             mass: 0.9,
             opacity: { duration: 0.25, ease: "easeOut" },
           }}
-      style={{zIndex: '1'}}
-      className="fixed right-0 bottom-0 w-full md:w-[420px] lg:w-[460px] md:max-w-lg bg-background z-[55] shadow-2xl flex flex-col overflow-hidden top-14 md:top-[122px]"
+      className="fixed right-0 bottom-0 w-full md:w-[420px] lg:w-[460px] md:max-w-lg bg-background z-[1] md:z-[55] shadow-2xl flex flex-col overflow-hidden top-14 md:top-[122px]"
         >
           {/* Mobile handle */}
           <button

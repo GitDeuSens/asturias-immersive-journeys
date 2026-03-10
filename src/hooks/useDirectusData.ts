@@ -110,16 +110,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       const getAudioDuration = (f: any): number | undefined =>
         typeof f === 'object' && f?.duration ? f.duration : undefined;
 
-      // Debug: log raw audio field values for troubleshooting
       if (poi.audio_es || poi.audio_en || poi.audio_fr) {
-        console.log(`[Audio Debug] POI "${poi.slug || poi.id}" audio fields:`, {
-          audio_es: poi.audio_es,
-          audio_en: poi.audio_en,
-          audio_fr: poi.audio_fr,
-          resolved_es: getAudioId(poi.audio_es),
-          resolved_en: getAudioId(poi.audio_en),
-          resolved_fr: getAudioId(poi.audio_fr),
-        });
 
         content.audioGuide = {};
         if (poi.audio_es) {

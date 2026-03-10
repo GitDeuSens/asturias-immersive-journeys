@@ -8,6 +8,9 @@ import {
 } from "@needle-tools/engine";
 import { DeviceUtilities } from "@needle-tools/engine";
 
+// Dev-only logging — silent in production builds
+const _log = (...args: any[]) => { if (import.meta.env.DEV) console.log(...args); };
+
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────────────────────────────────────
@@ -191,7 +194,7 @@ class InlineAudioPlayer {
 export class AsturiasAROverlay extends Behaviour {
     constructor() {
         super();
-        console.log('[Overlay] CONSTRUCTOR called');
+        _log('[Overlay] CONSTRUCTOR called');
   }
     // ── Internal state ─────────────────────────────────────────────────────
     private _lang:     string = 'es';
@@ -221,30 +224,30 @@ export class AsturiasAROverlay extends Behaviour {
     // ─────────────────────────────────────────────────────────────────────────
 
    awake() {
-    console.log('[Overlay] awake() called');
+    _log('[Overlay] awake() called');
     this._detectLanguage();
     this._detectSlug();
     this._isDesktop = DeviceUtilities.isDesktop();
-    console.log('[Overlay] isDesktop:', this._isDesktop, 'slug:', this._slug, 'lang:', this._lang);
+    _log('[Overlay] isDesktop:', this._isDesktop, 'slug:', this._slug, 'lang:', this._lang);
     this._loadGoogleFont();
     this._injectGlobalStyles();
     this._ensureRoot();
-    console.log('[Overlay] awake() done');
+    _log('[Overlay] awake() done');
 }
 
 async start() {
-    console.log('[Overlay] start() called');
+    _log('[Overlay] start() called');
     if (this._slug) {
         this._sceneInfo = await fetchSceneInfo(this._slug);
-        console.log('[Overlay] sceneInfo:', this._sceneInfo);
+        _log('[Overlay] sceneInfo:', this._sceneInfo);
     }
     this._arUrl = window.location.href;
-    console.log('[Overlay] arUrl:', this._arUrl);
+    _log('[Overlay] arUrl:', this._arUrl);
     if (this._isDesktop) {
-        console.log('[Overlay] building DESKTOP panel');
+        _log('[Overlay] building DESKTOP panel');
         this._buildDesktopPanel();
     } else {
-        console.log('[Overlay] building PRE-AR panel');
+        _log('[Overlay] building PRE-AR panel');
         this._buildPreARPanel();
     }
 
