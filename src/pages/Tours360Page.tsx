@@ -130,7 +130,7 @@ const TourViewerModal = React.forwardRef<HTMLDivElement, {
 
         {/* Iframe — fills rest of the frame */}
         <div className="flex-1 min-h-0 relative">
-          {embedUrl && (
+          {embedUrl ? (
             <iframe
               src={embedUrl}
               className="absolute inset-0 w-full h-full border-0"
@@ -138,6 +138,11 @@ const TourViewerModal = React.forwardRef<HTMLDivElement, {
               title={t(tour.title)}
               style={{ display: 'block' }}
             />
+          ) : (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-white/60 gap-3">
+              <View className="w-12 h-12 opacity-50" />
+              <p className="text-sm">{language === 'es' ? 'Tour no disponible' : language === 'fr' ? 'Visite non disponible' : 'Tour not available'}</p>
+            </div>
           )}
         </div>
       </div>

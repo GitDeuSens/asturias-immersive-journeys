@@ -258,11 +258,17 @@ class DirectusApiClient {
     try {
       const scenes = await this.getClient().request(readItems('ar_scenes', {
         filter: { slug: { _eq: slug }, status: { _in: ['published', 'draft'] } },
-        fields: ['*', ...TRANSLATIONS_DEEP],
+        fields: ['*', ...TRANSLATIONS_DEEP, 'audio_es', 'audio_en', 'audio_fr'],
         limit: 1,
       }));
       if ((scenes as any[]).length === 0) return null;
-      return transformARScene((scenes as unknown as DirectusARScene[])[0]);
+      const raw = (scenes as unknown as DirectusARScene[])[0];
+      const result = transformARScene(raw);
+      // Map audio file UUIDs (plain strings in ar_scenes)
+      result.audio_es = raw.audio_es ? getDirectusFileUrl(raw.audio_es) : undefined;
+      result.audio_en = raw.audio_en ? getDirectusFileUrl(raw.audio_en) : undefined;
+      result.audio_fr = raw.audio_fr ? getDirectusFileUrl(raw.audio_fr) : undefined;
+      return result;
     } catch (error) { logger.error(`[DirectusClient] Error fetching AR scene ${slug}:`, error); return null; }
   }
 
