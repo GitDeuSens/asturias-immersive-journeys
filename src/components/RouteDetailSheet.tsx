@@ -101,7 +101,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[40] bg-black/20"
+        className="fixed inset-0 z-[40] bg-black/30"
         onClick={onClose}
         role="presentation"
       />
@@ -117,7 +117,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
           mass: 0.8,
           opacity: { duration: 0.2, ease: 'easeOut' }
         }}
-        className="fixed inset-x-2 sm:inset-x-auto sm:right-2 top-16 md:top-[126px] bottom-2 sm:w-full sm:max-w-lg bg-background z-[45] shadow-2xl flex flex-col overflow-hidden rounded-2xl border border-border/40"
+        className="fixed inset-x-2 sm:inset-x-auto sm:right-2 top-16 md:top-[126px] bottom-2 sm:w-full sm:max-w-lg bg-background z-[42] shadow-2xl flex flex-col overflow-hidden rounded-2xl border border-border/40"
         onClick={(e) => {
           e.stopPropagation();
         }}
@@ -137,7 +137,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-background/80 backdrop-blur-sm text-foreground hover:bg-background transition-colors focus:outline-none focus:ring-2 focus:ring-primary shadow-lg"
+            className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors shadow-lg"
             aria-label={t('common.close')}
           >
             <X className="w-5 h-5" />
