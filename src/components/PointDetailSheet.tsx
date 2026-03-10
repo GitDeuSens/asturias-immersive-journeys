@@ -164,14 +164,14 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
         <motion.div key="overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           className="fixed inset-0 z-[40] bg-black/20 pointer-events-auto" onClick={onClose} />
         <motion.div key="sheet"
-          initial={{ x: '100%', opacity: 0.8 }} animate={{ x: 0, opacity: 1 }} exit={{ x: '100%', opacity: 0.8 }}
-          transition={{ type: 'spring', damping: 28, stiffness: 200, mass: 0.9, opacity: { duration: 0.2, ease: 'easeOut' } }}
-          className="fixed right-0 top-14 md:top-[122px] bottom-0 w-full max-w-lg bg-background z-[45] shadow-2xl flex flex-col overflow-hidden"
+          initial={{ y: '100%', opacity: 0.8 }} animate={{ y: 0, opacity: 1 }} exit={{ y: '100%', opacity: 0.8 }}
+          transition={{ type: 'spring', damping: 30, stiffness: 260, mass: 0.8, opacity: { duration: 0.2, ease: 'easeOut' } }}
+          className="fixed inset-x-2 sm:inset-x-auto sm:right-2 top-16 md:top-[126px] bottom-2 sm:w-full sm:max-w-lg bg-background z-[45] shadow-2xl flex flex-col overflow-hidden rounded-2xl border border-border/40"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Hero image */}
           <div
-            className="relative h-40 sm:h-56 bg-cover bg-center flex-shrink-0"
+            className="relative h-40 sm:h-56 bg-cover bg-center flex-shrink-0 rounded-t-2xl overflow-hidden"
             style={{ backgroundImage: point.coverImage ? `url(${DIRECTUS_URL}/assets/${point.coverImage})` : undefined }}
           >
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
@@ -211,16 +211,16 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
                       {onBackToRoute ? (
-                        <BreadcrumbLink href="#" onClick={(e) => { e.preventDefault(); onBackToRoute(); }} className="text-xs truncate max-w-[100px]">
+                        <BreadcrumbLink href="#" onClick={(e) => { e.preventDefault(); onBackToRoute(); }} className="text-xs truncate max-w-[80px] sm:max-w-[140px] inline-block align-bottom">
                           {routeTitle}
                         </BreadcrumbLink>
                       ) : (
-                        <span className="text-xs text-muted-foreground truncate max-w-[100px]">{routeTitle}</span>
+                        <span className="text-xs text-muted-foreground truncate max-w-[80px] sm:max-w-[140px] inline-block align-bottom">{routeTitle}</span>
                       )}
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                      <BreadcrumbPage className="text-xs truncate max-w-[120px]">{title}</BreadcrumbPage>
+                      <BreadcrumbPage className="text-xs truncate max-w-[80px] sm:max-w-[140px] inline-block align-bottom">{title}</BreadcrumbPage>
                     </BreadcrumbItem>
                   </BreadcrumbList>
                 </Breadcrumb>

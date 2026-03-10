@@ -107,18 +107,17 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
       />
       <motion.div
         key="sheet"
-        initial={{ x: '100%', opacity: 0.8 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: '100%', opacity: 0.8 }}
+        initial={{ y: '100%', opacity: 0.8 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: '100%', opacity: 0.8 }}
         transition={{
           type: 'spring',
-          damping: 28,
-          stiffness: 200,
-          mass: 0.9,
+          damping: 30,
+          stiffness: 260,
+          mass: 0.8,
           opacity: { duration: 0.2, ease: 'easeOut' }
         }}
-        style={{ width: '100%' }}
-        className="fixed right-0 top-14 md:top-[122px] bottom-0 max-w-lg bg-background z-[45] shadow-2xl flex flex-col overflow-hidden"
+        className="fixed inset-x-2 sm:inset-x-auto sm:right-2 top-16 md:top-[126px] bottom-2 sm:w-full sm:max-w-lg bg-background z-[45] shadow-2xl flex flex-col overflow-hidden rounded-2xl border border-border/40"
         onClick={(e) => {
           e.stopPropagation();
         }}
@@ -128,7 +127,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
       >
         {/* Hero image */}
         <div
-          className="relative h-40 sm:h-56 bg-cover bg-center flex-shrink-0"
+          className="relative h-40 sm:h-56 bg-cover bg-center flex-shrink-0 rounded-t-2xl overflow-hidden"
           style={{ backgroundImage: `url(${route.coverImage})` }}
           role="img"
           aria-label={route.title[lang]}
