@@ -54,7 +54,7 @@ const texts = {
 };
 
 // Dynamic Viewer
-function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewerProps) {
+function DynamicNeedleViewer({ scene, locale, onStart, onError, onClose }: NeedleARViewerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const initialized = useRef(false);
   const needleRef = useRef<HTMLElement | null>(null);
