@@ -124,6 +124,7 @@ const resources = {
       "vr.instructions": "Instrucciones de uso",
       "vr.requirements": "Requisitos",
       "vr.compatible": "Compatible con",
+      "vr.apkNotAvailable": "La descarga no está disponible en este momento",
 
       // Map
       "map.yourLocation": "Tu ubicación",
