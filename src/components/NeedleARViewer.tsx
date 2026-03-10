@@ -322,7 +322,7 @@ export function NeedleARViewer({ scene, locale = 'es', onStart, onError, onClose
   return (
     <motion.div ref={containerRef} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative space-y-4 h-full">
       {/* 3D Preview with built-in AR button inside needle-engine */}
-      <DynamicNeedleViewer scene={scene} locale={locale} onStart={onStart} onError={onError} />
+      <DynamicNeedleViewer scene={scene} locale={locale} onStart={onStart} onError={onError} onClose={onClose} />
 
       {/* Geo-located scene → navigation button */}
       {scene.needle_type === 'geo' && scene.location && (
