@@ -76,6 +76,7 @@ function transformTour360(tour: DirectusTour360): KuulaTour {
     duration_minutes: tour.duration_minutes,
     total_panoramas: tour.total_panoramas || (hasBuild ? 1 : 0),
     published: tour.status === 'published',
+    view_count: tour.view_count || 0,
   };
 }
 
