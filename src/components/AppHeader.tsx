@@ -30,6 +30,7 @@ export function AppHeader({ showRestart = true, variant = "light" }: AppHeaderPr
   const [menuOpen, setMenuOpen] = useState(false);
   const [glossaryOpen, setGlossaryOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { mode, clearMode } = useExplorationMode();
 
   // On /experience page, hide full nav — only show logo + language
   const isExperiencePage = location.pathname === "/" || location.pathname === "/experience";
