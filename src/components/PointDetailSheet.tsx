@@ -16,6 +16,7 @@ import { trackPOITimeSpent } from '@/lib/analytics';
 import { openNavigation } from '@/lib/mapUtils';
 import { getARScenesByPOI } from '@/lib/api/directus-client';
 import { ShareButtons } from '@/components/ShareButtons';
+import { QRCodeShare } from '@/components/QRCodeShare';
 import FullscreenModal from '@/components/poi/FullscreenModal';
 import { AudioGuidePlayer } from '@/components/AudioGuidePlayer';
 import {
