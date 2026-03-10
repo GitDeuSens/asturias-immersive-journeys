@@ -325,7 +325,7 @@ export async function loadSceneInto(
   if (model) {
     model.scale.setScalar(scale);
     model.rotation.y = MathUtils.degToRad(ry);
-    console.log(`[Directus] Ready. scale=${scale}, rotY=${ry}°`);
+    logger.log(`[Directus] Ready. scale=${scale}, rotY=${ry}°`);
   }
 }
 

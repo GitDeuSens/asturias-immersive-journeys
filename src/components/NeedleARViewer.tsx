@@ -158,7 +158,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
               // Dispose touch/mouse listeners if possible
               if (typeof ctrl.dispose === 'function') ctrl.dispose();
             }
-            console.log('[AR] OrbitControls: fully disabled, no interaction in preview or AR');
+            // OrbitControls fully disabled
           }
         } catch (e) {
           console.warn('[AR] Could not configure OrbitControls:', e);
