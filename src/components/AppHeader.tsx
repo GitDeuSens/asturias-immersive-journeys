@@ -126,6 +126,8 @@ export function AppHeader({ showRestart = true, variant = "light" }: AppHeaderPr
 
             {/* Right side controls */}
             <div className="flex items-center gap-1.5 sm:gap-2">
+              <SettingsDropdown variant="light" />
+
               {/* Help/glossary button */}
               <button
                 onClick={() => setGlossaryOpen(true)}
@@ -135,8 +137,6 @@ export function AppHeader({ showRestart = true, variant = "light" }: AppHeaderPr
               >
                 <HelpCircle className="w-5 h-5" />
               </button>
-
-              <SettingsDropdown variant="light" />
 
               {/* Hamburger menu button — hidden on /experience and on desktop */}
               {!isExperiencePage && (
