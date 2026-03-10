@@ -97,6 +97,7 @@ function AppWithOptimizations() {
       <Toaster />
       <Sonner />
       <>
+        <ScrollToTop />
         <AnalyticsTracker />
         <Suspense fallback={<PageLoader />}>
           <Routes>

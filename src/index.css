@@ -379,17 +379,29 @@
   }
 }
 
-/* Hide scrollbar but keep scroll functionality */
-* {
+/* Hide scrollbar but keep scroll functionality — except for scrollable containers that need visual indication */
+html, body {
   scrollbar-width: none;
-  /* Firefox */
   -ms-overflow-style: none;
-  /* IE and Edge */
 }
 
-*::-webkit-scrollbar {
+html::-webkit-scrollbar, body::-webkit-scrollbar {
   display: none;
-  /* Chrome, Safari, Opera */
+}
+
+/* Restore scrollbar for scrollable panels */
+.overflow-y-scroll, .overflow-y-auto, [data-radix-scroll-area-viewport] {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+
+.overflow-y-scroll::-webkit-scrollbar, .overflow-y-auto::-webkit-scrollbar, [data-radix-scroll-area-viewport]::-webkit-scrollbar {
+  width: 4px;
+}
+
+.overflow-y-scroll::-webkit-scrollbar-thumb, .overflow-y-auto::-webkit-scrollbar-thumb, [data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 9999px;
 }
 
 @layer utilities {
