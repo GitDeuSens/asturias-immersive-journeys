@@ -232,7 +232,7 @@ export class AsturiasAROverlay extends Behaviour {
     this._loadGoogleFont();
     this._injectGlobalStyles();
     this._ensureRoot();
-    console.log('[Overlay] awake() done');
+    _log('[Overlay] awake() done');
 }
 
 async start() {
