@@ -50,7 +50,7 @@ export function FavoritesPage() {
       case 'tour': return `/tours/${item.id}`;
       case 'route': return `/routes/${item.id}`;
       case 'ar': return `/ar/${item.id}`;
-      case 'vr': return '/vr';
+      case 'vr': return '/xr';
       case 'poi': return '/routes';
       default: return '/';
     }

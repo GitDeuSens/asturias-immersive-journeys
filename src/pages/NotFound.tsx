@@ -78,8 +78,7 @@ const NotFound = () => {
       suggestionsMap: {
         "/tours": "Visites Virtuelles 360°",
         "/routes": "Routes Immersives",
-        "/ar": "Expériences AR",
-        "/vr": "Expériences VR",
+        "/xr": "Expériences XR",
         "/": "Page d'accueil",
       },
     },
