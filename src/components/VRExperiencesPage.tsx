@@ -19,6 +19,7 @@ import {
   Monitor,
   Maximize2,
   Minimize2,
+  Box,
 } from 'lucide-react';
 import { AppHeader } from '@/components/AppHeader';
 import { SEOHead } from '@/components/SEOHead';
