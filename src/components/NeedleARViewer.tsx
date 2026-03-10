@@ -101,7 +101,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
             const root = ctx?.scene?.children?.[0] as any;
             if (root?.addComponent) {
               root.addComponent(AsturiasAROverlay);
-              console.log('[AR] Auto-instantiated AsturiasAROverlay');
+              // AsturiasAROverlay auto-instantiated
             }
           }
         } catch (e) {
