@@ -172,7 +172,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
               const { DeviceUtilities } = await import('@needle-tools/engine');
               
               if (DeviceUtilities.isiOS() || DeviceUtilities.isAndroidDevice()) {
-                console.log('[NeedleARViewer] Mobile detected, autostarting AR');
+                // Mobile detected, autostarting AR
                 setTimeout(() => tryStartAR(), 0);
                 return;
               }
