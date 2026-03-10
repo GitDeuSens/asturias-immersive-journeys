@@ -239,7 +239,7 @@ async start() {
     _log('[Overlay] start() called');
     if (this._slug) {
         this._sceneInfo = await fetchSceneInfo(this._slug);
-        console.log('[Overlay] sceneInfo:', this._sceneInfo);
+        _log('[Overlay] sceneInfo:', this._sceneInfo);
     }
     this._arUrl = window.location.href;
     console.log('[Overlay] arUrl:', this._arUrl);
