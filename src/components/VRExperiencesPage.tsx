@@ -51,6 +51,7 @@ const texts = {
     fr: 'Rechercher des expériences VR...',
   },
   downloadAPK: { es: 'Descargar APK', en: 'Download APK', fr: "Télécharger l'APK" },
+  openWeb: { es: 'Abrir en navegador', en: 'Open in browser', fr: 'Ouvrir dans le navigateur' },
   apkNotAvailable: {
     es: 'APK no disponible aún',
     en: 'APK not available yet',
@@ -462,7 +463,20 @@ export function VRExperiencesPage() {
               </ScrollArea>
 
               {/* CTA Footer */}
-              <div className="p-4 border-t border-border">
+              <div className="p-4 border-t border-border space-y-2">
+                {selectedExperience.web_url && (
+                  <Button
+                    variant="outline"
+                    className="w-full h-12 text-base font-bold"
+                    onClick={() => {
+                      trackVRStarted(selectedExperience.id, selectedExperience.title[lang]);
+                      window.open(selectedExperience.web_url, '_blank', 'noopener,noreferrer');
+                    }}
+                  >
+                    <Monitor className="w-5 h-5 mr-2" aria-hidden="true" />
+                    {t(texts.openWeb)}
+                  </Button>
+                )}
                 {selectedExperience.apk_url ? (
                   <Button
                     className="w-full h-12 text-base font-bold"
@@ -474,14 +488,14 @@ export function VRExperiencesPage() {
                     <Download className="w-5 h-5 mr-2" aria-hidden="true" />
                     {t(texts.downloadAPK)}
                   </Button>
-                ) : (
+                ) : !selectedExperience.web_url ? (
                   <div className="flex items-center justify-center p-4 bg-muted/50 rounded-lg border border-border">
                     <div className="flex items-center gap-2 text-muted-foreground text-sm">
                       <Info className="w-4 h-4" />
                       {t(texts.apkNotAvailable)}
                     </div>
                   </div>
-                )}
+                ) : null}
               </div>
             </motion.div>
           </motion.div>

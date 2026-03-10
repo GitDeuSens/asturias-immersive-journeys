@@ -151,12 +151,20 @@ export const initGA = () => {
 // ============ ENRICHED DIRECTUS TRACKING ============
 
 /** Build common fields for every Directus event */
+/** Strip internal/dev query params that can exceed DB column limits */
+function cleanPageUrl(): string {
+  const url = new URL(window.location.href);
+  url.searchParams.delete('__lovable_token');
+  // Return only pathname + cleaned search (no origin)
+  return url.pathname + (url.search || '');
+}
+
 function getCommonFields() {
   return {
     session_id: getSessionId(),
     device_type: getDeviceType(),
     language: getCurrentLanguage(),
-    page_url: window.location.pathname + window.location.search,
+    page_url: cleanPageUrl(),
     referrer: document.referrer || undefined,
     screen_resolution: getScreenResolution(),
     browser: getBrowserName(),

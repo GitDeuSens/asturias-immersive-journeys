@@ -146,6 +146,7 @@ export interface DirectusVRExperience {
   apk_file?: string;
   apk_version?: string;
   apk_size_mb?: number;
+  web_url?: string;
   thumbnail?: string;
   preview_video?: string;
   duration_minutes?: number;
