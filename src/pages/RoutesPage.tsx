@@ -12,6 +12,7 @@ import { RouteExplorerView } from "@/components/RouteExplorerView";
 import { PointDetailSheet } from "@/components/PointDetailSheet";
 import { SEOHead } from "@/components/SEOHead";
 import { Footer } from "@/components/Footer";
+import { RouteCardSkeleton } from "@/components/SkeletonCard";
 import type { ImmersiveRoute, RoutePoint } from "@/data/types";
 import { useImmersiveRoutes, useDirectusCategories, useDirectusPOIs, directusRouteToImmersive } from "@/hooks/useDirectusData";
 import { useGeolocation } from "@/hooks/useGeolocation";
