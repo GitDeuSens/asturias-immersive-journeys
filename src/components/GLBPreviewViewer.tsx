@@ -136,6 +136,7 @@ export default function GLBPreviewViewer({ glbUrl, scale = 1, rotationY = 0, cla
 
         // Animation loop
         const clock = new THREE.Clock();
+        let mixer: InstanceType<typeof THREE.AnimationMixer> | undefined;
         let animId: number;
         const animate = () => {
           animId = requestAnimationFrame(animate);
