@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, RefreshCw, Smartphone, MapPin } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Smartphone, MapPin, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { trackEvent, trackARStarted, trackARCompleted, trackARError } from '@/lib/analytics';
 // All needle-tools/engine imports are dynamic to avoid pulling three.js+rapier into non-AR pages
