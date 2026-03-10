@@ -224,10 +224,11 @@ export function ARExperiencesPage() {
                       </div>
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                      <div className="absolute top-3 left-3">
+                      <div className="absolute top-3 left-3 flex items-center gap-1.5">
                         <Badge className="bg-primary/90 text-primary-foreground">
                           <Sparkles className="w-3 h-3 mr-1" />AR
                         </Badge>
+                        <PopularityBadge launchCount={scene.launch_count} />
                       </div>
 
                       <div className="absolute top-3 right-3 flex items-center gap-2">
