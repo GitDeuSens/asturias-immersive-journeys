@@ -520,18 +520,20 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
             <div className="flex items-center justify-between mt-3 pt-2 border-t border-border/50">
               <div className="flex items-center gap-1.5">
                 {hasAR && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-warm/15 text-warm text-[10px] font-bold">
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-warm/15 text-warm text-[10px] font-bold" title={t('content.arFull')}>
                     <Smartphone className="w-3 h-3" />AR
+                    <span className="hidden sm:inline text-[9px] font-medium opacity-80">· {t('content.arFull')}</span>
                   </span>
                 )}
                 {has360 && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-360 text-white text-[10px] font-bold">
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-360 text-white text-[10px] font-bold" title={t('content.360Full')}>
                     <Camera className="w-3 h-3" />360°
+                    <span className="hidden sm:inline text-[9px] font-medium opacity-80">· {t('content.360Full')}</span>
                   </span>
                 )}
                 {!hasAR && !has360 && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-accent/15 text-accent text-[10px] font-bold">
-                    <Info className="w-3 h-3" />INFO
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-accent/15 text-accent text-[10px] font-bold" title={t('content.infoFull')}>
+                    <Info className="w-3 h-3" />{t('content.infoFull')}
                   </span>
                 )}
                 {hasVideo && <Play className="w-3.5 h-3.5 text-muted-foreground" />}
