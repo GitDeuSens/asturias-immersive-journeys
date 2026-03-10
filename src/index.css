@@ -501,15 +501,16 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
   }
 }
 
-/* Leaflet zoom controls positioning */
-.leaflet-control-zoom {
+/* Leaflet zoom controls positioning — left side */
+.leaflet-control-zoom,
+.leaflet-bar {
   margin-bottom: 50px !important;
 }
 
 @media (min-width: 800px) {
-  .leaflet-control-zoom {
+  .leaflet-control-zoom,
+  .leaflet-bar {
     margin-bottom: 50px !important;
-    right: 520px;
   }
 
   .initial-buttons {
