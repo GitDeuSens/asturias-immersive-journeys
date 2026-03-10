@@ -129,18 +129,9 @@ export function ARScenePage() {
         type="article"
       />
 
-      {/* Close button — top-right, next to needle-engine's own fullscreen/AR buttons */}
-      <button
-        onClick={handleClose}
-        className="absolute top-4 right-4 z-[100] flex items-center justify-center w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 transition-colors shadow-lg"
-        aria-label={texts.back[lang]}
-      >
-        <X className="w-5 h-5" />
-      </button>
-
       {/* NeedleARViewer fills the entire screen */}
       <div className="absolute inset-0 z-0">
-        <NeedleARViewer scene={scene} locale={lang} />
+        <NeedleARViewer scene={scene} locale={lang} onClose={handleClose} />
       </div>
     </div>
   );
