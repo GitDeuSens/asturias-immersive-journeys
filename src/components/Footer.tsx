@@ -20,10 +20,9 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
   return (
     <footer
       ref={ref}
-      className=""
+      className="text-muted-foreground bg-background w-full relative"
       role="contentinfo"
       aria-label={t("footer.ariaLabel", "Pie de página")}
-      className="text-muted-foreground bg-background w-full relative"
     >
       <div className="container mx-auto px-4 py-4 md:py-4">
         {/* Institutional logos - Row 1 */}
