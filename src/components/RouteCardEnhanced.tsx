@@ -63,7 +63,7 @@ const RouteCardComponent = forwardRef<HTMLButtonElement, RouteCardProps>(functio
         />
 
         {/* Badges */}
-        <div className="absolute top-2 right-2 flex items-center gap-1.5">
+        <div className="absolute top-2 left-2 flex items-center gap-1.5">
           <PopularityBadge viewCount={route.viewCount} />
           {route.isCircular && (
             <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-card/90 backdrop-blur-sm text-primary text-[10px] font-bold uppercase tracking-wide border border-primary/30">
