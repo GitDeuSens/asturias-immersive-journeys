@@ -297,7 +297,10 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
                     <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                       <Share2 className="w-4 h-4 text-primary" />{t(texts.shareExperience)}
                     </h4>
-                    <ShareButtons url={arScene?.slug ? `${window.location.origin}/ar/${arScene.slug}` : window.location.href} title={arTitle} description={arDescription} variant="inline" />
+                    <div className="flex items-center gap-2">
+                      <ShareButtons url={poiSharePath} title={arTitle} description={arDescription} variant="inline" />
+                      <QRCodeShare url={poiSharePath} title={arTitle} />
+                    </div>
                   </div>
                 </motion.div>
               )}
