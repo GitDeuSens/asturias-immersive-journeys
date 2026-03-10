@@ -228,7 +228,7 @@ export class AsturiasAROverlay extends Behaviour {
     this._detectLanguage();
     this._detectSlug();
     this._isDesktop = DeviceUtilities.isDesktop();
-    console.log('[Overlay] isDesktop:', this._isDesktop, 'slug:', this._slug, 'lang:', this._lang);
+    _log('[Overlay] isDesktop:', this._isDesktop, 'slug:', this._slug, 'lang:', this._lang);
     this._loadGoogleFont();
     this._injectGlobalStyles();
     this._ensureRoot();
