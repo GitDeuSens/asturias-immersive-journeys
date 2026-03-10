@@ -137,7 +137,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-background/80 backdrop-blur-sm text-foreground hover:bg-background transition-colors focus:outline-none focus:ring-2 focus:ring-primary shadow-lg"
+            className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors shadow-lg"
             aria-label={t('common.close')}
           >
             <X className="w-5 h-5" />
