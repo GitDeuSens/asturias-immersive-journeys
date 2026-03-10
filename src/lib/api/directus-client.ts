@@ -287,9 +287,10 @@ class DirectusApiClient {
         this.getClient().request(readItem('tours_360', id, { fields: ['*', ...TRANSLATIONS_DEEP] })),
         this.getAnalyticsCountMap('tour360', ['tour_viewed']),
       ]);
+      const rawTour = tour as unknown as DirectusTour360;
       return transformTour360({
-        ...(tour as DirectusTour360),
-        view_count: Math.max(Number((tour as DirectusTour360).view_count ?? 0), analyticsCounts.get(id) ?? 0),
+        ...rawTour,
+        view_count: Math.max(Number(rawTour.view_count ?? 0), analyticsCounts.get(id) ?? 0),
       } as DirectusTour360);
     } catch (error) { logger.error(`[DirectusClient] Error fetching tour 360 ${id}:`, error); return null; }
   }
