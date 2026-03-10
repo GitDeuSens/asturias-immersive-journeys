@@ -190,7 +190,7 @@ export function XRExperiencesPage() {
 
   // Counts
   const arCount = allItems.filter(i => i.kind === 'ar').length;
-  const vrCount = allItems.filter(i => i.kind === 'vr').length;
+  const vrCount = allItems.filter(i => i.kind === 'vr').length + arScenes.filter(s => !!s.vr_url).length;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
