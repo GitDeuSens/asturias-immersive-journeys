@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, RefreshCw, Smartphone, MapPin } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Smartphone, MapPin, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { trackEvent, trackARStarted, trackARCompleted, trackARError } from '@/lib/analytics';
 // All needle-tools/engine imports are dynamic to avoid pulling three.js+rapier into non-AR pages
@@ -15,6 +15,7 @@ interface NeedleARViewerProps {
   locale?: Language;
   onStart?: () => void;
   onError?: (error: string) => void;
+  onClose?: () => void;
 }
 
 const texts = {
@@ -53,7 +54,7 @@ const texts = {
 };
 
 // Dynamic Viewer
-function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewerProps) {
+function DynamicNeedleViewer({ scene, locale, onStart, onError, onClose }: NeedleARViewerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const initialized = useRef(false);
   const needleRef = useRef<HTMLElement | null>(null);
@@ -293,6 +294,16 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
       >
         <div id="needle-overlay-slot" style={{ display: 'contents' }} />
       </needle-engine>
+      {/* Close button integrated into the viewer's top-right button area */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 z-20 flex items-center justify-center w-10 h-10 rounded-full bg-black/70 text-white hover:bg-black/90 transition-colors"
+          aria-label="Close"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      )}
       <style>{`
         @keyframes needle_spin { to { transform: rotate(360deg); } }
         needle-engine .qr-code-label,
@@ -305,13 +316,13 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
 }
 
 // Main Component
-export function NeedleARViewer({ scene, locale = 'es', onStart, onError }: NeedleARViewerProps) {
+export function NeedleARViewer({ scene, locale = 'es', onStart, onError, onClose }: NeedleARViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   return (
     <motion.div ref={containerRef} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative space-y-4 h-full">
       {/* 3D Preview with built-in AR button inside needle-engine */}
-      <DynamicNeedleViewer scene={scene} locale={locale} onStart={onStart} onError={onError} />
+      <DynamicNeedleViewer scene={scene} locale={locale} onStart={onStart} onError={onError} onClose={onClose} />
 
       {/* Geo-located scene → navigation button */}
       {scene.needle_type === 'geo' && scene.location && (
