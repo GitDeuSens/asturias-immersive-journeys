@@ -141,6 +141,9 @@ function transformVRExperience(vr: DirectusVRExperience): VRExperience {
     apk_version: vr.apk_version,
     apk_size_mb: vr.apk_size_mb,
     web_url: vr.web_url || undefined,
+    glb_url: vr.glb_model ? getDirectusFileUrl(vr.glb_model) : undefined,
+    glb_scale: vr.glb_scale,
+    glb_rotation_y: vr.glb_rotation_y,
     duration_minutes: vr.duration_minutes,
     difficulty: vr.difficulty,
     age_rating: vr.age_rating,
@@ -483,7 +486,8 @@ class DirectusApiClient {
         filter: { status: { _in: API_CONFIG.getStatusFilter() } },
         fields: [
           'id', 'slug', 'category', 'apk_file', 'apk_version', 'apk_size_mb',
-          'web_url', 'thumbnail', 'preview_video', 'duration_minutes', 'difficulty',
+          'web_url', 'thumbnail', 'preview_video', 'glb_model', 'glb_scale', 'glb_rotation_y',
+          'duration_minutes', 'difficulty',
           'age_rating', 'motion_sickness_warning', 'compatible_devices', 'status',
           'created_at', 'updated_at', 'translations.*'
         ] as any,
@@ -497,7 +501,8 @@ class DirectusApiClient {
           filter: { status: { _eq: 'published' } },
           fields: [
             'id', 'slug', 'category', 'apk_file', 'apk_version', 'apk_size_mb',
-            'web_url', 'thumbnail', 'preview_video', 'duration_minutes', 'difficulty',
+            'web_url', 'thumbnail', 'preview_video', 'glb_model', 'glb_scale', 'glb_rotation_y',
+            'duration_minutes', 'difficulty',
             'age_rating', 'motion_sickness_warning', 'compatible_devices', 'status',
             'created_at', 'updated_at'
           ],

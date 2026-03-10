@@ -154,6 +154,9 @@ export interface VRExperience {
   apk_version?: string;
   apk_size_mb?: number;
   web_url?: string;
+  glb_url?: string;
+  glb_scale?: number;
+  glb_rotation_y?: number;
   duration_minutes?: number;
   difficulty?: 'easy' | 'moderate';
   age_rating?: '7+' | '12+' | '16+';

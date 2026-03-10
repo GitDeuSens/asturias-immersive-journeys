@@ -149,6 +149,9 @@ export interface DirectusVRExperience {
   web_url?: string;
   thumbnail?: string;
   preview_video?: string;
+  glb_model?: string;
+  glb_scale?: number;
+  glb_rotation_y?: number;
   duration_minutes?: number;
   difficulty?: 'easy' | 'moderate';
   age_rating?: '7+' | '12+' | '16+';

@@ -1,8 +1,9 @@
 // ============ VR EXPERIENCES PAGE ============
 // Catalog of VR experiences with consistent design matching AR/360 pages
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+const GLBPreviewViewer = lazy(() => import('@/components/GLBPreviewViewer'));
 import {
   Glasses,
   Download,
@@ -18,6 +19,7 @@ import {
   Monitor,
   Maximize2,
   Minimize2,
+  Box,
 } from 'lucide-react';
 import { AppHeader } from '@/components/AppHeader';
 import { SEOHead } from '@/components/SEOHead';
@@ -70,6 +72,7 @@ const texts = {
   tryInBrowser: { es: 'Probar en navegador', en: 'Try in browser', fr: 'Essayer dans le navigateur' },
   webPreview: { es: 'Vista previa interactiva', en: 'Interactive preview', fr: 'Aperçu interactif' },
   videoPreview: { es: 'Video preview', en: 'Video preview', fr: 'Aperçu vidéo' },
+  view3D: { es: 'Vista 3D', en: '3D View', fr: 'Vue 3D' },
   difficulty: {
     easy: { es: 'Fácil', en: 'Easy', fr: 'Facile' },
     moderate: { es: 'Moderado', en: 'Moderate', fr: 'Modéré' },
@@ -382,13 +385,14 @@ function VRDetailModal({
   categoryLabels: Record<string, Record<Language, string>>;
   onClose: () => void;
 }) {
-  const [previewMode, setPreviewMode] = useState<'thumbnail' | 'video' | 'web'>('thumbnail');
+  const [previewMode, setPreviewMode] = useState<'thumbnail' | 'video' | 'web' | '3d'>('thumbnail');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const iframeContainerRef = useRef<HTMLDivElement>(null);
 
   const hasWebUrl = !!experience.web_url;
   const hasVideo = !!experience.preview_video_url;
+  const hasGLB = !!experience.glb_url;
 
   const handleFullscreen = () => {
     const el = iframeContainerRef.current;
@@ -466,6 +470,15 @@ function VRDetailModal({
                     {t(tx.videoPreview)}
                   </button>
                 )}
+                {hasGLB && (
+                  <button
+                    onClick={() => setPreviewMode('3d')}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/20 backdrop-blur-sm text-white font-medium text-sm hover:bg-white/30 transition-colors"
+                  >
+                    <Box className="w-4 h-4" />
+                    {t(tx.view3D)}
+                  </button>
+                )}
               </div>
             </>
           )}
@@ -494,7 +507,17 @@ function VRDetailModal({
             />
           )}
 
-          {/* Controls overlay */}
+          {/* 3D GLB preview */}
+          {previewMode === '3d' && hasGLB && (
+            <Suspense fallback={<div className="w-full h-full bg-[#1a1a2e] flex items-center justify-center"><Box className="w-10 h-10 text-primary/40 animate-pulse" /></div>}>
+              <GLBPreviewViewer
+                glbUrl={experience.glb_url!}
+                scale={experience.glb_scale}
+                rotationY={experience.glb_rotation_y}
+              />
+            </Suspense>
+          )}
+
           <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
             {previewMode === 'web' && (
               <button
@@ -534,9 +557,9 @@ function VRDetailModal({
           )}
 
           {/* Preview mode label */}
-          {previewMode === 'web' && (
+          {(previewMode === 'web' || previewMode === '3d') && (
             <div className="absolute bottom-3 left-3 z-10 px-2 py-1 rounded-md bg-primary/80 text-primary-foreground text-[10px] font-bold uppercase tracking-wider">
-              {t(tx.webPreview)}
+              {previewMode === 'web' ? t(tx.webPreview) : t(tx.view3D)}
             </div>
           )}
         </div>
@@ -616,6 +639,16 @@ function VRDetailModal({
 
         {/* CTA Footer */}
         <div className="p-4 border-t border-border space-y-2">
+          {hasGLB && previewMode !== '3d' && (
+            <Button
+              variant="outline"
+              className="w-full h-12 text-base font-bold"
+              onClick={() => setPreviewMode('3d')}
+            >
+              <Box className="w-5 h-5 mr-2" aria-hidden="true" />
+              {t(tx.view3D)}
+            </Button>
+          )}
           {experience.web_url && previewMode !== 'web' && (
             <Button
               variant="outline"
