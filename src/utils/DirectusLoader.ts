@@ -298,7 +298,7 @@ export async function loadSceneInto(
   if (glbOverride) {
     glbUrl = glbOverride;
     name = slug ?? "override";
-    console.log("[Directus] GLB override:", glbUrl);
+    logger.log("[Directus] GLB override:", glbUrl);
   } else if (slug) {
     const scene = await fetchSceneBySlug(slug);
     if (!scene) {
