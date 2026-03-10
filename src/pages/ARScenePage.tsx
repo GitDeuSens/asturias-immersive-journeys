@@ -4,9 +4,8 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
 import {
-  ArrowLeft, AlertCircle, X, List,
+  ArrowLeft, AlertCircle, X,
 } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { NeedleARViewer } from "@/components/NeedleARViewer";
@@ -19,8 +18,6 @@ import type { ARScene, Language } from "@/lib/types";
 
 const texts = {
   back: { es: "Volver", en: "Back", fr: "Retour" },
-  allAR: { es: "Todas las experiencias", en: "All experiences", fr: "Toutes les expériences" },
-  close: { es: "Cerrar", en: "Close", fr: "Fermer" },
   notFound: { es: "Experiencia no encontrada", en: "Experience not found", fr: "Expérience non trouvée" },
   loading: { es: "Cargando...", en: "Loading...", fr: "Chargement..." },
 };
@@ -132,46 +129,14 @@ export function ARScenePage() {
         type="article"
       />
 
-      {/* Floating top controls */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, duration: 0.3 }}
-        className="absolute top-4 left-4 right-4 z-[100] flex items-center justify-between pointer-events-none"
+      {/* Close button — top-right, next to needle-engine's own fullscreen/AR buttons */}
+      <button
+        onClick={handleClose}
+        className="absolute top-4 right-4 z-[100] flex items-center justify-center w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 transition-colors shadow-lg"
+        aria-label={texts.back[lang]}
       >
-        {/* Left: back + title */}
-        <div className="flex items-center gap-2 pointer-events-auto">
-          <button
-            onClick={handleClose}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 transition-colors shadow-lg"
-            aria-label={texts.back[lang]}
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <span className="text-white text-sm font-semibold drop-shadow-lg truncate max-w-[200px] sm:max-w-[300px]">
-            {title}
-          </span>
-        </div>
-
-        {/* Right: list + close */}
-        <div className="flex items-center gap-2 pointer-events-auto">
-          <button
-            onClick={() => navigate("/ar")}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 transition-colors shadow-lg text-sm"
-            aria-label={texts.allAR[lang]}
-          >
-            <List className="w-4 h-4" />
-            <span className="hidden sm:inline">{texts.allAR[lang]}</span>
-          </button>
-          <button
-            onClick={handleClose}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 transition-colors shadow-lg"
-            aria-label={texts.close[lang]}
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-      </motion.div>
+        <X className="w-5 h-5" />
+      </button>
 
       {/* NeedleARViewer fills the entire screen */}
       <div className="absolute inset-0 z-0">
