@@ -311,15 +311,36 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
               </div>
             )}
 
-            {/* Share buttons */}
+            {/* Weather at start point */}
+            {route.points.length > 0 && route.points[0].location && (
+              <WeatherWidget lat={route.points[0].location.lat} lng={route.points[0].location.lng} />
+            )}
+
+            {/* Multi-day itinerary */}
+            {route.itineraryDays && route.itineraryDays.length > 0 && (
+              <ItineraryTimeline
+                days={route.itineraryDays}
+                points={route.points}
+                lang={lang}
+                onSelectPoint={onSelectPoint}
+              />
+            )}
+
+            {/* Share buttons + QR */}
             <div>
               <p className="text-sm font-semibold text-foreground mb-2">{t('common.share')}</p>
-              <ShareButtons
-                title={route.title[lang]}
-                description={route.shortDescription[lang]}
-                routeCode={route.id}
-                hashtags={['AsturiasParaisoNatural', 'AsturiasInmersivo', route.id.replace('-', '')]}
-              />
+              <div className="flex items-center gap-2">
+                <ShareButtons
+                  title={route.title[lang]}
+                  description={route.shortDescription[lang]}
+                  routeCode={route.id}
+                  hashtags={['AsturiasParaisoNatural', 'AsturiasInmersivo', route.id.replace('-', '')]}
+                />
+                <QRCodeShare
+                  url={`${window.location.origin}/routes/${route.id}`}
+                  title={route.title[lang]}
+                />
+              </div>
             </div>
 
             {/* Points preview (if any) */}
