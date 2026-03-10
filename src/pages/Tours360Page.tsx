@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { View, ChevronRight, X, Filter, Search, Home, Maximize2, Share2, Info, Minimize2, Star } from "lucide-react";
+import { View, ChevronRight, X, Filter, Search, Home, Maximize2, Share2, Info, Minimize2, Bookmark } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { DIRECTUS_URL } from '@/lib/directus-url';
 import { UnifiedSearchBar } from "@/components/UnifiedSearchBar";
@@ -338,7 +338,7 @@ export function Tours360Page() {
               className="mb-6"
             >
               <h2 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
-                <Star className="w-5 h-5 text-warm fill-warm" /> {t(texts.featured)}
+                <Bookmark className="w-4 h-4 text-muted-foreground" /> {t(texts.featured)}
               </h2>
               <HeroCarousel items={carouselItems} />
             </motion.div>
@@ -383,7 +383,10 @@ export function Tours360Page() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.04 * index }}
                 className="group cursor-pointer bg-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-border hover:border-primary"
-                onClick={() => handleTourClick(tour)}
+                onClick={(e) => {
+                  if ((e.target as HTMLElement).closest('[data-favorite-button="true"]')) return;
+                  handleTourClick(tour);
+                }}
               >
                 <div className="relative">
                   <div className="aspect-[16/10] overflow-hidden">
@@ -407,7 +410,14 @@ export function Tours360Page() {
                   </div>
 
                   {/* Favorite button */}
-                  <div className="absolute top-3 right-3 flex gap-2 items-center" onClick={e => { e.stopPropagation(); e.preventDefault(); }}>
+                  <div
+                    data-favorite-button="true"
+                    className="absolute top-3 right-3 z-10 flex gap-2 items-center"
+                    onPointerDown={(e) => {
+                      e.stopPropagation();
+                    }}
+                    onClick={e => { e.stopPropagation(); e.preventDefault(); }}
+                  >
                     {tour.duration_minutes && (
                       <span className="bg-black/60 text-white text-xs px-2 py-1 rounded-full">
                         {tour.duration_minutes} {t(texts.duration)}

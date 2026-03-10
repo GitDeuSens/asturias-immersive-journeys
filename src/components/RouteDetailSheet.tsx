@@ -337,7 +337,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
                   hashtags={['AsturiasParaisoNatural', 'AsturiasInmersivo', route.id.replace('-', '')]}
                 />
                 <QRCodeShare
-                  url={`${window.location.origin}/routes/${route.id}`}
+                  url={`/routes/${route.id}`}
                   title={route.title[lang]}
                 />
               </div>

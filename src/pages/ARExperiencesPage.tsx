@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, Clock, MapPin, ChevronRight, Home, Star } from "lucide-react";
+import { Sparkles, Clock, MapPin, ChevronRight, Home, Bookmark } from "lucide-react";
 import { UnifiedSearchBar, type CustomFilter } from "@/components/UnifiedSearchBar";
 import { TourCardSkeleton } from "@/components/SkeletonCard";
 import { HeroCarousel } from "@/components/HeroCarousel";
@@ -154,7 +154,7 @@ export function ARExperiencesPage() {
               className="mb-6"
             >
               <h2 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
-                <Star className="w-5 h-5 text-warm fill-warm" /> {t(texts.featured)}
+                <Bookmark className="w-4 h-4 text-muted-foreground" /> {t(texts.featured)}
               </h2>
               <HeroCarousel items={carouselItems} />
             </motion.div>
@@ -224,24 +224,34 @@ export function ARExperiencesPage() {
                       </div>
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                      <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                      <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5">
                         <Badge className="bg-primary/90 text-primary-foreground">
                           <Sparkles className="w-3 h-3 mr-1" />AR
                         </Badge>
                         <PopularityBadge launchCount={scene.launch_count} />
                       </div>
 
-                      <div className="absolute top-3 right-3 flex items-center gap-2" onClick={e => e.preventDefault()}>
+                      <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
                         <Badge variant="secondary" className="bg-card/90">
                           {texts.arType[scene.needle_type][locale]}
                         </Badge>
-                        <FavoriteButton
-                          id={scene.id}
-                          type="ar"
-                          title={scene.title[locale] || scene.title.es}
-                          image={scene.preview_image}
-                          size="sm"
-                        />
+                        <div
+                          onPointerDown={(e) => {
+                            e.stopPropagation();
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                          }}
+                        >
+                          <FavoriteButton
+                            id={scene.id}
+                            type="ar"
+                            title={scene.title[locale] || scene.title.es}
+                            image={scene.preview_image}
+                            size="sm"
+                          />
+                        </div>
                       </div>
 
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
