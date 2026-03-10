@@ -639,6 +639,16 @@ function VRDetailModal({
 
         {/* CTA Footer */}
         <div className="p-4 border-t border-border space-y-2">
+          {hasGLB && previewMode !== '3d' && (
+            <Button
+              variant="outline"
+              className="w-full h-12 text-base font-bold"
+              onClick={() => setPreviewMode('3d')}
+            >
+              <Box className="w-5 h-5 mr-2" aria-hidden="true" />
+              {t(tx.view3D)}
+            </Button>
+          )}
           {experience.web_url && previewMode !== 'web' && (
             <Button
               variant="outline"
