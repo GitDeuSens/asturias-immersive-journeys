@@ -4,9 +4,8 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
 import {
-  ArrowLeft, AlertCircle, X, List,
+  ArrowLeft, AlertCircle, X,
 } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { NeedleARViewer } from "@/components/NeedleARViewer";
