@@ -33,6 +33,7 @@ const resources = {
       "nav.vrExperiences": "Experiencias VR",
       "nav.arExperiences": "Experiencias AR",
       "nav.help": "Ayuda",
+      "nav.switchMode": "Cambiar modo de exploración",
 
       // Header
       "header.asturiasInmersivo": "Asturias Inmersivo",
