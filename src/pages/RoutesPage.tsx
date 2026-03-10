@@ -12,6 +12,7 @@ import { RouteExplorerView } from "@/components/RouteExplorerView";
 import { PointDetailSheet } from "@/components/PointDetailSheet";
 import { SEOHead } from "@/components/SEOHead";
 import { Footer } from "@/components/Footer";
+import { RouteCardSkeleton } from "@/components/SkeletonCard";
 import type { ImmersiveRoute, RoutePoint } from "@/data/types";
 import { useImmersiveRoutes, useDirectusCategories, useDirectusPOIs, directusRouteToImmersive } from "@/hooks/useDirectusData";
 import { useGeolocation } from "@/hooks/useGeolocation";
@@ -671,7 +672,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
               >
                 {/* Header */}
                 <div className="flex items-center justify-between">
-                  <h2 className="text-3xl font-bold text-foreground">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
                     {viewMode === 'points' ? t("routes.pointsTitle") : t("routes.title")}
                   </h2>
                   <span className="text-xs text-muted-foreground" aria-live="polite">
@@ -733,6 +734,13 @@ export const RoutesPage = React.memo(function RoutesPage() {
 
                 {/* Content list */}
                 <div className="space-y-3 mt-5">
+                  {routesLoading ? (
+                    <div className="space-y-3">
+                      {Array.from({ length: 4 }).map((_, i) => (
+                        <RouteCardSkeleton key={i} />
+                      ))}
+                    </div>
+                  ) : (
                   <AnimatePresence mode="wait">
                   {viewMode === 'routes' ? (
                     <motion.div key="routes-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="space-y-3">
@@ -769,7 +777,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                         >
                           <div className="flex gap-3 p-3">
                             <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-muted">
-                              <img src={imgSrc} alt={pointTitle} className="w-full h-full object-cover" />
+                              <img src={imgSrc} alt={pointTitle} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <h3 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1">
@@ -785,6 +793,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                     </motion.div>
                   )}
                   </AnimatePresence>
+                  )}
                 </div>
               </motion.div>
             )}

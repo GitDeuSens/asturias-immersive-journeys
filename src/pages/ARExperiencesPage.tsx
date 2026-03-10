@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Sparkles, Clock, MapPin, ChevronRight, Filter, Home } from "lucide-react";
+import { TourCardSkeleton } from "@/components/SkeletonCard";
 import { AppHeader } from "@/components/AppHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -153,8 +154,10 @@ export function ARExperiencesPage() {
 
           {/* Loading state */}
           {isLoading && (
-            <div className="flex items-center justify-center py-12">
-              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <TourCardSkeleton key={i} />
+              ))}
             </div>
           )}
 
@@ -186,10 +189,15 @@ export function ARExperiencesPage() {
                     className="group block bg-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-border hover:border-primary"
                   >
                     <div className="relative">
-                      <div
-                        className="aspect-[16/10] bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-                        style={{ backgroundImage: `url(${scene.preview_image})` }}
-                      />
+                      <div className="aspect-[16/10] overflow-hidden">
+                        <img
+                          src={scene.preview_image}
+                          alt={scene.title[locale] || scene.title.es}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
                       {/* AR badge */}
