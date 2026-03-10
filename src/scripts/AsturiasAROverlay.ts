@@ -644,6 +644,7 @@ export class AsturiasAROverlay extends Behaviour {
         const btnSt  = `display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);color:#fff;transition:all 0.15s ease;`;
         const share  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>`;
         const fs     = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>`;
+        const closeIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
         bar.style.cssText = `position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:linear-gradient(to bottom,rgba(0,0,0,0.8),transparent);pointer-events:auto;z-index:${ASTURIAS.zIndex.controls};animation:ast-fade-up 0.3s ease forwards;font-family:${ASTURIAS.fonts.family};`;
         bar.innerHTML = `
             <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;">
@@ -654,6 +655,7 @@ export class AsturiasAROverlay extends Behaviour {
                 <button id="ast-hdr-info"       style="${btnSt}">${this._icon('info')}</button>
                 <button id="ast-hdr-share"      style="${btnSt}">${share}</button>
                 <button id="ast-hdr-fullscreen" style="${btnSt}">${fs}</button>
+                <button id="ast-hdr-close"      style="${btnSt}">${closeIcon}</button>
             </div>
         `;
         root.appendChild(bar);
