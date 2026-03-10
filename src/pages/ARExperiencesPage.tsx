@@ -59,7 +59,18 @@ export function ARExperiencesPage() {
   const locale = language as Language;
   const [scenes, setScenes] = useState<ARScene[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "slam" | "image-tracking" | "geo">("all");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+
+  const arTypeFilters: CustomFilter[] = [
+    { id: 'slam', label: texts.arTypes.slam },
+    { id: 'image-tracking', label: texts.arTypes['image-tracking'] },
+    { id: 'geo', label: texts.arTypes.geo },
+  ];
+
+  const toggleType = (id: string) => {
+    setSelectedTypes(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  };
 
   useEffect(() => {
     async function loadScenes() {
@@ -76,7 +87,20 @@ export function ARExperiencesPage() {
     loadScenes();
   }, [locale]);
 
-  const filteredScenes = filter === "all" ? scenes : scenes.filter((s) => s.needle_type === filter);
+  const filteredScenes = (() => {
+    let filtered = scenes;
+    if (selectedTypes.length > 0) {
+      filtered = filtered.filter(s => selectedTypes.includes(s.needle_type));
+    }
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(s => {
+        const title = s.title[locale] || s.title.es || '';
+        return title.toLowerCase().includes(q) || title.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().includes(q);
+      });
+    }
+    return filtered;
+  })();
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
