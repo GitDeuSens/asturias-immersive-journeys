@@ -1,20 +1,49 @@
-import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Facebook, Twitter } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Facebook, Twitter, Menu, X, View, Map, Sparkles, Glasses, Home, ArrowLeftRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SettingsDropdown } from "@/components/SettingsDropdown";
+
 interface AppHeaderProps {
   showRestart?: boolean;
   variant?: "light" | "dark";
-  routes?: any
-  markerRoute?: any
-  mapReference?: any
+  routes?: any;
+  markerRoute?: any;
+  mapReference?: any;
 }
 
-export function AppHeader({ showRestart = true, variant = "light", routes = {}, markerRoute, mapReference }: AppHeaderProps) {
+const navItems = [
+  { key: "nav.home", path: "/experience", icon: Home },
+  { key: "nav.tours360", path: "/tours", icon: View },
+  { key: "nav.routes", path: "/routes", icon: Map },
+  { key: "nav.arExperiences", path: "/ar", icon: Sparkles },
+  { key: "nav.vrExperiences", path: "/vr", icon: Glasses },
+];
+
+export function AppHeader({ showRestart = true, variant = "light" }: AppHeaderProps) {
   const { t, i18n } = useTranslation();
-  const lang = i18n.language as 'es' | 'en' | 'fr';
   const navigate = useNavigate();
+  const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    if (menuOpen) document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [menuOpen]);
+
+  // Close menu on route change
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -20 }}
@@ -22,11 +51,10 @@ export function AppHeader({ showRestart = true, variant = "light", routes = {}, 
       transition={{ duration: 0.4 }}
       className="fixed top-0 left-0 right-0 z-50"
     >
-      {/* Social bar — hidden on mobile to save space */}
+      {/* Social bar — hidden on mobile */}
       <div className="hidden md:block bg-asturias-dark border-t-[8px] border-primary">
         <div className="container flex mx-auto pl-4 px-2 justify-between">
-          <div className="w-[33px] h-[48px] bg-primary absolute top-2">
-          </div>
+          <div className="w-[33px] h-[48px] bg-primary absolute top-2" />
           <div className="container mx-auto pl-4 px-2 py-1.5 flex justify-end gap-2">
             <a
               href="https://facebook.com"
@@ -53,23 +81,104 @@ export function AppHeader({ showRestart = true, variant = "light", routes = {}, 
       {/* Main header */}
       <div className="bg-accent text-accent-foreground">
         <div className="container mx-auto px-3 sm:px-4 py-2 md:py-3 flex items-center justify-between gap-2">
-          {/* Logo section */}
+          {/* Logo */}
           <Link to="/experience" className="flex items-center gap-2 sm:gap-3 group shrink min-w-0" aria-label="Asturias Inmersivo - Inicio">
             <svg fill="white" viewBox="0 0 33 60" className="w-5 h-9 sm:w-6 sm:h-10 md:w-7 md:h-12 shrink-0">
-              <path d="M16.483 60a9.972 9.972 0 0 0-7.865-3.78 8.585 8.585 0 0 1-6.1-2.541A8.658 8.658 0 0 1 0 47.546v-27.4h32.976v27.402a8.684 8.684 0 0 1-2.527 6.117 8.609 8.609 0 0 1-6.091 2.538 9.972 9.972 0 0 0-5.89 1.89A10.186 10.186 0 0 0 16.483 60ZM2.474 47.547a6.184 6.184 0 0 0 1.803 4.356 6.13 6.13 0 0 0 4.341 1.804c1.806-.004 3.592.39 5.23 1.153.888.408 1.725.918 2.494 1.521l.141.114.15-.114a12.573 12.573 0 0 1 7.725-2.674 6.13 6.13 0 0 0 4.335-1.807 6.183 6.183 0 0 0 1.8-4.353V22.61H2.473v24.936Zm4.46-29.944v-2.485h19.202v2.485H6.934Zm20.632-4.941v-2.74a2.758 2.758 0 0 1 .457-1.53 2.727 2.727 0 0 1 4.213-.427 2.753 2.753 0 0 1 .598 2.997 2.746 2.746 0 0 1-1.008 1.236 2.73 2.73 0 0 1-1.522.464h-2.738Zm-9.756 0V8.967c.002-.976.39-1.91 1.078-2.6a3.661 3.661 0 0 1 2.591-1.075h3.679v3.694c0 .975-.386 1.91-1.072 2.599a3.652 3.652 0 0 1-2.588 1.077H17.81Zm-6.2 0a3.67 3.67 0 0 1-2.598-1.08 3.702 3.702 0 0 1-1.08-2.605V5.32h3.64a3.67 3.67 0 0 1 2.598 1.079 3.703 3.703 0 0 1 1.08 2.606v3.657h-3.64Zm-8.872 0a2.712 2.712 0 0 1-1.514-.457A2.741 2.741 0 0 1 .806 8a2.715 2.715 0 0 1 2.967-.59 2.728 2.728 0 0 1 1.674 2.53v2.722h-2.71Zm13.792-8.4a.31.31 0 0 1-.216-.095l-1.816-1.814a.312.312 0 0 1 0-.444L16.314.095A.273.273 0 0 1 16.53 0a.31.31 0 0 1 .226.095l1.806 1.795a.313.313 0 0 1 .095.217.331.331 0 0 1-.095.227l-1.806 1.833a.347.347 0 0 1-.226.095Zm-3.584 38.532-.715-1.22-.81-1.407a.387.387 0 0 0-.535-.148.387.387 0 0 0-.142.148l-.818 1.408-.753 1.294c-.056.104-.103.331 0 .407a.293.293 0 0 0 .188.18c0 .094.442.056.508 0l.395-.143.18-.056a2.624 2.624 0 0 1 1.27 0l.263.085.3.104c.085.075.603.085.575 0a.197.197 0 0 0 .094-.057c.094-.142.075-.454 0-.595Zm10.735-1.04a2.16 2.16 0 0 0-.113-.708 2.576 2.576 0 0 0-.254-.51.452.452 0 0 0-.395-.218h-2.324a.469.469 0 0 0-.395.208 2.15 2.15 0 0 0-.367 1.228 2.3 2.3 0 0 0 .094.69c.07.251.218.473.423.633.228.17.507.256.79.246h1.223a1.19 1.19 0 0 0 1.214-.87c.073-.225.108-.461.104-.699Zm3.292-5.225-1.335-1.795a.859.859 0 0 0-.918-.325.852.852 0 0 0-.306.155l-1.25 1.001H17.97v-6.84l1.016-1.323a.872.872 0 0 0-.17-1.2l-1.787-1.333a.872.872 0 0 0-1.035 0l-1.787 1.333a.86.86 0 0 0-.151 1.2l.997 1.322v6.841H9.88l-1.252-1.001a.853.853 0 0 0-1.223.17l-1.336 1.795a.872.872 0 0 0 0 1.03l1.336 1.805a.866.866 0 0 0 1.223.16l1.252-1.001h5.174v10.394l-1.072 1.341a.625.625 0 0 0 .423 1.002c1.396.132 2.8.132 4.196 0a.62.62 0 0 0 .504-.376.626.626 0 0 0-.08-.626l-1.054-1.323V38.542h5.193l1.298.983a.866.866 0 0 0 1.224-.161l1.335-1.805a.872.872 0 0 0-.047-1.03Z"></path>
+              <path d="M16.483 60a9.972 9.972 0 0 0-7.865-3.78 8.585 8.585 0 0 1-6.1-2.541A8.658 8.658 0 0 1 0 47.546v-27.4h32.976v27.402a8.684 8.684 0 0 1-2.527 6.117 8.609 8.609 0 0 1-6.091 2.538 9.972 9.972 0 0 0-5.89 1.89A10.186 10.186 0 0 0 16.483 60ZM2.474 47.547a6.184 6.184 0 0 0 1.803 4.356 6.13 6.13 0 0 0 4.341 1.804c1.806-.004 3.592.39 5.23 1.153.888.408 1.725.918 2.494 1.521l.141.114.15-.114a12.573 12.573 0 0 1 7.725-2.674 6.13 6.13 0 0 0 4.335-1.807 6.183 6.183 0 0 0 1.8-4.353V22.61H2.473v24.936Zm4.46-29.944v-2.485h19.202v2.485H6.934Zm20.632-4.941v-2.74a2.758 2.758 0 0 1 .457-1.53 2.727 2.727 0 0 1 4.213-.427 2.753 2.753 0 0 1 .598 2.997 2.746 2.746 0 0 1-1.008 1.236 2.73 2.73 0 0 1-1.522.464h-2.738Zm-9.756 0V8.967c.002-.976.39-1.91 1.078-2.6a3.661 3.661 0 0 1 2.591-1.075h3.679v3.694c0 .975-.386 1.91-1.072 2.599a3.652 3.652 0 0 1-2.588 1.077H17.81Zm-6.2 0a3.67 3.67 0 0 1-2.598-1.08 3.703 3.703 0 0 1-1.08-2.605V5.32h3.64a3.67 3.67 0 0 1 2.598 1.079 3.703 3.703 0 0 1 1.08 2.606v3.657h-3.64Zm-8.872 0a2.712 2.712 0 0 1-1.514-.457A2.741 2.741 0 0 1 .806 8a2.715 2.715 0 0 1 2.967-.59 2.728 2.728 0 0 1 1.674 2.53v2.722h-2.71Zm13.792-8.4a.31.31 0 0 1-.216-.095l-1.816-1.814a.312.312 0 0 1 0-.444L16.314.095A.273.273 0 0 1 16.53 0a.31.31 0 0 1 .226.095l1.806 1.795a.313.313 0 0 1 .095.217.331.331 0 0 1-.095.227l-1.806 1.833a.347.347 0 0 1-.226.095Zm-3.584 38.532-.715-1.22-.81-1.407a.387.387 0 0 0-.535-.148.387.387 0 0 0-.142.148l-.818 1.408-.753 1.294c-.056.104-.103.331 0 .407a.293.293 0 0 0 .188.18c0 .094.442.056.508 0l.395-.143.18-.056a2.624 2.624 0 0 1 1.27 0l.263.085.3.104c.085.075.603.085.575 0a.197.197 0 0 0 .094-.057c.094-.142.075-.454 0-.595Zm10.735-1.04a2.16 2.16 0 0 0-.113-.708 2.576 2.576 0 0 0-.254-.51.452.452 0 0 0-.395-.218h-2.324a.469.469 0 0 0-.395.208 2.15 2.15 0 0 0-.367 1.228 2.3 2.3 0 0 0 .094.69c.07.251.218.473.423.633.228.17.507.256.79.246h1.223a1.19 1.19 0 0 0 1.214-.87c.073-.225.108-.461.104-.699Zm3.292-5.225-1.335-1.795a.859.859 0 0 0-.918-.325.852.852 0 0 0-.306.155l-1.25 1.001H17.97v-6.84l1.016-1.323a.872.872 0 0 0-.17-1.2l-1.787-1.333a.872.872 0 0 0-1.035 0l-1.787 1.333a.86.86 0 0 0-.151 1.2l.997 1.322v6.841H9.88l-1.252-1.001a.853.853 0 0 0-1.223.17l-1.336 1.795a.872.872 0 0 0 0 1.03l1.336 1.805a.866.866 0 0 0 1.223.16l1.252-1.001h5.174v10.394l-1.072 1.341a.625.625 0 0 0 .423 1.002c1.396.132 2.8.132 4.196 0a.62.62 0 0 0 .504-.376.626.626 0 0 0-.08-.626l-1.054-1.323V38.542h5.193l1.298.983a.866.866 0 0 0 1.224-.161l1.335-1.805a.872.872 0 0 0-.047-1.03Z" />
             </svg>
             <span className="hidden sm:block text-xs md:text-sm max-w-[160px] md:max-w-[200px] leading-tight font-semibold">
               {t("common.title")}
             </span>
           </Link>
 
+          {/* Desktop nav links */}
+          <nav className="hidden lg:flex items-center gap-1" aria-label={t("a11y.mainNavigation")}>
+            {navItems.map(({ key, path, icon: Icon }) => {
+              const isActive = location.pathname === path || (path !== "/experience" && location.pathname.startsWith(path));
+              return (
+                <Link
+                  key={path}
+                  to={path}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px] ${
+                    isActive
+                      ? "bg-white/20 text-white"
+                      : "text-white/70 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  <Icon className="w-4 h-4" aria-hidden="true" />
+                  {t(key)}
+                </Link>
+              );
+            })}
+          </nav>
+
           {/* Right side controls */}
-          <div className="flex items-center gap-3">
-            {/* Settings dropdown (language) */}
+          <div className="flex items-center gap-2">
             <SettingsDropdown variant="light" />
+
+            {/* Hamburger menu button — visible on mobile & tablet */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-white"
+              aria-label={menuOpen ? t("a11y.closeMenu") : t("a11y.openMenu")}
+              aria-expanded={menuOpen}
+            >
+              {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile menu dropdown */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            ref={menuRef}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="lg:hidden bg-accent border-t border-white/10 shadow-xl"
+          >
+            <nav className="container mx-auto px-4 py-3 space-y-1" aria-label={t("a11y.mainNavigation")}>
+              {navItems.map(({ key, path, icon: Icon }) => {
+                const isActive = location.pathname === path || (path !== "/experience" && location.pathname.startsWith(path));
+                return (
+                  <Link
+                    key={path}
+                    to={path}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-colors min-h-[48px] ${
+                      isActive
+                        ? "bg-white/20 text-white"
+                        : "text-white/80 hover:text-white hover:bg-white/10"
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" aria-hidden="true" />
+                    {t(key)}
+                  </Link>
+                );
+              })}
+
+              {/* Switch mode button */}
+              <button
+                onClick={() => {
+                  localStorage.removeItem("asturias-mode");
+                  navigate("/experience");
+                  setMenuOpen(false);
+                }}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-white/60 hover:text-white hover:bg-white/10 transition-colors w-full min-h-[48px]"
+              >
+                <ArrowLeftRight className="w-5 h-5" aria-hidden="true" />
+                {i18n.language === "es"
+                  ? "Cambiar modo de exploración"
+                  : i18n.language === "fr"
+                    ? "Changer le mode d'exploration"
+                    : "Switch exploration mode"}
+              </button>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 }
