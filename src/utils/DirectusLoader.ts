@@ -315,7 +315,7 @@ export async function loadSceneInto(
     name = scene.slug;
     logger.log(`[Directus] Loading '${name}':`, glbUrl);
   } else {
-    console.warn("[Directus] No slug or glb param provided");
+    if (import.meta.env.DEV) console.warn("[Directus] No slug or glb param provided");
     return;
   }
 

@@ -94,7 +94,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
         setLoadedARScene(scenes[0]);
       }
     } catch (err: any) {
-      console.error('[PointDetailSheet] Failed to load AR scene:', err);
+      if (import.meta.env.DEV) console.error('[PointDetailSheet] Failed to load AR scene:', err);
       setArSceneError(err?.message || 'Failed to load AR scene');
     } finally {
       setArSceneLoading(false);

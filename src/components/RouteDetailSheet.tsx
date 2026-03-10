@@ -88,13 +88,11 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
   };
 
   const handleNavigateToStart = () => {
-    if (route.polyline.length > 0) {
+    if (route.polyline.length > 0 && route.points.length > 0) {
       const start = route.points[0].location;
       openNavigation(start.lat, start.lng, route.title[lang]);
     }
   };
-
-
 
   return (
     <AnimatePresence>
@@ -135,7 +133,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
           role="img"
           aria-label={route.title[lang]}
         >
-          <div className="absolute inset-0 from-background via-background/20 to-transparent" aria-hidden="true" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" aria-hidden="true" />
 
           {/* Close button */}
           <button
@@ -145,13 +143,6 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
           >
             <X className="w-5 h-5" />
           </button>
-
-          {/* Route ID */}
-          <span className="hidden absolute top-4 left-4 px-3 py-1.5 rounded-lg bg-background/80 backdrop-blur-sm text-foreground text-sm font-bold shadow-lg">
-            {route.id}
-          </span>
-
-
         </div>
 
         {/* Scrollable content */}
@@ -236,13 +227,12 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
               </p>
             </div>
 
-            {/* Navigation button - NEW */}
+            {/* Navigation button */}
             {route.polyline.length > 0 && (
               <Button
                 variant="outline"
-                className="w-100 justify-between"
+                className="w-full justify-between"
                 onClick={handleNavigateToStart}
-                style={{ width: '100%' }}
               >
                 <span className="flex items-center gap-2">
                   <Navigation className="w-4 h-4" aria-hidden="true" />
@@ -252,20 +242,21 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
               </Button>
             )}
 
-            {/* Categories */}
+            {/* Categories with labels */}
             <div className="flex flex-wrap gap-2">
               {route.categoryIds.map(catId => {
                 const cat = getCategoryById(catId);
                 const IconComponent = iconMap[cat?.icon] || Tag;
                 return cat ? (
-                  <span className="px-1.5 py-1.5 border text-xs" style={{ borderRadius: '300px' }}>
-                    <IconComponent className="w-4 h-4" />
+                  <span key={catId} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium text-foreground">
+                    <IconComponent className="w-3.5 h-3.5" />
+                    {cat.label[lang] || cat.label.es || cat.label.en}
                   </span>
                 ) : null;
               })}
             </div>
 
-            {/* Share buttons - NEW */}
+            {/* Share buttons */}
             <div>
               <p className="text-sm font-semibold text-foreground mb-2">{t('common.share')}</p>
               <ShareButtons
@@ -286,11 +277,6 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
                   {route.points.map((point, idx) => (
                     <PointPreviewCard key={point.id} point={point} index={idx} lang={lang} onClick={() => onSelectPoint?.(point)} />
                   ))}
-                  {route.points.length > 3 && (
-                    <p className="text-xs text-muted-foreground text-center py-2">
-                      +{route.points.length - 3} más...
-                    </p>
-                  )}
                 </div>
               </div>
             )}
@@ -336,7 +322,7 @@ function PointPreviewCard({ point, index, lang, onClick }: { point: RoutePoint; 
   const colors = typeColors[primaryType];
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50 cursor-pointer hover:bg-muted/50 transition-colors" style={{ width: '100%' }} onClick={onClick}>
+    <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50 cursor-pointer hover:bg-muted/50 transition-colors w-full" onClick={onClick}>
       {/* Thumbnail */}
       <div className="relative flex-shrink-0">
         <div

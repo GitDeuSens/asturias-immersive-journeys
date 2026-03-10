@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { motion, AnimatePresence, progress } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft,
   MapPin,
@@ -17,7 +17,6 @@ import {
   Navigation,
   Footprints,
   Home,
-  Share,
   Share2,
   Mountain,
   Ruler
@@ -46,6 +45,7 @@ import {
   BreadcrumbPage,
 } from '@/components/ui/breadcrumb';
 import { calculateRouteDistance, formatDistance, openNavigation } from '@/lib/mapUtils';
+import { ShareButtons } from '@/components/ShareButtons';
 
 
 interface RouteExplorerViewProps {
@@ -69,12 +69,18 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   const { latitude, longitude, hasLocation } = useGeolocation();
   const [visitedPoints, setVisitedPoints] = useState<Set<string>>(new Set());
   const [routeStartTime] = useState(Date.now());
-  const [copied, setCopied] = useState(false);
   const navigate = useNavigate();
-  const shareUrl = window.location.href;
-  const isCopy = false;
 
-  const progress = route.points.length > 0
+  // Early return if no route
+  if (!route) {
+    return (
+      <div className="flex items-center justify-center h-full p-8">
+        <p className="text-muted-foreground">{t('routes.noRouteSelected')}</p>
+      </div>
+    );
+  }
+
+  const routeProgress = route.points.length > 0
     ? Math.round((visitedPoints.size / route.points.length) * 100)
     : 0;
 
@@ -123,11 +129,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   const nearestPoint = nextRoutePoint;
 
   const handlePointClick = (point: RoutePoint) => {
-    /*if (!visitedPoints.has(point.id)) {
-      trackPOIViewed(point.id, getText(point.title, lang), route.id);
-    }
-    setVisitedPoints(prev => new Set([...prev, point.id]));*/
-    onSelectPoint(point);
+    onSelectPoint?.(point);
   };
 
   const handleToggleVisited = (pointId: string) => {
@@ -143,15 +145,10 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   };
 
   const handleNavigateToStart = () => {
-    if (route.polyline.length > 0) {
+    if (route.polyline.length > 0 && route.points.length > 0) {
       const start = route.points[0].location;
       openNavigation(start.lat, start.lng, route.points[0].title[lang]);
     }
-  };
-
-  const handleCopyLink = async () => {
-    navigator.clipboard.writeText(shareUrl);
-    setCopied(true);
   };
 
   useEffect(() => {
@@ -183,7 +180,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
             <BreadcrumbItem>
               <BreadcrumbLink
                 href="#"
-                onClick={(e) => { e.preventDefault(); onBack(); }}
+                onClick={(e) => { e.preventDefault(); onBack?.(); }}
                 className="text-xs"
               >
                 {t('routes.title')}
@@ -227,9 +224,6 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
             style={{ backgroundImage: `url(${route.coverImage})` }}
           />
           <div className="flex-1 min-w-0">
-            <span className="hidden text-[10px] font-bold text-primary uppercase tracking-wider">
-              {t('routes.exploring')}
-            </span>
             <h2 className="font-sans font-bold text-foreground text-xl leading-tight truncate">
               {getText(route.title, lang)}
             </h2>
@@ -315,23 +309,28 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
         </div>
         <div className='flex flex-wrap gap-3 justify-end mt-4 sm:mt-6'>
           <div className='cursor-pointer' onClick={handleNavigateToStart}>
-            <span className='flex' style={{ alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}><Navigation className="w-6 h-6" /> {t('routes.howToGet')}</span>
-          </div>
-          <div className='cursor-pointer' onClick={handleCopyLink}>
-            <span className='flex' style={{ alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}><Share2 className="w-6 h-6" /> {t('share.title')}</span>
-
+            <span className='flex items-center gap-1.5'><Navigation className="w-6 h-6" /> {t('routes.howToGet')}</span>
           </div>
         </div>
-        {copied ? (
-          <small>Enlace copiado</small>
-        ) : ''}
+
+        {/* Share */}
+        <div>
+          <p className="text-sm font-semibold text-foreground mb-2">{t('common.share')}</p>
+          <ShareButtons
+            title={getText(route.title, lang)}
+            description={getText(route.shortDescription, lang)}
+            routeCode={route.id}
+            hashtags={['AsturiasParaisoNatural', 'AsturiasInmersivo']}
+          />
+        </div>
+
         {route.points.length > 0 && (
           <div className="space-y-1">
             <div className="flex items-center justify-between text-xs">
               <span className="text-muted-foreground">{t('routes.progress')}</span>
-              <span className="font-bold text-primary">{progress}%</span>
+              <span className="font-bold text-primary">{routeProgress}%</span>
             </div>
-            <Progress value={progress} className="h-2" />
+            <Progress value={routeProgress} className="h-2" />
           </div>
         )}
       </div>
@@ -340,7 +339,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-2">
           {/* Next point suggestion or completion CTA */}
-          {progress === 100 ? (
+          {routeProgress === 100 ? (
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -399,7 +398,6 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
                 isNearest={nearestPoint?.id === point.id}
                 distanceInfo={pointDistances.get(point.id)}
                 routeId={route.id}
-                progress={progress}
                 onClick={() => handlePointClick(point)}
                 onToggleVisited={() => handleToggleVisited(point.id)}
               />
@@ -431,10 +429,9 @@ interface PointCardProps {
   routeId: string;
   onClick: () => void;
   onToggleVisited: () => void;
-  progress: any;
 }
 
-function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNearest, distanceInfo, routeId, onClick, onToggleVisited, progress }: PointCardProps) {
+function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNearest, distanceInfo, routeId, onClick, onToggleVisited }: PointCardProps) {
   const { t } = useTranslation();
   const content = point.content;
 
@@ -466,7 +463,7 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
       </div>
 
       {/* Card */}
-      <div style={{ width: '100%' }}>
+      <div className="w-full">
         {isVisited && (
           <Check
             style={{ position: 'absolute', right: '5px', top: '5px', padding: '5px' }}
@@ -480,12 +477,12 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
         <motion.button
           initial={{ opacity: 0, x: -8 }}
           animate={{ opacity: 1, x: 0 }}
-          style={{ width: '100%' }}
+          className="w-full"
           transition={{ delay: index * 0.04, duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
           onClick={() => {
             onClick();
           }}
-          className={`flex-1 mb-3 rounded-xl overflow-hidden transition-all text-left border ${isSelected
+          className={`w-full mb-3 rounded-xl overflow-hidden transition-all text-left border ${isSelected
             ? 'border-primary bg-primary/10 shadow-md'
             : isNearest && !hasAR && !has360
               ? 'border-accent bg-accent/10 shadow-md'
@@ -533,14 +530,18 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
                 {hasPDF && <FileText className="w-3.5 h-3.5 text-muted-foreground" />}
               </div>
 
-              {isVisited ? <button onClick={(e) => {
-                e.stopPropagation();
-                onToggleVisited();
-              }} className='text-xs text-base'>{t('poi.unvisited')}</button>
-                : <button onClick={(e) => {
+              {/* Fixed: visited = mark as unvisited, unvisited = mark as visited */}
+              {isVisited ? (
+                <button onClick={(e) => {
                   e.stopPropagation();
                   onToggleVisited();
-                }} className='text-xs text-primary'>{t('poi.visited')}</button>}
+                }} className='text-xs text-primary font-medium'>{t('poi.markUnvisited')}</button>
+              ) : (
+                <button onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleVisited();
+                }} className='text-xs text-muted-foreground'>{t('poi.markVisited')}</button>
+              )}
 
               {distanceInfo && (
                 <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground font-medium">

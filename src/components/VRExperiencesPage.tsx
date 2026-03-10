@@ -36,7 +36,7 @@ export function VRExperiencesPage() {
         const data = await getVRExperiences(lang);
         setVrExperiences(data);
       } catch (err) {
-        console.error('[VRExperiencesPage] Error loading VR experiences:', err);
+        if (import.meta.env.DEV) console.error('[VRExperiencesPage] Error loading VR experiences:', err);
         setVrExperiences([]);
       } finally {
         setLoading(false);

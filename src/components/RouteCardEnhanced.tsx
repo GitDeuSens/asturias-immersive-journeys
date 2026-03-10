@@ -59,10 +59,6 @@ const RouteCardComponent = forwardRef<HTMLButtonElement, RouteCardProps>(functio
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           aspectRatio="aspect-[16/9]"
         />
-        {/* Route ID badge */}
-        <span className="hidden absolute top-2 left-2 px-2 py-1 rounded-md bg-black/60 backdrop-blur-sm text-white text-xs font-bold">
-          {route.id}
-        </span>
 
         {/* Circular badge */}
         {route.isCircular && (
@@ -134,21 +130,22 @@ const RouteCardComponent = forwardRef<HTMLButtonElement, RouteCardProps>(functio
           {/* Difficulty */}
           {route.difficulty && (
             <span
-              className={`px-2 py-0.5 rounded-md text-sm text-[10px] font-bold border ${difficultyColors[route.difficulty]}`}
+              className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${difficultyColors[route.difficulty]}`}
             >
               {t(`difficulty.${route.difficulty}`)}
             </span>
           )}
 
-          {/* Categories */}
-          <div className="flex items-center justify-between" style={{ width: '100%' }}>
-            <div className="flex gap-3 w-64">
+          {/* Categories with labels */}
+          <div className="flex items-center justify-between w-full">
+            <div className="flex gap-2 flex-wrap">
               {route.categoryIds.map(catId => {
                 const cat = getCategoryById(catId);
                 const IconComponent = iconMap[cat?.icon] || Tag;
                 return cat ? (
-                  <span className="px-1.5 py-1.5 border text-xs" style={{ borderRadius: '300px' }}>
-                    <IconComponent className="w-4 h-4" />
+                  <span key={catId} className="inline-flex items-center gap-1 px-2 py-1 rounded-full border text-[10px] font-medium text-muted-foreground">
+                    <IconComponent className="w-3 h-3" />
+                    {cat.label[lang] || cat.label.es || cat.label.en}
                   </span>
                 ) : null;
               })}
