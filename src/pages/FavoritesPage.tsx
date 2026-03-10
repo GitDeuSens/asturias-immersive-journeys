@@ -31,8 +31,8 @@ const texts = {
 const typeConfig: Record<FavoriteType, { icon: any; label: Record<string, string>; path: string }> = {
   tour: { icon: View, label: { es: 'Tours', en: 'Tours', fr: 'Visites' }, path: '/tours' },
   route: { icon: Map, label: { es: 'Rutas', en: 'Routes', fr: 'Itinéraires' }, path: '/routes' },
-  ar: { icon: Sparkles, label: { es: 'AR', en: 'AR', fr: 'AR' }, path: '/ar' },
-  vr: { icon: Glasses, label: { es: 'VR', en: 'VR', fr: 'VR' }, path: '/vr' },
+  ar: { icon: Sparkles, label: { es: 'AR', en: 'AR', fr: 'AR' }, path: '/xr' },
+  vr: { icon: Glasses, label: { es: 'VR', en: 'VR', fr: 'VR' }, path: '/xr' },
   poi: { icon: MapPin, label: { es: 'Puntos', en: 'Points', fr: 'Points' }, path: '/routes' },
 };
 

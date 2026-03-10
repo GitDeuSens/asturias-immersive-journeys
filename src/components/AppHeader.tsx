@@ -20,8 +20,7 @@ const navItems = [
   { key: "nav.home", path: "/experience", icon: Home },
   { key: "nav.tours360", path: "/tours", icon: View },
   { key: "nav.routes", path: "/routes", icon: Map },
-  { key: "nav.arExperiences", path: "/ar", icon: Sparkles },
-  { key: "nav.vrExperiences", path: "/vr", icon: Glasses },
+  { key: "nav.xrExperiences", path: "/xr", icon: Sparkles },
   { key: "nav.favorites", path: "/favorites", icon: Heart },
 ];
 

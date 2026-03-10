@@ -110,9 +110,10 @@ function AppWithOptimizations() {
             <Route path="/routes" element={<RoutesPage />} />
             <Route path="/routes/:routeCode" element={<RoutesPage />} />
             <Route path="/routes/:routeCode/:id" element={<RoutesPage />} />
-            <Route path="/vr" element={<VRExperiencesPage />} />
+            <Route path="/xr" element={<XRExperiencesPage />} />
+            <Route path="/ar" element={<XRExperiencesPage />} />
+            <Route path="/vr" element={<XRExperiencesPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
-            <Route path="/ar" element={<ARExperiencesPage />} />
             <Route path="/ar/:slug" element={<ARScenePage />} />
             {/* Redirects for relative navigation from /tours/:slug */}
             <Route path="/tours/ar/:slug" element={<RedirectToAR />} />
