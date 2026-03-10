@@ -733,6 +733,13 @@ export const RoutesPage = React.memo(function RoutesPage() {
 
                 {/* Content list */}
                 <div className="space-y-3 mt-5">
+                  {routesLoading ? (
+                    <div className="space-y-3">
+                      {Array.from({ length: 4 }).map((_, i) => (
+                        <RouteCardSkeleton key={i} />
+                      ))}
+                    </div>
+                  ) : (
                   <AnimatePresence mode="wait">
                   {viewMode === 'routes' ? (
                     <motion.div key="routes-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="space-y-3">
@@ -769,7 +776,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                         >
                           <div className="flex gap-3 p-3">
                             <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-muted">
-                              <img src={imgSrc} alt={pointTitle} className="w-full h-full object-cover" />
+                              <img src={imgSrc} alt={pointTitle} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <h3 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1">
@@ -785,6 +792,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                     </motion.div>
                   )}
                   </AnimatePresence>
+                  )}
                 </div>
               </motion.div>
             )}
