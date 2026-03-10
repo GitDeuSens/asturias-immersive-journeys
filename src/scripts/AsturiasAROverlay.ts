@@ -680,7 +680,7 @@ export class AsturiasAROverlay extends Behaviour {
             if (window.history.length > 1) {
                 window.history.back();
             } else {
-                window.location.href = '/ar';
+                window.location.href = '/xr';
             }
         });
     }

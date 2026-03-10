@@ -147,8 +147,8 @@ export function FavoritesPage() {
                 <Link to="/routes">
                   <Button variant="outline"><Map className="w-4 h-4 mr-2" />{language === 'es' ? 'Rutas' : 'Routes'}</Button>
                 </Link>
-                <Link to="/ar">
-                  <Button variant="outline"><Sparkles className="w-4 h-4 mr-2" />AR</Button>
+                <Link to="/xr">
+                  <Button variant="outline"><Sparkles className="w-4 h-4 mr-2" />XR</Button>
                 </Link>
               </div>
             </motion.div>
