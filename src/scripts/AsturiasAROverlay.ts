@@ -348,27 +348,42 @@ export class AsturiasAROverlay extends Behaviour {
             && window.innerWidth >= 768;
     }
 
-    private _detectVRHeadset() {
-        // Check for VR headset via WebXR API
+    private async _detectVRHeadset() {
+        // Preferred: use Needle Engine's own static check
+        try {
+            const { NeedleXRSession } = await import('@needle-tools/engine');
+            if (NeedleXRSession.isVRSupported && await NeedleXRSession.isVRSupported()) {
+                this._isVRHeadset = true;
+                this._isDesktop = false;
+                this._rebuildPrePanelIfNeeded();
+                return;
+            }
+        } catch { /* Needle not loaded yet, fall through */ }
+
+        // Fallback: WebXR Device API
         if (navigator.xr) {
             navigator.xr.isSessionSupported('immersive-vr').then(supported => {
                 if (supported) {
                     this._isVRHeadset = true;
-                    this._isDesktop = false; // VR headsets should not show QR
-                    // Rebuild pre-panel if already built to show VR button
-                    const existing = document.getElementById('ast-pre-panel');
-                    if (existing) {
-                        existing.remove();
-                        this._buildPreARPanel();
-                    }
+                    this._isDesktop = false;
+                    this._rebuildPrePanelIfNeeded();
                 }
             }).catch(() => {});
         }
-        // Also detect common VR headset user agents as fallback
+
+        // Also detect common VR headset user agents as immediate fallback
         const ua = navigator.userAgent;
         if (/OculusBrowser|Quest|Pico|HTC.*VR|XR Viewer/i.test(ua)) {
             this._isVRHeadset = true;
             this._isDesktop = false;
+        }
+    }
+
+    private _rebuildPrePanelIfNeeded() {
+        const existing = document.getElementById('ast-pre-panel');
+        if (existing) {
+            existing.remove();
+            this._buildPreARPanel();
         }
     }
 
