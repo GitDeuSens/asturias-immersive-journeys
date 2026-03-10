@@ -161,8 +161,9 @@ export function XRExperiencesPage() {
   // Filter by mode and search
   const filteredItems = useMemo(() => {
     let items = allItems;
+    // AR tab: only AR scenes; VR tab: ALL AR scenes + VR experiences
     if (mode === 'ar') items = items.filter(i => i.kind === 'ar');
-    if (mode === 'vr') items = items.filter(i => i.kind === 'vr');
+    // 'vr' mode shows everything (AR + VR), no filter needed
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
