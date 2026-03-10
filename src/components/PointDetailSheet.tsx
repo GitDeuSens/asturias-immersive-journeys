@@ -22,7 +22,15 @@ import {
   Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage,
 } from '@/components/ui/breadcrumb';
 
-interface PointDetailSheetProps { point: RoutePoint | null; onClose: () => void; routeTitle?: string; onBackToRoute?: () => void; }
+interface PointDetailSheetProps {
+  point: RoutePoint | null;
+  onClose: () => void;
+  routeTitle?: string;
+  onBackToRoute?: () => void;
+  allPoints?: RoutePoint[];
+  currentIndex?: number;
+  onNavigatePoint?: (point: RoutePoint) => void;
+}
 
 function getText(value: any, lang: string): string {
   if (!value) return '';
