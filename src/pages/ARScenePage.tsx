@@ -1,11 +1,12 @@
 // ============ AR SCENE PAGE ============
-// Fullscreen AR viewer page with floating header controls (same pattern as 360 tours)
+// Fullscreen AR viewer page with floating header controls
 // On iOS: shows POI sheet instead of full AR viewer (iOS uses Quick Look natively)
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
-  ArrowLeft, AlertCircle,
+  ArrowLeft, AlertCircle, X, List,
 } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { NeedleARViewer } from "@/components/NeedleARViewer";
