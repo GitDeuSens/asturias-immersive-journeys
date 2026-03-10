@@ -1,7 +1,8 @@
-import { forwardRef } from "react";
+import { forwardRef, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 // Import institutional logos
 import nextgenEuLogo from "@/assets/logos/nextgen-eu.png";
