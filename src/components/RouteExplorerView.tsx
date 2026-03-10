@@ -477,7 +477,6 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
         <motion.button
           initial={{ opacity: 0, x: -8 }}
           animate={{ opacity: 1, x: 0 }}
-          className="w-full"
           transition={{ delay: index * 0.04, duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
           onClick={() => {
             onClick();
