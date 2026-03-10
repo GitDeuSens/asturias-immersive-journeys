@@ -269,6 +269,19 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
               })}
             </div>
 
+            {/* Elevation Profile */}
+            {route.polyline.length >= 2 && route.elevationGainMeters && route.elevationGainMeters > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-2 uppercase tracking-wide flex items-center gap-2">
+                  <Mountain className="w-4 h-4 text-primary" />
+                  {lang === 'es' ? 'Perfil de elevación' : lang === 'en' ? 'Elevation profile' : "Profil d'élévation"}
+                </h3>
+                <div className="p-3 rounded-xl bg-muted/30 border border-border/50">
+                  <ElevationProfile polyline={route.polyline} elevationGain={route.elevationGainMeters} />
+                </div>
+              </div>
+            )}
+
             {/* Share buttons */}
             <div>
               <p className="text-sm font-semibold text-foreground mb-2">{t('common.share')}</p>
