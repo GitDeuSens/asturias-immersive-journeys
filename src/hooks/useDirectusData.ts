@@ -180,6 +180,8 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
         content,
         gallery: poi.gallery,
         tags: poi.tags || [],
+        viewCount: Math.max(Number(poi.view_count ?? 0), Number(poi.completion_count ?? 0)),
+        createdAt: poi.created_at,
       };
     });
   // Filter out points with invalid coordinates — they can't be shown on the map
