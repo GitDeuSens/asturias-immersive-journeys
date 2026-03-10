@@ -32,6 +32,7 @@ export interface KuulaTour {
   created_at?: string;
   updated_at?: string;
   published: boolean;
+  view_count?: number;
 }
 
 // ============ AR SCENE ============
