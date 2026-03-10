@@ -470,6 +470,15 @@ function VRDetailModal({
                     {t(tx.videoPreview)}
                   </button>
                 )}
+                {hasGLB && (
+                  <button
+                    onClick={() => setPreviewMode('3d')}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/20 backdrop-blur-sm text-white font-medium text-sm hover:bg-white/30 transition-colors"
+                  >
+                    <Box className="w-4 h-4" />
+                    {t(tx.view3D)}
+                  </button>
+                )}
               </div>
             </>
           )}
