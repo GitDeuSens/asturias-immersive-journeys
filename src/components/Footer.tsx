@@ -19,7 +19,7 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
   return (
     <footer
       ref={ref}
-      className="text-muted-foreground"
+      className=""
       role="contentinfo"
       aria-label={t("footer.ariaLabel", "Pie de página")}
       className="text-muted-foreground bg-background w-full relative"
