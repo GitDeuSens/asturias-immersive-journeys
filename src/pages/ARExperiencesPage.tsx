@@ -1,27 +1,22 @@
 // ============ AR EXPERIENCES LIST PAGE ============
-// List of all available AR experiences
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, Clock, MapPin, ChevronRight, Filter, Home } from "lucide-react";
+import { Sparkles, Clock, MapPin, ChevronRight, Home } from "lucide-react";
 import { UnifiedSearchBar, type CustomFilter } from "@/components/UnifiedSearchBar";
 import { TourCardSkeleton } from "@/components/SkeletonCard";
+import { HeroCarousel } from "@/components/HeroCarousel";
+import { FavoriteButton } from "@/components/FavoriteButton";
 import { AppHeader } from "@/components/AppHeader";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { SEOHead } from "@/components/SEOHead";
 import { Footer } from "@/components/Footer";
 import { getARScenes } from "@/lib/api/directus-client";
 import { useLanguage } from "@/hooks/useLanguage";
 import type { ARScene, Language } from "@/lib/types";
 import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbSeparator,
-  BreadcrumbPage,
+  Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 
 const texts = {
@@ -43,15 +38,12 @@ const texts = {
     geo: { es: "GPS", en: "GPS", fr: "GPS" },
   },
   startExperience: { es: "Iniciar experiencia", en: "Start experience", fr: "Démarrer l'expérience" },
-  filterAll: { es: "Todas", en: "All", fr: "Toutes" },
-  filterSLAM: { es: "Superficie", en: "Surface", fr: "Surface" },
-  filterMarker: { es: "Marcador", en: "Marker", fr: "Marqueur" },
-  filterGeo: { es: "GPS", en: "GPS", fr: "GPS" },
   noScenes: {
     es: "No hay experiencias disponibles",
     en: "No experiences available",
     fr: "Aucune expérience disponible",
   },
+  featured: { es: "Destacados", en: "Featured", fr: "En vedette" },
 };
 
 export function ARExperiencesPage() {
@@ -79,7 +71,6 @@ export function ARExperiencesPage() {
         const data = await getARScenes(locale);
         setScenes(data);
       } catch (error) {
-        // Silently fail AR scenes loading
       } finally {
         setIsLoading(false);
       }
@@ -102,10 +93,19 @@ export function ARExperiencesPage() {
     return filtered;
   })();
 
+  // Carousel items
+  const carouselItems = useMemo(() => {
+    return scenes.slice(0, 5).map(scene => ({
+      id: scene.id,
+      title: scene.title[locale] || scene.title.es,
+      subtitle: `${texts.arType[scene.needle_type]?.[locale]} · ${scene.duration_minutes} min`,
+      image: scene.preview_image,
+    }));
+  }, [scenes, locale]);
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <SEOHead title={texts.title[locale]} description={texts.subtitle[locale]} />
-
       <AppHeader variant="light" />
 
       <main className="flex-1 pt-14 md:pt-[122px]">
@@ -144,6 +144,21 @@ export function ARExperiencesPage() {
         </div>
 
         <div className="container mx-auto pb-5 px-4 max-w-6xl">
+          {/* Hero Carousel */}
+          {!isLoading && carouselItems.length > 1 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+              className="mb-6"
+            >
+              <h2 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+                ⭐ {t(texts.featured)}
+              </h2>
+              <HeroCarousel items={carouselItems} />
+            </motion.div>
+          )}
+
           {/* Search + Filters */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -162,12 +177,10 @@ export function ARExperiencesPage() {
             />
           </motion.div>
 
-          {/* Loading state */}
+          {/* Loading */}
           {isLoading && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <TourCardSkeleton key={i} />
-              ))}
+              {Array.from({ length: 6 }).map((_, i) => <TourCardSkeleton key={i} />)}
             </div>
           )}
 
@@ -192,7 +205,7 @@ export function ARExperiencesPage() {
                   key={scene.id}
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 * index }}
+                  transition={{ delay: 0.04 * index }}
                 >
                   <Link
                     to={`/ar/${scene.slug}`}
@@ -210,22 +223,25 @@ export function ARExperiencesPage() {
                       </div>
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                      {/* AR badge */}
                       <div className="absolute top-3 left-3">
                         <Badge className="bg-primary/90 text-primary-foreground">
-                          <Sparkles className="w-3 h-3 mr-1" />
-                          AR
+                          <Sparkles className="w-3 h-3 mr-1" />AR
                         </Badge>
                       </div>
 
-                      {/* Type badge */}
-                      <div className="absolute top-3 right-3">
+                      <div className="absolute top-3 right-3 flex items-center gap-2">
                         <Badge variant="secondary" className="bg-card/90">
                           {texts.arType[scene.needle_type][locale]}
                         </Badge>
+                        <FavoriteButton
+                          id={scene.id}
+                          type="ar"
+                          title={scene.title[locale] || scene.title.es}
+                          image={scene.preview_image}
+                          size="sm"
+                        />
                       </div>
 
-                      {/* Play button overlay */}
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center">
                           <Sparkles className="w-8 h-8 text-white" />
@@ -237,33 +253,23 @@ export function ARExperiencesPage() {
                       <h3 className="text-base sm:text-xl font-bold text-foreground mb-1 sm:mb-2 group-hover:text-primary transition-colors line-clamp-1">
                         {scene.title[locale] || scene.title.es}
                       </h3>
-
                       <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4 line-clamp-2">
                         {scene.description[locale] || scene.description.es}
                       </p>
-
                       <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2 sm:mb-4">
                         <Badge variant="outline" className="text-xs">
-                          <Clock className="w-3 h-3 mr-1" />
-                          {scene.duration_minutes} {texts.duration[locale]}
+                          <Clock className="w-3 h-3 mr-1" />{scene.duration_minutes} {texts.duration[locale]}
                         </Badge>
                         {scene.difficulty && texts.difficulty[scene.difficulty] && (
-                          <Badge variant="outline" className="text-xs">
-                            {texts.difficulty[scene.difficulty][locale]}
-                          </Badge>
+                          <Badge variant="outline" className="text-xs">{texts.difficulty[scene.difficulty][locale]}</Badge>
                         )}
                         {scene.location && (
-                          <Badge variant="outline" className="text-xs">
-                            <MapPin className="w-3 h-3 mr-1" />
-                            GPS
-                          </Badge>
+                          <Badge variant="outline" className="text-xs"><MapPin className="w-3 h-3 mr-1" />GPS</Badge>
                         )}
                       </div>
-
                       <div className="flex items-center justify-between">
                         <span className="text-primary font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
-                          {texts.startExperience[locale]}
-                          <ChevronRight className="w-4 h-4" />
+                          {texts.startExperience[locale]}<ChevronRight className="w-4 h-4" />
                         </span>
                       </div>
                     </div>

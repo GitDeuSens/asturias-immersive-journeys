@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
+import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -79,6 +80,7 @@ const ARExperiencesPage = lazy(() => import("./pages/ARExperiencesPage").then(m 
 const VRExperiencesPage = lazy(() => import("./components/VRExperiencesPage").then(m => ({ default: m.VRExperiencesPage })));
 const Tours360Page = lazy(() => import("./pages/Tours360Page").then(m => ({ default: m.Tours360Page })));
 const RoutesPage = lazy(() => import("./pages/RoutesPage").then(m => ({ default: m.RoutesPage })));
+const FavoritesPage = lazy(() => import("./pages/FavoritesPage").then(m => ({ default: m.FavoritesPage })));
 //const RouteDetailSheet = lazy(() => import("./components/RouteDetailSheet").then(m => ({ default: m.RouteDetailSheet })));
 // Internal component for performance optimizations
 function AppWithOptimizations() {
@@ -110,6 +112,7 @@ function AppWithOptimizations() {
             <Route path="/routes/:routeCode" element={<RoutesPage />} />
             <Route path="/routes/:routeCode/:id" element={<RoutesPage />} />
             <Route path="/vr" element={<VRExperiencesPage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/ar" element={<ARExperiencesPage />} />
             <Route path="/ar/:slug" element={<ARScenePage />} />
             {/* Redirects for relative navigation from /tours/:slug */}
@@ -126,6 +129,8 @@ function AppWithOptimizations() {
         <Suspense fallback={null}>
           <CookieConsent />
         </Suspense>
+        {/* PWA Install Prompt */}
+        <PWAInstallPrompt />
         {/* Welcome onboarding removed — replaced by glossary button in header */}
       </>
     </>
