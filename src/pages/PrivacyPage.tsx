@@ -149,7 +149,7 @@ export function PrivacyPage() {
   const content = privacyContent[lang] || privacyContent.es;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
       <SEOHead title={content.title} description={content.intro} />
       <AppHeader showRestart={false} />
 

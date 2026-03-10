@@ -164,7 +164,7 @@ export function CookiesPage() {
   const content = cookiesContent[lang] || cookiesContent.es;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
       <SEOHead title={content.title} description={content.intro} />
       <AppHeader showRestart={false} />
 

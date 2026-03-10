@@ -77,7 +77,7 @@ export function ARExperiencesPage() {
   const filteredScenes = filter === "all" ? scenes : scenes.filter((s) => s.needle_type === filter);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
       <SEOHead title={texts.title[locale]} description={texts.subtitle[locale]} />
 
       <AppHeader variant="light" />
