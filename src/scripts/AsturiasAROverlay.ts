@@ -72,6 +72,7 @@ const ASTURIAS = {
 
 const T: Record<string, Record<string, string>> = {
     startAR:          { es: 'Iniciar AR',                 en: 'Start AR',               fr: 'Démarrer AR' },
+    startVR:          { es: 'Iniciar Experiencia',        en: 'Start Experience',        fr: "Démarrer l'Expérience" },
     stopAR:           { es: 'Salir de AR',                en: 'Exit AR',                fr: 'Quitter AR' },
     info:             { es: 'Información',                en: 'Information',            fr: 'Informations' },
     close:            { es: 'Cerrar',                     en: 'Close',                  fr: 'Fermer' },
