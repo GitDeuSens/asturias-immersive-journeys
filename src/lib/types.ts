@@ -142,12 +142,21 @@ export interface SearchResults {
 
 export interface VRExperience {
   id: string;
+  slug: string;
   title: Record<Language, string>;
+  short_description?: Record<Language, string>;
   description: Record<Language, string>;
   thumbnail_url: string;
+  preview_video_url?: string;
   apk_url?: string;
+  apk_version?: string;
+  apk_size_mb?: number;
   web_url?: string;
   duration_minutes?: number;
+  difficulty?: 'easy' | 'moderate';
+  age_rating?: '7+' | '12+' | '16+';
+  motion_sickness_warning: boolean;
+  compatible_devices?: string[];
   category: string;
   published: boolean;
 }

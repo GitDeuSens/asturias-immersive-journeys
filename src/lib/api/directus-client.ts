@@ -126,11 +126,21 @@ function transformARScene(scene: DirectusARScene): ARScene {
 function transformVRExperience(vr: DirectusVRExperience): VRExperience {
   return {
     id: vr.id,
+    slug: vr.slug,
     title: toMultilingual(vr.translations, 'title', true),
+    short_description: toMultilingual(vr.translations, 'short_description'),
     description: toMultilingual(vr.translations, 'description'),
     thumbnail_url: getDirectusFileUrl(vr.thumbnail),
-    apk_url: getDirectusFileUrl(vr.apk_file),
+    preview_video_url: vr.preview_video ? getDirectusFileUrl(vr.preview_video) : undefined,
+    apk_url: vr.apk_file ? getDirectusFileUrl(vr.apk_file) : undefined,
+    apk_version: vr.apk_version,
+    apk_size_mb: vr.apk_size_mb,
+    web_url: undefined, // TODO: map when web_url field is added to Directus
     duration_minutes: vr.duration_minutes,
+    difficulty: vr.difficulty,
+    age_rating: vr.age_rating,
+    motion_sickness_warning: vr.motion_sickness_warning ?? false,
+    compatible_devices: vr.compatible_devices,
     category: vr.category || '',
     published: vr.status === 'published',
   };
@@ -248,11 +258,17 @@ class DirectusApiClient {
     try {
       const scenes = await this.getClient().request(readItems('ar_scenes', {
         filter: { slug: { _eq: slug }, status: { _in: ['published', 'draft'] } },
-        fields: ['*', ...TRANSLATIONS_DEEP],
+        fields: ['*', ...TRANSLATIONS_DEEP, 'audio_es', 'audio_en', 'audio_fr'],
         limit: 1,
       }));
       if ((scenes as any[]).length === 0) return null;
-      return transformARScene((scenes as unknown as DirectusARScene[])[0]);
+      const raw = (scenes as unknown as DirectusARScene[])[0];
+      const result = transformARScene(raw);
+      // Map audio file UUIDs (plain strings in ar_scenes)
+      result.audio_es = raw.audio_es ? getDirectusFileUrl(raw.audio_es) : undefined;
+      result.audio_en = raw.audio_en ? getDirectusFileUrl(raw.audio_en) : undefined;
+      result.audio_fr = raw.audio_fr ? getDirectusFileUrl(raw.audio_fr) : undefined;
+      return result;
     } catch (error) { logger.error(`[DirectusClient] Error fetching AR scene ${slug}:`, error); return null; }
   }
 
