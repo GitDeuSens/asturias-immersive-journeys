@@ -13,7 +13,7 @@ interface FavoriteButtonProps {
 
 export function FavoriteButton({ id, type, title, image, size = 'md', className = '' }: FavoriteButtonProps) {
   const { isFavorite, toggleFavorite } = useFavorites();
-  const active = isFavorite(id);
+  const active = isFavorite(id, type);
 
   const sizes = {
     sm: 'w-8 h-8',

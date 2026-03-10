@@ -410,7 +410,14 @@ export function Tours360Page() {
                   </div>
 
                   {/* Favorite button */}
-                  <div className="absolute top-3 right-3 flex gap-2 items-center" onClick={e => { e.stopPropagation(); e.preventDefault(); }}>
+                  <div
+                    data-favorite-button="true"
+                    className="absolute top-3 right-3 z-10 flex gap-2 items-center"
+                    onPointerDown={(e) => {
+                      e.stopPropagation();
+                    }}
+                    onClick={e => { e.stopPropagation(); e.preventDefault(); }}
+                  >
                     {tour.duration_minutes && (
                       <span className="bg-black/60 text-white text-xs px-2 py-1 rounded-full">
                         {tour.duration_minutes} {t(texts.duration)}

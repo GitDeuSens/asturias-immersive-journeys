@@ -35,15 +35,15 @@ export function useFavorites() {
     return () => window.removeEventListener('storage', handler);
   }, []);
 
-  const isFavorite = useCallback((id: string) => {
-    return favorites.some(f => f.id === id);
+  const isFavorite = useCallback((id: string, type?: FavoriteType) => {
+    return favorites.some(f => f.id === id && (!type || f.type === type));
   }, [favorites]);
 
   const toggleFavorite = useCallback((item: Omit<FavoriteItem, 'addedAt'>) => {
     setFavorites(prev => {
-      const exists = prev.some(f => f.id === item.id);
+      const exists = prev.some(f => f.id === item.id && f.type === item.type);
       const next = exists
-        ? prev.filter(f => f.id !== item.id)
+        ? prev.filter(f => !(f.id === item.id && f.type === item.type))
         : [...prev, { ...item, addedAt: Date.now() }];
       saveFavorites(next);
       return next;
