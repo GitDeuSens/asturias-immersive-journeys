@@ -102,11 +102,11 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
         </div>
         {/* Legal links */}
         <nav aria-label={t("footer.legalNav", "Enlaces legales")} className="mb-2">
-          <ul className="flex flex-wrap items-center justify-center gap-2 md:gap-2">
+          <ul className="flex flex-wrap items-center justify-center gap-1 md:gap-2">
             <li>
               <Link
                 to="/legal"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded uppercase tracking-wide"
+                className="inline-flex items-center justify-center min-h-[44px] px-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded uppercase tracking-wide"
               >
                 {t("footer.legal")}
               </Link>
@@ -114,7 +114,7 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
             <li>
               <Link
                 to="/accessibility"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded uppercase tracking-wide"
+                className="inline-flex items-center justify-center min-h-[44px] px-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded uppercase tracking-wide"
               >
                 {t("footer.accessibility")}
               </Link>
@@ -122,7 +122,7 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
             <li>
               <Link
                 to="/privacy"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded uppercase tracking-wide"
+                className="inline-flex items-center justify-center min-h-[44px] px-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded uppercase tracking-wide"
               >
                 {t("footer.privacy")}
               </Link>
@@ -130,7 +130,7 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
             <li>
               <Link
                 to="/cookies"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded uppercase tracking-wide"
+                className="inline-flex items-center justify-center min-h-[44px] px-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded uppercase tracking-wide"
               >
                 {t("footer.cookies")}
               </Link>

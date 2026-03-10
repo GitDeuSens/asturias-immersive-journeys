@@ -544,12 +544,17 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
                 <button onClick={(e) => {
                   e.stopPropagation();
                   onToggleVisited();
-                }} className='text-xs text-primary font-medium'>{t('poi.unvisited')}</button>
+                  import('sonner').then(({ toast }) => toast.success(t('poi.unvisited')));
+                }} className='inline-flex items-center gap-1 min-h-[44px] px-2 text-xs text-primary font-medium'>
+                  <Check className="w-3.5 h-3.5" />
+                  {t('poi.unvisited')}
+                </button>
               ) : (
                 <button onClick={(e) => {
                   e.stopPropagation();
                   onToggleVisited();
-                }} className='text-xs text-muted-foreground'>{t('poi.visited')}</button>
+                  import('sonner').then(({ toast }) => toast.success(t('poi.visited')));
+                }} className='inline-flex items-center min-h-[44px] px-2 text-xs text-muted-foreground'>{t('poi.visited')}</button>
               )}
 
               {distanceInfo && (
