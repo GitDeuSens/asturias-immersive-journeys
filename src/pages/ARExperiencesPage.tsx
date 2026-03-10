@@ -144,37 +144,22 @@ export function ARExperiencesPage() {
         </div>
 
         <div className="container mx-auto pb-5 px-4 max-w-6xl">
-          {/* Filters */}
+          {/* Search + Filters */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="mb-8"
           >
-            <div className="flex items-center gap-3 mb-4">
-              <Filter className="w-5 h-5 text-muted-foreground" />
-              <span className="font-semibold text-foreground">
-                {locale === "es" ? "Filtrar por tipo" : locale === "en" ? "Filter by type" : "Filtrer par type"}
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {(["all", "slam", "image-tracking", "geo"] as const).map((type) => (
-                <Button
-                  key={type}
-                  variant={filter === type ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setFilter(type)}
-                >
-                  {type === "all"
-                    ? texts.filterAll[locale]
-                    : type === "slam"
-                      ? texts.filterSLAM[locale]
-                      : type === "image-tracking"
-                        ? texts.filterMarker[locale]
-                        : texts.filterGeo[locale]}
-                </Button>
-              ))}
-            </div>
+            <UnifiedSearchBar
+              query={searchQuery}
+              onQueryChange={setSearchQuery}
+              placeholder={t({ es: 'Buscar experiencias AR...', en: 'Search AR experiences...', fr: 'Rechercher des expériences AR...' })}
+              customFilters={arTypeFilters}
+              selectedCustomFilters={selectedTypes}
+              onToggleCustomFilter={toggleType}
+              resultCount={filteredScenes.length}
+            />
           </motion.div>
 
           {/* Loading state */}
