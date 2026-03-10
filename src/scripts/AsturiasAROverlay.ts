@@ -740,6 +740,7 @@ export class AsturiasAROverlay extends Behaviour {
     private _buildPreARPanel() {
         const root  = this._ensureRoot();
         const panel = document.createElement('div');
+        panel.id = 'ast-pre-panel';
         this._prePanel = panel;
         const hasAudio = this._hasAudio();
         panel.style.cssText = `
