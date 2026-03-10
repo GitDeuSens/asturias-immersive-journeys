@@ -242,7 +242,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
           </div>
         </div>
         <div className="mt-4 sm:mt-6 mb-3 sm:mb-4">
-          <div className="flex gap-2 overflow-x-auto pb-1 -mx-3 px-3 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible">
+          <div className="flex gap-2 flex-wrap">
             {/* Duration */}
             {route.duration && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50 text-foreground text-sm font-medium">
