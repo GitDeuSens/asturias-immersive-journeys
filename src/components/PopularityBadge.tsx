@@ -13,10 +13,17 @@ function formatCount(n: number): string {
   return String(n);
 }
 
+function normalizeCount(value?: number): number {
+  if (typeof value !== 'number' || Number.isNaN(value)) return 0;
+  return Math.max(0, Math.floor(value));
+}
+
 function daysSince(dateStr?: string): number {
   if (!dateStr) return 999;
-  const diff = Date.now() - new Date(dateStr).getTime();
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
+  const parsedDate = new Date(dateStr).getTime();
+  if (Number.isNaN(parsedDate)) return 999;
+  const diff = Date.now() - parsedDate;
+  return Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
 }
 
 type BadgeStatus = { label: string; color: string; Icon: typeof Flame };
@@ -31,7 +38,7 @@ function getStatus(count: number, days: number): BadgeStatus {
 }
 
 export function PopularityBadge({ viewCount, launchCount, dateCreated, size = 'sm', className = '' }: PopularityBadgeProps) {
-  const count = Math.max(viewCount ?? 0, launchCount ?? 0);
+  const count = Math.max(normalizeCount(viewCount), normalizeCount(launchCount));
   const days = daysSince(dateCreated);
   const { label, color, Icon } = getStatus(count, days);
 
