@@ -117,7 +117,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
           mass: 0.8,
           opacity: { duration: 0.2, ease: 'easeOut' }
         }}
-        className="fixed inset-x-2 sm:inset-x-auto sm:right-2 top-16 md:top-[126px] bottom-2 sm:w-full sm:max-w-lg bg-background z-[45] shadow-2xl flex flex-col overflow-hidden rounded-2xl border border-border/40"
+        className="fixed inset-x-2 sm:inset-x-auto sm:right-2 top-16 md:top-[126px] bottom-2 sm:w-full sm:max-w-lg bg-background z-[42] shadow-2xl flex flex-col overflow-hidden rounded-2xl border border-border/40"
         onClick={(e) => {
           e.stopPropagation();
         }}
