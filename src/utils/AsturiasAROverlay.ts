@@ -224,7 +224,7 @@ export class AsturiasAROverlay extends Behaviour {
     // ─────────────────────────────────────────────────────────────────────────
 
    awake() {
-    console.log('[Overlay] awake() called');
+    _log('[Overlay] awake() called');
     this._detectLanguage();
     this._detectSlug();
     this._isDesktop = DeviceUtilities.isDesktop();
