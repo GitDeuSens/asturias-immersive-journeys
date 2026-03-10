@@ -178,7 +178,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
               }
               
               // Desktop: skip autostart
-              console.log('[NeedleARViewer] Desktop detected, skipping autostart');
+              // Desktop detected, skipping autostart
             } catch (e) {
               console.warn('[NeedleARViewer] DeviceUtilities not available, falling back to autostart', e);
               setTimeout(() => tryStartAR(), 0);
