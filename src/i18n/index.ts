@@ -605,6 +605,7 @@ const resources = {
       "vr.instructions": "Instructions d'utilisation",
       "vr.requirements": "Exigences",
       "vr.compatible": "Compatible avec",
+      "vr.apkNotAvailable": "Le téléchargement n'est pas disponible pour le moment",
 
       // Map
       "map.yourLocation": "Votre position",
