@@ -635,7 +635,7 @@ export class AsturiasAROverlay extends Behaviour {
         } catch (err) { console.warn('[AsturiasAROverlay] Direct immersive-vr session failed', err); }
     }
 
-
+    private async _stopAR() {
         try {
             const session = (window as any).__currentXRSession
                 ?? document.querySelector('needle-engine')?.['context']?.xrSession
