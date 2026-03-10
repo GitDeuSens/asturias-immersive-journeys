@@ -135,14 +135,14 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
         aria-modal="true"
         aria-labelledby="route-detail-title"
       >
-        {/* Hero image */}
+        {/* Hero image with title overlay */}
         <div
-          className="relative h-40 sm:h-56 bg-cover bg-center flex-shrink-0 rounded-t-2xl overflow-hidden"
+          className="relative h-44 sm:h-60 bg-cover bg-center flex-shrink-0 rounded-t-2xl overflow-hidden"
           style={{ backgroundImage: `url(${route.coverImage})` }}
           role="img"
           aria-label={route.title[lang]}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" aria-hidden="true" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" aria-hidden="true" />
 
           {/* Favorite + Close buttons */}
           <div className="absolute top-4 right-4 flex items-center gap-2">
@@ -161,22 +161,31 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
               <X className="w-5 h-5" />
             </button>
           </div>
+
+          {/* Title + theme + badge overlaid on hero */}
+          <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 pt-12">
+            <div className="flex items-end gap-2">
+              <div className="flex-1 min-w-0">
+                <h1
+                  id="route-detail-title"
+                  className="font-bold text-foreground leading-tight line-clamp-2"
+                  style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)' }}
+                >
+                  {route.title[lang]}
+                </h1>
+                {route.theme[lang] && (
+                  <p className="text-xs sm:text-sm font-medium text-foreground/70 mt-0.5 truncate">
+                    {route.theme[lang]}
+                  </p>
+                )}
+              </div>
+              <PopularityBadge viewCount={route.viewCount} dateCreated={route.createdAt} size="md" className="flex-shrink-0 mb-0.5" />
+            </div>
+          </div>
         </div>
 
         {/* Scrollable content */}
         <ScrollArea className="flex-1">
-          {/* Bottom info */}
-          <div className="px-6 pt-3">
-            <div className="flex items-center gap-2">
-              <h1 id="route-detail-title" className="text-2xl font-bold truncate flex-1 min-w-0">
-                {route.title[lang]}
-              </h1>
-              <PopularityBadge viewCount={route.viewCount} dateCreated={route.createdAt} size="md" className="flex-shrink-0" />
-            </div>
-            <p className="text-sm font-medium mt-0.5 truncate">
-              {route.theme[lang]}
-            </p>
-          </div>
           <div className="p-6 space-y-6">
             {/* Quick info badges */}
             <div className="flex flex-wrap gap-2">

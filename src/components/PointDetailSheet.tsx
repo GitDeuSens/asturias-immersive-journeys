@@ -187,12 +187,15 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
           <div className="flex-1 overflow-y-auto">
             {/* Hero image */}
             <div
-              className="sticky top-0 z-20 relative h-40 sm:h-56 bg-cover bg-center flex-shrink-0 overflow-hidden border-b border-border/40"
+              className="sticky top-0 z-20 relative h-44 sm:h-60 bg-cover bg-center flex-shrink-0 overflow-hidden border-b border-border/40"
               style={{ backgroundImage: point.coverImage ? `url(${DIRECTUS_URL}/assets/${point.coverImage})` : undefined }}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 px-6 pb-4 pt-10">
-                <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">{title}</h1>
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 pt-12">
+                <h1
+                  className="font-bold text-foreground leading-tight line-clamp-2"
+                  style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)' }}
+                >{title}</h1>
               </div>
               <button
                 onClick={() => {
