@@ -73,6 +73,17 @@ const RouteCardComponent = forwardRef<HTMLButtonElement, RouteCardProps>(functio
           )}
         </div>
 
+        {/* Favorite button */}
+        <div className="absolute top-2 right-2">
+          <FavoriteButton
+            id={route.id}
+            type="route"
+            title={route.title[lang]}
+            image={route.coverImage}
+            size="sm"
+          />
+        </div>
+
         {/* 360 tour badge */}
         {route.tour360?.available && (
           <span className="absolute bottom-2 right-2 px-2 py-1 rounded-md bg-primary/90 text-white text-[10px] font-bold uppercase">

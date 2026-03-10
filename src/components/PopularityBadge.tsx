@@ -23,18 +23,18 @@ export function PopularityBadge({ viewCount, launchCount, size = 'sm', className
   const label = isTrending ? 'Popular' : formatCount(count);
 
   const sizeClasses = size === 'sm'
-    ? 'px-2 py-0.5 text-[10px] gap-1'
-    : 'px-2.5 py-1 text-xs gap-1.5';
+    ? 'px-1.5 py-0.5 text-[10px] gap-0.5'
+    : 'px-2 py-1 text-xs gap-1';
 
   return (
-    <span className={`inline-flex items-center font-bold rounded-full ${sizeClasses} ${
+    <span className={`inline-flex items-center font-semibold rounded-md backdrop-blur-sm ${sizeClasses} ${
       isTrending
-        ? 'bg-destructive/15 text-destructive border border-destructive/30'
+        ? 'bg-card/90 text-destructive'
         : isPopular
-          ? 'bg-warm/15 text-warm border border-warm/30'
-          : 'bg-muted/50 text-muted-foreground border border-border/50'
+          ? 'bg-card/90 text-warm'
+          : 'bg-card/90 text-muted-foreground'
     } ${className}`}>
-      <Icon className={size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
+      <Icon className={size === 'sm' ? 'w-2.5 h-2.5' : 'w-3 h-3'} />
       {label}
     </span>
   );
