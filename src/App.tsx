@@ -126,6 +126,10 @@ function AppWithOptimizations() {
         <Suspense fallback={null}>
           <CookieConsent />
         </Suspense>
+        {/* Welcome onboarding for first-time visitors */}
+        <Suspense fallback={null}>
+          <WelcomeOnboarding />
+        </Suspense>
       </>
     </>
   );
