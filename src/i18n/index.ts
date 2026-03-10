@@ -34,6 +34,7 @@ const resources = {
       "nav.arExperiences": "Experiencias AR",
       "nav.help": "Ayuda",
       "nav.switchMode": "Cambiar modo de exploración",
+      "nav.favorites": "Favoritos",
 
       // Header
       "header.asturiasInmersivo": "Asturias Inmersivo",
