@@ -75,7 +75,7 @@ const AR_INSTRUCTIONS: Record<string, Record<string, string[]>> = {
   },
 };
 
-export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: PointDetailSheetProps) {
+export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, allPoints, currentIndex, onNavigatePoint }: PointDetailSheetProps) {
   const { t, language } = useLanguage();
   const isMobile = useIsMobile();
   const [showARViewer, setShowARViewer] = useState(false);

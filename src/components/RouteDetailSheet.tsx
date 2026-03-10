@@ -243,17 +243,36 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
 
             {/* Navigation button */}
             {route.polyline.length > 0 && (
-              <Button
-                variant="outline"
-                className="w-full justify-between"
-                onClick={handleNavigateToStart}
-              >
-                <span className="flex items-center gap-2">
-                  <Navigation className="w-4 h-4" aria-hidden="true" />
-                  {t('routes.howToGet')}
-                </span>
-                <ChevronRight className="w-4 h-4" aria-hidden="true" />
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1 justify-between"
+                  onClick={handleNavigateToStart}
+                >
+                  <span className="flex items-center gap-2">
+                    <Navigation className="w-4 h-4" aria-hidden="true" />
+                    {t('routes.howToGet')}
+                  </span>
+                  <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                </Button>
+                {route.gpxFile && (
+                  <Button
+                    variant="outline"
+                    className="gap-2"
+                    onClick={() => {
+                      const url = getDirectusAssetUrl(route.gpxFile);
+                      if (url) {
+                        window.open(url, '_blank');
+                        const routeName = typeof route.title === 'string' ? route.title : route.title[lang] || route.title.es;
+                        trackGPXDownloaded(route.id, routeName);
+                      }
+                    }}
+                  >
+                    <Download className="w-4 h-4" aria-hidden="true" />
+                    GPX
+                  </Button>
+                )}
+              </div>
             )}
 
             {/* Categories with labels */}
