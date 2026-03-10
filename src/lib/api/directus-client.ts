@@ -402,7 +402,7 @@ class DirectusApiClient {
           'web_url', 'thumbnail', 'preview_video', 'duration_minutes', 'difficulty',
           'age_rating', 'motion_sickness_warning', 'compatible_devices', 'status',
           'created_at', 'updated_at', 'translations.*'
-        ],
+        ] as any,
         limit, offset: (page - 1) * limit, sort: ['-created_at'],
       }));
       return (experiences as unknown as DirectusVRExperience[]).map(transformVRExperience);
