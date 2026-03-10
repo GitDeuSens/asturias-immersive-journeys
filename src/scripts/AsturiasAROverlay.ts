@@ -268,6 +268,7 @@ export class AsturiasAROverlay extends Behaviour {
         this._detectLanguage();
         this._detectSlug();
         this._isDesktop = this._detectDesktop();
+        this._detectVRHeadset();
         this._loadGoogleFont();
         this._injectGlobalStyles();
         this._hideNeedleDefaultUI();
