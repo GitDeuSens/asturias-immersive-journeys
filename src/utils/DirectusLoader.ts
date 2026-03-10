@@ -306,7 +306,7 @@ export async function loadSceneInto(
       return;
     }
     if (!scene.glb_model) {
-      console.error(`[Directus] Scene '${slug}' has no GLB assigned`);
+      if (import.meta.env.DEV) console.error(`[Directus] Scene '${slug}' has no GLB assigned`);
       return;
     }
     glbUrl = getAssetUrl(scene.glb_model);
