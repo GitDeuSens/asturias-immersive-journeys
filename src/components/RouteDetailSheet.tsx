@@ -31,6 +31,10 @@ import { calculateRouteDistance, formatDistance, openNavigation } from '@/lib/ma
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ShareButtons } from '@/components/ShareButtons';
+import { FavoriteButton } from '@/components/FavoriteButton';
+import { ElevationProfile } from '@/components/ElevationProfile';
+import { useVisited } from '@/hooks/useVisited';
+import { Progress } from '@/components/ui/progress';
 import { trackRouteViewed } from '@/lib/analytics';
 import { useNavigate } from 'react-router-dom';
 import { useSearchParams } from 'react-router-dom';
