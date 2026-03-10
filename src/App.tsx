@@ -79,6 +79,7 @@ const ARExperiencesPage = lazy(() => import("./pages/ARExperiencesPage").then(m 
 const VRExperiencesPage = lazy(() => import("./components/VRExperiencesPage").then(m => ({ default: m.VRExperiencesPage })));
 const Tours360Page = lazy(() => import("./pages/Tours360Page").then(m => ({ default: m.Tours360Page })));
 const RoutesPage = lazy(() => import("./pages/RoutesPage").then(m => ({ default: m.RoutesPage })));
+const FavoritesPage = lazy(() => import("./pages/FavoritesPage").then(m => ({ default: m.FavoritesPage })));
 //const RouteDetailSheet = lazy(() => import("./components/RouteDetailSheet").then(m => ({ default: m.RouteDetailSheet })));
 // Internal component for performance optimizations
 function AppWithOptimizations() {
