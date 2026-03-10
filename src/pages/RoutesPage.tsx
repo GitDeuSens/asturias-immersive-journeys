@@ -680,20 +680,22 @@ export const RoutesPage = React.memo(function RoutesPage() {
                   </span>
                 </div>
 
-                {/* Search */}
-                <div className="relative">
-                  <Search
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
-                    aria-hidden="true"
-                  />
-                  <input
-                    type="search"
-                    placeholder={viewMode === 'points' ? t("routes.searchPoints") : t("routes.search")}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-muted/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
-                    aria-label={viewMode === 'points' ? t("routes.searchPoints") : t("routes.search")}
-                  />
+                {/* Search + Categories on same line on mobile */}
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <Search
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+                      aria-hidden="true"
+                    />
+                    <input
+                      type="search"
+                      placeholder={viewMode === 'points' ? t("routes.searchPoints") : t("routes.search")}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-muted/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+                      aria-label={viewMode === 'points' ? t("routes.searchPoints") : t("routes.search")}
+                    />
+                  </div>
                 </div>
 
                 {/* Categories, Toggle & Locate */}
