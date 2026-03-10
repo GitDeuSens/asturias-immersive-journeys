@@ -135,7 +135,7 @@ function transformVRExperience(vr: DirectusVRExperience): VRExperience {
     apk_url: vr.apk_file ? getDirectusFileUrl(vr.apk_file) : undefined,
     apk_version: vr.apk_version,
     apk_size_mb: vr.apk_size_mb,
-    web_url: (vr as any).web_url || undefined,
+    web_url: vr.web_url || undefined,
     duration_minutes: vr.duration_minutes,
     difficulty: vr.difficulty,
     age_rating: vr.age_rating,
