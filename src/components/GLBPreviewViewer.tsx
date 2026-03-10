@@ -116,11 +116,11 @@ export default function GLBPreviewViewer({ glbUrl, scale = 1, rotationY = 0, cla
 
             // Handle animations
             if (gltf.animations.length > 0) {
-              const mixer = new THREE.AnimationMixer(model);
+              const m = new THREE.AnimationMixer(model);
               gltf.animations.forEach(clip => {
-                mixer.clipAction(clip).play();
+                m.clipAction(clip).play();
               });
-              (renderer as any)._mixer = mixer;
+              mixer = m;
             }
 
             setLoading(false);
