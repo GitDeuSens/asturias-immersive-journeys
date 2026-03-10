@@ -184,22 +184,24 @@ export function Tours360Page() {
   }, [slug, kuulaTours]);
 
   const filteredTours = useMemo(() => {
-    if (selectedCategories.length === 0) return kuulaTours;
-    return kuulaTours.filter((tour) =>
-      tour.categories?.some((cat: any) => {
-        const catId = typeof cat === 'object' ? (cat.categories_id ?? cat.id) : cat;
-        return selectedCategories.includes(String(catId));
-      })
-    );
-  }, [selectedCategories, kuulaTours]);
-
-  const localSearchData: LocalSearchItem[] = useMemo(() => {
-    return filteredTours.map((tour) => ({
-      id: tour.id,
-      title: tour.title,
-      subtitle: "",
-    }));
-  }, [filteredTours]);
+    let filtered = kuulaTours;
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter((tour) =>
+        tour.categories?.some((cat: any) => {
+          const catId = typeof cat === 'object' ? (cat.categories_id ?? cat.id) : cat;
+          return selectedCategories.includes(String(catId));
+        })
+      );
+    }
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter((tour) => {
+        const title = typeof tour.title === 'string' ? tour.title : (tour.title[language] || tour.title.es || '');
+        return title.toLowerCase().includes(q) || title.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().includes(q);
+      });
+    }
+    return filtered;
+  }, [selectedCategories, searchQuery, kuulaTours, language]);
 
   const toggleCategory = (catId: string) => {
     setSelectedCategories((prev) => (prev.includes(catId) ? prev.filter((id) => id !== catId) : [...prev, catId]));
