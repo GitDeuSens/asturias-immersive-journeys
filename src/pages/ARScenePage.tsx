@@ -5,7 +5,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
-  ArrowLeft, AlertCircle, X,
+  AlertCircle, X,
 } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { NeedleARViewer } from "@/components/NeedleARViewer";
