@@ -6,35 +6,35 @@ export interface WeatherData {
   windSpeed: number;
   humidity: number;
   description: string;
-  icon: string;
+  iconName: string;
 }
 
-const WMO_DESCRIPTIONS: Record<number, { desc: string; icon: string }> = {
-  0: { desc: 'Clear sky', icon: '☀️' },
-  1: { desc: 'Mainly clear', icon: '🌤️' },
-  2: { desc: 'Partly cloudy', icon: '⛅' },
-  3: { desc: 'Overcast', icon: '☁️' },
-  45: { desc: 'Fog', icon: '🌫️' },
-  48: { desc: 'Rime fog', icon: '🌫️' },
-  51: { desc: 'Light drizzle', icon: '🌦️' },
-  53: { desc: 'Moderate drizzle', icon: '🌦️' },
-  55: { desc: 'Dense drizzle', icon: '🌧️' },
-  61: { desc: 'Slight rain', icon: '🌧️' },
-  63: { desc: 'Moderate rain', icon: '🌧️' },
-  65: { desc: 'Heavy rain', icon: '🌧️' },
-  71: { desc: 'Slight snow', icon: '🌨️' },
-  73: { desc: 'Moderate snow', icon: '🌨️' },
-  75: { desc: 'Heavy snow', icon: '❄️' },
-  80: { desc: 'Rain showers', icon: '🌦️' },
-  81: { desc: 'Moderate showers', icon: '🌧️' },
-  82: { desc: 'Violent showers', icon: '⛈️' },
-  95: { desc: 'Thunderstorm', icon: '⛈️' },
-  96: { desc: 'Thunderstorm + hail', icon: '⛈️' },
-  99: { desc: 'Thunderstorm + heavy hail', icon: '⛈️' },
+const WMO_DESCRIPTIONS: Record<number, { desc: string; iconName: string }> = {
+  0: { desc: 'Clear sky', iconName: 'Sun' },
+  1: { desc: 'Mainly clear', iconName: 'SunMedium' },
+  2: { desc: 'Partly cloudy', iconName: 'CloudSun' },
+  3: { desc: 'Overcast', iconName: 'Cloud' },
+  45: { desc: 'Fog', iconName: 'CloudFog' },
+  48: { desc: 'Rime fog', iconName: 'CloudFog' },
+  51: { desc: 'Light drizzle', iconName: 'CloudDrizzle' },
+  53: { desc: 'Moderate drizzle', iconName: 'CloudDrizzle' },
+  55: { desc: 'Dense drizzle', iconName: 'CloudRain' },
+  61: { desc: 'Slight rain', iconName: 'CloudRain' },
+  63: { desc: 'Moderate rain', iconName: 'CloudRain' },
+  65: { desc: 'Heavy rain', iconName: 'CloudRainWind' },
+  71: { desc: 'Slight snow', iconName: 'CloudSnow' },
+  73: { desc: 'Moderate snow', iconName: 'CloudSnow' },
+  75: { desc: 'Heavy snow', iconName: 'Snowflake' },
+  80: { desc: 'Rain showers', iconName: 'CloudDrizzle' },
+  81: { desc: 'Moderate showers', iconName: 'CloudRain' },
+  82: { desc: 'Violent showers', iconName: 'CloudLightning' },
+  95: { desc: 'Thunderstorm', iconName: 'CloudLightning' },
+  96: { desc: 'Thunderstorm + hail', iconName: 'CloudLightning' },
+  99: { desc: 'Thunderstorm + heavy hail', iconName: 'CloudLightning' },
 };
 
 const CACHE_KEY = 'weather-cache';
-const CACHE_TTL = 30 * 60 * 1000; // 30 min
+const CACHE_TTL = 30 * 60 * 1000;
 
 export function useWeather(lat?: number, lng?: number) {
   const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -44,7 +44,6 @@ export function useWeather(lat?: number, lng?: number) {
     if (!lat || !lng) return;
     const key = `${CACHE_KEY}-${lat.toFixed(2)}-${lng.toFixed(2)}`;
 
-    // Check cache
     try {
       const cached = localStorage.getItem(key);
       if (cached) {
@@ -62,14 +61,14 @@ export function useWeather(lat?: number, lng?: number) {
       .then(data => {
         if (data.current) {
           const code = data.current.weather_code;
-          const wmo = WMO_DESCRIPTIONS[code] || { desc: 'Unknown', icon: '🌡️' };
+          const wmo = WMO_DESCRIPTIONS[code] || { desc: 'Unknown', iconName: 'Thermometer' };
           const w: WeatherData = {
             temperature: Math.round(data.current.temperature_2m),
             weatherCode: code,
             windSpeed: Math.round(data.current.wind_speed_10m),
             humidity: data.current.relative_humidity_2m,
             description: wmo.desc,
-            icon: wmo.icon,
+            iconName: wmo.iconName,
           };
           setWeather(w);
           try { localStorage.setItem(key, JSON.stringify({ data: w, ts: Date.now() })); } catch {}

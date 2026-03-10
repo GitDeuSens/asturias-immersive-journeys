@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { View, ChevronRight, X, Filter, Search, Home, Maximize2, Share2, Info, Minimize2 } from "lucide-react";
+import { View, ChevronRight, X, Filter, Search, Home, Maximize2, Share2, Info, Minimize2, Star } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { DIRECTUS_URL } from '@/lib/directus-url';
 import { UnifiedSearchBar } from "@/components/UnifiedSearchBar";
@@ -338,7 +338,7 @@ export function Tours360Page() {
               className="mb-6"
             >
               <h2 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
-                ⭐ {t(texts.featured)}
+                <Star className="w-5 h-5 text-warm fill-warm" /> {t(texts.featured)}
               </h2>
               <HeroCarousel items={carouselItems} />
             </motion.div>

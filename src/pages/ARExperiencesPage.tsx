@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, Clock, MapPin, ChevronRight, Home } from "lucide-react";
+import { Sparkles, Clock, MapPin, ChevronRight, Home, Star } from "lucide-react";
 import { UnifiedSearchBar, type CustomFilter } from "@/components/UnifiedSearchBar";
 import { TourCardSkeleton } from "@/components/SkeletonCard";
 import { HeroCarousel } from "@/components/HeroCarousel";
@@ -154,7 +154,7 @@ export function ARExperiencesPage() {
               className="mb-6"
             >
               <h2 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
-                ⭐ {t(texts.featured)}
+                <Star className="w-5 h-5 text-warm fill-warm" /> {t(texts.featured)}
               </h2>
               <HeroCarousel items={carouselItems} />
             </motion.div>

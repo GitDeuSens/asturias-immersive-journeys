@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Facebook, Twitter, Menu, X, View, Map, Sparkles, Glasses, Home, ArrowLeftRight, HelpCircle, Heart } from "lucide-react";
+import { Facebook, Twitter, Menu, X, View, Map, Sparkles, Glasses, Home, ArrowLeftRight, HelpCircle, Heart, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SettingsDropdown } from "@/components/SettingsDropdown";
 import { GlossaryDialog } from "@/components/GlossaryDialog";
@@ -197,8 +197,8 @@ export function AppHeader({ showRestart = true, variant = "light" }: AppHeaderPr
                   <ArrowLeftRight className="w-5 h-5" aria-hidden="true" />
                   {t("nav.switchMode")}
                   {mode && (
-                    <span className="ml-auto text-xs text-white/40">
-                      {mode === 'home' ? '🏠' : '📍'}
+                    <span className="ml-auto text-muted-foreground">
+                      {mode === 'home' ? <Home className="w-3.5 h-3.5" /> : <MapPin className="w-3.5 h-3.5" />}
                     </span>
                   )}
                 </button>
