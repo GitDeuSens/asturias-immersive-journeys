@@ -672,6 +672,14 @@ export class AsturiasAROverlay extends Behaviour {
                 ?? document.documentElement;
             document.fullscreenElement ? document.exitFullscreen() : el?.requestFullscreen?.();
         });
+        bar.querySelector('#ast-hdr-close')?.addEventListener('click', () => {
+            // Navigate back — uses browser history or falls back to /ar list
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '/ar';
+            }
+        });
     }
 
     private _showHeaderBar() { if (this._headerBar) this._headerBar.style.display = 'flex'; }
