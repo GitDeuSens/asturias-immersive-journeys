@@ -521,7 +521,7 @@ export class AsturiasAROverlay extends Behaviour {
         if (this._isiOS()) {
             // Redirect to App Clip with CLEAN _sceneUrl — no autostart param,
             // so the App Clip opens the page normally without re-triggering autostart.
-            console.log('[AsturiasAROverlay] iOS autostart → App Clip');
+            _log('[AsturiasAROverlay] iOS autostart → App Clip');
             window.location.href = this._getAppClipUrl();
             return;
         }
