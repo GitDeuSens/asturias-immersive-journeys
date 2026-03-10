@@ -370,23 +370,22 @@ class DirectusApiClient {
 
   async getRoutes(_locale: Language = 'es') {
     try {
-      // Step 1: fetch all routes without deep point relations (avoids query complexity limit)
-      const routes = await this.getClient().request(readItems('routes' as any, {
-        filter: { status: { _in: API_CONFIG.getStatusFilter() } } as any,
-        fields: ['*', 'translations.*', 'categories.categories_id.*', 'categories.categories_id.translations.*'] as any,
-        limit: -1,
-      }));
+      const [routes, allPoints, analyticsCounts] = await Promise.all([
+        this.getClient().request(readItems('routes' as any, {
+          filter: { status: { _in: API_CONFIG.getStatusFilter() } } as any,
+          fields: ['*', 'translations.*', 'categories.categories_id.*', 'categories.categories_id.translations.*'] as any,
+          limit: -1,
+        })),
+        this.getClient().request(readItems('pois' as any, {
+          filter: { status: { _in: API_CONFIG.getStatusFilter() } } as any,
+          fields: ['*', 'translations.*', 'ar_scene_id.slug', 'ar_scene_id.build_path', 'ar_scene_id.translations.*', 'ar_scene_id.scene_mode', 'ar_scene_id.glb_model', 'ar_scene_id.glb_scale', 'ar_scene_id.glb_rotation_y', 'tour_360_id.slug', 'tour_360_id.build_path', 'tour_360_id.translations.*', 'gallery.*', 'audio_es.id', 'audio_es.duration', 'audio_en.id', 'audio_en.duration', 'audio_fr.id', 'audio_fr.duration'] as any,
+          sort: ['order'] as any,
+          limit: -1,
+        })).catch(() => []),
+        this.getAnalyticsCountMap('route', ['route_viewed']),
+      ]);
       const routeList = routes as unknown as DirectusRoute[];
 
-      // Step 2: fetch all points in one separate query (avoids deep-relation complexity limit)
-      const allPoints = await this.getClient().request(readItems('pois' as any, {
-        filter: { status: { _in: API_CONFIG.getStatusFilter() } } as any,
-        fields: ['*', 'translations.*', 'ar_scene_id.slug', 'ar_scene_id.build_path', 'ar_scene_id.translations.*', 'ar_scene_id.scene_mode', 'ar_scene_id.glb_model', 'ar_scene_id.glb_scale', 'ar_scene_id.glb_rotation_y', 'tour_360_id.slug', 'tour_360_id.build_path', 'tour_360_id.translations.*', 'gallery.*', 'audio_es.id', 'audio_es.duration', 'audio_en.id', 'audio_en.duration', 'audio_fr.id', 'audio_fr.duration'] as any,
-        sort: ['order'] as any,
-        limit: -1,
-      })).catch(() => []);
-
-      // Attach points to their routes
       const pointsByRoute = new Map<string, any[]>();
       for (const pt of allPoints as any[]) {
         const rid = pt.route_id;
@@ -398,31 +397,53 @@ class DirectusApiClient {
         (route as any).points = pointsByRoute.get(route.id) ?? (route as any).points ?? [];
       }
 
-      return routeList.map(transformRoute);
+      return routeList.map((route) => {
+        const analyticsCount = analyticsCounts.get((route as any).route_code) ?? analyticsCounts.get(route.id) ?? 0;
+        return transformRoute({
+          ...route,
+          view_count: Math.max(Number(route.view_count ?? 0), analyticsCount),
+        } as DirectusRoute);
+      });
     } catch (error) { logger.error('[DirectusClient] Error fetching routes:', error); return []; }
   }
 
   async getRouteBySlug(slug: string, _locale: Language = 'es') {
     try {
-      const routes = await this.getClient().request(readItems('routes', {
-        filter: { slug: { _eq: slug }, status: { _in: ['published', 'draft'] } },
-        fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.*', 'categories.categories_id.translations.*', 'points.*', 'points.translations.*', 'points.ar_scene_id.*', 'points.ar_scene_id.translations.*', 'points.tour_360_id.*', 'points.tour_360_id.translations.*', 'points.gallery.*', 'points.audio_es.id', 'points.audio_es.duration', 'points.audio_en.id', 'points.audio_en.duration', 'points.audio_fr.id', 'points.audio_fr.duration'] as any,
-        limit: 1,
-      }));
+      const [routes, analyticsCounts] = await Promise.all([
+        this.getClient().request(readItems('routes', {
+          filter: { slug: { _eq: slug }, status: { _in: ['published', 'draft'] } },
+          fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.*', 'categories.categories_id.translations.*', 'points.*', 'points.translations.*', 'points.ar_scene_id.*', 'points.ar_scene_id.translations.*', 'points.tour_360_id.*', 'points.tour_360_id.translations.*', 'points.gallery.*', 'points.audio_es.id', 'points.audio_es.duration', 'points.audio_en.id', 'points.audio_en.duration', 'points.audio_fr.id', 'points.audio_fr.duration'] as any,
+          limit: 1,
+        })),
+        this.getAnalyticsCountMap('route', ['route_viewed']),
+      ]);
       if ((routes as any[]).length === 0) return null;
-      return transformRoute((routes as unknown as DirectusRoute[])[0]);
+      const raw = (routes as unknown as DirectusRoute[])[0];
+      const analyticsCount = analyticsCounts.get((raw as any).route_code) ?? analyticsCounts.get(raw.id) ?? 0;
+      return transformRoute({
+        ...raw,
+        view_count: Math.max(Number(raw.view_count ?? 0), analyticsCount),
+      } as DirectusRoute);
     } catch (error) { logger.error(`[DirectusClient] Error fetching route ${slug}:`, error); return null; }
   }
 
   async getRouteByCode(code: string, _locale: Language = 'es') {
     try {
-      const routes = await this.getClient().request(readItems('routes', {
-        filter: { route_code: { _eq: code }, status: { _in: ['published', 'draft'] } },
-        fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.*', 'categories.categories_id.translations.*', 'points.*', 'points.translations.*', 'points.ar_scene_id.*', 'points.ar_scene_id.translations.*', 'points.tour_360_id.*', 'points.tour_360_id.translations.*', 'points.gallery.*', 'points.audio_es.id', 'points.audio_es.duration', 'points.audio_en.id', 'points.audio_en.duration', 'points.audio_fr.id', 'points.audio_fr.duration'] as any,
-        limit: 1,
-      }));
+      const [routes, analyticsCounts] = await Promise.all([
+        this.getClient().request(readItems('routes', {
+          filter: { route_code: { _eq: code }, status: { _in: ['published', 'draft'] } },
+          fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.*', 'categories.categories_id.translations.*', 'points.*', 'points.translations.*', 'points.ar_scene_id.*', 'points.ar_scene_id.translations.*', 'points.tour_360_id.*', 'points.tour_360_id.translations.*', 'points.gallery.*', 'points.audio_es.id', 'points.audio_es.duration', 'points.audio_en.id', 'points.audio_en.duration', 'points.audio_fr.id', 'points.audio_fr.duration'] as any,
+          limit: 1,
+        })),
+        this.getAnalyticsCountMap('route', ['route_viewed']),
+      ]);
       if ((routes as any[]).length === 0) return null;
-      return transformRoute((routes as unknown as DirectusRoute[])[0]);
+      const raw = (routes as unknown as DirectusRoute[])[0];
+      const analyticsCount = analyticsCounts.get((raw as any).route_code) ?? analyticsCounts.get(raw.id) ?? 0;
+      return transformRoute({
+        ...raw,
+        view_count: Math.max(Number(raw.view_count ?? 0), analyticsCount),
+      } as DirectusRoute);
     } catch (error) { logger.error(`[DirectusClient] Error fetching route ${code}:`, error); return null; }
   }
 
