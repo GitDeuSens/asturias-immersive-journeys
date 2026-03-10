@@ -173,6 +173,7 @@ function transformRoute(route: DirectusRoute) {
     theme: toMultilingual(route.translations, 'theme'),
     duration: toMultilingual(route.translations, 'duration'),
     cover_image_url: getDirectusFileUrl(route.cover_image),
+    view_count: Math.max(Number(route.view_count ?? 0), Number((route as any).completion_count ?? 0)),
     category_ids: extractCategoryIds((route as any).categories),
   };
 }
