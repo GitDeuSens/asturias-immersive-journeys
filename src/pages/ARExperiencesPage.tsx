@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, Clock, MapPin, ChevronRight, Home } from "lucide-react";
+import { Sparkles, Clock, MapPin, ChevronRight, Home, Star } from "lucide-react";
 import { UnifiedSearchBar, type CustomFilter } from "@/components/UnifiedSearchBar";
 import { TourCardSkeleton } from "@/components/SkeletonCard";
 import { HeroCarousel } from "@/components/HeroCarousel";

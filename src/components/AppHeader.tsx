@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Facebook, Twitter, Menu, X, View, Map, Sparkles, Glasses, Home, ArrowLeftRight, HelpCircle, Heart } from "lucide-react";
+import { Facebook, Twitter, Menu, X, View, Map, Sparkles, Glasses, Home, ArrowLeftRight, HelpCircle, Heart, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SettingsDropdown } from "@/components/SettingsDropdown";
 import { GlossaryDialog } from "@/components/GlossaryDialog";
