@@ -259,14 +259,6 @@ export function Tours360Page() {
     }
   };
 
-  const handleLocalSearchSelect = (item: LocalSearchItem) => {
-    const tour = kuulaTours.find((t) => t.id === item.id);
-    if (tour) {
-      handleTourClick(tour);
-      setShowSearch(false);
-    }
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <AppHeader variant="light" />
