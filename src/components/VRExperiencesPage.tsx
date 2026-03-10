@@ -67,6 +67,9 @@ const texts = {
   close: { es: 'Cerrar', en: 'Close', fr: 'Fermer' },
   details: { es: 'Ver detalles', en: 'View details', fr: 'Voir les détails' },
   duration: { es: 'min', en: 'min', fr: 'min' },
+  tryInBrowser: { es: 'Probar en navegador', en: 'Try in browser', fr: 'Essayer dans le navigateur' },
+  webPreview: { es: 'Vista previa interactiva', en: 'Interactive preview', fr: 'Aperçu interactif' },
+  videoPreview: { es: 'Video preview', en: 'Video preview', fr: 'Aperçu vidéo' },
   difficulty: {
     easy: { es: 'Fácil', en: 'Easy', fr: 'Facile' },
     moderate: { es: 'Moderado', en: 'Moderate', fr: 'Modéré' },
