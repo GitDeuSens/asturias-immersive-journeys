@@ -1,5 +1,15 @@
 import { useWeather } from '@/hooks/useWeather';
-import { Wind, Droplets } from 'lucide-react';
+import {
+  Wind, Droplets, Sun, SunMedium, CloudSun, Cloud, CloudFog,
+  CloudDrizzle, CloudRain, CloudRainWind, CloudSnow, Snowflake,
+  CloudLightning, Thermometer
+} from 'lucide-react';
+
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  Sun, SunMedium, CloudSun, Cloud, CloudFog,
+  CloudDrizzle, CloudRain, CloudRainWind, CloudSnow, Snowflake,
+  CloudLightning, Thermometer,
+};
 
 interface WeatherWidgetProps {
   lat: number;
@@ -24,9 +34,13 @@ export function WeatherWidget({ lat, lng, className = '' }: WeatherWidgetProps) 
 
   if (!weather) return null;
 
+  const WeatherIcon = iconMap[weather.iconName] || Sun;
+
   return (
     <div className={`flex items-center gap-3 p-3 rounded-xl bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/15 ${className}`}>
-      <span className="text-3xl" role="img" aria-label={weather.description}>{weather.icon}</span>
+      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+        <WeatherIcon className="w-6 h-6 text-primary" />
+      </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-1.5">
           <span className="text-xl font-bold text-foreground">{weather.temperature}°C</span>

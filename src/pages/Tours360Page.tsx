@@ -338,7 +338,7 @@ export function Tours360Page() {
               className="mb-6"
             >
               <h2 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
-                ⭐ {t(texts.featured)}
+                <Star className="w-5 h-5 text-warm fill-warm" /> {t(texts.featured)}
               </h2>
               <HeroCarousel items={carouselItems} />
             </motion.div>

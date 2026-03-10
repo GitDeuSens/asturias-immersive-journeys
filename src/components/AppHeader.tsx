@@ -197,8 +197,8 @@ export function AppHeader({ showRestart = true, variant = "light" }: AppHeaderPr
                   <ArrowLeftRight className="w-5 h-5" aria-hidden="true" />
                   {t("nav.switchMode")}
                   {mode && (
-                    <span className="ml-auto text-xs text-white/40">
-                      {mode === 'home' ? '🏠' : '📍'}
+                    <span className="ml-auto text-muted-foreground">
+                      {mode === 'home' ? <Home className="w-3.5 h-3.5" /> : <MapPin className="w-3.5 h-3.5" />}
                     </span>
                   )}
                 </button>
