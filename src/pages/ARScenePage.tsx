@@ -18,8 +18,6 @@ import type { ARScene, Language } from "@/lib/types";
 
 const texts = {
   back: { es: "Volver", en: "Back", fr: "Retour" },
-  allAR: { es: "Todas las experiencias", en: "All experiences", fr: "Toutes les expériences" },
-  close: { es: "Cerrar", en: "Close", fr: "Fermer" },
   notFound: { es: "Experiencia no encontrada", en: "Experience not found", fr: "Expérience non trouvée" },
   loading: { es: "Cargando...", en: "Loading...", fr: "Chargement..." },
 };
