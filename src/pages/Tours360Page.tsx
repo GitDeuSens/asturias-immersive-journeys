@@ -7,6 +7,7 @@ import { CategoryChips } from "@/components/CategoryChips";
 import { DIRECTUS_URL } from '@/lib/directus-url';
 import { GlobalSearch, LocalSearchItem } from "@/components/GlobalSearch";
 import { Footer } from "@/components/Footer";
+import { TourCardSkeleton } from "@/components/SkeletonCard";
 import { useDirectusTours, useDirectusCategories } from "@/hooks/useDirectusData";
 import { useLanguage } from "@/hooks/useLanguage";
 import { trackTourViewed, trackEvent } from "@/lib/analytics";
