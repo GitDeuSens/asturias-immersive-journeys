@@ -557,9 +557,9 @@ function VRDetailModal({
           )}
 
           {/* Preview mode label */}
-          {previewMode === 'web' && (
+          {(previewMode === 'web' || previewMode === '3d') && (
             <div className="absolute bottom-3 left-3 z-10 px-2 py-1 rounded-md bg-primary/80 text-primary-foreground text-[10px] font-bold uppercase tracking-wider">
-              {t(tx.webPreview)}
+              {previewMode === 'web' ? t(tx.webPreview) : t(tx.view3D)}
             </div>
           )}
         </div>
