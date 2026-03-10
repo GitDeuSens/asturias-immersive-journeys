@@ -624,7 +624,7 @@ export class AsturiasAROverlay extends Behaviour {
         try {
             const { NeedleXRSession, Context } = await import('@needle-tools/engine');
             const ctx = Context.Current;
-            if (NeedleXRSession && ctx) { await NeedleXRSession.start("ar", undefined, ctx); return; }
+            if (NeedleXRSession && ctx) { await NeedleXRSession.start({ mode: 'immersive-ar' }); return; }
         } catch (err) { console.warn('[AsturiasAROverlay] NeedleXRSession.start failed', err); }
         try {
             const f = WebXRButtonFactory.getOrCreate();
