@@ -149,7 +149,7 @@ export class ModelLoading extends Behaviour {
       return;
     }
 
-    console.log(`[ModelLoading] Found ${animations.length} animation(s), setting up mixer`);
+    logger.log(`[ModelLoading] Found ${animations.length} animation(s), setting up mixer`);
 
     // Collect material names present on the instantiated object
     const materialNames: string[] = [];
