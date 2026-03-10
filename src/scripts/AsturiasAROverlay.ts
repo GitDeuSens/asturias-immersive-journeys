@@ -309,8 +309,10 @@ export class AsturiasAROverlay extends Behaviour {
         onXRSessionStart(() => {
             this._hidePrePanel();
             this._hideHeaderBar();
+            // Stop header audio player before switching to AR controls
+            this._audio.stop();
+            if (this._headerAudioPanel) this._headerAudioPanel.style.display = 'none';
             this._buildARControls();
-            // _audioPanel is set inside _buildARControls — open immediately if audio exists
             if (this._hasAudio()) this._toggleAudioPanel();
         });
         onXRSessionEnd(() => {
@@ -636,15 +638,19 @@ export class AsturiasAROverlay extends Behaviour {
     // HEADER BAR
     // ─────────────────────────────────────────────────────────────────────────
 
+    private _headerAudioPanel?: HTMLElement;
+
     private _buildHeaderBar() {
         const root = this._ensureRoot();
         const bar  = document.createElement('div');
         this._headerBar = bar;
-        const title  = this._getTitle();
+        const title    = this._getTitle();
+        const hasAudio = this._hasAudio();
         const btnSt  = `display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);color:#fff;transition:all 0.15s ease;`;
         const share  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>`;
         const fs     = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>`;
         const closeIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+        const headphonesSmall = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>`;
         bar.style.cssText = `position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:linear-gradient(to bottom,rgba(0,0,0,0.8),transparent);pointer-events:auto;z-index:${ASTURIAS.zIndex.controls};animation:ast-fade-up 0.3s ease forwards;font-family:${ASTURIAS.fonts.family};`;
         bar.innerHTML = `
             <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;">
@@ -652,6 +658,7 @@ export class AsturiasAROverlay extends Behaviour {
                 <div style="font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${title}</div>
             </div>
             <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+                ${hasAudio ? `<button id="ast-hdr-audio" style="${btnSt}" title="${t('audioGuide', this._lang)}">${headphonesSmall}</button>` : ''}
                 <button id="ast-hdr-info"       style="${btnSt}">${this._icon('info')}</button>
                 <button id="ast-hdr-share"      style="${btnSt}">${share}</button>
                 <button id="ast-hdr-fullscreen" style="${btnSt}">${fs}</button>
@@ -673,13 +680,106 @@ export class AsturiasAROverlay extends Behaviour {
             document.fullscreenElement ? document.exitFullscreen() : el?.requestFullscreen?.();
         });
         bar.querySelector('#ast-hdr-close')?.addEventListener('click', () => {
-            // Navigate back — uses browser history or falls back to /ar list
             if (window.history.length > 1) {
                 window.history.back();
             } else {
                 window.location.href = '/ar';
             }
         });
+        if (hasAudio) {
+            bar.querySelector('#ast-hdr-audio')?.addEventListener('click', () => this._toggleHeaderAudio());
+            this._buildHeaderAudioPanel(root);
+        }
+    }
+
+    /** Floating audio player panel below header bar (3D preview mode) */
+    private _buildHeaderAudioPanel(root: HTMLElement) {
+        const panel = document.createElement('div');
+        this._headerAudioPanel = panel;
+        panel.style.cssText = `
+            display:none;position:absolute;top:52px;right:12px;
+            pointer-events:auto;
+            background:linear-gradient(160deg,${ASTURIAS.colors.forest} 0%,#0d2b18 100%);
+            border:1.5px solid rgba(122,184,0,0.35);border-radius:${ASTURIAS.radius.lg};
+            padding:12px 16px;width:min(300px,85vw);box-sizing:border-box;
+            box-shadow:0 8px 32px rgba(0,0,0,0.5);
+            z-index:${ASTURIAS.zIndex.controls};
+            animation:ast-fade-up 0.2s ease forwards;
+            font-family:${ASTURIAS.fonts.family};
+        `;
+        const playBtnSt = `display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;border:1.5px solid rgba(122,184,0,0.5);cursor:pointer;background:rgba(122,184,0,0.15);color:${ASTURIAS.colors.primary};transition:all 0.15s ease;flex-shrink:0;`;
+        panel.innerHTML = `
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                <div style="width:32px;height:32px;border-radius:50%;flex-shrink:0;
+                    background:rgba(122,184,0,0.2);border:1.5px solid rgba(122,184,0,0.5);
+                    display:flex;align-items:center;justify-content:center;color:${ASTURIAS.colors.primary};">
+                    ${this._icon('headphones')}
+                </div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:10px;font-weight:700;color:${ASTURIAS.colors.primary};text-transform:uppercase;letter-spacing:1px;">
+                        ${t('audioGuide', this._lang)}
+                    </div>
+                    <div style="font-size:11px;color:rgba(255,255,255,0.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                        ${this._getTitle()}
+                    </div>
+                </div>
+                <button id="ast-hdr-audio-play" style="${playBtnSt}">
+                    ${this._icon('play')}
+                </button>
+            </div>
+            <div id="ast-hdr-progress-track" class="ast-progress-track">
+                <div id="ast-hdr-progress-fill" class="ast-progress-fill" style="width:0%"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:4px;">
+                <span id="ast-hdr-time-cur" style="font-size:10px;color:rgba(255,255,255,0.4);">0:00</span>
+                <span id="ast-hdr-time-tot" style="font-size:10px;color:rgba(255,255,255,0.4);">0:00</span>
+            </div>
+        `;
+        root.appendChild(panel);
+        panel.querySelector('#ast-hdr-audio-play')?.addEventListener('click', () => {
+            const url = this._getAudioUrl();
+            if (!url) return;
+            if (this._audio.isPlaying) {
+                this._audio.pause();
+                this._updateHeaderAudioUI(false);
+            } else {
+                this._audio.play(url);
+                this._updateHeaderAudioUI(true);
+            }
+        });
+        panel.querySelector('#ast-hdr-progress-track')?.addEventListener('click', (evt) => {
+            const track = evt.currentTarget as HTMLElement;
+            const rect  = track.getBoundingClientRect();
+            const ratio = ((evt as MouseEvent).clientX - rect.left) / rect.width;
+            this._audio.seek(ratio * this._audio.duration);
+        });
+        this._audio.onProgress = (current, duration) => {
+            const fill = panel.querySelector('#ast-hdr-progress-fill') as HTMLElement | null;
+            const cur  = panel.querySelector('#ast-hdr-time-cur') as HTMLElement | null;
+            const tot  = panel.querySelector('#ast-hdr-time-tot') as HTMLElement | null;
+            if (fill && duration > 0) fill.style.width = `${(current / duration) * 100}%`;
+            if (cur) cur.textContent = this._fmtTime(current);
+            if (tot) tot.textContent = this._fmtTime(duration);
+        };
+        this._audio.onEnded = () => {
+            this._updateHeaderAudioUI(false);
+            const fill = panel.querySelector('#ast-hdr-progress-fill') as HTMLElement | null;
+            if (fill) fill.style.width = '0%';
+        };
+    }
+
+    private _toggleHeaderAudio() {
+        const panel = this._headerAudioPanel;
+        if (!panel) return;
+        const open = panel.style.display !== 'block';
+        panel.style.display = open ? 'block' : 'none';
+        const btn = this._headerBar?.querySelector('#ast-hdr-audio') as HTMLElement | null;
+        if (btn) btn.style.background = open ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.15)';
+    }
+
+    private _updateHeaderAudioUI(playing: boolean) {
+        const playBtn = this._headerAudioPanel?.querySelector('#ast-hdr-audio-play') as HTMLElement | null;
+        if (playBtn) playBtn.innerHTML = playing ? this._icon('pause') : this._icon('play');
     }
 
     private _showHeaderBar() { if (this._headerBar) this._headerBar.style.display = 'flex'; }
