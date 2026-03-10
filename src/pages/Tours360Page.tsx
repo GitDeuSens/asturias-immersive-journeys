@@ -314,25 +314,22 @@ export function Tours360Page() {
         </div>
 
         <div className="container mx-auto pb-5 px-4 max-w-6xl">
-          {/* Category filters */}
+          {/* Search + Filters */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="mb-6"
           >
-            <div className="flex flex-col sm:flex-row gap-3">
-              <CategoryChips categories={categories} selectedIds={selectedCategories} onToggle={toggleCategory} />
-              <div className="flex-1">
-                <GlobalSearch
-                  locale={language as Language}
-                  localData={localSearchData}
-                  onLocalSelect={handleLocalSearchSelect}
-                  localIcon={<View className="w-4 h-4 text-muted-foreground flex-shrink-0" />}
-                  placeholder={t(texts.searchPlaceholder)}
-                />
-              </div>
-            </div>
+            <UnifiedSearchBar
+              query={searchQuery}
+              onQueryChange={setSearchQuery}
+              placeholder={t(texts.searchPlaceholder)}
+              categories={categories}
+              selectedCategoryIds={selectedCategories}
+              onToggleCategory={toggleCategory}
+              resultCount={filteredTours.length}
+            />
           </motion.div>
 
           {/* Tours grid */}
