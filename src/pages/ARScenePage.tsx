@@ -132,7 +132,48 @@ export function ARScenePage() {
         type="article"
       />
 
-      {/* NeedleARViewer fills the entire screen. */}
+      {/* Floating top controls */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.3 }}
+        className="absolute top-4 left-4 right-4 z-[100] flex items-center justify-between pointer-events-none"
+      >
+        {/* Left: back + title */}
+        <div className="flex items-center gap-2 pointer-events-auto">
+          <button
+            onClick={handleClose}
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 transition-colors shadow-lg"
+            aria-label={texts.back[lang]}
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <span className="text-white text-sm font-semibold drop-shadow-lg truncate max-w-[200px] sm:max-w-[300px]">
+            {title}
+          </span>
+        </div>
+
+        {/* Right: list + close */}
+        <div className="flex items-center gap-2 pointer-events-auto">
+          <button
+            onClick={() => navigate("/ar")}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 transition-colors shadow-lg text-sm"
+            aria-label={texts.allAR[lang]}
+          >
+            <List className="w-4 h-4" />
+            <span className="hidden sm:inline">{texts.allAR[lang]}</span>
+          </button>
+          <button
+            onClick={handleClose}
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 transition-colors shadow-lg"
+            aria-label={texts.close[lang]}
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      </motion.div>
+
+      {/* NeedleARViewer fills the entire screen */}
       <div className="absolute inset-0 z-0">
         <NeedleARViewer scene={scene} locale={lang} />
       </div>
