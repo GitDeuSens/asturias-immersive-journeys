@@ -184,32 +184,32 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
           className="fixed inset-x-2 sm:inset-x-auto sm:right-2 top-16 md:top-[126px] bottom-2 sm:w-full sm:max-w-lg bg-background z-[48] shadow-2xl flex flex-col overflow-hidden rounded-2xl border border-border/40"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Hero image */}
-          <div
-            className="relative h-40 sm:h-56 bg-cover bg-center flex-shrink-0 rounded-t-2xl overflow-hidden"
-            style={{ backgroundImage: point.coverImage ? `url(${DIRECTUS_URL}/assets/${point.coverImage})` : undefined }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 px-6 pb-4 pt-10">
-              <h1 className="text-2xl font-bold text-foreground line-clamp-2">{title}</h1>
-            </div>
-            <button
-              onClick={() => {
-                onClose();
-              }}
-              className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+          <div className="flex-1 overflow-y-auto">
+            {/* Hero image */}
+            <div
+              className="sticky top-0 z-20 relative h-40 sm:h-56 bg-cover bg-center flex-shrink-0 overflow-hidden border-b border-border/40"
+              style={{ backgroundImage: point.coverImage ? `url(${DIRECTUS_URL}/assets/${point.coverImage})` : undefined }}
             >
-              <X className="w-5 h-5" />
-            </button>
-            {hasAR && (
-              <motion.span initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-warm text-warm-foreground text-sm font-bold shadow-lg">
-                <Smartphone className="w-4 h-4" />AR<Sparkles className="w-3 h-3" />
-              </motion.span>
-            )}
-          </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 px-6 pb-4 pt-10">
+                <h1 className="text-2xl font-bold text-foreground line-clamp-2">{title}</h1>
+              </div>
+              <button
+                onClick={() => {
+                  onClose();
+                }}
+                className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              {hasAR && (
+                <motion.span initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                  className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-warm text-warm-foreground text-sm font-bold shadow-lg">
+                  <Smartphone className="w-4 h-4" />AR<Sparkles className="w-3 h-3" />
+                </motion.span>
+              )}
+            </div>
 
-          <ScrollArea className="flex-1">
             {/* Breadcrumb */}
             {routeTitle && (
               <div className="px-6 pt-3 pb-1">
