@@ -501,7 +501,8 @@ class DirectusApiClient {
           filter: { status: { _eq: 'published' } },
           fields: [
             'id', 'slug', 'category', 'apk_file', 'apk_version', 'apk_size_mb',
-            'web_url', 'thumbnail', 'preview_video', 'duration_minutes', 'difficulty',
+            'web_url', 'thumbnail', 'preview_video', 'glb_model', 'glb_scale', 'glb_rotation_y',
+            'duration_minutes', 'difficulty',
             'age_rating', 'motion_sickness_warning', 'compatible_devices', 'status',
             'created_at', 'updated_at'
           ],
