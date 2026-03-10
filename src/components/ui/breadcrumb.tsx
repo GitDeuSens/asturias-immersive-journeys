@@ -28,7 +28,7 @@ BreadcrumbList.displayName = "BreadcrumbList";
 
 const BreadcrumbItem = React.forwardRef<HTMLLIElement, React.ComponentPropsWithoutRef<"li">>(
   ({ className, ...props }, ref) => (
-    <li ref={ref} className={cn("inline-flex items-center gap-1.5 min-h-[44px]", className)} {...props} />
+    <li ref={ref} className={cn("inline-flex items-center gap-1.5", className)} {...props} />
   ),
 );
 BreadcrumbItem.displayName = "BreadcrumbItem";
@@ -41,7 +41,7 @@ const BreadcrumbLink = React.forwardRef<
 >(({ asChild, className, ...props }, ref) => {
   const Comp = asChild ? Slot : "a";
 
-  return <Comp ref={ref} className={cn("transition-colors hover:text-foreground min-h-[44px] inline-flex items-center", className)} {...props} />;
+  return <Comp ref={ref} className={cn("transition-colors hover:text-foreground inline-flex items-center", className)} {...props} />;
 });
 BreadcrumbLink.displayName = "BreadcrumbLink";
 

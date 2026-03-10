@@ -190,7 +190,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage className="text-xs truncate max-w-[80px] sm:max-w-[150px] inline-block align-bottom">
+              <BreadcrumbPage className="text-xs truncate max-w-[80px] sm:max-w-[150px] block">
                 {getText(route.title, lang)}
               </BreadcrumbPage>
             </BreadcrumbItem>
@@ -198,7 +198,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
               <>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="text-xs truncate max-w-[80px] sm:max-w-[150px] inline-block align-bottom">
+                  <BreadcrumbPage className="text-xs truncate max-w-[80px] sm:max-w-[150px] block">
                     {getText(selectedPoint.title, lang)}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
