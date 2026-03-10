@@ -53,7 +53,7 @@ export function VRExperiencesPage() {
       />
       <AppHeader variant="light" />
       
-      <main id="main-content" className="pt-14 md:pt-[122px] pb-12">
+      <main id="main-content" className="flex-1 pt-14 md:pt-[122px] pb-12">
         {/* Hero section */}
         <div className="bg-gradient-to-r from-accent to-accent/80 py-6 sm:py-12 mb-6 sm:mb-8">
           <div className="container mx-auto px-4 max-w-6xl">
