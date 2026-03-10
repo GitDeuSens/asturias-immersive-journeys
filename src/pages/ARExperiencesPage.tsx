@@ -63,9 +63,9 @@ export function ARExperiencesPage() {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
 
   const arTypeFilters: CustomFilter[] = [
-    { id: 'slam', label: texts.arTypes.slam },
-    { id: 'image-tracking', label: texts.arTypes['image-tracking'] },
-    { id: 'geo', label: texts.arTypes.geo },
+    { id: 'slam', label: texts.arType.slam },
+    { id: 'image-tracking', label: texts.arType['image-tracking'] },
+    { id: 'geo', label: texts.arType.geo },
   ];
 
   const toggleType = (id: string) => {
