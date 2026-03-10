@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Camera,
   Play,
+  Download,
   FileText,
   Headphones,
   Smartphone,
