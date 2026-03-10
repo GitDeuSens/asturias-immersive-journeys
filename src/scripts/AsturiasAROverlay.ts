@@ -309,8 +309,10 @@ export class AsturiasAROverlay extends Behaviour {
         onXRSessionStart(() => {
             this._hidePrePanel();
             this._hideHeaderBar();
+            // Stop header audio player before switching to AR controls
+            this._audio.stop();
+            if (this._headerAudioPanel) this._headerAudioPanel.style.display = 'none';
             this._buildARControls();
-            // _audioPanel is set inside _buildARControls — open immediately if audio exists
             if (this._hasAudio()) this._toggleAudioPanel();
         });
         onXRSessionEnd(() => {
