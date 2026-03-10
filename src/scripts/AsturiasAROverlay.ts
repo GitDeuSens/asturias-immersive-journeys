@@ -634,12 +634,11 @@ export class AsturiasAROverlay extends Behaviour {
     }
 
     private async _startVR() {
-        // Start immersive-vr session via Needle Engine (for VR headsets)
+        // Start immersive-vr session via Needle Engine (correct API signature)
         try {
-            const { NeedleXRSession, Context } = await import('@needle-tools/engine');
-            const ctx = Context.Current;
-            if (NeedleXRSession && ctx) {
-                await NeedleXRSession.start("immersive-vr", undefined, ctx);
+            const { NeedleXRSession } = await import('@needle-tools/engine');
+            if (NeedleXRSession) {
+                await NeedleXRSession.start({ mode: 'immersive-vr' });
                 return;
             }
         } catch (err) { console.warn('[AsturiasAROverlay] NeedleXRSession.start immersive-vr failed', err); }

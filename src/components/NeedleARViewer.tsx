@@ -192,7 +192,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError, onClose }: Needl
               const { NeedleXRSession, Context } = await import('@needle-tools/engine');
               const ctx = Context.Current;
               if (NeedleXRSession && ctx) {
-                await NeedleXRSession.start("immersive-ar", undefined, ctx);
+                await NeedleXRSession.start({ mode: 'immersive-ar' });
                 return true;
               }
             } catch {}
