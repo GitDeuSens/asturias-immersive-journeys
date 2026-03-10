@@ -194,4 +194,5 @@ export interface ImmersiveRoute {
   distanceKm?: number;
   elevationGainMeters?: number;
   surfaceType?: 'paved' | 'gravel' | 'dirt' | 'mixed';
+  gpxFile?: string;
 }

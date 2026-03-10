@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MapPin, Camera, Play, FileText, Headphones, Smartphone, ExternalLink, ChevronRight, Maximize2, Sparkles, Image as ImageIcon, Phone, Mail, Globe, Clock, Euro, Info, Navigation, Footprints, Car, Eye, Download, Share2, Home } from 'lucide-react';
+import { X, MapPin, Camera, Play, FileText, Headphones, Smartphone, ExternalLink, ChevronRight, ChevronLeft, Maximize2, Sparkles, Image as ImageIcon, Phone, Mail, Globe, Clock, Euro, Info, Navigation, Footprints, Car, Eye, Download, Share2, Home } from 'lucide-react';
 import type { RoutePoint } from '@/data/types';
 import { DIRECTUS_URL } from '@/lib/directus-url';
 import { useLanguage, useExplorationMode } from '@/hooks/useLanguage';
@@ -22,7 +22,15 @@ import {
   Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage,
 } from '@/components/ui/breadcrumb';
 
-interface PointDetailSheetProps { point: RoutePoint | null; onClose: () => void; routeTitle?: string; onBackToRoute?: () => void; }
+interface PointDetailSheetProps {
+  point: RoutePoint | null;
+  onClose: () => void;
+  routeTitle?: string;
+  onBackToRoute?: () => void;
+  allPoints?: RoutePoint[];
+  currentIndex?: number;
+  onNavigatePoint?: (point: RoutePoint) => void;
+}
 
 function getText(value: any, lang: string): string {
   if (!value) return '';
@@ -67,7 +75,7 @@ const AR_INSTRUCTIONS: Record<string, Record<string, string[]>> = {
   },
 };
 
-export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: PointDetailSheetProps) {
+export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, allPoints, currentIndex, onNavigatePoint }: PointDetailSheetProps) {
   const { t, language } = useLanguage();
   const isMobile = useIsMobile();
   const [showARViewer, setShowARViewer] = useState(false);
@@ -452,6 +460,33 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                 </div>
               )}
             </div>
+
+            {/* Previous / Next navigation */}
+            {allPoints && allPoints.length > 1 && currentIndex !== undefined && onNavigatePoint && (
+              <div className="flex gap-2 pt-2 pb-2">
+                <Button
+                  variant="outline"
+                  className="flex-1 gap-2"
+                  disabled={currentIndex <= 0}
+                  onClick={() => onNavigatePoint(allPoints[currentIndex - 1])}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  {language === 'es' ? 'Anterior' : language === 'en' ? 'Previous' : 'Précédent'}
+                </Button>
+                <span className="flex items-center text-xs text-muted-foreground font-medium tabular-nums">
+                  {currentIndex + 1}/{allPoints.length}
+                </span>
+                <Button
+                  variant="outline"
+                  className="flex-1 gap-2"
+                  disabled={currentIndex >= allPoints.length - 1}
+                  onClick={() => onNavigatePoint(allPoints[currentIndex + 1])}
+                >
+                  {language === 'es' ? 'Siguiente' : language === 'en' ? 'Next' : 'Suivant'}
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
           </ScrollArea>
         </motion.div>
       </AnimatePresence>
