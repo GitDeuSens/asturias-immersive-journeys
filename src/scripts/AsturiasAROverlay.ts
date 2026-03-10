@@ -737,16 +737,26 @@ export class AsturiasAROverlay extends Behaviour {
         `;
         const title = this._getTitle();
         const secondaryBtnSt = `background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:${ASTURIAS.radius.base};padding:clamp(10px,2.5vw,14px);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:clamp(10px,2.5vw,13px);font-weight:600;gap:5px;font-family:${ASTURIAS.fonts.family};flex-shrink:0;`;
+        const primaryBtnSt = `flex:1;gap:6px;background:${ASTURIAS.colors.primary};color:#fff;border-radius:${ASTURIAS.radius.base};padding:clamp(10px,2.5vw,14px) clamp(10px,3vw,16px);font-size:clamp(11px,2.8vw,14px);font-weight:700;justify-content:center;box-shadow:0 4px 20px rgba(122,184,0,0.4);`;
+        const xrLabel = this._isVRHeadset ? 'Asturias XR' : 'Asturias AR';
+
+        // Determine main action button
+        let mainButton: string;
+        if (this._isVRHeadset) {
+            mainButton = `<button id="ast-start-vr-btn" class="ast-btn" style="${primaryBtnSt}">${this._icon('vr')} ${t('startVR', this._lang)}</button>`;
+        } else if (this._isDesktop) {
+            mainButton = `<button id="ast-show-qr-btn" class="ast-btn" style="${primaryBtnSt}">${this._icon('qr')} ${t('qrTitle', this._lang)}</button>`;
+        } else {
+            mainButton = `<button id="ast-start-ar-btn" class="ast-btn" style="${primaryBtnSt}">${this._icon('ar')} ${t('startAR', this._lang)}</button>`;
+        }
+
         panel.innerHTML = `
             <div style="margin-bottom:clamp(10px,2.5vw,16px);">
-                <div style="font-size:clamp(9px,2vw,11px);font-weight:700;color:${ASTURIAS.colors.primary};text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px;">Asturias AR</div>
+                <div style="font-size:clamp(9px,2vw,11px);font-weight:700;color:${ASTURIAS.colors.primary};text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px;">${xrLabel}</div>
                 <div style="font-size:clamp(13px,3.5vw,17px);font-weight:700;color:#fff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${title}</div>
             </div>
             <div style="display:flex;gap:clamp(6px,2vw,10px);align-items:stretch;">
-                ${this._isDesktop
-                    ? `<button id="ast-show-qr-btn" class="ast-btn" style="flex:1;gap:6px;background:${ASTURIAS.colors.primary};color:#fff;border-radius:${ASTURIAS.radius.base};padding:clamp(10px,2.5vw,14px) clamp(10px,3vw,16px);font-size:clamp(11px,2.8vw,14px);font-weight:700;justify-content:center;box-shadow:0 4px 20px rgba(122,184,0,0.4);">${this._icon('qr')} ${t('qrTitle', this._lang)}</button>`
-                    : `<button id="ast-start-ar-btn" class="ast-btn" style="flex:1;gap:6px;background:${ASTURIAS.colors.primary};color:#fff;border-radius:${ASTURIAS.radius.base};padding:clamp(10px,2.5vw,14px) clamp(10px,3vw,16px);font-size:clamp(11px,2.8vw,14px);font-weight:700;justify-content:center;box-shadow:0 4px 20px rgba(122,184,0,0.4);">${this._icon('ar')} ${t('startAR', this._lang)}</button>`
-                }
+                ${mainButton}
                 ${hasAudio ? `<button id="ast-pre-audio-btn" style="${secondaryBtnSt}" title="${t('audioGuide', this._lang)}">${this._icon('headphones')}</button>` : ''}
                 <button id="ast-lang-btn" style="${secondaryBtnSt}">
                     ${this._icon('lang')} ${this._lang.toUpperCase()}
@@ -756,6 +766,7 @@ export class AsturiasAROverlay extends Behaviour {
         `;
         root.appendChild(panel);
         panel.querySelector('#ast-start-ar-btn')?.addEventListener('click', () => this._startAR());
+        panel.querySelector('#ast-start-vr-btn')?.addEventListener('click', () => this._startVR());
         panel.querySelector('#ast-show-qr-btn')?.addEventListener('click', () => this._showQRPanel());
         panel.querySelector('#ast-lang-btn')?.addEventListener('click',    () => this._showLangPanel());
 
