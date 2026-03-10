@@ -527,7 +527,7 @@ export class AsturiasAROverlay extends Behaviour {
         }
         if (DeviceUtilities.isAndroidDevice()) {
             // WebXR requires a user gesture on Android — show tap-to-start overlay
-            console.log('[AsturiasAROverlay] Android autostart → tap prompt');
+            _log('[AsturiasAROverlay] Android autostart → tap prompt');
             this._showAndroidTapPrompt();
             return;
         }

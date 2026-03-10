@@ -247,7 +247,7 @@ async start() {
         _log('[Overlay] building DESKTOP panel');
         this._buildDesktopPanel();
     } else {
-        console.log('[Overlay] building PRE-AR panel');
+        _log('[Overlay] building PRE-AR panel');
         this._buildPreARPanel();
     }
 
