@@ -231,7 +231,7 @@ export function ARExperiencesPage() {
                         <PopularityBadge launchCount={scene.launch_count} />
                       </div>
 
-                      <div className="absolute top-3 right-3 flex items-center gap-2">
+                      <div className="absolute top-3 right-3 flex items-center gap-2" onClick={e => e.preventDefault()}>
                         <Badge variant="secondary" className="bg-card/90">
                           {texts.arType[scene.needle_type][locale]}
                         </Badge>
