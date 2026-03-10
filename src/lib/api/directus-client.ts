@@ -223,13 +223,45 @@ function transformPOI(poi: DirectusPOI) {
     richText,
     cover_image_url: getDirectusFileUrl(poi.cover_image),
     category_ids: extractCategoryIds((poi as any).categories),
+    created_at: (poi as any).created_at,
+    view_count: Math.max(Number((poi as any).view_count ?? 0), Number((poi as any).completion_count ?? 0)),
   };
 }
+
+type AnalyticsExperienceType = 'route' | 'tour360' | 'ar' | 'poi';
 
 // ============ API CLIENT CLASS ============
 
 class DirectusApiClient {
   private getClient() { return directusClient; }
+
+  private async getAnalyticsCountMap(
+    experienceType: AnalyticsExperienceType,
+    eventTypes: string[]
+  ): Promise<Map<string, number>> {
+    try {
+      const events = await this.getClient().request(readItems('analytics_events' as any, {
+        filter: {
+          experience_type: { _eq: experienceType },
+          event_type: { _in: eventTypes },
+          resource_id: { _nnull: true },
+        } as any,
+        fields: ['resource_id'] as any,
+        limit: -1,
+      }));
+
+      const counts = new Map<string, number>();
+      for (const event of events as any[]) {
+        const resourceId = typeof event?.resource_id === 'string' ? event.resource_id : '';
+        if (!resourceId) continue;
+        counts.set(resourceId, (counts.get(resourceId) ?? 0) + 1);
+      }
+      return counts;
+    } catch (error) {
+      logger.warn(`[DirectusClient] Analytics count fallback failed for ${experienceType}:`, error);
+      return new Map();
+    }
+  }
 
   async getTours360(_locale: Language = 'es', page = 1, limit = 20): Promise<KuulaTour[]> {
     try {
