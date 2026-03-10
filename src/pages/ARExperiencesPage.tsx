@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Sparkles, Clock, MapPin, ChevronRight, Filter, Home } from "lucide-react";
+import { UnifiedSearchBar, type CustomFilter } from "@/components/UnifiedSearchBar";
 import { TourCardSkeleton } from "@/components/SkeletonCard";
 import { AppHeader } from "@/components/AppHeader";
 import { Badge } from "@/components/ui/badge";
@@ -58,7 +59,18 @@ export function ARExperiencesPage() {
   const locale = language as Language;
   const [scenes, setScenes] = useState<ARScene[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "slam" | "image-tracking" | "geo">("all");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+
+  const arTypeFilters: CustomFilter[] = [
+    { id: 'slam', label: texts.arType.slam },
+    { id: 'image-tracking', label: texts.arType['image-tracking'] },
+    { id: 'geo', label: texts.arType.geo },
+  ];
+
+  const toggleType = (id: string) => {
+    setSelectedTypes(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  };
 
   useEffect(() => {
     async function loadScenes() {
@@ -75,7 +87,20 @@ export function ARExperiencesPage() {
     loadScenes();
   }, [locale]);
 
-  const filteredScenes = filter === "all" ? scenes : scenes.filter((s) => s.needle_type === filter);
+  const filteredScenes = (() => {
+    let filtered = scenes;
+    if (selectedTypes.length > 0) {
+      filtered = filtered.filter(s => selectedTypes.includes(s.needle_type));
+    }
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(s => {
+        const title = s.title[locale] || s.title.es || '';
+        return title.toLowerCase().includes(q) || title.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().includes(q);
+      });
+    }
+    return filtered;
+  })();
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -119,37 +144,22 @@ export function ARExperiencesPage() {
         </div>
 
         <div className="container mx-auto pb-5 px-4 max-w-6xl">
-          {/* Filters */}
+          {/* Search + Filters */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="mb-8"
           >
-            <div className="flex items-center gap-3 mb-4">
-              <Filter className="w-5 h-5 text-muted-foreground" />
-              <span className="font-semibold text-foreground">
-                {locale === "es" ? "Filtrar por tipo" : locale === "en" ? "Filter by type" : "Filtrer par type"}
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {(["all", "slam", "image-tracking", "geo"] as const).map((type) => (
-                <Button
-                  key={type}
-                  variant={filter === type ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setFilter(type)}
-                >
-                  {type === "all"
-                    ? texts.filterAll[locale]
-                    : type === "slam"
-                      ? texts.filterSLAM[locale]
-                      : type === "image-tracking"
-                        ? texts.filterMarker[locale]
-                        : texts.filterGeo[locale]}
-                </Button>
-              ))}
-            </div>
+            <UnifiedSearchBar
+              query={searchQuery}
+              onQueryChange={setSearchQuery}
+              placeholder={t({ es: 'Buscar experiencias AR...', en: 'Search AR experiences...', fr: 'Rechercher des expériences AR...' })}
+              customFilters={arTypeFilters}
+              selectedCustomFilters={selectedTypes}
+              onToggleCustomFilter={toggleType}
+              resultCount={filteredScenes.length}
+            />
           </motion.div>
 
           {/* Loading state */}

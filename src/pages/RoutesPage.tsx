@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import L from "leaflet";
 import { MapPin, Search, ChevronUp, ChevronDown, Maximize2, Locate, Loader2 } from "lucide-react";
+import { UnifiedSearchBar } from "@/components/UnifiedSearchBar";
 import { useTranslation } from "react-i18next";
 import { AppHeader } from "@/components/AppHeader";
 import { CategoryChips } from "@/components/CategoryChips";
@@ -680,58 +681,47 @@ export const RoutesPage = React.memo(function RoutesPage() {
                   </span>
                 </div>
 
-                {/* Search + Filters on same line */}
-                <div className="flex items-center gap-2">
-                  <div className="relative flex-1 min-w-0">
-                    <Search
-                      className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
-                      aria-hidden="true"
-                    />
-                    <input
-                      type="search"
-                      placeholder={viewMode === 'points' ? t("routes.searchPoints") : t("routes.search")}
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-muted/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
-                      aria-label={viewMode === 'points' ? t("routes.searchPoints") : t("routes.search")}
-                    />
-                  </div>
-                  <CategoryChips
-                    categories={categories}
-                    selectedIds={selectedCategories}
-                    onToggle={toggleCategory}
-                    selectedDifficulties={selectedDifficulties}
-                    onToggleDifficulty={toggleDifficulty}
-                    viewMode={viewMode}
-                    onViewModeChange={setViewMode}
-                    className="justify-start"
-                  />
-                </div>
-
-                {/* Locate button */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={async () => {
-                      if (hasLocation) {
-                        centerOnUser();
-                      } else {
-                        const success = await requestLocation();
-                        if (success && mapRef.current) {
-                          setTimeout(() => centerOnUser(), 500);
+                {/* Unified Search + Filters */}
+                <UnifiedSearchBar
+                  query={searchQuery}
+                  onQueryChange={setSearchQuery}
+                  placeholder={viewMode === 'points' ? t("routes.searchPoints") : t("routes.search")}
+                  categories={categories}
+                  selectedCategoryIds={selectedCategories}
+                  onToggleCategory={toggleCategory}
+                  selectedDifficulties={selectedDifficulties}
+                  onToggleDifficulty={toggleDifficulty}
+                  viewMode={viewMode}
+                  onViewModeChange={setViewMode}
+                  resultCount={viewMode === 'routes' ? sortedFilteredRoutes.length : allPoints.length}
+                  extraAction={
+                    <button
+                      onClick={async () => {
+                        if (hasLocation) {
+                          centerOnUser();
+                        } else {
+                          const success = await requestLocation();
+                          if (success && mapRef.current) {
+                            setTimeout(() => centerOnUser(), 500);
+                          }
                         }
-                      }
-                    }}
-                    className={`category-chip flex items-center gap-2 text-sm px-4 py-2 whitespace-nowrap ${hasLocation ? 'active' : ''}`}
-                    disabled={geoLoading}
-                  >
-                    {geoLoading ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Locate className="w-4 h-4" />
-                    )}
-                    <span>{hasLocation ? t("routes.located") : t("routes.locateMe")}</span>
-                  </button>
-                </div>
+                      }}
+                      className={`inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors ${
+                        hasLocation
+                          ? 'bg-primary/10 text-primary border-primary/30'
+                          : 'bg-muted/40 text-foreground border-border/40 hover:bg-muted/60'
+                      }`}
+                      disabled={geoLoading}
+                    >
+                      {geoLoading ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Locate className="w-3.5 h-3.5" />
+                      )}
+                      <span>{hasLocation ? t("routes.located") : t("routes.locateMe")}</span>
+                    </button>
+                  }
+                />
 
                 {/* Content list */}
                 <div className="space-y-3 mt-5">

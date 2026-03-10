@@ -3,9 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { View, ChevronRight, X, Filter, Search, Home, Maximize2, Share2, Info, Minimize2 } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
-import { CategoryChips } from "@/components/CategoryChips";
 import { DIRECTUS_URL } from '@/lib/directus-url';
-import { GlobalSearch, LocalSearchItem } from "@/components/GlobalSearch";
+import { UnifiedSearchBar } from "@/components/UnifiedSearchBar";
 import { Footer } from "@/components/Footer";
 import { TourCardSkeleton } from "@/components/SkeletonCard";
 import { useDirectusTours, useDirectusCategories } from "@/hooks/useDirectusData";
@@ -154,7 +153,7 @@ export function Tours360Page() {
   const { categories } = useDirectusCategories(language as Language);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [activeTour, setActiveTour] = useState<KuulaTour | null>(null);
-  const [showSearch, setShowSearch] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const [showInfo, setShowInfo] = useState(false);
 
   // Generate slug for a tour — prefer DB slug, fallback to title
@@ -185,22 +184,24 @@ export function Tours360Page() {
   }, [slug, kuulaTours]);
 
   const filteredTours = useMemo(() => {
-    if (selectedCategories.length === 0) return kuulaTours;
-    return kuulaTours.filter((tour) =>
-      tour.categories?.some((cat: any) => {
-        const catId = typeof cat === 'object' ? (cat.categories_id ?? cat.id) : cat;
-        return selectedCategories.includes(String(catId));
-      })
-    );
-  }, [selectedCategories, kuulaTours]);
-
-  const localSearchData: LocalSearchItem[] = useMemo(() => {
-    return filteredTours.map((tour) => ({
-      id: tour.id,
-      title: tour.title,
-      subtitle: "",
-    }));
-  }, [filteredTours]);
+    let filtered = kuulaTours;
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter((tour) =>
+        tour.categories?.some((cat: any) => {
+          const catId = typeof cat === 'object' ? (cat.categories_id ?? cat.id) : cat;
+          return selectedCategories.includes(String(catId));
+        })
+      );
+    }
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter((tour) => {
+        const title = typeof tour.title === 'string' ? tour.title : (tour.title[language] || tour.title.es || '');
+        return title.toLowerCase().includes(q) || title.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().includes(q);
+      });
+    }
+    return filtered;
+  }, [selectedCategories, searchQuery, kuulaTours, language]);
 
   const toggleCategory = (catId: string) => {
     setSelectedCategories((prev) => (prev.includes(catId) ? prev.filter((id) => id !== catId) : [...prev, catId]));
@@ -255,14 +256,6 @@ export function Tours360Page() {
       } else {
         el.requestFullscreen?.();
       }
-    }
-  };
-
-  const handleLocalSearchSelect = (item: LocalSearchItem) => {
-    const tour = kuulaTours.find((t) => t.id === item.id);
-    if (tour) {
-      handleTourClick(tour);
-      setShowSearch(false);
     }
   };
 
@@ -321,25 +314,22 @@ export function Tours360Page() {
         </div>
 
         <div className="container mx-auto pb-5 px-4 max-w-6xl">
-          {/* Category filters */}
+          {/* Search + Filters */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="mb-6"
           >
-            <div className="flex flex-col sm:flex-row gap-3">
-              <CategoryChips categories={categories} selectedIds={selectedCategories} onToggle={toggleCategory} />
-              <div className="flex-1">
-                <GlobalSearch
-                  locale={language as Language}
-                  localData={localSearchData}
-                  onLocalSelect={handleLocalSearchSelect}
-                  localIcon={<View className="w-4 h-4 text-muted-foreground flex-shrink-0" />}
-                  placeholder={t(texts.searchPlaceholder)}
-                />
-              </div>
-            </div>
+            <UnifiedSearchBar
+              query={searchQuery}
+              onQueryChange={setSearchQuery}
+              placeholder={t(texts.searchPlaceholder)}
+              categories={categories}
+              selectedCategoryIds={selectedCategories}
+              onToggleCategory={toggleCategory}
+              resultCount={filteredTours.length}
+            />
           </motion.div>
 
           {/* Tours grid */}
