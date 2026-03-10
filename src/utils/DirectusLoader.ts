@@ -313,7 +313,7 @@ export async function loadSceneInto(
     scale = scene.glb_scale ?? DEFAULT_SCALE;
     ry = scene.glb_rotation_y ?? DEFAULT_RY;
     name = scene.slug;
-    console.log(`[Directus] Loading '${name}':`, glbUrl);
+    logger.log(`[Directus] Loading '${name}':`, glbUrl);
   } else {
     console.warn("[Directus] No slug or glb param provided");
     return;
