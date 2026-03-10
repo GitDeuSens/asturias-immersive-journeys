@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useDirectusCategories } from "@/hooks/useDirectusData";
 import { calculateRouteDistance, formatDistance } from "@/lib/mapUtils";
 import { OptimizedImage } from "./OptimizedImage";
+import { PopularityBadge } from "./PopularityBadge";
 
 interface RouteCardProps {
   route: ImmersiveRoute;
