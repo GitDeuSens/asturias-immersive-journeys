@@ -126,11 +126,21 @@ function transformARScene(scene: DirectusARScene): ARScene {
 function transformVRExperience(vr: DirectusVRExperience): VRExperience {
   return {
     id: vr.id,
+    slug: vr.slug,
     title: toMultilingual(vr.translations, 'title', true),
+    short_description: toMultilingual(vr.translations, 'short_description'),
     description: toMultilingual(vr.translations, 'description'),
     thumbnail_url: getDirectusFileUrl(vr.thumbnail),
-    apk_url: getDirectusFileUrl(vr.apk_file),
+    preview_video_url: vr.preview_video ? getDirectusFileUrl(vr.preview_video) : undefined,
+    apk_url: vr.apk_file ? getDirectusFileUrl(vr.apk_file) : undefined,
+    apk_version: vr.apk_version,
+    apk_size_mb: vr.apk_size_mb,
+    web_url: undefined, // TODO: map when web_url field is added to Directus
     duration_minutes: vr.duration_minutes,
+    difficulty: vr.difficulty,
+    age_rating: vr.age_rating,
+    motion_sickness_warning: vr.motion_sickness_warning ?? false,
+    compatible_devices: vr.compatible_devices,
     category: vr.category || '',
     published: vr.status === 'published',
   };
