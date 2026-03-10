@@ -73,6 +73,7 @@ function RedirectToAR() {
 
 // Lazy load heavy components
 const CookieConsent = lazy(() => import("./components/CookieConsent").then(m => ({ default: m.CookieConsent })));
+const WelcomeOnboarding = lazy(() => import("./components/WelcomeOnboarding").then(m => ({ default: m.WelcomeOnboarding })));
 const AnalyticsDashboard = lazy(() => import("./pages/AnalyticsDashboard").then(m => ({ default: m.AnalyticsDashboard })));
 const ARExperiencesPage = lazy(() => import("./pages/ARExperiencesPage").then(m => ({ default: m.ARExperiencesPage })));
 const VRExperiencesPage = lazy(() => import("./components/VRExperiencesPage").then(m => ({ default: m.VRExperiencesPage })));
