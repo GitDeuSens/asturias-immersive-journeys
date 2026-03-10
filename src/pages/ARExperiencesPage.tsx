@@ -186,10 +186,15 @@ export function ARExperiencesPage() {
                     className="group block bg-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-border hover:border-primary"
                   >
                     <div className="relative">
-                      <div
-                        className="aspect-[16/10] bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-                        style={{ backgroundImage: `url(${scene.preview_image})` }}
-                      />
+                      <div className="aspect-[16/10] overflow-hidden">
+                        <img
+                          src={scene.preview_image}
+                          alt={scene.title[locale] || scene.title.es}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
                       {/* AR badge */}

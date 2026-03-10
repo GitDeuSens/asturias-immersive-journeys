@@ -342,6 +342,13 @@ export function Tours360Page() {
           </motion.div>
 
           {/* Tours grid */}
+          {toursLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <TourCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -358,10 +365,15 @@ export function Tours360Page() {
                 onClick={() => handleTourClick(tour)}
               >
                 <div className="relative">
-                  <div
-                    className="aspect-[16/10] bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-                    style={{ backgroundImage: `url(${tour.thumbnail_url})` }}
-                  />
+                  <div className="aspect-[16/10] overflow-hidden">
+                    <img
+                      src={tour.thumbnail_url}
+                      alt={t(tour.title)}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
                   {/* 360 badge */}
@@ -409,6 +421,7 @@ export function Tours360Page() {
               </motion.div>
             ))}
           </motion.div>
+          )}
         </div>
 
         <Footer />
