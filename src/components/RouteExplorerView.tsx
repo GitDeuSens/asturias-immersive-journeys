@@ -102,6 +102,15 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
     return route.points.find(point => !visitedPoints.has(point.id)) || null;
   }, [route.points, visitedPoints]);
 
+  // Early return after all hooks
+  if (!route) {
+    return (
+      <div className="flex items-center justify-center h-full p-8">
+        <p className="text-muted-foreground">{t('routes.noRouteSelected')}</p>
+      </div>
+    );
+  }
+
   const surfaceLabels: Record<string, Record<string, string>> = {
     paved: { es: 'Asfaltado', en: 'Paved', fr: 'Asphalté' },
     gravel: { es: 'Grava', en: 'Gravel', fr: 'Gravier' },
