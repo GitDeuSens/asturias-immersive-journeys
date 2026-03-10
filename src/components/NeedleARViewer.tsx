@@ -15,6 +15,7 @@ interface NeedleARViewerProps {
   locale?: Language;
   onStart?: () => void;
   onError?: (error: string) => void;
+  onClose?: () => void;
 }
 
 const texts = {
