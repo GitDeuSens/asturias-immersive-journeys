@@ -11,6 +11,7 @@ export interface FavoriteItem {
 }
 
 const STORAGE_KEY = 'asturias-favorites';
+const FAVORITES_UPDATED_EVENT = 'favorites:updated';
 
 function loadFavorites(): FavoriteItem[] {
   try {
@@ -21,18 +22,29 @@ function loadFavorites(): FavoriteItem[] {
 
 function saveFavorites(items: FavoriteItem[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  window.dispatchEvent(new CustomEvent(FAVORITES_UPDATED_EVENT));
 }
 
 export function useFavorites() {
   const [favorites, setFavorites] = useState<FavoriteItem[]>(loadFavorites);
 
-  // Sync across tabs
+  // Sync across tabs and same-tab component instances
   useEffect(() => {
-    const handler = (e: StorageEvent) => {
+    const storageHandler = (e: StorageEvent) => {
       if (e.key === STORAGE_KEY) setFavorites(loadFavorites());
     };
-    window.addEventListener('storage', handler);
-    return () => window.removeEventListener('storage', handler);
+
+    const localHandler = () => {
+      setFavorites(loadFavorites());
+    };
+
+    window.addEventListener('storage', storageHandler);
+    window.addEventListener(FAVORITES_UPDATED_EVENT, localHandler);
+
+    return () => {
+      window.removeEventListener('storage', storageHandler);
+      window.removeEventListener(FAVORITES_UPDATED_EVENT, localHandler);
+    };
   }, []);
 
   const isFavorite = useCallback((id: string, type?: FavoriteType) => {
@@ -40,14 +52,14 @@ export function useFavorites() {
   }, [favorites]);
 
   const toggleFavorite = useCallback((item: Omit<FavoriteItem, 'addedAt'>) => {
-    setFavorites(prev => {
-      const exists = prev.some(f => f.id === item.id && f.type === item.type);
-      const next = exists
-        ? prev.filter(f => !(f.id === item.id && f.type === item.type))
-        : [...prev, { ...item, addedAt: Date.now() }];
-      saveFavorites(next);
-      return next;
-    });
+    const latest = loadFavorites();
+    const exists = latest.some(f => f.id === item.id && f.type === item.type);
+    const next = exists
+      ? latest.filter(f => !(f.id === item.id && f.type === item.type))
+      : [...latest, { ...item, addedAt: Date.now() }];
+
+    saveFavorites(next);
+    setFavorites(next);
   }, []);
 
   const getFavoritesByType = useCallback((type: FavoriteType) => {

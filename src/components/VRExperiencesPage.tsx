@@ -14,8 +14,6 @@ import {
   Info,
   AlertTriangle,
   Home,
-  Smartphone,
-  Monitor,
 } from 'lucide-react';
 import { AppHeader } from '@/components/AppHeader';
 import { SEOHead } from '@/components/SEOHead';

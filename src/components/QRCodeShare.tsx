@@ -77,7 +77,7 @@ export function QRCodeShare({ url, title, size = 180 }: QRCodeShareProps) {
                   fgColor="#1a1a1a"
                 />
               </div>
-              <p className="text-xs text-muted-foreground mb-4 break-all">{url}</p>
+              
               <Button variant="outline" size="sm" onClick={handleDownload} className="gap-2">
                 <Download className="w-4 h-4" />
                 Download PNG
