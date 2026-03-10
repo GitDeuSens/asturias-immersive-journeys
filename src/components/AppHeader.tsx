@@ -65,18 +65,7 @@ export function AppHeader({ showRestart = true, variant = "light", routes = {}, 
 
           {/* Right side controls */}
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => {
-                // filterMap();
-              }}
-              style={{ fontSize: '16px', height: '50px' }}
-              className="hidden items-center gap-2 px-5 py-2.5 rounded-lg transition-all duration-200 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg"
-              aria-label={t("common.home")}
-            >
-              <span className="hidden sm:inline">Ver puntos de interés</span>
-            </button>
-
-            {/* Settings dropdown (language + theme) */}
+            {/* Settings dropdown (language) */}
             <SettingsDropdown variant="light" />
           </div>
         </div>
