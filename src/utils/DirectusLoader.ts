@@ -302,7 +302,7 @@ export async function loadSceneInto(
   } else if (slug) {
     const scene = await fetchSceneBySlug(slug);
     if (!scene) {
-      console.error(`[Directus] Scene '${slug}' not found`);
+      if (import.meta.env.DEV) console.error(`[Directus] Scene '${slug}' not found`);
       return;
     }
     if (!scene.glb_model) {
