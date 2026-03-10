@@ -706,7 +706,10 @@ export const RoutesPage = React.memo(function RoutesPage() {
                     onViewModeChange={setViewMode}
                     className="justify-start"
                   />
+                </div>
 
+                {/* Locate button */}
+                <div className="flex items-center gap-2">
                   <button
                     onClick={async () => {
                       if (hasLocation) {
