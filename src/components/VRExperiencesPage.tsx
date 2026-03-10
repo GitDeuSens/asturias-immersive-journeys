@@ -364,3 +364,299 @@ export function VRExperiencesPage() {
     </div>
   );
 }
+
+// ============ VR DETAIL MODAL WITH WEB PREVIEW ============
+
+function VRDetailModal({
+  experience,
+  lang,
+  t,
+  texts: tx,
+  categoryLabels: catLabels,
+  onClose,
+}: {
+  experience: VRExperience;
+  lang: Language;
+  t: (v: any) => string;
+  texts: typeof texts;
+  categoryLabels: Record<string, Record<Language, string>>;
+  onClose: () => void;
+}) {
+  const [previewMode, setPreviewMode] = useState<'thumbnail' | 'video' | 'web'>('thumbnail');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const iframeContainerRef = useRef<HTMLDivElement>(null);
+
+  const hasWebUrl = !!experience.web_url;
+  const hasVideo = !!experience.preview_video_url;
+
+  const handleFullscreen = () => {
+    const el = iframeContainerRef.current;
+    if (!el) return;
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    } else {
+      el.requestFullscreen?.();
+      setIsFullscreen(true);
+    }
+  };
+
+  useEffect(() => {
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', handler);
+    return () => document.removeEventListener('fullscreenchange', handler);
+  }, []);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="vr-detail-title"
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="bg-background rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Preview area */}
+        <div ref={iframeContainerRef} className="relative aspect-video bg-black">
+          {/* Thumbnail (default) */}
+          {previewMode === 'thumbnail' && (
+            <>
+              {experience.thumbnail_url ? (
+                <img
+                  src={experience.thumbnail_url}
+                  alt={experience.title[lang]}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
+                  <Glasses className="w-20 h-20 text-primary/40" />
+                </div>
+              )}
+
+              {/* Preview action buttons overlay */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/40">
+                {hasWebUrl && (
+                  <button
+                    onClick={() => {
+                      setPreviewMode('web');
+                      trackVRStarted(experience.id, experience.title[lang]);
+                    }}
+                    className="flex items-center gap-2 px-5 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-lg hover:bg-primary/90 transition-colors"
+                  >
+                    <Monitor className="w-5 h-5" />
+                    {t(tx.tryInBrowser)}
+                  </button>
+                )}
+                {hasVideo && (
+                  <button
+                    onClick={() => setPreviewMode('video')}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/20 backdrop-blur-sm text-white font-medium text-sm hover:bg-white/30 transition-colors"
+                  >
+                    <Play className="w-4 h-4" />
+                    {t(tx.videoPreview)}
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Video preview */}
+          {previewMode === 'video' && hasVideo && (
+            <video
+              ref={videoRef}
+              src={experience.preview_video_url}
+              className="w-full h-full object-cover"
+              controls
+              autoPlay
+              muted
+              playsInline
+              onEnded={() => setPreviewMode('thumbnail')}
+            />
+          )}
+
+          {/* Web iframe preview */}
+          {previewMode === 'web' && hasWebUrl && (
+            <iframe
+              src={experience.web_url!}
+              className="w-full h-full border-0"
+              allow="xr-spatial-tracking; gyroscope; accelerometer; fullscreen"
+              title={experience.title[lang]}
+            />
+          )}
+
+          {/* Controls overlay */}
+          <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
+            {previewMode === 'web' && (
+              <button
+                onClick={handleFullscreen}
+                className="p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                title="Fullscreen"
+              >
+                {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+              aria-label={t(tx.close)}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Back to thumbnail when in preview */}
+          {previewMode !== 'thumbnail' && (
+            <button
+              onClick={() => setPreviewMode('thumbnail')}
+              className="absolute top-3 left-3 z-10 px-3 py-1.5 rounded-lg bg-black/50 text-white text-xs font-medium hover:bg-black/70 transition-colors backdrop-blur-sm"
+            >
+              ← Back
+            </button>
+          )}
+
+          {/* Title overlay */}
+          {previewMode === 'thumbnail' && (
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background to-transparent p-6">
+              <h2 id="vr-detail-title" className="text-2xl font-bold text-foreground">
+                {experience.title[lang]}
+              </h2>
+            </div>
+          )}
+
+          {/* Preview mode label */}
+          {previewMode === 'web' && (
+            <div className="absolute bottom-3 left-3 z-10 px-2 py-1 rounded-md bg-primary/80 text-primary-foreground text-[10px] font-bold uppercase tracking-wider">
+              {t(tx.webPreview)}
+            </div>
+          )}
+        </div>
+
+        <ScrollArea className="max-h-[50vh]">
+          <div className="p-6 space-y-5">
+            {/* Title (when not on thumbnail) */}
+            {previewMode !== 'thumbnail' && (
+              <h2 className="text-xl font-bold text-foreground">{experience.title[lang]}</h2>
+            )}
+
+            {/* Metadata badges */}
+            <div className="flex flex-wrap gap-2">
+              {experience.duration_minutes && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground text-sm font-medium">
+                  <Clock className="w-4 h-4 text-primary" aria-hidden="true" />
+                  {experience.duration_minutes} min
+                </span>
+              )}
+              {experience.difficulty && tx.difficulty[experience.difficulty] && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground text-sm font-medium">
+                  <Star className="w-4 h-4 text-primary" aria-hidden="true" />
+                  {t(tx.difficulty[experience.difficulty])}
+                </span>
+              )}
+              {experience.category && catLabels[experience.category] && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-medium">
+                  {t(catLabels[experience.category])}
+                </span>
+              )}
+              {experience.age_rating && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground text-sm font-medium">
+                  {experience.age_rating}
+                </span>
+              )}
+            </div>
+
+            {/* Motion sickness warning */}
+            {experience.motion_sickness_warning && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm text-destructive">
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                {t(tx.motionWarning)}
+              </div>
+            )}
+
+            {/* Description */}
+            <p className="text-muted-foreground leading-relaxed">
+              {experience.description[lang]}
+            </p>
+
+            {/* Compatible devices */}
+            {experience.compatible_devices && experience.compatible_devices.length > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-1.5">
+                  <Smartphone className="w-4 h-4 text-primary" />
+                  {t(tx.compatibleDevices)}
+                </h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {experience.compatible_devices.map(device => (
+                    <Badge key={device} variant="outline" className="text-xs">
+                      {device}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* APK info */}
+            {(experience.apk_version || experience.apk_size_mb) && (
+              <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+                {experience.apk_version && <span>{t(tx.version)}: {experience.apk_version}</span>}
+                {experience.apk_size_mb && <span>{t(tx.size)}: {experience.apk_size_mb} MB</span>}
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+
+        {/* CTA Footer */}
+        <div className="p-4 border-t border-border space-y-2">
+          {experience.web_url && previewMode !== 'web' && (
+            <Button
+              variant="outline"
+              className="w-full h-12 text-base font-bold"
+              onClick={() => setPreviewMode('web')}
+            >
+              <Monitor className="w-5 h-5 mr-2" aria-hidden="true" />
+              {t(tx.tryInBrowser)}
+            </Button>
+          )}
+          {experience.web_url && previewMode === 'web' && (
+            <Button
+              variant="outline"
+              className="w-full h-12 text-base font-bold"
+              onClick={() => window.open(experience.web_url, '_blank', 'noopener,noreferrer')}
+            >
+              <Maximize2 className="w-5 h-5 mr-2" aria-hidden="true" />
+              {t(tx.openWeb)}
+            </Button>
+          )}
+          {experience.apk_url ? (
+            <Button
+              className="w-full h-12 text-base font-bold"
+              onClick={() => {
+                trackVRStarted(experience.id, experience.title[lang]);
+                window.open(experience.apk_url, '_blank', 'noopener,noreferrer');
+              }}
+            >
+              <Download className="w-5 h-5 mr-2" aria-hidden="true" />
+              {t(tx.downloadAPK)}
+            </Button>
+          ) : !experience.web_url ? (
+            <div className="flex items-center justify-center p-4 bg-muted/50 rounded-lg border border-border">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                <Info className="w-4 h-4" />
+                {t(tx.apkNotAvailable)}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
