@@ -49,7 +49,7 @@ export async function fetchSceneBySlug(slug: string): Promise<ArScene | null> {
     const json = await res.json();
     return (json.data?.[0] as ArScene) ?? null;
   } catch (e) {
-    console.error("[Directus] Fetch failed:", e);
+    if (import.meta.env.DEV) console.error("[Directus] Fetch failed:", e);
     return null;
   }
 }
