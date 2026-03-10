@@ -5,6 +5,7 @@ import { Facebook, Twitter, Menu, X, View, Map, Sparkles, Glasses, Home, ArrowLe
 import { useTranslation } from "react-i18next";
 import { SettingsDropdown } from "@/components/SettingsDropdown";
 import { GlossaryDialog } from "@/components/GlossaryDialog";
+import { useExplorationMode } from "@/hooks/useLanguage";
 
 interface AppHeaderProps {
   showRestart?: boolean;
