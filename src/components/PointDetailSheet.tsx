@@ -185,6 +185,9 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
             style={{ backgroundImage: point.coverImage ? `url(${DIRECTUS_URL}/assets/${point.coverImage})` : undefined }}
           >
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 px-6 pb-4 pt-10">
+              <h1 className="text-2xl font-bold text-foreground line-clamp-2">{title}</h1>
+            </div>
             <button
               onClick={() => {
                 onClose();
