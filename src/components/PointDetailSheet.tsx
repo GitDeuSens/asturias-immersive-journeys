@@ -460,6 +460,33 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
                 </div>
               )}
             </div>
+
+            {/* Previous / Next navigation */}
+            {allPoints && allPoints.length > 1 && currentIndex !== undefined && onNavigatePoint && (
+              <div className="flex gap-2 pt-2 pb-2">
+                <Button
+                  variant="outline"
+                  className="flex-1 gap-2"
+                  disabled={currentIndex <= 0}
+                  onClick={() => onNavigatePoint(allPoints[currentIndex - 1])}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  {language === 'es' ? 'Anterior' : language === 'en' ? 'Previous' : 'Précédent'}
+                </Button>
+                <span className="flex items-center text-xs text-muted-foreground font-medium tabular-nums">
+                  {currentIndex + 1}/{allPoints.length}
+                </span>
+                <Button
+                  variant="outline"
+                  className="flex-1 gap-2"
+                  disabled={currentIndex >= allPoints.length - 1}
+                  onClick={() => onNavigatePoint(allPoints[currentIndex + 1])}
+                >
+                  {language === 'es' ? 'Siguiente' : language === 'en' ? 'Next' : 'Suivant'}
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
           </ScrollArea>
         </motion.div>
       </AnimatePresence>
