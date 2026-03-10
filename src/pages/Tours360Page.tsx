@@ -7,6 +7,8 @@ import { DIRECTUS_URL } from '@/lib/directus-url';
 import { UnifiedSearchBar } from "@/components/UnifiedSearchBar";
 import { Footer } from "@/components/Footer";
 import { TourCardSkeleton } from "@/components/SkeletonCard";
+import { HeroCarousel } from "@/components/HeroCarousel";
+import { FavoriteButton } from "@/components/FavoriteButton";
 import { useDirectusTours, useDirectusCategories } from "@/hooks/useDirectusData";
 import { useLanguage } from "@/hooks/useLanguage";
 import { trackTourViewed, trackEvent } from "@/lib/analytics";
@@ -38,6 +40,7 @@ const texts = {
   share: { es: "Compartir", en: "Share", fr: "Partager" },
   panoramas: { es: "panoramas", en: "panoramas", fr: "panoramas" },
   duration: { es: "min", en: "min", fr: "min" },
+  featured: { es: "Destacados", en: "Featured", fr: "En vedette" },
 };
 
 // Tour viewer rendered as a plain div (no framer-motion) to avoid SPA rendering issues
@@ -176,13 +179,11 @@ export function Tours360Page() {
         return tourSlug === slug || slugify(tour.id) === slug || slug === tour.slug;
       });
       if (found) {
-        // Only update if different tour (avoid unnecessary re-renders)
         if (!activeTour || activeTour.id !== found.id) {
           setActiveTour(found);
         }
       }
     } else if (!slug && activeTour) {
-      // URL changed to /tours (no slug) — close the modal
       setActiveTour(null);
       setShowInfo(false);
     }
@@ -208,11 +209,21 @@ export function Tours360Page() {
     return filtered;
   }, [selectedCategories, searchQuery, kuulaTours, language]);
 
+  // Featured tours for carousel
+  const carouselItems = useMemo(() => {
+    return kuulaTours.slice(0, 5).map(tour => ({
+      id: tour.id,
+      title: t(tour.title),
+      subtitle: `${tour.total_panoramas} ${t(texts.scenes)}${tour.duration_minutes ? ` · ${tour.duration_minutes} min` : ''}`,
+      image: tour.thumbnail_url,
+      onClick: () => handleTourClick(tour),
+    }));
+  }, [kuulaTours, language]);
+
   const toggleCategory = (catId: string) => {
     setSelectedCategories((prev) => (prev.includes(catId) ? prev.filter((id) => id !== catId) : [...prev, catId]));
   };
 
-  // Save scroll position before opening a tour
   const scrollPositionRef = React.useRef(0);
 
   const handleTourClick = (tour: KuulaTour) => {
@@ -229,7 +240,6 @@ export function Tours360Page() {
     setActiveTour(null);
     setShowInfo(false);
     navigate('/tours', { replace: true });
-    // Restore scroll position after React re-renders
     requestAnimationFrame(() => {
       window.scrollTo(0, savedScroll);
     });
@@ -313,12 +323,26 @@ export function Tours360Page() {
                 <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold leading-tight">{t(texts.title)}</h1>
               </div>
               <p className="text-sm sm:text-lg text-white/90 max-w-2xl mx-auto mb-5 px-2">{t(texts.subtitle)}</p>
-
             </motion.div>
           </div>
         </div>
 
         <div className="container mx-auto pb-5 px-4 max-w-6xl">
+          {/* Hero Carousel */}
+          {!toursLoading && carouselItems.length > 1 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+              className="mb-6"
+            >
+              <h2 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+                ⭐ {t(texts.featured)}
+              </h2>
+              <HeroCarousel items={carouselItems} />
+            </motion.div>
+          )}
+
           {/* Search + Filters */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -380,13 +404,20 @@ export function Tours360Page() {
                     </span>
                   </div>
 
-                  {/* Metadata badges */}
-                  <div className="absolute top-3 right-3 flex gap-2">
+                  {/* Favorite button */}
+                  <div className="absolute top-3 right-3 flex gap-2 items-center">
                     {tour.duration_minutes && (
                       <span className="bg-black/60 text-white text-xs px-2 py-1 rounded-full">
                         {tour.duration_minutes} {t(texts.duration)}
                       </span>
                     )}
+                    <FavoriteButton
+                      id={tour.id}
+                      type="tour"
+                      title={t(tour.title)}
+                      image={tour.thumbnail_url}
+                      size="sm"
+                    />
                   </div>
 
                   {/* Play button overlay */}
@@ -410,7 +441,7 @@ export function Tours360Page() {
                     </span>
                     <span className="text-primary font-semibold text-xs sm:text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
                       {t(texts.startTour)}
-                      <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      <ChevronRight className="w-4 h-4" />
                     </span>
                   </div>
                 </div>
@@ -423,20 +454,21 @@ export function Tours360Page() {
         <Footer />
       </main>
 
-      {/* Tour Viewer Modal — rendered as plain div for reliable SPA rendering */}
-      {activeTour && activeTour.id && (
-        <TourViewerModal
-          key={activeTour.id}
-          tour={activeTour}
-          language={language}
-          showInfo={showInfo}
-          onToggleInfo={() => setShowInfo(!showInfo)}
-          onShare={handleShare}
-          onFullscreen={handleFullscreen}
-          onClose={closeTour}
-          t={t}
-        />
-      )}
+      {/* Tour Viewer Modal */}
+      <AnimatePresence>
+        {activeTour && (
+          <TourViewerModal
+            tour={activeTour}
+            language={language}
+            showInfo={showInfo}
+            onToggleInfo={() => setShowInfo(!showInfo)}
+            onShare={handleShare}
+            onFullscreen={handleFullscreen}
+            onClose={closeTour}
+            t={t}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
