@@ -507,7 +507,17 @@ function VRDetailModal({
             />
           )}
 
-          {/* Controls overlay */}
+          {/* 3D GLB preview */}
+          {previewMode === '3d' && hasGLB && (
+            <Suspense fallback={<div className="w-full h-full bg-[#1a1a2e] flex items-center justify-center"><Box className="w-10 h-10 text-primary/40 animate-pulse" /></div>}>
+              <GLBPreviewViewer
+                glbUrl={experience.glb_url!}
+                scale={experience.glb_scale}
+                rotationY={experience.glb_rotation_y}
+              />
+            </Suspense>
+          )}
+
           <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
             {previewMode === 'web' && (
               <button
