@@ -497,10 +497,15 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
             }`}
         >
           {point.coverImage && (
-            <div
-              className="w-full h-24 bg-cover bg-center"
-              style={{ backgroundImage: `url(${DIRECTUS_URL}/assets/${point.coverImage})` }}
-            />
+            <div className="w-full h-24 overflow-hidden">
+              <img
+                src={`${DIRECTUS_URL}/assets/${point.coverImage}`}
+                alt={title}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover"
+              />
+            </div>
           )}
 
           <div className="p-3">

@@ -325,12 +325,17 @@ function PointPreviewCard({ point, index, lang, onClick }: { point: RoutePoint; 
     <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50 cursor-pointer hover:bg-muted/50 transition-colors w-full" onClick={onClick}>
       {/* Thumbnail */}
       <div className="relative flex-shrink-0">
-        <div
-          className="w-12 h-12 rounded-lg bg-cover bg-center border-2 border-primary/30"
-          style={{ backgroundImage: point.coverImage ? `url(${DIRECTUS_URL}/assets/${point.coverImage})` : undefined }}
-          role="img"
-          aria-label={typeof pointTitle === 'string' ? pointTitle : (pointTitle as any)?.es || ''}
-        />
+        <div className="w-12 h-12 rounded-lg overflow-hidden border-2 border-primary/30 bg-muted">
+          {point.coverImage && (
+            <img
+              src={`${DIRECTUS_URL}/assets/${point.coverImage}`}
+              alt={typeof pointTitle === 'string' ? pointTitle : (pointTitle as any)?.es || ''}
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover"
+            />
+          )}
+        </div>
         <div className={`absolute -top-2 -right-2 w-6 h-6 ${colors.bg} rounded-full flex items-center justify-center text-xs font-bold text-white border-2 border-white shadow-sm`}>
           {index + 1}
         </div>
