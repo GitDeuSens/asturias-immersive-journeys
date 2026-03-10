@@ -76,7 +76,9 @@ function transformTour360(tour: DirectusTour360): KuulaTour {
     duration_minutes: tour.duration_minutes,
     total_panoramas: tour.total_panoramas || (hasBuild ? 1 : 0),
     published: tour.status === 'published',
-    view_count: tour.view_count || 0,
+    created_at: tour.created_at,
+    updated_at: tour.updated_at,
+    view_count: Number(tour.view_count ?? 0),
   };
 }
 
@@ -120,8 +122,9 @@ function transformARScene(scene: DirectusARScene): ARScene {
         }
       : undefined,
 
+    created_at: scene.created_at,
     published: scene.status === 'published',
-    launch_count: scene.launch_count || 0,
+    launch_count: Math.max(Number(scene.launch_count ?? 0), Number(scene.completion_count ?? 0)),
   };
 }
 
@@ -170,6 +173,7 @@ function transformRoute(route: DirectusRoute) {
     theme: toMultilingual(route.translations, 'theme'),
     duration: toMultilingual(route.translations, 'duration'),
     cover_image_url: getDirectusFileUrl(route.cover_image),
+    view_count: Math.max(Number(route.view_count ?? 0), Number((route as any).completion_count ?? 0)),
     category_ids: extractCategoryIds((route as any).categories),
   };
 }

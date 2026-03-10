@@ -196,6 +196,7 @@ export interface ImmersiveRoute {
   surfaceType?: 'paved' | 'gravel' | 'dirt' | 'mixed';
   gpxFile?: string;
   viewCount?: number;
+  createdAt?: string;
   itineraryDays?: {
     day: number;
     title: Record<string, string>;

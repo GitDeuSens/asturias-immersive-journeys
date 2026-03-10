@@ -228,7 +228,7 @@ export function ARExperiencesPage() {
                         <Badge className="bg-primary/90 text-primary-foreground">
                           <Sparkles className="w-3 h-3 mr-1" />AR
                         </Badge>
-                        <PopularityBadge launchCount={scene.launch_count} />
+                        <PopularityBadge launchCount={scene.launch_count} dateCreated={scene.created_at} />
                       </div>
 
                       <div className="absolute top-3 right-3 z-10 flex items-center gap-2">

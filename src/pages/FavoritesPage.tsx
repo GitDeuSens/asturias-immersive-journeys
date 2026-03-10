@@ -14,16 +14,16 @@ import {
 } from '@/components/ui/breadcrumb';
 
 const texts = {
-  title: { es: 'Mis Favoritos', en: 'My Favorites', fr: 'Mes Favoris' },
+  title: { es: 'Guardados', en: 'Saved', fr: 'Enregistrés' },
   subtitle: {
-    es: 'Tus experiencias guardadas',
-    en: 'Your saved experiences',
-    fr: 'Vos expériences sauvegardées',
+    es: 'Lo guardado en este dispositivo para volver después',
+    en: 'Saved on this device to come back later',
+    fr: 'Enregistré sur cet appareil pour y revenir plus tard',
   },
   empty: {
-    es: 'Aún no tienes favoritos. Explora y toca el ❤️ para guardar.',
-    en: "You don't have favorites yet. Explore and tap ❤️ to save.",
-    fr: "Vous n'avez pas encore de favoris. Explorez et touchez ❤️ pour sauvegarder.",
+    es: 'Aún no has guardado nada. Explora y toca el ❤️ para volver aquí luego en este dispositivo.',
+    en: "You haven't saved anything yet. Explore and tap ❤️ to return here later on this device.",
+    fr: "Vous n'avez encore rien enregistré. Explorez et touchez ❤️ pour revenir ici plus tard sur cet appareil.",
   },
   all: { es: 'Todos', en: 'All', fr: 'Tous' },
 };

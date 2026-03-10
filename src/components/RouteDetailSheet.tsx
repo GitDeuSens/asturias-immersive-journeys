@@ -176,7 +176,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
                   {route.theme[lang]}
                 </p>
               </div>
-              <PopularityBadge viewCount={route.viewCount} size="md" className="mt-1 flex-shrink-0" />
+              <PopularityBadge viewCount={route.viewCount} dateCreated={route.createdAt} size="md" className="mt-1 flex-shrink-0" />
             </div>
           </div>
           <div className="p-6 space-y-6">

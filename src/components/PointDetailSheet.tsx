@@ -166,6 +166,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
 
   const arTitle = arScene ? getText(arScene.title, language) : title;
   const arDescription = arScene ? getText(arScene.description, language) : shortDescription;
+  const poiSharePath = window.location.pathname;
 
   return (
     <>
@@ -184,6 +185,9 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
             style={{ backgroundImage: point.coverImage ? `url(${DIRECTUS_URL}/assets/${point.coverImage})` : undefined }}
           >
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 px-6 pb-4 pt-10">
+              <h1 className="text-2xl font-bold text-foreground line-clamp-2">{title}</h1>
+            </div>
             <button
               onClick={() => {
                 onClose();
@@ -235,12 +239,13 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
                 </Breadcrumb>
               </div>
             )}
-            <div className="px-6 pt-3 space-y-1">
-              <h1 className="text-2xl font-bold">{title}</h1>
-              {hasAR && arDescription && (
-                <p className="text-sm text-muted-foreground leading-relaxed">{arDescription}</p>
-              )}
-            </div>
+            {hasAR && (
+              <div className="px-6 pt-3">
+                {arDescription && (
+                  <p className="text-sm text-muted-foreground leading-relaxed">{arDescription}</p>
+                )}
+              </div>
+            )}
             <div className="p-6 space-y-6">
               {!hasAR && <p className="text-muted-foreground leading-relaxed text-base">{shortDescription}</p>}
               <NavigationSection point={point} />
@@ -294,7 +299,10 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
                     <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                       <Share2 className="w-4 h-4 text-primary" />{t(texts.shareExperience)}
                     </h4>
-                    <ShareButtons url={arScene?.slug ? `${window.location.origin}/ar/${arScene.slug}` : window.location.href} title={arTitle} description={arDescription} variant="inline" />
+                    <div className="flex items-center gap-2">
+                      <ShareButtons url={poiSharePath} title={arTitle} description={arDescription} variant="inline" />
+                      <QRCodeShare url={poiSharePath} title={arTitle} />
+                    </div>
                   </div>
                 </motion.div>
               )}
@@ -462,10 +470,20 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
               )}
             </div>
 
-            {/* QR Code for this POI */}
-            <div className="flex justify-center">
-              <QRCodeShare url={`${window.location.origin}/routes/${point.id}`} title={title} />
-            </div>
+            {/* Share + QR for this POI */}
+            {!hasAR && (
+              <div className="px-6 pb-2">
+                <div className="bg-card border border-border rounded-xl p-4">
+                  <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <Share2 className="w-4 h-4 text-primary" />{t(texts.shareExperience)}
+                  </h4>
+                  <div className="flex items-center gap-2">
+                    <ShareButtons url={poiSharePath} title={title} description={shortDescription} variant="inline" />
+                    <QRCodeShare url={poiSharePath} title={title} />
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Previous / Next navigation */}
             {allPoints && allPoints.length > 1 && currentIndex !== undefined && onNavigatePoint && (
