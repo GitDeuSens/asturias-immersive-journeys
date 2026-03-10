@@ -85,36 +85,36 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
         <nav aria-label={t("footer.legalNav", "Enlaces legales")} className="mb-2">
           <ul className="flex flex-wrap items-center justify-center gap-2 md:gap-2">
             <li>
-              <a
-                href="/legal"
+              <Link
+                to="/legal"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded uppercase tracking-wide"
               >
                 {t("footer.legal")}
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="/accessibility"
+              <Link
+                to="/accessibility"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded uppercase tracking-wide"
               >
                 {t("footer.accessibility")}
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="/privacy"
+              <Link
+                to="/privacy"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded uppercase tracking-wide"
               >
                 {t("footer.privacy")}
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="/cookies"
+              <Link
+                to="/cookies"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded uppercase tracking-wide"
               >
                 {t("footer.cookies")}
-              </a>
+              </Link>
             </li>
           </ul>
         </nav>
