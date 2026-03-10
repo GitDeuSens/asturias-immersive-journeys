@@ -749,6 +749,19 @@ const resources = {
       "error.notFound": "Page non trouvée",
       "error.goHome": "Aller à l'accueil",
       "error.tryAgain": "Réessayer",
+
+      // Content type explanations
+      "content.arFull": "Réalité Augmentée",
+      "content.360Full": "Vue panoramique 360°",
+      "content.vrFull": "Réalité Virtuelle",
+      "content.infoFull": "Informations",
+
+      // Welcome / onboarding
+      "welcome.title": "Bienvenue !",
+      "welcome.message": "Explorez le contenu via le menu ☰ en haut à droite. Les icônes colorées indiquent le type d'expérience disponible à chaque point.",
+      "welcome.arExplain": "AR = Réalité Augmentée : pointez votre téléphone pour voir des modèles 3D dans le monde réel",
+      "welcome.360Explain": "360° = Vues panoramiques immersives à explorer en tournant l'écran",
+      "welcome.understood": "Compris !",
     },
   },
 };
