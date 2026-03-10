@@ -294,6 +294,16 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError, onClose }: Needl
       >
         <div id="needle-overlay-slot" style={{ display: 'contents' }} />
       </needle-engine>
+      {/* Close button integrated into the viewer's top-right button area */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 z-20 flex items-center justify-center w-10 h-10 rounded-full bg-black/70 text-white hover:bg-black/90 transition-colors"
+          aria-label="Close"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      )}
       <style>{`
         @keyframes needle_spin { to { transform: rotate(360deg); } }
         needle-engine .qr-code-label,
