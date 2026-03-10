@@ -211,16 +211,16 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute }: 
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
                       {onBackToRoute ? (
-                        <BreadcrumbLink href="#" onClick={(e) => { e.preventDefault(); onBackToRoute(); }} className="text-xs truncate max-w-[100px]">
+                        <BreadcrumbLink href="#" onClick={(e) => { e.preventDefault(); onBackToRoute(); }} className="text-xs truncate max-w-[80px] sm:max-w-[140px] inline-block align-bottom">
                           {routeTitle}
                         </BreadcrumbLink>
                       ) : (
-                        <span className="text-xs text-muted-foreground truncate max-w-[100px]">{routeTitle}</span>
+                        <span className="text-xs text-muted-foreground truncate max-w-[80px] sm:max-w-[140px] inline-block align-bottom">{routeTitle}</span>
                       )}
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                      <BreadcrumbPage className="text-xs truncate max-w-[120px]">{title}</BreadcrumbPage>
+                      <BreadcrumbPage className="text-xs truncate max-w-[80px] sm:max-w-[140px] inline-block align-bottom">{title}</BreadcrumbPage>
                     </BreadcrumbItem>
                   </BreadcrumbList>
                 </Breadcrumb>
