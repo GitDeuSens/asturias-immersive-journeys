@@ -23,9 +23,9 @@ export function AppHeader({ showRestart = true, variant = "light", routes = {}, 
       className="fixed top-0 left-0 right-0 z-50"
     >
       {/* Social bar — hidden on mobile to save space */}
-      <div className="hidden md:block" style={{backgroundColor: '#0a4b77', borderTop: '8px solid hsl(var(--primary))'}}>
+      <div className="hidden md:block bg-accent-foreground/90 border-t-[8px] border-primary">
         <div className="container flex mx-auto pl-4 px-2 justify-between">
-          <div style={{ width: '33px', height: '48px', backgroundColor: 'hsl(var(--primary))', position: 'absolute', top: '8px' }}>
+          <div className="w-[33px] h-[48px] bg-primary absolute top-2">
           </div>
           <div className="container mx-auto pl-4 px-2 py-1.5 flex justify-end gap-2">
             <a
