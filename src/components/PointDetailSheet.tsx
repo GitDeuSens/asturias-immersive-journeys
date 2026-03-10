@@ -239,11 +239,13 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
                 </Breadcrumb>
               </div>
             )}
-            <div className="px-6 pt-3">
-              {(hasAR ? arDescription : shortDescription) && (
-                <p className="text-sm text-muted-foreground leading-relaxed">{hasAR ? arDescription : shortDescription}</p>
-              )}
-            </div>
+            {hasAR && (
+              <div className="px-6 pt-3">
+                {arDescription && (
+                  <p className="text-sm text-muted-foreground leading-relaxed">{arDescription}</p>
+                )}
+              </div>
+            )}
             <div className="p-6 space-y-6">
               {!hasAR && <p className="text-muted-foreground leading-relaxed text-base">{shortDescription}</p>}
               <NavigationSection point={point} />
