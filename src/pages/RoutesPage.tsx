@@ -680,9 +680,9 @@ export const RoutesPage = React.memo(function RoutesPage() {
                   </span>
                 </div>
 
-                {/* Search + Categories on same line on mobile */}
+                {/* Search + Filters on same line */}
                 <div className="flex items-center gap-2">
-                  <div className="relative flex-1">
+                  <div className="relative flex-1 min-w-0">
                     <Search
                       className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
                       aria-hidden="true"
@@ -696,10 +696,6 @@ export const RoutesPage = React.memo(function RoutesPage() {
                       aria-label={viewMode === 'points' ? t("routes.searchPoints") : t("routes.search")}
                     />
                   </div>
-                </div>
-
-                {/* Categories, Toggle & Locate */}
-                <div className="flex items-center gap-2 flex-wrap">
                   <CategoryChips
                     categories={categories}
                     selectedIds={selectedCategories}
@@ -710,7 +706,10 @@ export const RoutesPage = React.memo(function RoutesPage() {
                     onViewModeChange={setViewMode}
                     className="justify-start"
                   />
+                </div>
 
+                {/* Locate button */}
+                <div className="flex items-center gap-2">
                   <button
                     onClick={async () => {
                       if (hasLocation) {

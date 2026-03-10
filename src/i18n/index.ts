@@ -33,6 +33,7 @@ const resources = {
       "nav.vrExperiences": "Experiencias VR",
       "nav.arExperiences": "Experiencias AR",
       "nav.help": "Ayuda",
+      "nav.switchMode": "Cambiar modo de exploración",
 
       // Header
       "header.asturiasInmersivo": "Asturias Inmersivo",
@@ -308,6 +309,7 @@ const resources = {
       "nav.vrExperiences": "VR Experiences",
       "nav.arExperiences": "AR Experiences",
       "nav.help": "Help",
+      "nav.switchMode": "Switch exploration mode",
 
       // Header
       "header.asturiasInmersivo": "Asturias Immersive",
@@ -583,6 +585,7 @@ const resources = {
       "nav.vrExperiences": "Expériences VR",
       "nav.arExperiences": "Expériences AR",
       "nav.help": "Aide",
+      "nav.switchMode": "Changer le mode d'exploration",
 
       // Header
       "header.asturiasInmersivo": "Asturies Immersif",
