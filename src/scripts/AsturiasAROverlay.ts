@@ -7,6 +7,9 @@ import {
 } from "@needle-tools/engine";
 import QRCode from 'qrcode';
 
+// Dev-only logging — silent in production builds
+const _log = (...args: any[]) => { if (import.meta.env.DEV) console.log(...args); };
+
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────────────────────────────────────
