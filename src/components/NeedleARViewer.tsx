@@ -306,7 +306,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
 }
 
 // Main Component
-export function NeedleARViewer({ scene, locale = 'es', onStart, onError }: NeedleARViewerProps) {
+export function NeedleARViewer({ scene, locale = 'es', onStart, onError, onClose }: NeedleARViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   return (
