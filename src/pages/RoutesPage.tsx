@@ -814,6 +814,9 @@ export const RoutesPage = React.memo(function RoutesPage() {
           onClose={handleClosePoint}
           routeTitle={exploringRoute ? (typeof exploringRoute.title === 'string' ? exploringRoute.title : (exploringRoute.title as any)[lang] || (exploringRoute.title as any).es || '') : selectedRoute ? (typeof selectedRoute.title === 'string' ? selectedRoute.title : (selectedRoute.title as any)[lang] || (selectedRoute.title as any).es || '') : undefined}
           onBackToRoute={exploringRoute ? handleClosePoint : undefined}
+          allPoints={exploringRoute?.points || selectedRoute?.points}
+          currentIndex={(exploringRoute?.points || selectedRoute?.points)?.findIndex(p => p.id === selectedPoint.id)}
+          onNavigatePoint={handleSelectPoint}
         />
       )}
       </AnimatePresence>
