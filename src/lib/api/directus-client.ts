@@ -265,44 +265,70 @@ class DirectusApiClient {
 
   async getTours360(_locale: Language = 'es', page = 1, limit = 20): Promise<KuulaTour[]> {
     try {
-      const tours = await this.getClient().request(readItems('tours_360', {
-        filter: { status: { _in: API_CONFIG.getStatusFilter() } },
-        fields: ['*', ...TRANSLATIONS_DEEP],
-        limit, offset: (page - 1) * limit, sort: ['-created_at'],
-      }));
-      return (tours as unknown as DirectusTour360[]).map(transformTour360);
+      const [tours, analyticsCounts] = await Promise.all([
+        this.getClient().request(readItems('tours_360', {
+          filter: { status: { _in: API_CONFIG.getStatusFilter() } },
+          fields: ['*', ...TRANSLATIONS_DEEP],
+          limit, offset: (page - 1) * limit, sort: ['-created_at'],
+        })),
+        this.getAnalyticsCountMap('tour360', ['tour_viewed']),
+      ]);
+
+      return (tours as unknown as DirectusTour360[]).map((tour) => transformTour360({
+        ...tour,
+        view_count: Math.max(Number(tour.view_count ?? 0), analyticsCounts.get(tour.id) ?? 0),
+      } as DirectusTour360));
     } catch (error) { logger.error('[DirectusClient] Error fetching tours 360:', error); return []; }
   }
 
   async getTour360ById(id: string, _locale: Language = 'es'): Promise<KuulaTour | null> {
     try {
-      const tour = await this.getClient().request(readItem('tours_360', id, { fields: ['*', ...TRANSLATIONS_DEEP] }));
-      return transformTour360(tour as unknown as DirectusTour360);
+      const [tour, analyticsCounts] = await Promise.all([
+        this.getClient().request(readItem('tours_360', id, { fields: ['*', ...TRANSLATIONS_DEEP] })),
+        this.getAnalyticsCountMap('tour360', ['tour_viewed']),
+      ]);
+      return transformTour360({
+        ...(tour as DirectusTour360),
+        view_count: Math.max(Number((tour as DirectusTour360).view_count ?? 0), analyticsCounts.get(id) ?? 0),
+      } as DirectusTour360);
     } catch (error) { logger.error(`[DirectusClient] Error fetching tour 360 ${id}:`, error); return null; }
   }
 
   async getARScenes(_locale: Language = 'es', page = 1, limit = 20): Promise<ARScene[]> {
     try {
-      const scenes = await this.getClient().request(readItems('ar_scenes', {
-        filter: { status: { _in: API_CONFIG.getStatusFilter() } },
-        fields: ['*', ...TRANSLATIONS_DEEP],
-        limit, offset: (page - 1) * limit, sort: ['-created_at'],
-      }));
-      return (scenes as unknown as DirectusARScene[]).map(transformARScene);
+      const [scenes, analyticsCounts] = await Promise.all([
+        this.getClient().request(readItems('ar_scenes', {
+          filter: { status: { _in: API_CONFIG.getStatusFilter() } },
+          fields: ['*', ...TRANSLATIONS_DEEP],
+          limit, offset: (page - 1) * limit, sort: ['-created_at'],
+        })),
+        this.getAnalyticsCountMap('ar', ['ar_started']),
+      ]);
+
+      return (scenes as unknown as DirectusARScene[]).map((scene) => transformARScene({
+        ...scene,
+        launch_count: Math.max(Number(scene.launch_count ?? 0), analyticsCounts.get(scene.id) ?? 0),
+      } as DirectusARScene));
     } catch (error) { logger.error('[DirectusClient] Error fetching AR scenes:', error); return []; }
   }
 
   async getARSceneBySlug(slug: string, _locale: Language = 'es'): Promise<ARScene | null> {
     try {
-      const scenes = await this.getClient().request(readItems('ar_scenes', {
-        filter: { slug: { _eq: slug }, status: { _in: ['published', 'draft'] } },
-        fields: ['*', ...TRANSLATIONS_DEEP, 'audio_es', 'audio_en', 'audio_fr'],
-        limit: 1,
-      }));
+      const [scenes, analyticsCounts] = await Promise.all([
+        this.getClient().request(readItems('ar_scenes', {
+          filter: { slug: { _eq: slug }, status: { _in: ['published', 'draft'] } },
+          fields: ['*', ...TRANSLATIONS_DEEP, 'audio_es', 'audio_en', 'audio_fr'],
+          limit: 1,
+        })),
+        this.getAnalyticsCountMap('ar', ['ar_started']),
+      ]);
+
       if ((scenes as any[]).length === 0) return null;
       const raw = (scenes as unknown as DirectusARScene[])[0];
-      const result = transformARScene(raw);
-      // Map audio file UUIDs (plain strings in ar_scenes)
+      const result = transformARScene({
+        ...raw,
+        launch_count: Math.max(Number(raw.launch_count ?? 0), analyticsCounts.get(raw.id) ?? 0),
+      } as DirectusARScene);
       result.audio_es = raw.audio_es ? getDirectusFileUrl(raw.audio_es) : undefined;
       result.audio_en = raw.audio_en ? getDirectusFileUrl(raw.audio_en) : undefined;
       result.audio_fr = raw.audio_fr ? getDirectusFileUrl(raw.audio_fr) : undefined;
