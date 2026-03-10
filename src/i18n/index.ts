@@ -255,6 +255,28 @@ const resources = {
       "welcome.arExplain": "AR = Realidad Aumentada: apunta tu móvil para ver modelos 3D sobre el mundo real",
       "welcome.360Explain": "360° = Vistas panorámicas inmersivas que puedes explorar girando la pantalla",
       "welcome.understood": "¡Entendido!",
+
+      // Glossary
+      "glossary.title": "Guía de contenidos",
+      "glossary.subtitle": "Aprende qué significan los iconos y tipos de experiencia que encontrarás en la app.",
+      "glossary.arTitle": "AR — Realidad Aumentada",
+      "glossary.arDesc": "Apunta la cámara de tu móvil para ver modelos 3D superpuestos sobre el mundo real. Funciona mejor al aire libre.",
+      "glossary.360Title": "360° — Vistas panorámicas",
+      "glossary.360Desc": "Explora escenas inmersivas girando la pantalla o arrastrando con el dedo. No necesitas estar en el lugar.",
+      "glossary.vrTitle": "VR — Realidad Virtual",
+      "glossary.vrDesc": "Experiencias inmersivas con gafas de realidad virtual (Meta Quest, etc.). Requiere descargar una app.",
+      "glossary.routesTitle": "Rutas",
+      "glossary.routesDesc": "Recorridos con varios puntos de interés que puedes seguir en orden. Cada punto puede tener contenido AR, 360° o informativo.",
+      "glossary.poiTitle": "Puntos de interés",
+      "glossary.poiDesc": "Lugares destacados con contenido multimedia: fotos, vídeos, audioguías y experiencias interactivas.",
+      "glossary.visitedTitle": "Marcar como visitado",
+      "glossary.visitedDesc": "Puedes marcar puntos como visitados para llevar un registro de tu progreso en cada ruta.",
+
+      // Toast messages for visited
+      "toast.markedVisited": "✓ Punto visitado",
+      "toast.markedVisitedDesc": "Tu progreso se ha guardado. ¡Sigue explorando!",
+      "toast.markedUnvisited": "Punto desmarcado",
+      "toast.markedUnvisitedDesc": "Se ha eliminado de tus puntos visitados.",
     },
   },
   en: {
