@@ -394,6 +394,11 @@ function ARCard({ scene, lang, t }: { scene: ARScene; lang: Language; t: (v: any
           <Badge className="bg-[hsl(var(--ar-accent,48_100%_50%))] text-black font-bold">
             <Sparkles className="w-3 h-3 mr-1" />AR
           </Badge>
+          {scene.vr_url && (
+            <Badge className="bg-primary/90 text-primary-foreground font-bold">
+              <Glasses className="w-3 h-3 mr-1" />VR
+            </Badge>
+          )}
           <PopularityBadge launchCount={scene.launch_count} dateCreated={scene.created_at} />
         </div>
 
