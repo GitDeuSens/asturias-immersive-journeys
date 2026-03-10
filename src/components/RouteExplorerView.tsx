@@ -472,8 +472,7 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
       <div className="w-full">
         {isVisited && (
           <Check
-            style={{ position: 'absolute', right: '5px', top: '5px', padding: '5px' }}
-            className="cursor-pointer w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-md z-10 bg-primary"
+            className="absolute right-2 top-2 p-1 cursor-pointer w-6 h-6 rounded-full flex items-center justify-center text-white shadow-md z-10 bg-primary"
             onClick={(e) => {
               e.stopPropagation();
               onToggleVisited();

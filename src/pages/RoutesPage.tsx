@@ -672,7 +672,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
               >
                 {/* Header */}
                 <div className="flex items-center justify-between">
-                  <h2 className="text-3xl font-bold text-foreground">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
                     {viewMode === 'points' ? t("routes.pointsTitle") : t("routes.title")}
                   </h2>
                   <span className="text-xs text-muted-foreground" aria-live="polite">
