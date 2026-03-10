@@ -129,6 +129,8 @@ function AppWithOptimizations() {
         <Suspense fallback={null}>
           <CookieConsent />
         </Suspense>
+        {/* PWA Install Prompt */}
+        <PWAInstallPrompt />
         {/* Welcome onboarding removed — replaced by glossary button in header */}
       </>
     </>
