@@ -72,6 +72,7 @@ const texts = {
   tryInBrowser: { es: 'Probar en navegador', en: 'Try in browser', fr: 'Essayer dans le navigateur' },
   webPreview: { es: 'Vista previa interactiva', en: 'Interactive preview', fr: 'Aperçu interactif' },
   videoPreview: { es: 'Video preview', en: 'Video preview', fr: 'Aperçu vidéo' },
+  view3D: { es: 'Vista 3D', en: '3D View', fr: 'Vue 3D' },
   difficulty: {
     easy: { es: 'Fácil', en: 'Easy', fr: 'Facile' },
     moderate: { es: 'Moderado', en: 'Moderate', fr: 'Modéré' },
