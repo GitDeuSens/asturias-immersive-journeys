@@ -142,7 +142,6 @@ export default function GLBPreviewViewer({ glbUrl, scale = 1, rotationY = 0, cla
           animId = requestAnimationFrame(animate);
           const delta = clock.getDelta();
           controls.update();
-          const mixer = (renderer as any)._mixer as THREE.AnimationMixer | undefined;
           if (mixer) mixer.update(delta);
           renderer.render(scene, camera);
         };
