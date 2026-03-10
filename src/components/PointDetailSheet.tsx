@@ -468,10 +468,20 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
               )}
             </div>
 
-            {/* QR Code for this POI */}
-            <div className="flex justify-center">
-              <QRCodeShare url={`${window.location.origin}/routes/${point.id}`} title={title} />
-            </div>
+            {/* Share + QR for this POI */}
+            {!hasAR && (
+              <div className="px-6 pb-2">
+                <div className="bg-card border border-border rounded-xl p-4">
+                  <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <Share2 className="w-4 h-4 text-primary" />{t(texts.shareExperience)}
+                  </h4>
+                  <div className="flex items-center gap-2">
+                    <ShareButtons url={poiSharePath} title={title} description={shortDescription} variant="inline" />
+                    <QRCodeShare url={poiSharePath} title={title} />
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Previous / Next navigation */}
             {allPoints && allPoints.length > 1 && currentIndex !== undefined && onNavigatePoint && (
