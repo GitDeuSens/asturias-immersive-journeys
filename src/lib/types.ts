@@ -85,6 +85,9 @@ export interface ARScene {
   audio_en?: string;
   audio_fr?: string;
 
+  // VR URL (for headset experiences)
+  vr_url?: string;
+
   // Settings
   difficulty: ARDifficulty;
   duration_minutes: number;

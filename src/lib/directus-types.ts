@@ -126,6 +126,8 @@ export interface DirectusARScene {
   audio_en?: string;
   audio_fr?: string;
 
+  vr_url?: string;           // External VR experience URL
+
   translations: DirectusARSceneTranslation[];
   pois?: DirectusPOI[];
   status: 'draft' | 'published' | 'archived';

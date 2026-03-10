@@ -72,6 +72,7 @@ const ASTURIAS = {
 
 const T: Record<string, Record<string, string>> = {
     startAR:          { es: 'Iniciar AR',                 en: 'Start AR',               fr: 'Démarrer AR' },
+    startVR:          { es: 'Iniciar Experiencia',        en: 'Start Experience',        fr: "Démarrer l'Expérience" },
     stopAR:           { es: 'Salir de AR',                en: 'Exit AR',                fr: 'Quitter AR' },
     info:             { es: 'Información',                en: 'Information',            fr: 'Informations' },
     close:            { es: 'Cerrar',                     en: 'Close',                  fr: 'Fermer' },
@@ -232,6 +233,7 @@ export class AsturiasAROverlay extends Behaviour {
 
     private _lang      = 'es';
     private _isDesktop = false;
+    private _isVRHeadset = false;
     private _sceneInfo: SceneInfo | null = null;
     private _slug      = '';
 
@@ -266,6 +268,7 @@ export class AsturiasAROverlay extends Behaviour {
         this._detectLanguage();
         this._detectSlug();
         this._isDesktop = this._detectDesktop();
+        this._detectVRHeadset();
         this._loadGoogleFont();
         this._injectGlobalStyles();
         this._hideNeedleDefaultUI();
@@ -343,6 +346,30 @@ export class AsturiasAROverlay extends Behaviour {
     private _detectDesktop(): boolean {
         return !/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
             && window.innerWidth >= 768;
+    }
+
+    private _detectVRHeadset() {
+        // Check for VR headset via WebXR API
+        if (navigator.xr) {
+            navigator.xr.isSessionSupported('immersive-vr').then(supported => {
+                if (supported) {
+                    this._isVRHeadset = true;
+                    this._isDesktop = false; // VR headsets should not show QR
+                    // Rebuild pre-panel if already built to show VR button
+                    const existing = document.getElementById('ast-pre-panel');
+                    if (existing) {
+                        existing.remove();
+                        this._buildPreARPanel();
+                    }
+                }
+            }).catch(() => {});
+        }
+        // Also detect common VR headset user agents as fallback
+        const ua = navigator.userAgent;
+        if (/OculusBrowser|Quest|Pico|HTC.*VR|XR Viewer/i.test(ua)) {
+            this._isVRHeadset = true;
+            this._isDesktop = false;
+        }
     }
 
     private _isiOS(): boolean {
@@ -443,6 +470,7 @@ export class AsturiasAROverlay extends Behaviour {
             play:       `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>`,
             pause:      `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`,
             headphones: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>`,
+            vr:         `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-4.764a2 2 0 0 1-1.789-1.106l-.894-1.788a1 1 0 0 0-.894-.553h-1.318a1 1 0 0 0-.894.553l-.894 1.788A2 2 0 0 1 6.764 18H4a2 2 0 0 1-2-2V8z"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/></svg>`,
         };
         return icons[name] ?? '';
     }
@@ -590,6 +618,23 @@ export class AsturiasAROverlay extends Behaviour {
         (document.querySelector('[ar-button]') as HTMLElement)?.click();
     }
 
+    private async _startVR() {
+        // Start immersive-vr session via Needle Engine (for VR headsets)
+        try {
+            const { NeedleXRSession, Context } = await import('@needle-tools/engine');
+            const ctx = Context.Current;
+            if (NeedleXRSession && ctx) {
+                await NeedleXRSession.start("immersive-vr", undefined, ctx);
+                return;
+            }
+        } catch (err) { console.warn('[AsturiasAROverlay] NeedleXRSession.start immersive-vr failed', err); }
+        // Fallback: try requestSession directly
+        try {
+            const session = await navigator.xr!.requestSession('immersive-vr');
+            (window as any).__currentXRSession = session;
+        } catch (err) { console.warn('[AsturiasAROverlay] Direct immersive-vr session failed', err); }
+    }
+
     private async _stopAR() {
         try {
             const session = (window as any).__currentXRSession
@@ -695,6 +740,7 @@ export class AsturiasAROverlay extends Behaviour {
     private _buildPreARPanel() {
         const root  = this._ensureRoot();
         const panel = document.createElement('div');
+        panel.id = 'ast-pre-panel';
         this._prePanel = panel;
         const hasAudio = this._hasAudio();
         panel.style.cssText = `
@@ -709,16 +755,26 @@ export class AsturiasAROverlay extends Behaviour {
         `;
         const title = this._getTitle();
         const secondaryBtnSt = `background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:${ASTURIAS.radius.base};padding:clamp(10px,2.5vw,14px);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:clamp(10px,2.5vw,13px);font-weight:600;gap:5px;font-family:${ASTURIAS.fonts.family};flex-shrink:0;`;
+        const primaryBtnSt = `flex:1;gap:6px;background:${ASTURIAS.colors.primary};color:#fff;border-radius:${ASTURIAS.radius.base};padding:clamp(10px,2.5vw,14px) clamp(10px,3vw,16px);font-size:clamp(11px,2.8vw,14px);font-weight:700;justify-content:center;box-shadow:0 4px 20px rgba(122,184,0,0.4);`;
+        const xrLabel = this._isVRHeadset ? 'Asturias XR' : 'Asturias AR';
+
+        // Determine main action button
+        let mainButton: string;
+        if (this._isVRHeadset) {
+            mainButton = `<button id="ast-start-vr-btn" class="ast-btn" style="${primaryBtnSt}">${this._icon('vr')} ${t('startVR', this._lang)}</button>`;
+        } else if (this._isDesktop) {
+            mainButton = `<button id="ast-show-qr-btn" class="ast-btn" style="${primaryBtnSt}">${this._icon('qr')} ${t('qrTitle', this._lang)}</button>`;
+        } else {
+            mainButton = `<button id="ast-start-ar-btn" class="ast-btn" style="${primaryBtnSt}">${this._icon('ar')} ${t('startAR', this._lang)}</button>`;
+        }
+
         panel.innerHTML = `
             <div style="margin-bottom:clamp(10px,2.5vw,16px);">
-                <div style="font-size:clamp(9px,2vw,11px);font-weight:700;color:${ASTURIAS.colors.primary};text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px;">Asturias AR</div>
+                <div style="font-size:clamp(9px,2vw,11px);font-weight:700;color:${ASTURIAS.colors.primary};text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px;">${xrLabel}</div>
                 <div style="font-size:clamp(13px,3.5vw,17px);font-weight:700;color:#fff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${title}</div>
             </div>
             <div style="display:flex;gap:clamp(6px,2vw,10px);align-items:stretch;">
-                ${this._isDesktop
-                    ? `<button id="ast-show-qr-btn" class="ast-btn" style="flex:1;gap:6px;background:${ASTURIAS.colors.primary};color:#fff;border-radius:${ASTURIAS.radius.base};padding:clamp(10px,2.5vw,14px) clamp(10px,3vw,16px);font-size:clamp(11px,2.8vw,14px);font-weight:700;justify-content:center;box-shadow:0 4px 20px rgba(122,184,0,0.4);">${this._icon('qr')} ${t('qrTitle', this._lang)}</button>`
-                    : `<button id="ast-start-ar-btn" class="ast-btn" style="flex:1;gap:6px;background:${ASTURIAS.colors.primary};color:#fff;border-radius:${ASTURIAS.radius.base};padding:clamp(10px,2.5vw,14px) clamp(10px,3vw,16px);font-size:clamp(11px,2.8vw,14px);font-weight:700;justify-content:center;box-shadow:0 4px 20px rgba(122,184,0,0.4);">${this._icon('ar')} ${t('startAR', this._lang)}</button>`
-                }
+                ${mainButton}
                 ${hasAudio ? `<button id="ast-pre-audio-btn" style="${secondaryBtnSt}" title="${t('audioGuide', this._lang)}">${this._icon('headphones')}</button>` : ''}
                 <button id="ast-lang-btn" style="${secondaryBtnSt}">
                     ${this._icon('lang')} ${this._lang.toUpperCase()}
@@ -728,6 +784,7 @@ export class AsturiasAROverlay extends Behaviour {
         `;
         root.appendChild(panel);
         panel.querySelector('#ast-start-ar-btn')?.addEventListener('click', () => this._startAR());
+        panel.querySelector('#ast-start-vr-btn')?.addEventListener('click', () => this._startVR());
         panel.querySelector('#ast-show-qr-btn')?.addEventListener('click', () => this._showQRPanel());
         panel.querySelector('#ast-lang-btn')?.addEventListener('click',    () => this._showLangPanel());
 

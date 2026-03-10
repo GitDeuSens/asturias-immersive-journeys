@@ -122,6 +122,9 @@ function transformARScene(scene: DirectusARScene): ARScene {
         }
       : undefined,
 
+    // VR URL
+    vr_url: scene.vr_url || undefined,
+
     created_at: scene.created_at,
     published: scene.status === 'published',
     launch_count: Math.max(Number(scene.launch_count ?? 0), Number(scene.completion_count ?? 0)),
