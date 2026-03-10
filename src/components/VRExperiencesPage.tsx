@@ -385,13 +385,14 @@ function VRDetailModal({
   categoryLabels: Record<string, Record<Language, string>>;
   onClose: () => void;
 }) {
-  const [previewMode, setPreviewMode] = useState<'thumbnail' | 'video' | 'web'>('thumbnail');
+  const [previewMode, setPreviewMode] = useState<'thumbnail' | 'video' | 'web' | '3d'>('thumbnail');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const iframeContainerRef = useRef<HTMLDivElement>(null);
 
   const hasWebUrl = !!experience.web_url;
   const hasVideo = !!experience.preview_video_url;
+  const hasGLB = !!experience.glb_url;
 
   const handleFullscreen = () => {
     const el = iframeContainerRef.current;
