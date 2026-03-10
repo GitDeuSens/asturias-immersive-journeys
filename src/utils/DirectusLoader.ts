@@ -43,13 +43,13 @@ export async function fetchSceneBySlug(slug: string): Promise<ArScene | null> {
         `&limit=1`
     );
     if (!res.ok) {
-      console.error(`[Directus] HTTP ${res.status}: ${res.statusText}`);
+      if (import.meta.env.DEV) console.error(`[Directus] HTTP ${res.status}: ${res.statusText}`);
       return null;
     }
     const json = await res.json();
     return (json.data?.[0] as ArScene) ?? null;
   } catch (e) {
-    console.error("[Directus] Fetch failed:", e);
+    if (import.meta.env.DEV) console.error("[Directus] Fetch failed:", e);
     return null;
   }
 }
@@ -286,7 +286,7 @@ export async function loadSceneInto(
   glbOverride?: string
 ): Promise<void> {
   if (!loader) {
-    console.error("[loadSceneInto] No ModelLoading component provided");
+    if (import.meta.env.DEV) console.error("[loadSceneInto] No ModelLoading component provided");
     return;
   }
 
@@ -302,11 +302,11 @@ export async function loadSceneInto(
   } else if (slug) {
     const scene = await fetchSceneBySlug(slug);
     if (!scene) {
-      console.error(`[Directus] Scene '${slug}' not found`);
+      if (import.meta.env.DEV) console.error(`[Directus] Scene '${slug}' not found`);
       return;
     }
     if (!scene.glb_model) {
-      console.error(`[Directus] Scene '${slug}' has no GLB assigned`);
+      if (import.meta.env.DEV) console.error(`[Directus] Scene '${slug}' has no GLB assigned`);
       return;
     }
     glbUrl = getAssetUrl(scene.glb_model);
@@ -315,7 +315,7 @@ export async function loadSceneInto(
     name = scene.slug;
     logger.log(`[Directus] Loading '${name}':`, glbUrl);
   } else {
-    console.warn("[Directus] No slug or glb param provided");
+    if (import.meta.env.DEV) console.warn("[Directus] No slug or glb param provided");
     return;
   }
 

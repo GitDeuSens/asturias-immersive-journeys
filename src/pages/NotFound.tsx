@@ -1,19 +1,18 @@
 import { useLocation, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Mountain, Home, Search, Map, ArrowLeft, Compass } from "lucide-react";
+import { Home, Search, Map, ArrowLeft, Compass } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import { AppHeader } from "@/components/AppHeader";
+import { Footer } from "@/components/Footer";
 
 const NotFound = () => {
   const location = useLocation();
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
   useEffect(() => {
-    // Track 404 error silently
-
-    // Generate suggestions based on current path
     const path = location.pathname.toLowerCase();
     const newSuggestions: string[] = [];
 
@@ -30,7 +29,6 @@ const NotFound = () => {
       newSuggestions.push("/vr");
     }
 
-    // Always add home as fallback
     if (newSuggestions.length === 0) {
       newSuggestions.push("/");
     }
@@ -97,32 +95,12 @@ const NotFound = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Header bar */}
-      <header
-        className="fixed -top-3 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border"
-        role="banner"
-      >
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <Link
-            to="/"
-            className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg"
-            aria-label="Asturias Inmersivo - Ir al inicio"
-          >
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Mountain className="w-6 h-6 text-primary-foreground" aria-hidden="true" />
-            </div>
-            <div className="hidden sm:block">
-              <span className="font-bold text-lg text-foreground">Asturias</span>
-              <span className="text-primary font-semibold text-sm ml-1 uppercase tracking-wider">Inmersivo</span>
-            </div>
-          </Link>
-        </div>
-      </header>
+      <AppHeader showRestart={false} />
 
       {/* Main content */}
       <main
         id="main-content"
-        className="flex-1 flex items-center justify-center px-4 pt-20"
+        className="flex-1 flex items-center justify-center px-4 pt-14 md:pt-[122px]"
         role="main"
         aria-labelledby="notfound-title"
       >
@@ -214,12 +192,12 @@ const NotFound = () => {
             </Link>
           </motion.div>
 
-          {/* Attempted path for debugging */}
+          {/* Attempted path */}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.5 }}
-            className="mt-8 text-xs text-muted-foreground/50 font-mono"
+            className="mt-8 mb-8 text-xs text-muted-foreground/50 font-mono"
             aria-hidden="true"
           >
             {location.pathname}
@@ -227,14 +205,7 @@ const NotFound = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="py-6 px-4 border-t border-border bg-muted/30" role="contentinfo">
-        <div className="container mx-auto text-center">
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Asturias Inmersivo · Turismo de Asturias
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
