@@ -186,18 +186,19 @@ export function AppHeader({ showRestart = true, variant = "light" }: AppHeaderPr
                 {/* Switch mode button */}
                 <button
                   onClick={() => {
-                    localStorage.removeItem("asturias-mode");
+                    clearMode();
                     navigate("/experience");
                     setMenuOpen(false);
                   }}
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-white/60 hover:text-white hover:bg-white/10 transition-colors w-full min-h-[48px]"
                 >
                   <ArrowLeftRight className="w-5 h-5" aria-hidden="true" />
-                  {i18n.language === "es"
-                    ? "Cambiar modo de exploración"
-                    : i18n.language === "fr"
-                      ? "Changer le mode d'exploration"
-                      : "Switch exploration mode"}
+                  {t("nav.switchMode")}
+                  {mode && (
+                    <span className="ml-auto text-xs text-white/40">
+                      {mode === 'home' ? '🏠' : '📍'}
+                    </span>
+                  )}
                 </button>
               </nav>
             </motion.div>
