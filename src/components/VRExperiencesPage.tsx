@@ -1,8 +1,9 @@
 // ============ VR EXPERIENCES PAGE ============
 // Catalog of VR experiences with consistent design matching AR/360 pages
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+const GLBPreviewViewer = lazy(() => import('@/components/GLBPreviewViewer'));
 import {
   Glasses,
   Download,
