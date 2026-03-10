@@ -99,8 +99,23 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
 
   // Next suggested POI: first unvisited point in route order
   const nextRoutePoint = useMemo(() => {
+    if (!route) return null;
     return route.points.find(point => !visitedPoints.has(point.id)) || null;
-  }, [route.points, visitedPoints]);
+  }, [route?.points, visitedPoints]);
+
+  useEffect(() => {
+    if (!route) return;
+    if (visitedPoints.size === route.points.length && route.points.length > 0) {
+      const durationSec = Math.round((Date.now() - routeStartTime) / 1000);
+      trackRouteCompleted(
+        route.id,
+        getText(route.title, lang),
+        durationSec,
+        visitedPoints.size,
+        route.points.length
+      );
+    }
+  }, [visitedPoints, route?.points?.length, route?.id, route?.title, routeStartTime, lang]);
 
   // Early return after all hooks
   if (!route) {
@@ -150,19 +165,6 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
       openNavigation(start.lat, start.lng, route.points[0].title[lang]);
     }
   };
-
-  useEffect(() => {
-    if (visitedPoints.size === route.points.length && route.points.length > 0) {
-      const durationSec = Math.round((Date.now() - routeStartTime) / 1000);
-      trackRouteCompleted(
-        route.id,
-        getText(route.title, lang),
-        durationSec,
-        visitedPoints.size,
-        route.points.length
-      );
-    }
-  }, [visitedPoints, route.points.length, route.id, route.title, routeStartTime, lang]);
 
   return (
     <div className="flex flex-col h-full">
