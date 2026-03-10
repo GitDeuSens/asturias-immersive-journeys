@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Sparkles, Clock, MapPin, ChevronRight, Filter, Home } from "lucide-react";
+import { UnifiedSearchBar, type CustomFilter } from "@/components/UnifiedSearchBar";
 import { TourCardSkeleton } from "@/components/SkeletonCard";
 import { AppHeader } from "@/components/AppHeader";
 import { Badge } from "@/components/ui/badge";
