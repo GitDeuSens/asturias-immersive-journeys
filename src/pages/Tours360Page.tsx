@@ -406,7 +406,7 @@ export function Tours360Page() {
                       <View className="w-3 h-3" />
                       360°
                     </span>
-                    <PopularityBadge viewCount={tour.view_count} />
+                    <PopularityBadge viewCount={tour.view_count} dateCreated={tour.created_at} />
                   </div>
 
                   {/* Favorite button */}
