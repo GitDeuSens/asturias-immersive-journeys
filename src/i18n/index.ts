@@ -124,6 +124,7 @@ const resources = {
       "vr.instructions": "Instrucciones de uso",
       "vr.requirements": "Requisitos",
       "vr.compatible": "Compatible con",
+      "vr.apkNotAvailable": "La descarga no está disponible en este momento",
 
       // Map
       "map.yourLocation": "Tu ubicación",
@@ -363,6 +364,7 @@ const resources = {
       "vr.instructions": "Usage instructions",
       "vr.requirements": "Requirements",
       "vr.compatible": "Compatible with",
+      "vr.apkNotAvailable": "Download is not available at this time",
 
       // Map
       "map.yourLocation": "Your location",
@@ -603,6 +605,7 @@ const resources = {
       "vr.instructions": "Instructions d'utilisation",
       "vr.requirements": "Exigences",
       "vr.compatible": "Compatible avec",
+      "vr.apkNotAvailable": "Le téléchargement n'est pas disponible pour le moment",
 
       // Map
       "map.yourLocation": "Votre position",

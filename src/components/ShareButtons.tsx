@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Share2, Link, Check, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -41,7 +41,7 @@ interface ShareButtonsProps {
   variant?: 'inline' | 'modal';
 }
 
-export function ShareButtons({ 
+export const ShareButtons = forwardRef<HTMLDivElement, ShareButtonsProps>(function ShareButtons({ 
   url, 
   title, 
   description = '', 
@@ -49,7 +49,7 @@ export function ShareButtons({
   hashtags = ['AsturiasParaisoNatural', 'AsturiasInmersivo'],
   className = '',
   variant = 'inline'
-}: ShareButtonsProps) {
+}, ref) {
   const { t } = useTranslation();
   const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -254,4 +254,4 @@ export function ShareButtons({
       </AnimatePresence>
     </>
   );
-}
+});

@@ -82,7 +82,7 @@ export function ModeSelector({ onSelect }: ModeSelectorProps) {
 
   return (
     <>
-      <div className="relative z-10 flex flex-col items-center justify-center px-4 py-3 min-h-[calc(100dvh-56px)] md:min-h-[calc(100dvh-60px)]">
+      <div className="relative z-10 flex flex-col items-center justify-center px-4 py-3 min-h-dvh">
         {/* Geolocation Error Alert */}
         <GeolocationErrorAlert error={geoError} onDismiss={handleDismissError} onRetry={handleRetryLocation} />
 
