@@ -236,7 +236,7 @@ export class AsturiasAROverlay extends Behaviour {
 }
 
 async start() {
-    console.log('[Overlay] start() called');
+    _log('[Overlay] start() called');
     if (this._slug) {
         this._sceneInfo = await fetchSceneInfo(this._slug);
         console.log('[Overlay] sceneInfo:', this._sceneInfo);
