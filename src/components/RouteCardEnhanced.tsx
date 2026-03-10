@@ -7,6 +7,7 @@ import { useDirectusCategories } from "@/hooks/useDirectusData";
 import { calculateRouteDistance, formatDistance } from "@/lib/mapUtils";
 import { OptimizedImage } from "./OptimizedImage";
 import { PopularityBadge } from "./PopularityBadge";
+import { FavoriteButton } from "./FavoriteButton";
 
 interface RouteCardProps {
   route: ImmersiveRoute;
