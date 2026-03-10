@@ -696,6 +696,7 @@ export class AsturiasAROverlay extends Behaviour {
         const root  = this._ensureRoot();
         const panel = document.createElement('div');
         this._prePanel = panel;
+        const hasAudio = this._hasAudio();
         panel.style.cssText = `
             position:absolute;left:0;right:0;bottom:0;
             background:linear-gradient(160deg,${ASTURIAS.colors.forest} 0%,#0d2b18 100%);
@@ -707,6 +708,7 @@ export class AsturiasAROverlay extends Behaviour {
             font-family:${ASTURIAS.fonts.family};
         `;
         const title = this._getTitle();
+        const secondaryBtnSt = `background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:${ASTURIAS.radius.base};padding:clamp(10px,2.5vw,14px);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:clamp(10px,2.5vw,13px);font-weight:600;gap:5px;font-family:${ASTURIAS.fonts.family};flex-shrink:0;`;
         panel.innerHTML = `
             <div style="margin-bottom:clamp(10px,2.5vw,16px);">
                 <div style="font-size:clamp(9px,2vw,11px);font-weight:700;color:${ASTURIAS.colors.primary};text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px;">Asturias AR</div>
@@ -717,15 +719,108 @@ export class AsturiasAROverlay extends Behaviour {
                     ? `<button id="ast-show-qr-btn" class="ast-btn" style="flex:1;gap:6px;background:${ASTURIAS.colors.primary};color:#fff;border-radius:${ASTURIAS.radius.base};padding:clamp(10px,2.5vw,14px) clamp(10px,3vw,16px);font-size:clamp(11px,2.8vw,14px);font-weight:700;justify-content:center;box-shadow:0 4px 20px rgba(122,184,0,0.4);">${this._icon('qr')} ${t('qrTitle', this._lang)}</button>`
                     : `<button id="ast-start-ar-btn" class="ast-btn" style="flex:1;gap:6px;background:${ASTURIAS.colors.primary};color:#fff;border-radius:${ASTURIAS.radius.base};padding:clamp(10px,2.5vw,14px) clamp(10px,3vw,16px);font-size:clamp(11px,2.8vw,14px);font-weight:700;justify-content:center;box-shadow:0 4px 20px rgba(122,184,0,0.4);">${this._icon('ar')} ${t('startAR', this._lang)}</button>`
                 }
-                <button id="ast-lang-btn" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:${ASTURIAS.radius.base};padding:clamp(10px,2.5vw,14px);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:clamp(10px,2.5vw,13px);font-weight:600;gap:5px;font-family:${ASTURIAS.fonts.family};flex-shrink:0;">
+                ${hasAudio ? `<button id="ast-pre-audio-btn" style="${secondaryBtnSt}" title="${t('audioGuide', this._lang)}">${this._icon('headphones')}</button>` : ''}
+                <button id="ast-lang-btn" style="${secondaryBtnSt}">
                     ${this._icon('lang')} ${this._lang.toUpperCase()}
                 </button>
             </div>
+            ${hasAudio ? `<div id="ast-pre-audio-player" style="display:none;margin-top:clamp(10px,2.5vw,14px);"></div>` : ''}
         `;
         root.appendChild(panel);
         panel.querySelector('#ast-start-ar-btn')?.addEventListener('click', () => this._startAR());
         panel.querySelector('#ast-show-qr-btn')?.addEventListener('click', () => this._showQRPanel());
         panel.querySelector('#ast-lang-btn')?.addEventListener('click',    () => this._showLangPanel());
+
+        // Audio guide in bottom panel
+        if (hasAudio) {
+            panel.querySelector('#ast-pre-audio-btn')?.addEventListener('click', () => this._togglePreAudio());
+            this._buildPreAudioPlayer(panel.querySelector('#ast-pre-audio-player') as HTMLElement);
+        }
+    }
+
+    /** Inline audio player inside the pre-AR bottom panel */
+    private _buildPreAudioPlayer(container: HTMLElement) {
+        if (!container) return;
+        this._preAudioPanel = container;
+        const playBtnSt = `display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;border:1.5px solid rgba(122,184,0,0.5);cursor:pointer;background:rgba(122,184,0,0.15);color:${ASTURIAS.colors.primary};transition:all 0.15s ease;flex-shrink:0;`;
+        container.innerHTML = `
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                <div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;
+                    background:rgba(122,184,0,0.2);border:1px solid rgba(122,184,0,0.4);
+                    display:flex;align-items:center;justify-content:center;color:${ASTURIAS.colors.primary};">
+                    ${this._icon('headphones')}
+                </div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:9px;font-weight:700;color:${ASTURIAS.colors.primary};text-transform:uppercase;letter-spacing:0.8px;">
+                        ${t('audioGuide', this._lang)}
+                    </div>
+                </div>
+                <button id="ast-pre-audio-play" style="${playBtnSt}">
+                    ${this._icon('play')}
+                </button>
+                <button id="ast-pre-audio-close" style="background:transparent;border:none;padding:4px;flex-shrink:0;color:rgba(255,255,255,0.4);cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                    ${this._icon('close')}
+                </button>
+            </div>
+            <div id="ast-pre-progress-track" class="ast-progress-track">
+                <div id="ast-pre-progress-fill" class="ast-progress-fill" style="width:0%"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:3px;">
+                <span id="ast-pre-time-cur" style="font-size:10px;color:rgba(255,255,255,0.4);">0:00</span>
+                <span id="ast-pre-time-tot" style="font-size:10px;color:rgba(255,255,255,0.4);">0:00</span>
+            </div>
+        `;
+        container.querySelector('#ast-pre-audio-play')?.addEventListener('click', () => {
+            const url = this._getAudioUrl();
+            if (!url) return;
+            if (this._audio.isPlaying) {
+                this._audio.pause();
+                this._updatePreAudioUI(false);
+            } else {
+                this._audio.play(url);
+                this._updatePreAudioUI(true);
+            }
+        });
+        container.querySelector('#ast-pre-audio-close')?.addEventListener('click', () => {
+            this._audio.stop();
+            this._updatePreAudioUI(false);
+            container.style.display = 'none';
+            const btn = this._prePanel?.querySelector('#ast-pre-audio-btn') as HTMLElement | null;
+            if (btn) btn.style.background = 'rgba(255,255,255,0.12)';
+        });
+        container.querySelector('#ast-pre-progress-track')?.addEventListener('click', (evt) => {
+            const track = evt.currentTarget as HTMLElement;
+            const rect  = track.getBoundingClientRect();
+            const ratio = ((evt as MouseEvent).clientX - rect.left) / rect.width;
+            this._audio.seek(ratio * this._audio.duration);
+        });
+        this._audio.onProgress = (current, duration) => {
+            const fill = container.querySelector('#ast-pre-progress-fill') as HTMLElement | null;
+            const cur  = container.querySelector('#ast-pre-time-cur') as HTMLElement | null;
+            const tot  = container.querySelector('#ast-pre-time-tot') as HTMLElement | null;
+            if (fill && duration > 0) fill.style.width = `${(current / duration) * 100}%`;
+            if (cur) cur.textContent = this._fmtTime(current);
+            if (tot) tot.textContent = this._fmtTime(duration);
+        };
+        this._audio.onEnded = () => {
+            this._updatePreAudioUI(false);
+            const fill = container.querySelector('#ast-pre-progress-fill') as HTMLElement | null;
+            if (fill) fill.style.width = '0%';
+        };
+    }
+
+    private _togglePreAudio() {
+        const panel = this._preAudioPanel;
+        if (!panel) return;
+        const open = panel.style.display !== 'block';
+        panel.style.display = open ? 'block' : 'none';
+        const btn = this._prePanel?.querySelector('#ast-pre-audio-btn') as HTMLElement | null;
+        if (btn) btn.style.background = open ? 'rgba(122,184,0,0.25)' : 'rgba(255,255,255,0.12)';
+    }
+
+    private _updatePreAudioUI(playing: boolean) {
+        const playBtn = this._preAudioPanel?.querySelector('#ast-pre-audio-play') as HTMLElement | null;
+        if (playBtn) playBtn.innerHTML = playing ? this._icon('pause') : this._icon('play');
     }
 
     private _showPrePanel() { if (this._prePanel) this._prePanel.style.display = 'block'; }
