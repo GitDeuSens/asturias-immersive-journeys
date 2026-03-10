@@ -22,11 +22,8 @@ const NotFound = () => {
     if (path.includes("ruta") || path.includes("route") || path.includes("camino")) {
       newSuggestions.push("/routes");
     }
-    if (path.includes("ar") || path.includes("realidad")) {
-      newSuggestions.push("/ar");
-    }
-    if (path.includes("vr") || path.includes("virtual")) {
-      newSuggestions.push("/vr");
+    if (path.includes("ar") || path.includes("realidad") || path.includes("vr") || path.includes("virtual") || path.includes("xr")) {
+      newSuggestions.push("/xr");
     }
 
     if (newSuggestions.length === 0) {
