@@ -378,7 +378,7 @@ async start() {
                 btn?.click();
             }
         } catch (e) {
-            console.error('[AsturiasAROverlay] Start AR failed', e);
+            if (import.meta.env.DEV) console.error('[AsturiasAROverlay] Start AR failed', e);
         }
     }
 
