@@ -286,7 +286,7 @@ export async function loadSceneInto(
   glbOverride?: string
 ): Promise<void> {
   if (!loader) {
-    console.error("[loadSceneInto] No ModelLoading component provided");
+    if (import.meta.env.DEV) console.error("[loadSceneInto] No ModelLoading component provided");
     return;
   }
 
