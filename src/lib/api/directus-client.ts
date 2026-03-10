@@ -121,6 +121,7 @@ function transformARScene(scene: DirectusARScene): ARScene {
       : undefined,
 
     published: scene.status === 'published',
+    launch_count: scene.launch_count || 0,
   };
 }
 
