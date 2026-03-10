@@ -9,13 +9,32 @@ import nextgenEuLogo from "@/assets/logos/nextgen-eu.png";
 import planRecuperacionLogo from "@/assets/logos/plan-recuperacion.png";
 import ministerioTurismoLogo from "@/assets/logos/ministerio-turismo.png";
 import principadoAsturiasLogo from "@/assets/logos/principado-asturias.png";
+function ScrollToTopButton({ label }: { label: string }) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setVisible(window.scrollY > 300);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <Button
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      variant="default"
+      size="icon"
+      className="fixed bottom-6 right-6 z-50 rounded-md shadow-lg"
+      aria-label={label}
+    >
+      <ChevronUp className="h-5 w-5" aria-hidden="true" />
+    </Button>
+  );
+}
 
 export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
   const { t } = useTranslation();
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
 
   return (
     <footer
