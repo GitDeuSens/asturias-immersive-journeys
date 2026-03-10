@@ -244,7 +244,7 @@ async start() {
     this._arUrl = window.location.href;
     _log('[Overlay] arUrl:', this._arUrl);
     if (this._isDesktop) {
-        console.log('[Overlay] building DESKTOP panel');
+        _log('[Overlay] building DESKTOP panel');
         this._buildDesktopPanel();
     } else {
         console.log('[Overlay] building PRE-AR panel');
