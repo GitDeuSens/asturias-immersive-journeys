@@ -242,6 +242,19 @@ const resources = {
       "error.notFound": "Página no encontrada",
       "error.goHome": "Volver al inicio",
       "error.tryAgain": "Intentar de nuevo",
+
+      // Content type explanations
+      "content.arFull": "Realidad Aumentada",
+      "content.360Full": "Vista panorámica 360°",
+      "content.vrFull": "Realidad Virtual",
+      "content.infoFull": "Información",
+
+      // Welcome / onboarding
+      "welcome.title": "¡Bienvenido!",
+      "welcome.message": "Explora los contenidos usando el menú ☰ arriba a la derecha. Los iconos de colores indican el tipo de experiencia disponible en cada punto.",
+      "welcome.arExplain": "AR = Realidad Aumentada: apunta tu móvil para ver modelos 3D sobre el mundo real",
+      "welcome.360Explain": "360° = Vistas panorámicas inmersivas que puedes explorar girando la pantalla",
+      "welcome.understood": "¡Entendido!",
     },
   },
   en: {
@@ -482,6 +495,19 @@ const resources = {
       "error.notFound": "Page not found",
       "error.goHome": "Go to home",
       "error.tryAgain": "Try again",
+
+      // Content type explanations
+      "content.arFull": "Augmented Reality",
+      "content.360Full": "360° panoramic view",
+      "content.vrFull": "Virtual Reality",
+      "content.infoFull": "Information",
+
+      // Welcome / onboarding
+      "welcome.title": "Welcome!",
+      "welcome.message": "Explore content using the menu ☰ at the top right. Colored icons indicate the type of experience available at each point.",
+      "welcome.arExplain": "AR = Augmented Reality: point your phone to see 3D models over the real world",
+      "welcome.360Explain": "360° = Immersive panoramic views you can explore by rotating your screen",
+      "welcome.understood": "Got it!",
     },
   },
   fr: {
@@ -723,6 +749,19 @@ const resources = {
       "error.notFound": "Page non trouvée",
       "error.goHome": "Aller à l'accueil",
       "error.tryAgain": "Réessayer",
+
+      // Content type explanations
+      "content.arFull": "Réalité Augmentée",
+      "content.360Full": "Vue panoramique 360°",
+      "content.vrFull": "Réalité Virtuelle",
+      "content.infoFull": "Informations",
+
+      // Welcome / onboarding
+      "welcome.title": "Bienvenue !",
+      "welcome.message": "Explorez le contenu via le menu ☰ en haut à droite. Les icônes colorées indiquent le type d'expérience disponible à chaque point.",
+      "welcome.arExplain": "AR = Réalité Augmentée : pointez votre téléphone pour voir des modèles 3D dans le monde réel",
+      "welcome.360Explain": "360° = Vues panoramiques immersives à explorer en tournant l'écran",
+      "welcome.understood": "Compris !",
     },
   },
 };
