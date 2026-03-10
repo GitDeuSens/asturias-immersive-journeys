@@ -27,7 +27,7 @@ export function DynamicBackground({ blur = 8, interval = 7000 }: DynamicBackgrou
   }, [interval]);
 
   return (
-    <div className="inset-0 overflow-hidden">
+    <div className="fixed inset-0 overflow-hidden">
       <AnimatePresence mode="sync">
         <motion.div
           key={currentIndex}

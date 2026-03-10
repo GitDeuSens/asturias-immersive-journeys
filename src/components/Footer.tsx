@@ -124,16 +124,7 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
         <p className="text-center text-sm text-muted-foreground/80">{t("footer.copyright")}</p>
       </div>
 
-      {/* Scroll to top button */}
-      <Button
-        onClick={scrollToTop}
-        variant="default"
-        size="icon"
-        className="fixed bottom-6 right-6 z-50 rounded-md shadow-lg"
-        aria-label={t("footer.scrollToTop", "Volver arriba")}
-      >
-        <ChevronUp className="h-5 w-5" aria-hidden="true" />
-      </Button>
+      <ScrollToTopButton label={t("footer.scrollToTop", "Volver arriba")} />
     </footer>
   );
 });

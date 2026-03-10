@@ -51,7 +51,7 @@ export function AppHeader({ showRestart = true, variant = "light", routes = {}, 
       </div>
 
       {/* Main header */}
-      <div style={{backgroundColor: '#006db0', color: 'white'}} >
+      <div className="bg-accent text-accent-foreground">
         <div className="container mx-auto px-3 sm:px-4 py-2 md:py-3 flex items-center justify-between gap-2">
           {/* Logo section */}
           <Link to="/experience" className="flex items-center gap-2 sm:gap-3 group shrink min-w-0" aria-label="Asturias Inmersivo - Inicio">
