@@ -348,6 +348,30 @@ export class AsturiasAROverlay extends Behaviour {
             && window.innerWidth >= 768;
     }
 
+    private _detectVRHeadset() {
+        // Check for VR headset via WebXR API
+        if (navigator.xr) {
+            navigator.xr.isSessionSupported('immersive-vr').then(supported => {
+                if (supported) {
+                    this._isVRHeadset = true;
+                    this._isDesktop = false; // VR headsets should not show QR
+                    // Rebuild pre-panel if already built to show VR button
+                    const existing = document.getElementById('ast-pre-panel');
+                    if (existing) {
+                        existing.remove();
+                        this._buildPreARPanel();
+                    }
+                }
+            }).catch(() => {});
+        }
+        // Also detect common VR headset user agents as fallback
+        const ua = navigator.userAgent;
+        if (/OculusBrowser|Quest|Pico|HTC.*VR|XR Viewer/i.test(ua)) {
+            this._isVRHeadset = true;
+            this._isDesktop = false;
+        }
+    }
+
     private _isiOS(): boolean {
         return /iPhone|iPad|iPod/i.test(navigator.userAgent)
             || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
