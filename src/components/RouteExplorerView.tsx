@@ -541,22 +541,34 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
                 {hasPDF && <FileText className="w-3.5 h-3.5 text-muted-foreground" />}
               </div>
 
-              {/* Fixed: visited = mark as unvisited, unvisited = mark as visited */}
+              {/* Visited/unvisited toggle — uses div instead of button to avoid nesting inside motion.button */}
               {isVisited ? (
-                <button onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleVisited();
-                  import('sonner').then(({ toast }) => toast.success(t('poi.unvisited')));
-                }} className='inline-flex items-center gap-1 min-h-[44px] px-2 text-xs text-primary font-medium'>
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleVisited();
+                    import('sonner').then(({ toast }) => toast(t('toast.markedUnvisited'), { description: t('toast.markedUnvisitedDesc') }));
+                  }}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); onToggleVisited(); } }}
+                  className='inline-flex items-center gap-1 min-h-[44px] px-2 text-xs text-primary font-medium cursor-pointer hover:opacity-80'
+                >
                   <Check className="w-3.5 h-3.5" />
                   {t('poi.unvisited')}
-                </button>
+                </div>
               ) : (
-                <button onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleVisited();
-                  import('sonner').then(({ toast }) => toast.success(t('poi.visited')));
-                }} className='inline-flex items-center min-h-[44px] px-2 text-xs text-muted-foreground'>{t('poi.visited')}</button>
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleVisited();
+                    import('sonner').then(({ toast }) => toast.success(t('toast.markedVisited'), { description: t('toast.markedVisitedDesc') }));
+                  }}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); onToggleVisited(); } }}
+                  className='inline-flex items-center min-h-[44px] px-2 text-xs text-muted-foreground cursor-pointer hover:text-primary'
+                >{t('poi.visited')}</div>
               )}
 
               {distanceInfo && (
