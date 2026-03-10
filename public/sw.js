@@ -45,6 +45,16 @@ function isDirectusAsset(url) {
   );
 }
 
+// Is this a map tile?
+function isMapTile(url) {
+  return url.includes('tile.openstreetmap.org') ||
+         url.includes('tiles.stadiamaps.com') ||
+         url.includes('cartodb-basemaps') ||
+         url.includes('tile.thunderforest.com') ||
+         url.includes('.tile.') ||
+         url.includes('/tiles/');
+}
+
 // Fetch handler
 self.addEventListener('fetch', (event) => {
   const { request } = event;
