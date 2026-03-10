@@ -1,7 +1,7 @@
 // ============ VR EXPERIENCES PAGE ============
 // Catalog of VR experiences with consistent design matching AR/360 pages
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Glasses,
@@ -16,6 +16,8 @@ import {
   Home,
   Smartphone,
   Monitor,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react';
 import { AppHeader } from '@/components/AppHeader';
 import { SEOHead } from '@/components/SEOHead';
