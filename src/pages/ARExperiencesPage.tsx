@@ -154,8 +154,10 @@ export function ARExperiencesPage() {
 
           {/* Loading state */}
           {isLoading && (
-            <div className="flex items-center justify-center py-12">
-              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <TourCardSkeleton key={i} />
+              ))}
             </div>
           )}
 
