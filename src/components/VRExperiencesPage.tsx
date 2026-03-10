@@ -70,9 +70,9 @@ const texts = {
     moderate: { es: 'Moderado', en: 'Moderate', fr: 'Modéré' },
   },
   motionWarning: {
-    es: '⚠️ Puede causar mareos',
-    en: '⚠️ May cause motion sickness',
-    fr: '⚠️ Peut provoquer le mal des transports',
+    es: 'Puede causar mareos',
+    en: 'May cause motion sickness',
+    fr: 'Peut provoquer le mal des transports',
   },
   compatibleDevices: { es: 'Dispositivos compatibles', en: 'Compatible devices', fr: 'Appareils compatibles' },
   version: { es: 'Versión', en: 'Version', fr: 'Version' },

@@ -397,11 +397,42 @@ class DirectusApiClient {
     try {
       const experiences = await this.getClient().request(readItems('vr_experiences', {
         filter: { status: { _in: API_CONFIG.getStatusFilter() } },
-        fields: ['*', ...TRANSLATIONS_DEEP],
+        fields: [
+          'id', 'slug', 'category', 'apk_file', 'apk_version', 'apk_size_mb',
+          'web_url', 'thumbnail', 'preview_video', 'duration_minutes', 'difficulty',
+          'age_rating', 'motion_sickness_warning', 'compatible_devices', 'status',
+          'created_at', 'updated_at', 'translations.*'
+        ] as any,
         limit, offset: (page - 1) * limit, sort: ['-created_at'],
       }));
       return (experiences as unknown as DirectusVRExperience[]).map(transformVRExperience);
-    } catch (error) { logger.error('[DirectusClient] Error fetching VR experiences:', error); return []; }
+    } catch (error) {
+      logger.warn('[DirectusClient] VR query with translations failed, trying fallback:', error);
+      try {
+        const fallback = await this.getClient().request(readItems('vr_experiences', {
+          filter: { status: { _eq: 'published' } },
+          fields: [
+            'id', 'slug', 'category', 'apk_file', 'apk_version', 'apk_size_mb',
+            'web_url', 'thumbnail', 'preview_video', 'duration_minutes', 'difficulty',
+            'age_rating', 'motion_sickness_warning', 'compatible_devices', 'status',
+            'created_at', 'updated_at'
+          ],
+          limit, offset: (page - 1) * limit, sort: ['-created_at'],
+        }));
+
+        return (fallback as any[]).map((vr) => transformVRExperience({
+          ...vr,
+          translations: [
+            { languages_code: 'es', title: vr.slug || 'VR Experience', description: '', short_description: '' },
+            { languages_code: 'en', title: vr.slug || 'VR Experience', description: '', short_description: '' },
+            { languages_code: 'fr', title: vr.slug || 'VR Experience', description: '', short_description: '' },
+          ],
+        } as DirectusVRExperience));
+      } catch (fallbackError) {
+        logger.error('[DirectusClient] Error fetching VR experiences:', fallbackError);
+        return [];
+      }
+    }
   }
 
   async getPOIs(_locale: Language = 'es') {

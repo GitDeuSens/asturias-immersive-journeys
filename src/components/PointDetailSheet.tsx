@@ -463,32 +463,34 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
 
             {/* Previous / Next navigation */}
             {allPoints && allPoints.length > 1 && currentIndex !== undefined && onNavigatePoint && (
-              <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 pt-2 pb-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-9 px-3 gap-1.5"
-                  disabled={currentIndex <= 0}
-                  onClick={() => onNavigatePoint(allPoints[currentIndex - 1])}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  <span className="hidden sm:inline">{language === 'es' ? 'Anterior' : language === 'en' ? 'Previous' : 'Précédent'}</span>
-                  <span className="sm:hidden">{language === 'es' ? 'Prev' : language === 'en' ? 'Prev' : 'Préc.'}</span>
-                </Button>
-                <span className="justify-self-center flex items-center text-xs text-muted-foreground font-medium tabular-nums px-1">
-                  {currentIndex + 1}/{allPoints.length}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-9 px-3 gap-1.5"
-                  disabled={currentIndex >= allPoints.length - 1}
-                  onClick={() => onNavigatePoint(allPoints[currentIndex + 1])}
-                >
-                  <span className="hidden sm:inline">{language === 'es' ? 'Siguiente' : language === 'en' ? 'Next' : 'Suivant'}</span>
-                  <span className="sm:hidden">{language === 'es' ? 'Next' : language === 'en' ? 'Next' : 'Suiv.'}</span>
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
+              <div className="flex justify-center pt-2 pb-2">
+                <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 w-full max-w-sm">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-9 px-3 gap-1.5"
+                    disabled={currentIndex <= 0}
+                    onClick={() => onNavigatePoint(allPoints[currentIndex - 1])}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span className="hidden sm:inline">{language === 'es' ? 'Anterior' : language === 'en' ? 'Previous' : 'Précédent'}</span>
+                    <span className="sm:hidden">{language === 'es' ? 'Prev' : language === 'en' ? 'Prev' : 'Préc.'}</span>
+                  </Button>
+                  <span className="justify-self-center flex items-center text-xs text-muted-foreground font-medium tabular-nums px-1">
+                    {currentIndex + 1}/{allPoints.length}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-9 px-3 gap-1.5"
+                    disabled={currentIndex >= allPoints.length - 1}
+                    onClick={() => onNavigatePoint(allPoints[currentIndex + 1])}
+                  >
+                    <span className="hidden sm:inline">{language === 'es' ? 'Siguiente' : language === 'en' ? 'Next' : 'Suivant'}</span>
+                    <span className="sm:hidden">{language === 'es' ? 'Next' : language === 'en' ? 'Next' : 'Suiv.'}</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
             )}
           </ScrollArea>
