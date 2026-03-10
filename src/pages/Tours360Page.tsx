@@ -383,7 +383,10 @@ export function Tours360Page() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.04 * index }}
                 className="group cursor-pointer bg-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-border hover:border-primary"
-                onClick={() => handleTourClick(tour)}
+                onClick={(e) => {
+                  if ((e.target as HTMLElement).closest('[data-favorite-button="true"]')) return;
+                  handleTourClick(tour);
+                }}
               >
                 <div className="relative">
                   <div className="aspect-[16/10] overflow-hidden">
