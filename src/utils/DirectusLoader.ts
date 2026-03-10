@@ -8,6 +8,7 @@ import {
 import { AnimationAction, AnimationClip, AnimationMixer, Box3, Clock, MathUtils, Object3D, Vector3 } from "three";
 import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils.js";
 import { DIRECTUS_URL } from '@/lib/directus-url';
+import { logger } from '@/lib/logger';
 export { DIRECTUS_URL };
 
 // ─────────────────────────────────────────────
