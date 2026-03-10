@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MapPin, Camera, Play, FileText, Headphones, Smartphone, ExternalLink, ChevronRight, Maximize2, Sparkles, Image as ImageIcon, Phone, Mail, Globe, Clock, Euro, Info, Navigation, Footprints, Car, Eye, Download, Share2, Home } from 'lucide-react';
+import { X, MapPin, Camera, Play, FileText, Headphones, Smartphone, ExternalLink, ChevronRight, ChevronLeft, Maximize2, Sparkles, Image as ImageIcon, Phone, Mail, Globe, Clock, Euro, Info, Navigation, Footprints, Car, Eye, Download, Share2, Home } from 'lucide-react';
 import type { RoutePoint } from '@/data/types';
 import { DIRECTUS_URL } from '@/lib/directus-url';
 import { useLanguage, useExplorationMode } from '@/hooks/useLanguage';
