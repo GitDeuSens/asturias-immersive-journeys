@@ -153,7 +153,7 @@ export function Tours360Page() {
   const { categories } = useDirectusCategories(language as Language);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [activeTour, setActiveTour] = useState<KuulaTour | null>(null);
-  const [showSearch, setShowSearch] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const [showInfo, setShowInfo] = useState(false);
 
   // Generate slug for a tour — prefer DB slug, fallback to title
