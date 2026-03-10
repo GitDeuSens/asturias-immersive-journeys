@@ -93,6 +93,7 @@ export interface ARScene {
   // Metadata
   created_at?: string;
   published: boolean;
+  launch_count?: number;
 }
 
 // ============ AUDIO TRACK ============
