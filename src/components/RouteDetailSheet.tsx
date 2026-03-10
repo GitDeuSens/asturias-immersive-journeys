@@ -167,12 +167,17 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
         <ScrollArea className="flex-1">
           {/* Bottom info */}
           <div className="pl-6 pt-3">
-            <h1 id="route-detail-title" className="text-2xl font-bold mb-1">
-              {route.title[lang]}
-            </h1>
-            <p className="text-sm font-medium">
-              {route.theme[lang]}
-            </p>
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <h1 id="route-detail-title" className="text-2xl font-bold mb-1">
+                  {route.title[lang]}
+                </h1>
+                <p className="text-sm font-medium">
+                  {route.theme[lang]}
+                </p>
+              </div>
+              <PopularityBadge viewCount={route.viewCount} size="md" className="mt-1 flex-shrink-0" />
+            </div>
           </div>
           <div className="p-6 space-y-6">
             {/* Quick info badges */}
