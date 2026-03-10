@@ -638,7 +638,7 @@ export class AsturiasAROverlay extends Behaviour {
         try {
             const { NeedleXRSession } = await import('@needle-tools/engine');
             if (NeedleXRSession) {
-                await NeedleXRSession.start({ mode: 'immersive-vr' });
+                await NeedleXRSession.start("immersive-vr" as any);
                 return;
             }
         } catch (err) { console.warn('[AsturiasAROverlay] NeedleXRSession.start immersive-vr failed', err); }
