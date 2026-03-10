@@ -254,4 +254,4 @@ export const ShareButtons = forwardRef<HTMLDivElement, ShareButtonsProps>(functi
       </AnimatePresence>
     </>
   );
-}
+});
