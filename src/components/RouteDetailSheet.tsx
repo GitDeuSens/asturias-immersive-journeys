@@ -166,18 +166,16 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
         {/* Scrollable content */}
         <ScrollArea className="flex-1">
           {/* Bottom info */}
-          <div className="pl-6 pt-3">
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex-1 min-w-0">
-                <h1 id="route-detail-title" className="text-2xl font-bold mb-1">
-                  {route.title[lang]}
-                </h1>
-                <p className="text-sm font-medium">
-                  {route.theme[lang]}
-                </p>
-              </div>
-              <PopularityBadge viewCount={route.viewCount} dateCreated={route.createdAt} size="md" className="mt-1 flex-shrink-0" />
+          <div className="px-6 pt-3">
+            <div className="flex items-center gap-2">
+              <h1 id="route-detail-title" className="text-2xl font-bold truncate flex-1 min-w-0">
+                {route.title[lang]}
+              </h1>
+              <PopularityBadge viewCount={route.viewCount} dateCreated={route.createdAt} size="md" className="flex-shrink-0" />
             </div>
+            <p className="text-sm font-medium mt-0.5 truncate">
+              {route.theme[lang]}
+            </p>
           </div>
           <div className="p-6 space-y-6">
             {/* Quick info badges */}

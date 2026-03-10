@@ -215,7 +215,41 @@ export const RoutesPage = React.memo(function RoutesPage() {
       attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://osm.org/">OpenStreetMap</a>',
     }).addTo(mapRef.current);
 
-    L.control.zoom({ position: "bottomright" }).addTo(mapRef.current);
+    L.control.zoom({ position: "bottomleft" }).addTo(mapRef.current);
+
+    // Add locate (geolocation) button
+    const LocateControl = L.Control.extend({
+      options: { position: 'bottomleft' as L.ControlPosition },
+      onAdd() {
+        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+        const btn = L.DomUtil.create('a', '', container);
+        btn.href = '#';
+        btn.title = 'My location';
+        btn.setAttribute('role', 'button');
+        btn.setAttribute('aria-label', 'Center on my location');
+        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M2 12h2"/><path d="M20 12h2"/></svg>';
+        btn.style.display = 'flex';
+        btn.style.alignItems = 'center';
+        btn.style.justifyContent = 'center';
+        btn.style.width = '34px';
+        btn.style.height = '34px';
+        L.DomEvent.disableClickPropagation(container);
+        L.DomEvent.on(btn, 'click', (e) => {
+          L.DomEvent.preventDefault(e);
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                mapRef.current?.setView([pos.coords.latitude, pos.coords.longitude], 14);
+              },
+              () => {},
+              { enableHighAccuracy: true, timeout: 8000 }
+            );
+          }
+        });
+        return container;
+      },
+    });
+    new LocateControl().addTo(mapRef.current);
 
     // Initialize cluster group
     clusterGroupRef.current = createClusterGroup();
