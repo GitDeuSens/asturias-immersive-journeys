@@ -84,7 +84,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError }: NeedleARViewer
       if (initialized.current) return;
       initialized.current = true;
 
-      console.log('[AR] loadfinished event fired');
+      // loadfinished event fired
 
       try {
         onStart?.();
