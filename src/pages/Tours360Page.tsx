@@ -9,6 +9,7 @@ import { Footer } from "@/components/Footer";
 import { TourCardSkeleton } from "@/components/SkeletonCard";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { PopularityBadge } from "@/components/PopularityBadge";
 import { useDirectusTours, useDirectusCategories } from "@/hooks/useDirectusData";
 import { useLanguage } from "@/hooks/useLanguage";
 import { trackTourViewed, trackEvent } from "@/lib/analytics";
@@ -396,12 +397,13 @@ export function Tours360Page() {
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                  {/* 360 badge */}
-                  <div className="absolute top-3 left-3">
+                  {/* 360 badge + popularity */}
+                  <div className="absolute top-3 left-3 flex items-center gap-1.5">
                     <span className="badge-360 flex items-center gap-1">
                       <View className="w-3 h-3" />
                       360°
                     </span>
+                    <PopularityBadge viewCount={tour.view_count} />
                   </div>
 
                   {/* Favorite button */}

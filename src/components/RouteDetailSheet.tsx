@@ -34,6 +34,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ShareButtons } from '@/components/ShareButtons';
 import { FavoriteButton } from '@/components/FavoriteButton';
 import { ElevationProfile } from '@/components/ElevationProfile';
+import { WeatherWidget } from '@/components/WeatherWidget';
+import { QRCodeShare } from '@/components/QRCodeShare';
+import { PopularityBadge } from '@/components/PopularityBadge';
+import { ItineraryTimeline } from '@/components/ItineraryTimeline';
 import { useVisited } from '@/hooks/useVisited';
 import { Progress } from '@/components/ui/progress';
 import { trackRouteViewed } from '@/lib/analytics';
@@ -163,12 +167,17 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
         <ScrollArea className="flex-1">
           {/* Bottom info */}
           <div className="pl-6 pt-3">
-            <h1 id="route-detail-title" className="text-2xl font-bold mb-1">
-              {route.title[lang]}
-            </h1>
-            <p className="text-sm font-medium">
-              {route.theme[lang]}
-            </p>
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <h1 id="route-detail-title" className="text-2xl font-bold mb-1">
+                  {route.title[lang]}
+                </h1>
+                <p className="text-sm font-medium">
+                  {route.theme[lang]}
+                </p>
+              </div>
+              <PopularityBadge viewCount={route.viewCount} size="md" className="mt-1 flex-shrink-0" />
+            </div>
           </div>
           <div className="p-6 space-y-6">
             {/* Quick info badges */}
@@ -302,15 +311,36 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
               </div>
             )}
 
-            {/* Share buttons */}
+            {/* Weather at start point */}
+            {route.points.length > 0 && route.points[0].location && (
+              <WeatherWidget lat={route.points[0].location.lat} lng={route.points[0].location.lng} />
+            )}
+
+            {/* Multi-day itinerary */}
+            {route.itineraryDays && route.itineraryDays.length > 0 && (
+              <ItineraryTimeline
+                days={route.itineraryDays}
+                points={route.points}
+                lang={lang}
+                onSelectPoint={onSelectPoint}
+              />
+            )}
+
+            {/* Share buttons + QR */}
             <div>
               <p className="text-sm font-semibold text-foreground mb-2">{t('common.share')}</p>
-              <ShareButtons
-                title={route.title[lang]}
-                description={route.shortDescription[lang]}
-                routeCode={route.id}
-                hashtags={['AsturiasParaisoNatural', 'AsturiasInmersivo', route.id.replace('-', '')]}
-              />
+              <div className="flex items-center gap-2">
+                <ShareButtons
+                  title={route.title[lang]}
+                  description={route.shortDescription[lang]}
+                  routeCode={route.id}
+                  hashtags={['AsturiasParaisoNatural', 'AsturiasInmersivo', route.id.replace('-', '')]}
+                />
+                <QRCodeShare
+                  url={`${window.location.origin}/routes/${route.id}`}
+                  title={route.title[lang]}
+                />
+              </div>
             </div>
 
             {/* Points preview (if any) */}

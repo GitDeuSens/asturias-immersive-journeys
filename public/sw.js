@@ -45,6 +45,16 @@ function isDirectusAsset(url) {
   );
 }
 
+// Is this a map tile?
+function isMapTile(url) {
+  return url.includes('tile.openstreetmap.org') ||
+         url.includes('tiles.stadiamaps.com') ||
+         url.includes('cartodb-basemaps') ||
+         url.includes('tile.thunderforest.com') ||
+         url.includes('.tile.') ||
+         url.includes('/tiles/');
+}
+
 // Fetch handler
 self.addEventListener('fetch', (event) => {
   const { request } = event;
@@ -90,6 +100,23 @@ self.addEventListener('fetch', (event) => {
 
   // === Directus images: Cache-first (immutable content-addressed) ===
   if (isDirectusAsset(url) || request.destination === 'image') {
+    event.respondWith(
+      caches.match(request).then(cached => {
+        if (cached) return cached;
+        return fetch(request).then(response => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(RUNTIME_CACHE).then(cache => cache.put(request, clone));
+          }
+          return response;
+        }).catch(() => new Response('', { status: 404 }));
+      })
+    );
+    return;
+  }
+
+  // === Map tiles: Cache-first for offline maps ===
+  if (isMapTile(url)) {
     event.respondWith(
       caches.match(request).then(cached => {
         if (cached) return cached;

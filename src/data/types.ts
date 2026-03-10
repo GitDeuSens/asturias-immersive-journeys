@@ -195,4 +195,10 @@ export interface ImmersiveRoute {
   elevationGainMeters?: number;
   surfaceType?: 'paved' | 'gravel' | 'dirt' | 'mixed';
   gpxFile?: string;
+  viewCount?: number;
+  itineraryDays?: {
+    day: number;
+    title: Record<string, string>;
+    poiIds: string[];
+  }[];
 }
