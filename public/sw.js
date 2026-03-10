@@ -115,6 +115,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // === Map tiles: Cache-first for offline maps ===
+  if (isMapTile(url)) {
+    event.respondWith(
+      caches.match(request).then(cached => {
+        if (cached) return cached;
+        return fetch(request).then(response => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(RUNTIME_CACHE).then(cache => cache.put(request, clone));
+          }
+          return response;
+        }).catch(() => new Response('', { status: 404 }));
+      })
+    );
+    return;
+  }
+
   // === Static assets (fonts, CSS, JS): Cache-first with background revalidation ===
   if (
     request.destination === 'font' ||
