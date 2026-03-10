@@ -242,7 +242,7 @@ async start() {
         _log('[Overlay] sceneInfo:', this._sceneInfo);
     }
     this._arUrl = window.location.href;
-    console.log('[Overlay] arUrl:', this._arUrl);
+    _log('[Overlay] arUrl:', this._arUrl);
     if (this._isDesktop) {
         console.log('[Overlay] building DESKTOP panel');
         this._buildDesktopPanel();
