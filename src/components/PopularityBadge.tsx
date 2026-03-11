@@ -59,7 +59,7 @@ export function PopularityBadge({ viewCount, launchCount, dateCreated, size = 's
 
   return (
     <span
-      className={`inline-flex items-center rounded-full border border-border/60 bg-background/80 backdrop-blur-sm font-semibold tracking-wide uppercase ${sizeClasses} ${color} ${className}`}
+      className={`inline-flex items-center rounded-full border backdrop-blur-sm font-semibold tracking-wide uppercase ${sizeClasses} ${color} ${className}`}
       aria-label={`Popularity: ${label}`}
     >
       <Icon className={size === 'sm' ? 'w-2.5 h-2.5' : 'w-3 h-3'} strokeWidth={2} />
