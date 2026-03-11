@@ -31,7 +31,7 @@ import { trackRouteStarted } from "@/lib/analytics";
 import { BREAKPOINTS, MAP_PANEL_OFFSETS, ASTURIAS_BOUNDS, DEFAULT_COORDINATES } from "@/constants/breakpoints";
 import { DIRECTUS_URL } from "@/lib/directus-url";
 import "leaflet/dist/leaflet.css";
-import { matchesSlug, slugifyWithId } from "@/lib/slugify";
+// slugs come directly from Directus DB
 // Create route bubble marker with name label
 const createRouteMarkerIcon = (route: ImmersiveRoute, routeName: string) => {
   const borderColor = route.isCircular ? "hsl(79, 100%, 36%)" : "hsl(203, 100%, 32%)";
@@ -92,16 +92,9 @@ export const RoutesPage = React.memo(function RoutesPage() {
   const userMarkerRef = useRef<L.Marker | null>(null);
   const clusterGroupRef = useRef<L.MarkerClusterGroup | null>(null);
 
-  // Slug helpers
-  const routeSlug = useCallback((route: ImmersiveRoute) => {
-    const title = route.title[lang] || route.title.es || '';
-    return slugifyWithId(title, route.id);
-  }, [lang]);
-
-  const pointSlug = useCallback((point: RoutePoint) => {
-    const title = typeof point.title === 'string' ? point.title : (point.title[lang] || point.title.es || '');
-    return slugifyWithId(title, point.id);
-  }, [lang]);
+  // Slug helpers — use DB slugs directly from Directus
+  const routeSlug = useCallback((route: ImmersiveRoute) => route.slug, []);
+  const pointSlug = useCallback((point: RoutePoint) => point.slug, []);
 
   // Load routes, categories and ALL POIs from Directus
   const { routes: immersiveRoutes, loading: routesLoading } = useImmersiveRoutes(lang);
@@ -130,13 +123,8 @@ export const RoutesPage = React.memo(function RoutesPage() {
     // Handle /routes/poi/:pointSlug — direct POI link (Ubicaciones mode)
     if (routeCode === 'poi' && pointId) {
       const allPOIs = immersiveRoutes.flatMap(r => r.points);
-      const matchedPoint = allPOIs.find(p => {
-        const pTitle = typeof p.title === 'string' ? p.title : (p.title[lang] || p.title.es || '');
-        return matchesSlug(pointId, pTitle, p.id);
-      }) || allDirectusPOIs.map((poi: any) => {
-        const pTitle = poi.title?.[lang] || poi.title?.es || '';
-        return matchesSlug(pointId, pTitle, poi.slug || poi.id) ? poi : null;
-      }).find(Boolean);
+      const matchedPoint = allPOIs.find(p => p.slug === pointId || p.id === pointId)
+        || allDirectusPOIs.find((poi: any) => (poi.slug || poi.id) === pointId);
 
       if (matchedPoint) {
         setViewMode('points');
@@ -146,10 +134,9 @@ export const RoutesPage = React.memo(function RoutesPage() {
       return;
     }
 
-    const matched = immersiveRoutes.find(route => {
-      const title = route.title[lang] || route.title.es || '';
-      return matchesSlug(routeCode, title, route.id);
-    });
+    const matched = immersiveRoutes.find(route =>
+      route.slug === routeCode || route.id === routeCode
+    );
     if (matched) {
       setSelectedRoute(matched);
       setExploringRoute(matched);
@@ -158,10 +145,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
 
       // If a point ID is in the URL, find and select the point
       if (pointId) {
-        const point = matched.points.find(p => {
-          const pTitle = typeof p.title === 'string' ? p.title : (p.title[lang] || p.title.es || '');
-          return matchesSlug(pointId, pTitle, p.id);
-        }) || matched.points.find(p => p.id === pointId);
+        const point = matched.points.find(p => p.slug === pointId || p.id === pointId);
         if (point) {
           setExploringRoute(matched);
           setShowRouteDetail(false);
