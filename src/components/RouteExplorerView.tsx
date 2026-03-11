@@ -323,12 +323,15 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
         {/* Share */}
         <div>
           <p className="text-sm font-semibold text-foreground mb-2">{t('common.share')}</p>
-          <ShareButtons
-            title={getText(route.title, lang)}
-            description={getText(route.shortDescription, lang)}
-            routeCode={route.id}
-            hashtags={['AsturiasParaisoNatural', 'AsturiasInmersivo']}
-          />
+          <div className="flex items-center gap-2">
+            <ShareButtons
+              title={getText(route.title, lang)}
+              description={getText(route.shortDescription, lang)}
+              routeCode={route.id}
+              hashtags={['AsturiasParaisoNatural', 'AsturiasInmersivo']}
+            />
+            <QRCodeShare url={`/routes/${route.id}`} title={getText(route.title, lang)} />
+          </div>
         </div>
 
         {route.points.length > 0 && (
