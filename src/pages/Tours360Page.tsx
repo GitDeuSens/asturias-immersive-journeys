@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { ParallaxHero } from '@/components/ParallaxHero';
 import { View, ChevronRight, X, Filter, Search, Home, Maximize2, Share2, Info, Minimize2, Bookmark } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { DIRECTUS_URL } from '@/lib/directus-url';

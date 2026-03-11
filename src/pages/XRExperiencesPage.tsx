@@ -3,7 +3,8 @@
 
 import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ParallaxHero } from '@/components/ParallaxHero';
 const GLBPreviewViewer = lazy(() => import('@/components/GLBPreviewViewer'));
 import {
   Sparkles,
