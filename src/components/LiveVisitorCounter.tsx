@@ -1,5 +1,3 @@
-import { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Users } from 'lucide-react';
 
 interface LiveVisitorCounterProps {
