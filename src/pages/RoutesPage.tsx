@@ -173,7 +173,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
         if (selectedPoint) {
           setSelectedPoint(null);
           if (exploringRoute) {
-            navigate(`/routes/${exploringRoute.id}`, { replace: true });
+            navigate(`/routes/${routeSlug(exploringRoute)}`, { replace: true });
           } else {
             navigate('/routes', { replace: true });
           }
