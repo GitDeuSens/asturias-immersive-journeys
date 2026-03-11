@@ -47,6 +47,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { calculateRouteDistance, formatDistance, openNavigation } from '@/lib/mapUtils';
 import { ShareButtons } from '@/components/ShareButtons';
+import { QRCodeShare } from '@/components/QRCodeShare';
 
 
 interface RouteExplorerViewProps {
