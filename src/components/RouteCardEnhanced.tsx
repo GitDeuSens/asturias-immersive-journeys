@@ -8,6 +8,8 @@ import { calculateRouteDistance, formatDistance } from "@/lib/mapUtils";
 import { OptimizedImage } from "./OptimizedImage";
 import { PopularityBadge } from "./PopularityBadge";
 import { FavoriteButton } from "./FavoriteButton";
+import { RouteProgressBar } from "./RouteProgressBar";
+import { LiveVisitorCounter } from "./LiveVisitorCounter";
 
 interface RouteCardProps {
   route: ImmersiveRoute;
