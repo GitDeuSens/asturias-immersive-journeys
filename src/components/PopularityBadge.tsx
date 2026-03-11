@@ -35,11 +35,11 @@ type BadgeStatus = { label: string; color: string; Icon: typeof Flame } | null;
  * 6. null      — nothing to show (old content with few interactions)
  */
 function getStatus(count: number, days: number): BadgeStatus {
-  if (count >= 500) return { label: 'HOT', color: 'text-destructive', Icon: Flame };
-  if (count >= 200) return { label: 'TRENDING', color: 'text-primary', Icon: TrendingUp };
-  if (count >= 50) return { label: 'POPULAR', color: 'text-primary', Icon: Sparkles };
-  if (count >= 10) return { label: 'RISING', color: 'text-accent-foreground', Icon: Zap };
-  if (days <= 14) return { label: 'NEW', color: 'text-accent-foreground', Icon: Clock };
+  if (count >= 500) return { label: 'HOT', color: 'text-destructive bg-destructive/10 border-destructive/30', Icon: Flame };
+  if (count >= 200) return { label: 'TRENDING', color: 'text-primary bg-primary/10 border-primary/30', Icon: TrendingUp };
+  if (count >= 50) return { label: 'POPULAR', color: 'text-primary bg-primary/10 border-primary/30', Icon: Sparkles };
+  if (count >= 10) return { label: 'RISING', color: 'text-[hsl(48,100%,40%)] bg-[hsl(48,100%,50%)]/10 border-[hsl(48,100%,50%)]/30', Icon: Zap };
+  if (days <= 14) return { label: 'NEW', color: 'text-[hsl(142,71%,35%)] bg-[hsl(142,71%,45%)]/10 border-[hsl(142,71%,45%)]/30', Icon: Clock };
   return null; // Don't show badge for old low-activity content
 }
 
