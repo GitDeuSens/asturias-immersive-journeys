@@ -168,6 +168,7 @@ export interface RoutePoint {
     address?: string;
   };
   coverImage?: string;
+  shareUrl?: string;   // Share URL from Directus DB
   content: RoutePointContent;
   tags?: string[];
   viewCount?: number;
