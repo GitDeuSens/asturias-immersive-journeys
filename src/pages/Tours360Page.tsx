@@ -312,8 +312,8 @@ export function Tours360Page() {
           </Breadcrumb>
         </div>
 
-        {/* Hero section */}
-        <div className="bg-primary pt-5 sm:pt-12 mb-5 sm:mb-8 mt-1">
+        {/* Hero section with parallax */}
+        <ParallaxHero className="pt-5 sm:pt-12 mb-5 sm:mb-8 mt-1">
           <div className="container mx-auto pb-4 px-4 max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -327,7 +327,7 @@ export function Tours360Page() {
               <p className="text-sm sm:text-lg text-white/90 max-w-2xl mx-auto mb-5 px-2">{t(texts.subtitle)}</p>
             </motion.div>
           </div>
-        </div>
+        </ParallaxHero>
 
         <div className="container mx-auto pb-5 px-4 max-w-6xl">
           {/* Hero Carousel */}
