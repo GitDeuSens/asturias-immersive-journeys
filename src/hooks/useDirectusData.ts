@@ -235,6 +235,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
 
   return {
     id: route.route_code || route.id,
+    slug: route.slug || route.route_code || route.id, // DB slug from Directus
     title: route.title || { es: '', en: '', fr: '' },
     shortDescription: route.short_description || { es: '', en: '', fr: '' },
     fullDescription: route.description,

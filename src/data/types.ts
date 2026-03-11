@@ -176,6 +176,7 @@ export interface RoutePoint {
 
 export interface ImmersiveRoute {
   id: string;
+  slug: string;     // DB slug from Directus
   title: Record<Language, string>;
   shortDescription: Record<Language, string>;
   fullDescription?: Record<Language, string>;

@@ -92,16 +92,9 @@ export const RoutesPage = React.memo(function RoutesPage() {
   const userMarkerRef = useRef<L.Marker | null>(null);
   const clusterGroupRef = useRef<L.MarkerClusterGroup | null>(null);
 
-  // Slug helpers
-  const routeSlug = useCallback((route: ImmersiveRoute) => {
-    const title = route.title[lang] || route.title.es || '';
-    return slugifyWithId(title, route.id);
-  }, [lang]);
-
-  const pointSlug = useCallback((point: RoutePoint) => {
-    const title = typeof point.title === 'string' ? point.title : (point.title[lang] || point.title.es || '');
-    return slugifyWithId(title, point.id);
-  }, [lang]);
+  // Slug helpers — use DB slugs directly from Directus
+  const routeSlug = useCallback((route: ImmersiveRoute) => route.slug, []);
+  const pointSlug = useCallback((point: RoutePoint) => point.slug, []);
 
   // Load routes, categories and ALL POIs from Directus
   const { routes: immersiveRoutes, loading: routesLoading } = useImmersiveRoutes(lang);
