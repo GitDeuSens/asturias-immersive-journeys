@@ -27,6 +27,7 @@ import type { ImmersiveRoute, RoutePoint } from '@/data/types';
 import { DIRECTUS_URL } from '@/lib/directus-url';
 import { useExplorationMode } from '@/hooks/useLanguage';
 import { useGeolocation } from '@/hooks/useGeolocation';
+import { useVisited } from '@/hooks/useVisited';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { trackPOIViewed, trackRouteCompleted } from '@/lib/analytics';
@@ -67,8 +68,14 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   const lang = i18n.language as 'es' | 'en' | 'fr';
   const { mode } = useExplorationMode();
   const { latitude, longitude, hasLocation } = useGeolocation();
-  const [visitedPoints, setVisitedPoints] = useState<Set<string>>(new Set());
+  const { isVisited: isPointVisited, toggleVisited, getRouteProgress } = useVisited();
   const [routeStartTime] = useState(Date.now());
+
+  // Derive visitedPoints Set from useVisited for backwards compat
+  const visitedPoints = useMemo(() => {
+    if (!route) return new Set<string>();
+    return new Set(route.points.filter(p => isPointVisited(route.id, p.id)).map(p => p.id));
+  }, [route, isPointVisited]);
   const navigate = useNavigate();
 
   const routeProgress = route?.points?.length
@@ -148,15 +155,8 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   };
 
   const handleToggleVisited = (pointId: string) => {
-    setVisitedPoints(prev => {
-      const next = new Set(prev);
-      if (next.has(pointId)) {
-        next.delete(pointId);
-      } else {
-        next.add(pointId);
-      }
-      return next;
-    });
+    if (!route) return;
+    toggleVisited(route.id, pointId);
   };
 
   const handleNavigateToStart = () => {
