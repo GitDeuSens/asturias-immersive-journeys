@@ -540,7 +540,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
           setSelectedRoute(route);
           setExploringRoute(route);
           setShowRouteDetail(false);
-          navigate(`/routes/${route.id}`, { replace: false });
+          navigate(`/routes/${routeSlug(route)}`, { replace: false });
         });
 
         clusterGroupRef.current?.addLayer(marker);
