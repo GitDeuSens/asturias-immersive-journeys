@@ -269,7 +269,7 @@ function DynamicNeedleViewer({ scene, locale, onStart, onError, onClose }: Needl
   }, [scene, locale, onStart, onError]);
 
   return (
-    <div className="relative rounded-2xl border border-border bg-black overflow-hidden h-full" style={{ minHeight: 500 }}>
+    <div className="relative rounded-2xl border border-border bg-black overflow-hidden h-full" style={{ minHeight: 500, isolation: 'isolate', zIndex: 0 }}>
       {isLoading && (
         <div style={{
           position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
