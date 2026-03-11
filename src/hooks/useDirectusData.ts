@@ -162,6 +162,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       // TODO meter gallery aqui
       return {
         id: poi.slug || poi.id || `point-${idx}`, // Use slug first for clean URLs
+        slug: poi.slug || poi.id || `point-${idx}`, // DB slug from Directus
         audioGuides: {
           es: buildAudioUrl(poi.audio_es),
           en: buildAudioUrl(poi.audio_en),
