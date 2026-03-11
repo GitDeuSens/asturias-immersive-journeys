@@ -178,6 +178,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
           address: poi.address,
         },
         coverImage: poi.cover_image || '',
+        shareUrl: poi.share_url || '',
         content,
         gallery: poi.gallery,
         tags: poi.tags || [],

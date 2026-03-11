@@ -171,8 +171,8 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
 
   const arTitle = arScene ? getText(arScene.title, language) : title;
   const arDescription = arScene ? getText(arScene.description, language) : shortDescription;
-  // Build share URL from DB slugs for correct QR/share links
-  const poiSharePath = point.slug ? `${window.location.origin}/routes/poi/${point.slug}` : window.location.href;
+  // Use share_url from Directus DB, fallback to slug-based URL
+  const poiSharePath = (point as any).shareUrl || (point.slug ? `${window.location.origin}/routes/poi/${point.slug}` : window.location.href);
 
   return (
     <>
