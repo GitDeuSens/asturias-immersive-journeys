@@ -1,4 +1,5 @@
 import { Suspense, lazy, useEffect } from 'react';
+import { SplashScreen } from '@/components/SplashScreen';
 import { HelmetProvider } from 'react-helmet-async';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import { Toaster } from "@/components/ui/toaster";
