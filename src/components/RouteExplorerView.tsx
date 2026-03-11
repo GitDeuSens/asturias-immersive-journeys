@@ -47,6 +47,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { calculateRouteDistance, formatDistance, openNavigation } from '@/lib/mapUtils';
 import { ShareButtons } from '@/components/ShareButtons';
+import { QRCodeShare } from '@/components/QRCodeShare';
 
 
 interface RouteExplorerViewProps {
@@ -162,7 +163,7 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   const handleNavigateToStart = () => {
     if (route.polyline.length > 0 && route.points.length > 0) {
       const start = route.points[0].location;
-      openNavigation(start.lat, start.lng, route.points[0].title[lang]);
+      openNavigation(start.lat, start.lng);
     }
   };
 
@@ -322,12 +323,15 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
         {/* Share */}
         <div>
           <p className="text-sm font-semibold text-foreground mb-2">{t('common.share')}</p>
-          <ShareButtons
-            title={getText(route.title, lang)}
-            description={getText(route.shortDescription, lang)}
-            routeCode={route.id}
-            hashtags={['AsturiasParaisoNatural', 'AsturiasInmersivo']}
-          />
+          <div className="flex items-center gap-2">
+            <ShareButtons
+              title={getText(route.title, lang)}
+              description={getText(route.shortDescription, lang)}
+              routeCode={route.id}
+              hashtags={['AsturiasParaisoNatural', 'AsturiasInmersivo']}
+            />
+            <QRCodeShare url={`/routes/${route.id}`} title={getText(route.title, lang)} />
+          </div>
         </div>
 
         {route.points.length > 0 && (

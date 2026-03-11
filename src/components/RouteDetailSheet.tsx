@@ -100,7 +100,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
   const handleNavigateToStart = () => {
     if (route.polyline.length > 0 && route.points.length > 0) {
       const start = route.points[0].location;
-      openNavigation(start.lat, start.lng, route.title[lang]);
+      openNavigation(start.lat, start.lng);
     }
   };
 
