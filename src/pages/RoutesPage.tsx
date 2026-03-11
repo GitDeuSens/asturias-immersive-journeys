@@ -145,10 +145,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
 
       // If a point ID is in the URL, find and select the point
       if (pointId) {
-        const point = matched.points.find(p => {
-          const pTitle = typeof p.title === 'string' ? p.title : (p.title[lang] || p.title.es || '');
-          return matchesSlug(pointId, pTitle, p.id);
-        }) || matched.points.find(p => p.id === pointId);
+        const point = matched.points.find(p => p.slug === pointId || p.id === pointId);
         if (point) {
           setExploringRoute(matched);
           setShowRouteDetail(false);
