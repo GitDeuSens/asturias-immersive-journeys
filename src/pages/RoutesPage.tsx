@@ -601,7 +601,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
     setShowRouteDetail(false);
     setExploringRoute(route);
     setSelectedPoint(null);
-    navigate(`/routes/${route.id}`, { replace: false });
+    navigate(`/routes/${routeSlug(route)}`, { replace: false });
   };
 
   const handleExitRoute = () => {
