@@ -190,7 +190,8 @@ export function XRExperiencesPage() {
 
   // Counts
   const arCount = allItems.filter(i => i.kind === 'ar').length;
-  const vrCount = allItems.filter(i => i.kind === 'vr').length + arScenes.filter(s => !!s.vr_url).length;
+  // VR tab shows ALL items (AR+VR combined), count should match
+  const vrCount = allItems.length;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

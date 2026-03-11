@@ -38,7 +38,7 @@ function getStatus(count: number, days: number): BadgeStatus {
   if (count >= 500) return { label: 'HOT', color: 'text-destructive', Icon: Flame };
   if (count >= 200) return { label: 'TRENDING', color: 'text-primary', Icon: TrendingUp };
   if (count >= 50) return { label: 'POPULAR', color: 'text-primary', Icon: Sparkles };
-  if (count >= 10) return { label: 'RISING', color: 'text-muted-foreground', Icon: Zap };
+  if (count >= 10) return { label: 'RISING', color: 'text-accent-foreground', Icon: Zap };
   if (days <= 14) return { label: 'NEW', color: 'text-accent-foreground', Icon: Clock };
   return null; // Don't show badge for old low-activity content
 }
