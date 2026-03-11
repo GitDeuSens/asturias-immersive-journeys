@@ -838,6 +838,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                         onClick={() => {
                           setSelectedRoute(route);
                           setShowRouteDetail(true);
+                          navigate(`/routes/${routeSlug(route)}`, { replace: false });
                         }}
                       />
                       </motion.div>
