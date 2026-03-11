@@ -99,6 +99,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedDifficulties, setSelectedDifficulties] = useState<('easy' | 'medium' | 'hard')[]>([]);
+  const [selectedExpTypes, setSelectedExpTypes] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRoute, setSelectedRoute] = useState<ImmersiveRoute | null>(null);
   const [showRouteDetail, setShowRouteDetail] = useState(false);
