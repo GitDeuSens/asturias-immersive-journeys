@@ -123,13 +123,8 @@ export const RoutesPage = React.memo(function RoutesPage() {
     // Handle /routes/poi/:pointSlug — direct POI link (Ubicaciones mode)
     if (routeCode === 'poi' && pointId) {
       const allPOIs = immersiveRoutes.flatMap(r => r.points);
-      const matchedPoint = allPOIs.find(p => {
-        const pTitle = typeof p.title === 'string' ? p.title : (p.title[lang] || p.title.es || '');
-        return matchesSlug(pointId, pTitle, p.id);
-      }) || allDirectusPOIs.map((poi: any) => {
-        const pTitle = poi.title?.[lang] || poi.title?.es || '';
-        return matchesSlug(pointId, pTitle, poi.slug || poi.id) ? poi : null;
-      }).find(Boolean);
+      const matchedPoint = allPOIs.find(p => p.slug === pointId || p.id === pointId)
+        || allDirectusPOIs.find((poi: any) => (poi.slug || poi.id) === pointId);
 
       if (matchedPoint) {
         setViewMode('points');
@@ -139,10 +134,9 @@ export const RoutesPage = React.memo(function RoutesPage() {
       return;
     }
 
-    const matched = immersiveRoutes.find(route => {
-      const title = route.title[lang] || route.title.es || '';
-      return matchesSlug(routeCode, title, route.id);
-    });
+    const matched = immersiveRoutes.find(route =>
+      route.slug === routeCode || route.id === routeCode
+    );
     if (matched) {
       setSelectedRoute(matched);
       setExploringRoute(matched);
