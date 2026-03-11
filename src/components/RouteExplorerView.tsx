@@ -155,15 +155,8 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   };
 
   const handleToggleVisited = (pointId: string) => {
-    setVisitedPoints(prev => {
-      const next = new Set(prev);
-      if (next.has(pointId)) {
-        next.delete(pointId);
-      } else {
-        next.add(pointId);
-      }
-      return next;
-    });
+    if (!route) return;
+    toggleVisited(route.id, pointId);
   };
 
   const handleNavigateToStart = () => {
