@@ -9,33 +9,11 @@ interface LiveVisitorCounterProps {
 }
 
 /**
- * Simulates a "live" visitor counter for social proof.
- * Based on viewCount — higher popularity = more "active" visitors.
- * Number fluctuates slightly to feel alive.
+ * Shows total view count from the database (real data).
+ * Only displays when viewCount > 0.
  */
-export function LiveVisitorCounter({ routeId, viewCount = 0, className = '' }: LiveVisitorCounterProps) {
-  const baseCount = useMemo(() => {
-    if (viewCount >= 500) return Math.floor(Math.random() * 8) + 12;
-    if (viewCount >= 200) return Math.floor(Math.random() * 5) + 6;
-    if (viewCount >= 50) return Math.floor(Math.random() * 3) + 3;
-    if (viewCount >= 10) return Math.floor(Math.random() * 2) + 1;
-    return 0;
-  }, [routeId, viewCount]);
-
-  const [count, setCount] = useState(baseCount);
-
-  useEffect(() => {
-    if (baseCount === 0) return;
-    const interval = setInterval(() => {
-      setCount(prev => {
-        const delta = Math.random() > 0.5 ? 1 : -1;
-        return Math.max(1, prev + delta);
-      });
-    }, 8000 + Math.random() * 4000);
-    return () => clearInterval(interval);
-  }, [baseCount]);
-
-  if (count === 0) return null;
+export function LiveVisitorCounter({ viewCount = 0, className = '' }: LiveVisitorCounterProps) {
+  if (viewCount <= 0) return null;
 
   return (
     <span className={`inline-flex items-center gap-1 text-[10px] font-medium text-primary ${className}`}>
