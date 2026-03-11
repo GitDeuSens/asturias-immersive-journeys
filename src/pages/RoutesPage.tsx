@@ -628,9 +628,9 @@ export const RoutesPage = React.memo(function RoutesPage() {
 
   const handleClosePoint = () => {
     setSelectedPoint(null);
-    const routeId = exploringRoute?.id || selectedRoute?.id;
-    if (routeId) {
-      navigate(`/routes/${routeId}`, { replace: true });
+    const route = exploringRoute || selectedRoute;
+    if (route) {
+      navigate(`/routes/${routeSlug(route)}`, { replace: true });
     } else {
       navigate('/routes', { replace: true });
     }
