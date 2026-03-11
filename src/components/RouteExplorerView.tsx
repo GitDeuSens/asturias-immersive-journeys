@@ -27,6 +27,7 @@ import type { ImmersiveRoute, RoutePoint } from '@/data/types';
 import { DIRECTUS_URL } from '@/lib/directus-url';
 import { useExplorationMode } from '@/hooks/useLanguage';
 import { useGeolocation } from '@/hooks/useGeolocation';
+import { useVisited } from '@/hooks/useVisited';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { trackPOIViewed, trackRouteCompleted } from '@/lib/analytics';
