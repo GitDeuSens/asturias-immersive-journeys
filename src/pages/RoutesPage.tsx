@@ -388,12 +388,23 @@ export const RoutesPage = React.memo(function RoutesPage() {
     
     // Apply search filter
     const searchLower = searchQuery.toLowerCase();
-    return searchQuery === '' ? points : points.filter((p: any) => {
+    const searched = searchQuery === '' ? points : points.filter((p: any) => {
       const title = p.title[lang] || p.title.es || '';
       return title.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().includes(searchLower) ||
              title.toLowerCase().includes(searchLower);
     });
-  }, [viewMode, filteredRoutes, immersiveRoutes, allDirectusPOIs, searchQuery, lang]);
+
+    // Apply experience type filter
+    if (selectedExpTypes.length === 0) return searched;
+    return searched.filter((p: any) => {
+      const hasAR = !!p.content?.arExperience;
+      const has360 = !!p.content?.tour360;
+      const isInfo = !hasAR && !has360;
+      return (selectedExpTypes.includes('AR') && hasAR) ||
+             (selectedExpTypes.includes('360') && has360) ||
+             (selectedExpTypes.includes('INFO') && isInfo);
+    });
+  }, [viewMode, filteredRoutes, immersiveRoutes, allDirectusPOIs, searchQuery, lang, selectedExpTypes]);
 
 
   const getPanelOffset = useCallback(() => {
