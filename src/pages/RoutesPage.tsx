@@ -31,7 +31,7 @@ import { trackRouteStarted } from "@/lib/analytics";
 import { BREAKPOINTS, MAP_PANEL_OFFSETS, ASTURIAS_BOUNDS, DEFAULT_COORDINATES } from "@/constants/breakpoints";
 import { DIRECTUS_URL } from "@/lib/directus-url";
 import "leaflet/dist/leaflet.css";
-import { matchesSlug } from "@/lib/slugify";
+import { matchesSlug, slugifyWithId } from "@/lib/slugify";
 // Create route bubble marker with name label
 const createRouteMarkerIcon = (route: ImmersiveRoute, routeName: string) => {
   const borderColor = route.isCircular ? "hsl(79, 100%, 36%)" : "hsl(203, 100%, 32%)";
@@ -92,6 +92,17 @@ export const RoutesPage = React.memo(function RoutesPage() {
   const userMarkerRef = useRef<L.Marker | null>(null);
   const clusterGroupRef = useRef<L.MarkerClusterGroup | null>(null);
 
+  // Slug helpers
+  const routeSlug = useCallback((route: ImmersiveRoute) => {
+    const title = route.title[lang] || route.title.es || '';
+    return slugifyWithId(title, route.id);
+  }, [lang]);
+
+  const pointSlug = useCallback((point: RoutePoint) => {
+    const title = typeof point.title === 'string' ? point.title : (point.title[lang] || point.title.es || '');
+    return slugifyWithId(title, point.id);
+  }, [lang]);
+
   // Load routes, categories and ALL POIs from Directus
   const { routes: immersiveRoutes, loading: routesLoading } = useImmersiveRoutes(lang);
   const { categories } = useDirectusCategories(lang);
@@ -115,6 +126,26 @@ export const RoutesPage = React.memo(function RoutesPage() {
   // Sync URL → state on initial load and when URL params change
   useEffect(() => {
     if (!routeCode || routeCodeHandledRef.current || immersiveRoutes.length === 0) return;
+
+    // Handle /routes/poi/:pointSlug — direct POI link (Ubicaciones mode)
+    if (routeCode === 'poi' && pointId) {
+      const allPOIs = immersiveRoutes.flatMap(r => r.points);
+      const matchedPoint = allPOIs.find(p => {
+        const pTitle = typeof p.title === 'string' ? p.title : (p.title[lang] || p.title.es || '');
+        return matchesSlug(pointId, pTitle, p.id);
+      }) || allDirectusPOIs.map((poi: any) => {
+        const pTitle = poi.title?.[lang] || poi.title?.es || '';
+        return matchesSlug(pointId, pTitle, poi.slug || poi.id) ? poi : null;
+      }).find(Boolean);
+
+      if (matchedPoint) {
+        setViewMode('points');
+        setSelectedPoint(matchedPoint as RoutePoint);
+        routeCodeHandledRef.current = true;
+      }
+      return;
+    }
+
     const matched = immersiveRoutes.find(route => {
       const title = route.title[lang] || route.title.es || '';
       return matchesSlug(routeCode, title, route.id);
@@ -127,7 +158,10 @@ export const RoutesPage = React.memo(function RoutesPage() {
 
       // If a point ID is in the URL, find and select the point
       if (pointId) {
-        const point = matched.points.find(p => p.id === pointId);
+        const point = matched.points.find(p => {
+          const pTitle = typeof p.title === 'string' ? p.title : (p.title[lang] || p.title.es || '');
+          return matchesSlug(pointId, pTitle, p.id);
+        }) || matched.points.find(p => p.id === pointId);
         if (point) {
           setExploringRoute(matched);
           setShowRouteDetail(false);
@@ -135,7 +169,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
         }
       }
     }
-  }, [routeCode, pointId, immersiveRoutes, lang]);
+  }, [routeCode, pointId, immersiveRoutes, allDirectusPOIs, lang]);
 
   // UX2: Handle browser back button — close sheets instead of leaving page
   useEffect(() => {
@@ -162,7 +196,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
         if (selectedPoint) {
           setSelectedPoint(null);
           if (exploringRoute) {
-            navigate(`/routes/${exploringRoute.id}`, { replace: true });
+            navigate(`/routes/${routeSlug(exploringRoute)}`, { replace: true });
           } else {
             navigate('/routes', { replace: true });
           }
@@ -529,7 +563,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
           setSelectedRoute(route);
           setExploringRoute(route);
           setShowRouteDetail(false);
-          navigate(`/routes/${route.id}`, { replace: false });
+          navigate(`/routes/${routeSlug(route)}`, { replace: false });
         });
 
         clusterGroupRef.current?.addLayer(marker);
@@ -590,7 +624,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
     setShowRouteDetail(false);
     setExploringRoute(route);
     setSelectedPoint(null);
-    navigate(`/routes/${route.id}`, { replace: false });
+    navigate(`/routes/${routeSlug(route)}`, { replace: false });
   };
 
   const handleExitRoute = () => {
@@ -605,18 +639,21 @@ export const RoutesPage = React.memo(function RoutesPage() {
     setSelectedPoint(null);
     setTimeout(() => {
       setSelectedPoint(point);
-      const routeId = exploringRoute?.id || selectedRoute?.id;
-      if (routeId) {
-        navigate(`/routes/${routeId}/${point.id}`, { replace: false });
+      const route = exploringRoute || selectedRoute;
+      if (route) {
+        navigate(`/routes/${routeSlug(route)}/${pointSlug(point)}`, { replace: false });
+      } else {
+        // Points-only mode (Ubicaciones) — use point slug directly
+        navigate(`/routes/poi/${pointSlug(point)}`, { replace: false });
       }
     }, 0);
   };
 
   const handleClosePoint = () => {
     setSelectedPoint(null);
-    const routeId = exploringRoute?.id || selectedRoute?.id;
-    if (routeId) {
-      navigate(`/routes/${routeId}`, { replace: true });
+    const route = exploringRoute || selectedRoute;
+    if (route) {
+      navigate(`/routes/${routeSlug(route)}`, { replace: true });
     } else {
       navigate('/routes', { replace: true });
     }
@@ -801,6 +838,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                         onClick={() => {
                           setSelectedRoute(route);
                           setShowRouteDetail(true);
+                          navigate(`/routes/${routeSlug(route)}`, { replace: false });
                         }}
                       />
                       </motion.div>
