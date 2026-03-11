@@ -126,6 +126,26 @@ export const RoutesPage = React.memo(function RoutesPage() {
   // Sync URL → state on initial load and when URL params change
   useEffect(() => {
     if (!routeCode || routeCodeHandledRef.current || immersiveRoutes.length === 0) return;
+
+    // Handle /routes/poi/:pointSlug — direct POI link (Ubicaciones mode)
+    if (routeCode === 'poi' && pointId) {
+      const allPOIs = immersiveRoutes.flatMap(r => r.points);
+      const matchedPoint = allPOIs.find(p => {
+        const pTitle = typeof p.title === 'string' ? p.title : (p.title[lang] || p.title.es || '');
+        return matchesSlug(pointId, pTitle, p.id);
+      }) || allDirectusPOIs.map((poi: any) => {
+        const pTitle = poi.title?.[lang] || poi.title?.es || '';
+        return matchesSlug(pointId, pTitle, poi.slug || poi.id) ? poi : null;
+      }).find(Boolean);
+
+      if (matchedPoint) {
+        setViewMode('points');
+        setSelectedPoint(matchedPoint as RoutePoint);
+        routeCodeHandledRef.current = true;
+      }
+      return;
+    }
+
     const matched = immersiveRoutes.find(route => {
       const title = route.title[lang] || route.title.es || '';
       return matchesSlug(routeCode, title, route.id);
@@ -138,7 +158,10 @@ export const RoutesPage = React.memo(function RoutesPage() {
 
       // If a point ID is in the URL, find and select the point
       if (pointId) {
-        const point = matched.points.find(p => p.id === pointId);
+        const point = matched.points.find(p => {
+          const pTitle = typeof p.title === 'string' ? p.title : (p.title[lang] || p.title.es || '');
+          return matchesSlug(pointId, pTitle, p.id);
+        }) || matched.points.find(p => p.id === pointId);
         if (point) {
           setExploringRoute(matched);
           setShowRouteDetail(false);
