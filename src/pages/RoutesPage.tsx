@@ -562,6 +562,16 @@ export const RoutesPage = React.memo(function RoutesPage() {
     setSelectedDifficulties((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]));
   };
 
+  const toggleExpType = (id: string) => {
+    setSelectedExpTypes((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  const experienceTypeFilters = useMemo(() => [
+    { id: 'AR', label: { es: 'AR', en: 'AR', fr: 'AR' }, icon: <Smartphone className="w-3.5 h-3.5" /> },
+    { id: '360', label: { es: '360°', en: '360°', fr: '360°' }, icon: <Camera className="w-3.5 h-3.5" /> },
+    { id: 'INFO', label: { es: 'Info', en: 'Info', fr: 'Info' }, icon: <Info className="w-3.5 h-3.5" /> },
+  ], []);
+
   const handleEnterRoute = (route: ImmersiveRoute) => {
     const routeName = typeof route.title === 'string' ? route.title : route.title[i18n.language as keyof typeof route.title] || route.title.es;
     trackRouteStarted(route.id, routeName);
