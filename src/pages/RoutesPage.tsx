@@ -322,14 +322,20 @@ export const RoutesPage = React.memo(function RoutesPage() {
     });
   }, [immersiveRoutes, searchQuery, selectedCategories, selectedDifficulties, lang]);
 
-  // UX7: Sort inside useMemo to avoid mutation on every render
+  // UX7: Sort — by distance if user has location, otherwise by ID
   const sortedFilteredRoutes = useMemo(() => {
     return [...filteredRoutes].sort((a: any, b: any) => {
+      // If user has location, sort by distance (nearest first)
+      if (userPosition) {
+        const distA = Math.hypot(a.center.lat - userPosition.lat, a.center.lng - userPosition.lng);
+        const distB = Math.hypot(b.center.lat - userPosition.lat, b.center.lng - userPosition.lng);
+        return distA - distB;
+      }
       const aNum = parseInt(a.id.split('-')[1]) || 0;
       const bNum = parseInt(b.id.split('-')[1]) || 0;
       return aNum - bNum;
     });
-  }, [filteredRoutes]);
+  }, [filteredRoutes, userPosition]);
 
   // All points for "Ubicaciones" view — includes ALL POIs from DB, not just route-attached ones
   const allPoints = useMemo(() => {
