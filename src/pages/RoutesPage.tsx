@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import L from "leaflet";
-import { MapPin, Search, ChevronUp, ChevronDown, Maximize2, Locate, Loader2 } from "lucide-react";
+import { MapPin, Search, ChevronUp, ChevronDown, Maximize2, Locate, Loader2, Smartphone, Camera, Info } from "lucide-react";
 import { UnifiedSearchBar } from "@/components/UnifiedSearchBar";
 import { useTranslation } from "react-i18next";
 import { AppHeader } from "@/components/AppHeader";
@@ -99,6 +99,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedDifficulties, setSelectedDifficulties] = useState<('easy' | 'medium' | 'hard')[]>([]);
+  const [selectedExpTypes, setSelectedExpTypes] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRoute, setSelectedRoute] = useState<ImmersiveRoute | null>(null);
   const [showRouteDetail, setShowRouteDetail] = useState(false);
@@ -387,12 +388,23 @@ export const RoutesPage = React.memo(function RoutesPage() {
     
     // Apply search filter
     const searchLower = searchQuery.toLowerCase();
-    return searchQuery === '' ? points : points.filter((p: any) => {
+    const searched = searchQuery === '' ? points : points.filter((p: any) => {
       const title = p.title[lang] || p.title.es || '';
       return title.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().includes(searchLower) ||
              title.toLowerCase().includes(searchLower);
     });
-  }, [viewMode, filteredRoutes, immersiveRoutes, allDirectusPOIs, searchQuery, lang]);
+
+    // Apply experience type filter
+    if (selectedExpTypes.length === 0) return searched;
+    return searched.filter((p: any) => {
+      const hasAR = !!p.content?.arExperience;
+      const has360 = !!p.content?.tour360;
+      const isInfo = !hasAR && !has360;
+      return (selectedExpTypes.includes('AR') && hasAR) ||
+             (selectedExpTypes.includes('360') && has360) ||
+             (selectedExpTypes.includes('INFO') && isInfo);
+    });
+  }, [viewMode, filteredRoutes, immersiveRoutes, allDirectusPOIs, searchQuery, lang, selectedExpTypes]);
 
 
   const getPanelOffset = useCallback(() => {
@@ -561,6 +573,16 @@ export const RoutesPage = React.memo(function RoutesPage() {
     setSelectedDifficulties((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]));
   };
 
+  const toggleExpType = (id: string) => {
+    setSelectedExpTypes((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  const experienceTypeFilters = useMemo(() => [
+    { id: 'AR', label: { es: 'AR', en: 'AR', fr: 'AR' }, icon: <Smartphone className="w-3.5 h-3.5" /> },
+    { id: '360', label: { es: '360°', en: '360°', fr: '360°' }, icon: <Camera className="w-3.5 h-3.5" /> },
+    { id: 'INFO', label: { es: 'Info', en: 'Info', fr: 'Info' }, icon: <Info className="w-3.5 h-3.5" /> },
+  ], []);
+
   const handleEnterRoute = (route: ImmersiveRoute) => {
     const routeName = typeof route.title === 'string' ? route.title : route.title[i18n.language as keyof typeof route.title] || route.title.es;
     trackRouteStarted(route.id, routeName);
@@ -723,8 +745,11 @@ export const RoutesPage = React.memo(function RoutesPage() {
                   categories={categories}
                   selectedCategoryIds={selectedCategories}
                   onToggleCategory={toggleCategory}
-                  selectedDifficulties={selectedDifficulties}
-                  onToggleDifficulty={toggleDifficulty}
+                  selectedDifficulties={viewMode === 'routes' ? selectedDifficulties : undefined}
+                  onToggleDifficulty={viewMode === 'routes' ? toggleDifficulty : undefined}
+                  customFilters={viewMode === 'points' ? experienceTypeFilters : undefined}
+                  selectedCustomFilters={viewMode === 'points' ? selectedExpTypes : undefined}
+                  onToggleCustomFilter={viewMode === 'points' ? toggleExpType : undefined}
                   viewMode={viewMode}
                   onViewModeChange={setViewMode}
                   resultCount={viewMode === 'routes' ? sortedFilteredRoutes.length : allPoints.length}
