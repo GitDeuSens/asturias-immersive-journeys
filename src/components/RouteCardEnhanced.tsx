@@ -174,6 +174,9 @@ const RouteCardComponent = forwardRef<HTMLButtonElement, RouteCardProps>(functio
               aria-hidden="true"
             />
           </div>
+
+          {/* Route progress */}
+          <RouteProgressBar routeId={route.id} totalPoints={route.points.length} className="mt-2" />
         </div>
       </div>
     </motion.button>

@@ -142,7 +142,9 @@ const App = () => (
   <ErrorBoundary>
     <HelmetProvider>
       <TooltipProvider>
-        <AppWithOptimizations />
+        <SplashScreen>
+          <AppWithOptimizations />
+        </SplashScreen>
       </TooltipProvider>
     </HelmetProvider>
   </ErrorBoundary>
