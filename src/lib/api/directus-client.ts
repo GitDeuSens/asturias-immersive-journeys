@@ -303,19 +303,41 @@ class DirectusApiClient {
 
   async getARScenes(_locale: Language = 'es', page = 1, limit = 20): Promise<ARScene[]> {
     try {
-      const [scenes, analyticsCounts] = await Promise.all([
+      const [scenes, analyticsCounts, pois] = await Promise.all([
         this.getClient().request(readItems('ar_scenes', {
           filter: { status: { _in: API_CONFIG.getStatusFilter() } },
           fields: ['*', ...TRANSLATIONS_DEEP],
           limit, offset: (page - 1) * limit, sort: ['-created_at'],
         })),
         this.getAnalyticsCountMap('ar', ['ar_started']),
+        // Fetch POIs that reference AR scenes to use their cover_image as fallback
+        this.getClient().request(readItems('pois', {
+          filter: { ar_scene_id: { _nnull: true } },
+          fields: ['ar_scene_id', 'cover_image'],
+          limit: 200,
+        })).catch(() => [] as any[]),
       ]);
 
-      return (scenes as unknown as DirectusARScene[]).map((scene) => transformARScene({
-        ...scene,
-        launch_count: Math.max(Number(scene.launch_count ?? 0), analyticsCounts.get(scene.id) ?? 0),
-      } as DirectusARScene));
+      // Build map: AR scene ID → POI cover_image UUID
+      const poiCoverByAR = new Map<string, string>();
+      for (const poi of (pois as any[])) {
+        const arId = typeof poi.ar_scene_id === 'object' ? poi.ar_scene_id?.id : poi.ar_scene_id;
+        if (arId && poi.cover_image && !poiCoverByAR.has(arId)) {
+          poiCoverByAR.set(arId, poi.cover_image);
+        }
+      }
+
+      return (scenes as unknown as DirectusARScene[]).map((scene) => {
+        const result = transformARScene({
+          ...scene,
+          launch_count: Math.max(Number(scene.launch_count ?? 0), analyticsCounts.get(scene.id) ?? 0),
+        } as DirectusARScene);
+        // Fallback: use POI cover_image if AR scene has no preview_image
+        if (!result.preview_image && poiCoverByAR.has(scene.id)) {
+          result.preview_image = getDirectusFileUrl(poiCoverByAR.get(scene.id)!);
+        }
+        return result;
+      });
     } catch (error) { logger.error('[DirectusClient] Error fetching AR scenes:', error); return []; }
   }
 
