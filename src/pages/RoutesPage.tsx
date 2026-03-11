@@ -31,7 +31,7 @@ import { trackRouteStarted } from "@/lib/analytics";
 import { BREAKPOINTS, MAP_PANEL_OFFSETS, ASTURIAS_BOUNDS, DEFAULT_COORDINATES } from "@/constants/breakpoints";
 import { DIRECTUS_URL } from "@/lib/directus-url";
 import "leaflet/dist/leaflet.css";
-import { matchesSlug } from "@/lib/slugify";
+// slugs come directly from Directus DB
 // Create route bubble marker with name label
 const createRouteMarkerIcon = (route: ImmersiveRoute, routeName: string) => {
   const borderColor = route.isCircular ? "hsl(79, 100%, 36%)" : "hsl(203, 100%, 32%)";
