@@ -139,11 +139,12 @@ const RouteCardComponent = forwardRef<HTMLButtonElement, RouteCardProps>(functio
             </span>
           )}
 
-          {/* Points count */}
+          {/* Points count + live visitors */}
           <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
             <MapPin className="w-3 h-3" aria-hidden="true" />
             {route.points.length} {t("routes.points")}
           </span>
+          <LiveVisitorCounter routeId={route.id} viewCount={route.viewCount} />
 
           {/* Difficulty */}
           {route.difficulty && (
