@@ -745,8 +745,11 @@ export const RoutesPage = React.memo(function RoutesPage() {
                   categories={categories}
                   selectedCategoryIds={selectedCategories}
                   onToggleCategory={toggleCategory}
-                  selectedDifficulties={selectedDifficulties}
-                  onToggleDifficulty={toggleDifficulty}
+                  selectedDifficulties={viewMode === 'routes' ? selectedDifficulties : undefined}
+                  onToggleDifficulty={viewMode === 'routes' ? toggleDifficulty : undefined}
+                  customFilters={viewMode === 'points' ? experienceTypeFilters : undefined}
+                  selectedCustomFilters={viewMode === 'points' ? selectedExpTypes : undefined}
+                  onToggleCustomFilter={viewMode === 'points' ? toggleExpType : undefined}
                   viewMode={viewMode}
                   onViewModeChange={setViewMode}
                   resultCount={viewMode === 'routes' ? sortedFilteredRoutes.length : allPoints.length}
