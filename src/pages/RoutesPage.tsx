@@ -169,7 +169,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
         }
       }
     }
-  }, [routeCode, pointId, immersiveRoutes, lang]);
+  }, [routeCode, pointId, immersiveRoutes, allDirectusPOIs, lang]);
 
   // UX2: Handle browser back button — close sheets instead of leaving page
   useEffect(() => {
