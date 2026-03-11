@@ -157,6 +157,7 @@ export interface RoutePointContent {
 
 export interface RoutePoint {
   id: string;       // slug (for clean URLs)
+  slug: string;     // DB slug from Directus
   poiUUID?: string; // original Directus UUID (for API queries)
   order: number;
   title: Record<Language, string>;
