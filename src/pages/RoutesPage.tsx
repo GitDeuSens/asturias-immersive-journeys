@@ -616,9 +616,12 @@ export const RoutesPage = React.memo(function RoutesPage() {
     setSelectedPoint(null);
     setTimeout(() => {
       setSelectedPoint(point);
-      const routeId = exploringRoute?.id || selectedRoute?.id;
-      if (routeId) {
-        navigate(`/routes/${routeId}/${point.id}`, { replace: false });
+      const route = exploringRoute || selectedRoute;
+      if (route) {
+        navigate(`/routes/${routeSlug(route)}/${pointSlug(point)}`, { replace: false });
+      } else {
+        // Points-only mode (Ubicaciones) — use point slug directly
+        navigate(`/routes/poi/${pointSlug(point)}`, { replace: false });
       }
     }, 0);
   };
