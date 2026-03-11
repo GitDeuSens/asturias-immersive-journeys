@@ -1,4 +1,5 @@
 import { Suspense, lazy, useEffect } from 'react';
+import { SplashScreen } from '@/components/SplashScreen';
 import { HelmetProvider } from 'react-helmet-async';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import { Toaster } from "@/components/ui/toaster";
@@ -141,7 +142,9 @@ const App = () => (
   <ErrorBoundary>
     <HelmetProvider>
       <TooltipProvider>
-        <AppWithOptimizations />
+        <SplashScreen>
+          <AppWithOptimizations />
+        </SplashScreen>
       </TooltipProvider>
     </HelmetProvider>
   </ErrorBoundary>

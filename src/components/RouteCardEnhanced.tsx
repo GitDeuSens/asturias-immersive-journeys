@@ -8,6 +8,8 @@ import { calculateRouteDistance, formatDistance } from "@/lib/mapUtils";
 import { OptimizedImage } from "./OptimizedImage";
 import { PopularityBadge } from "./PopularityBadge";
 import { FavoriteButton } from "./FavoriteButton";
+import { RouteProgressBar } from "./RouteProgressBar";
+import { LiveVisitorCounter } from "./LiveVisitorCounter";
 
 interface RouteCardProps {
   route: ImmersiveRoute;
@@ -137,11 +139,12 @@ const RouteCardComponent = forwardRef<HTMLButtonElement, RouteCardProps>(functio
             </span>
           )}
 
-          {/* Points count */}
+          {/* Points count + live visitors */}
           <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
             <MapPin className="w-3 h-3" aria-hidden="true" />
             {route.points.length} {t("routes.points")}
           </span>
+          <LiveVisitorCounter routeId={route.id} viewCount={route.viewCount} />
 
           {/* Difficulty */}
           {route.difficulty && (
@@ -171,6 +174,9 @@ const RouteCardComponent = forwardRef<HTMLButtonElement, RouteCardProps>(functio
               aria-hidden="true"
             />
           </div>
+
+          {/* Route progress */}
+          <RouteProgressBar routeId={route.id} totalPoints={route.points.length} className="mt-2" />
         </div>
       </div>
     </motion.button>

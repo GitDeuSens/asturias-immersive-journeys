@@ -4,6 +4,7 @@
 import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ParallaxHero } from '@/components/ParallaxHero';
 const GLBPreviewViewer = lazy(() => import('@/components/GLBPreviewViewer'));
 import {
   Sparkles,
@@ -216,8 +217,8 @@ export function XRExperiencesPage() {
           </Breadcrumb>
         </div>
 
-        {/* Hero */}
-        <div className="bg-primary py-6 sm:py-12 mb-6 sm:mb-8 mt-2">
+        {/* Hero with parallax */}
+        <ParallaxHero>
           <div className="container mx-auto px-4 max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -234,7 +235,7 @@ export function XRExperiencesPage() {
               </p>
             </motion.div>
           </div>
-        </div>
+        </ParallaxHero>
 
         <div className="container mx-auto px-4 max-w-6xl pb-5">
           {/* Mode tabs */}
