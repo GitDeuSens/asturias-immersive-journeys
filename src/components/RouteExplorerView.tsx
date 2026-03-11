@@ -68,8 +68,14 @@ export function RouteExplorerView({ route, onBack, onSelectPoint, selectedPoint 
   const lang = i18n.language as 'es' | 'en' | 'fr';
   const { mode } = useExplorationMode();
   const { latitude, longitude, hasLocation } = useGeolocation();
-  const [visitedPoints, setVisitedPoints] = useState<Set<string>>(new Set());
+  const { isVisited: isPointVisited, toggleVisited, getRouteProgress } = useVisited();
   const [routeStartTime] = useState(Date.now());
+
+  // Derive visitedPoints Set from useVisited for backwards compat
+  const visitedPoints = useMemo(() => {
+    if (!route) return new Set<string>();
+    return new Set(route.points.filter(p => isPointVisited(route.id, p.id)).map(p => p.id));
+  }, [route, isPointVisited]);
   const navigate = useNavigate();
 
   const routeProgress = route?.points?.length
