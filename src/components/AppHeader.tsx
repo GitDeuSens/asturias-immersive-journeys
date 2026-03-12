@@ -61,10 +61,10 @@ export function AppHeader({ showRestart = true, variant = "light" }: AppHeaderPr
         className="fixed top-0 left-0 right-0 z-50"
       >
         {/* Social bar — hidden on mobile */}
-        {!isExperiencePage && (
-          <div className="hidden md:block bg-asturias-dark border-t-[8px] border-primary">
-            <div className="container flex mx-auto pl-4 px-2 justify-between">
-              <div className="w-[33px] h-[48px] bg-primary absolute top-2" />
+        <div className="hidden md:block bg-asturias-dark border-t-[8px] border-primary">
+          <div className="container flex mx-auto pl-4 px-2 justify-between">
+            <div className="w-[33px] h-[48px] bg-primary absolute top-2" />
+            {!isExperiencePage && (
               <div className="container mx-auto pl-4 px-2 py-1.5 flex justify-end gap-2">
                 <a
                   href="https://facebook.com"
@@ -85,9 +85,9 @@ export function AppHeader({ showRestart = true, variant = "light" }: AppHeaderPr
                   <Twitter className="w-4 h-4 text-white" />
                 </a>
               </div>
-            </div>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Main header */}
         <div className="bg-accent text-accent-foreground">
