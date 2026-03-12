@@ -62,7 +62,7 @@ export function AppHeader({ showRestart = true, variant = "light" }: AppHeaderPr
       >
         {/* Social bar — hidden on mobile */}
         <div className="hidden md:block bg-asturias-dark border-t-[8px] border-primary">
-          <div className="container flex mx-auto pl-4 px-2 justify-between">
+          <div className="container flex mx-auto pl-4 px-2 justify-between min-h-[44px]">
             <div className="w-[33px] h-[48px] bg-primary absolute top-2" />
             {!isExperiencePage && (
               <div className="container mx-auto pl-4 px-2 py-1.5 flex justify-end gap-2">
