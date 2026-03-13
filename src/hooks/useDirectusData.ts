@@ -93,27 +93,36 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       }
 
       // Map practical info
+      const openingHours = poi.opening_hours ?? toMultilingual(poi.translations, 'opening_hours');
+      const prices = poi.prices ?? toMultilingual(poi.translations, 'prices');
+
       // Debug: log practical info fields for POIs that might have data
       if (poi.slug?.includes('moa') || poi.slug?.includes('oro')) {
         console.log(`[PracticalInfo Debug] POI "${poi.slug}":`, {
           phone: poi.phone,
           email: poi.email,
           website: poi.website,
-          opening_hours: poi.opening_hours,
-          prices: poi.prices,
+          opening_hours_raw: poi.opening_hours,
+          prices_raw: poi.prices,
+          opening_hours_resolved: openingHours,
+          prices_resolved: prices,
+          translations_count: Array.isArray(poi.translations) ? poi.translations.length : 0,
         });
       }
-      // Check multilingual objects for actual content (they're always objects, even when empty)
+
+      // Check multilingual objects for actual content (they can exist with empty values)
       const hasMultilingualContent = (obj: any): boolean =>
-        obj && typeof obj === 'object' && Object.values(obj).some((v: any) => v && typeof v === 'string' && v.trim() !== '');
-      
-      if (poi.phone || poi.email || poi.website || hasMultilingualContent(poi.opening_hours) || hasMultilingualContent(poi.prices)) {
+        !!obj &&
+        typeof obj === 'object' &&
+        Object.values(obj).some((v: any) => typeof v === 'string' && v.trim() !== '');
+
+      if (poi.phone || poi.email || poi.website || hasMultilingualContent(openingHours) || hasMultilingualContent(prices)) {
         content.practicalInfo = {
           phone: poi.phone,
           email: poi.email,
           website: poi.website,
-          schedule: hasMultilingualContent(poi.opening_hours) ? poi.opening_hours : undefined,
-          prices: hasMultilingualContent(poi.prices) ? poi.prices : undefined,
+          schedule: hasMultilingualContent(openingHours) ? openingHours : undefined,
+          prices: hasMultilingualContent(prices) ? prices : undefined,
         };
       }
 
