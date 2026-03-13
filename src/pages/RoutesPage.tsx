@@ -749,12 +749,30 @@ export const RoutesPage = React.memo(function RoutesPage() {
                 transition={{ duration: 0.25, ease: 'easeInOut' }}
                 className="flex-1 overflow-y-auto p-4 space-y-4"
               >
-                {/* Header */}
+                {/* View mode toggle — always visible */}
+                <div className="flex items-center gap-1 p-0.5 rounded-lg bg-muted/60 border border-border/40">
+                  {(['routes', 'points'] as const).map((mode) => (
+                    <button
+                      key={mode}
+                      onClick={() => setViewMode(mode)}
+                      className={`flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-md transition-all ${
+                        viewMode === mode
+                          ? 'bg-primary text-primary-foreground shadow-sm'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {mode === 'routes' ? <Map className="w-3.5 h-3.5" /> : <MapPin className="w-3.5 h-3.5" />}
+                      {mode === 'routes' ? t("routes.title") : t("routes.pointsTitle")}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Header with result count */}
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
+                  <h2 className="text-xl sm:text-2xl font-bold text-foreground truncate">
                     {viewMode === 'points' ? t("routes.pointsTitle") : t("routes.title")}
                   </h2>
-                  <span className="text-xs text-muted-foreground" aria-live="polite">
+                  <span className="text-xs text-muted-foreground shrink-0 ml-2" aria-live="polite">
                     {viewMode === 'routes' ? sortedFilteredRoutes.length : allPoints.length} {t("common.results")}
                   </span>
                 </div>
