@@ -645,7 +645,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
     setTimeout(() => fitToAllRoutes(), 100);
   };
 
-  // Helper: update URL when selecting a point
+  // Helper: update URL when selecting a point + focus map
   const handleSelectPoint = (point: RoutePoint) => {
     setSelectedPoint(null);
     setTimeout(() => {
@@ -656,6 +656,10 @@ export const RoutesPage = React.memo(function RoutesPage() {
       } else {
         // Points-only mode (Ubicaciones) — use point slug directly
         navigate(`/routes/poi/${pointSlug(point)}`, { replace: false });
+      }
+      // Focus map on clicked POI
+      if (mapRef.current && point.location.lat !== 0 && point.location.lng !== 0) {
+        mapRef.current.setView([point.location.lat, point.location.lng], 15, { animate: true });
       }
     }, 0);
   };
