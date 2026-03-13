@@ -77,6 +77,25 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
     }
   }, [route, lang]);
 
+  // Track when body title scrolls behind sticky hero
+  useEffect(() => {
+    setTitlePinned(false);
+  }, [route?.id]);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    const titleEl = bodyTitleRef.current;
+    if (!container || !titleEl) return;
+    const heroHeight = window.innerWidth >= 640 ? 240 : 176;
+    const onScroll = () => {
+      const titleRect = titleEl.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      setTitlePinned(titleRect.top - containerRect.top < heroHeight);
+    };
+    container.addEventListener('scroll', onScroll, { passive: true });
+    return () => container.removeEventListener('scroll', onScroll);
+  }, [route?.id]);
+
   if (!route) return null;
 
   const calculatedDistance = calculateRouteDistance(route.polyline);
