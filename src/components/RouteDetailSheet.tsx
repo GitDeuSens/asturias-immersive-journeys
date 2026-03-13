@@ -84,13 +84,9 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
 
   useEffect(() => {
     const container = scrollContainerRef.current;
-    const titleEl = bodyTitleRef.current;
-    if (!container || !titleEl) return;
-    const heroHeight = window.innerWidth >= 640 ? 240 : 176;
+    if (!container) return;
     const onScroll = () => {
-      const titleRect = titleEl.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-      setTitlePinned(titleRect.top - containerRect.top < heroHeight);
+      setTitlePinned(container.scrollTop > 20);
     };
     container.addEventListener('scroll', onScroll, { passive: true });
     return () => container.removeEventListener('scroll', onScroll);

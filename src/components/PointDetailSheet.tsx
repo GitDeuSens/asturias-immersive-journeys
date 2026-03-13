@@ -93,17 +93,12 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
 
   useEffect(() => { setShow360Inline(false); setTitlePinned(false); }, [point?.id]);
 
-  // Track when the body title scrolls behind the sticky hero
+  // Activate gradient overlay when user starts scrolling
   useEffect(() => {
     const container = scrollContainerRef.current;
-    const titleEl = bodyTitleRef.current;
-    if (!container || !titleEl) return;
-    const heroHeight = window.innerWidth >= 640 ? 240 : 176; // sm:h-60 : h-44
+    if (!container) return;
     const onScroll = () => {
-      const titleRect = titleEl.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-      const titleTopRelative = titleRect.top - containerRect.top;
-      setTitlePinned(titleTopRelative < heroHeight);
+      setTitlePinned(container.scrollTop > 20);
     };
     container.addEventListener('scroll', onScroll, { passive: true });
     return () => container.removeEventListener('scroll', onScroll);
