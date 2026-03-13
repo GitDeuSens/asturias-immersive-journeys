@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import {
   X,
   MapPin,
