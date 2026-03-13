@@ -14,6 +14,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { setMode } = useExplorationMode();
   const [step, setStep] = useState<FlowStep>('mode');
+  const { data: homepageConfig } = useHomepageConfig();
   
   // Optimize LCP
   useLCPOptimization();
