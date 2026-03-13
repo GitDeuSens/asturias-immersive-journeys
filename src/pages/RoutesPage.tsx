@@ -421,6 +421,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
         order: poi.order ?? idx + 1,
         title: poi.title || { es: '', en: '', fr: '' },
         shortDescription: poi.short_description || { es: '', en: '', fr: '' },
+        longDescription: poi.description || undefined,
         location: { lat, lng, address: poi.address },
         coverImage: poi.cover_image || '',
         content,
