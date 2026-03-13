@@ -49,9 +49,6 @@ interface UnifiedSearchBarProps {
   // Extra action (e.g. locate button)
   extraAction?: React.ReactNode;
 
-  // Result count
-  resultCount?: number;
-
   className?: string;
 }
 
