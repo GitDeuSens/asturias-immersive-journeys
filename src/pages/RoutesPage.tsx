@@ -787,7 +787,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                           : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
-                      {mode === 'routes' ? <Map className="w-3.5 h-3.5" /> : <MapPin className="w-3.5 h-3.5" />}
+                      {mode === 'routes' ? <RouteIcon className="w-3.5 h-3.5" /> : <MapPin className="w-3.5 h-3.5" />}
                       {mode === 'routes' ? t("routes.title") : t("routes.pointsTitle")}
                     </button>
                   ))}
