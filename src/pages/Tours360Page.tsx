@@ -362,7 +362,7 @@ export function Tours360Page() {
               categories={categories}
               selectedCategoryIds={selectedCategories}
               onToggleCategory={toggleCategory}
-              resultCount={filteredTours.length}
+              
             />
           </motion.div>
 
