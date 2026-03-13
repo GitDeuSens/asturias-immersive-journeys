@@ -704,7 +704,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
             mass: 0.9,
             opacity: { duration: 0.25, ease: "easeOut" },
           }}
-      className="fixed right-0 bottom-0 w-full md:w-[420px] lg:w-[460px] md:max-w-lg bg-background z-[1] md:z-[35] shadow-2xl flex flex-col overflow-hidden top-14 md:top-[122px] md:rounded-tl-2xl md:border-l md:border-t md:border-border/40"
+      className="fixed right-0 bottom-0 w-full md:w-[480px] lg:w-[520px] md:max-w-xl bg-background z-[1] md:z-[35] shadow-2xl flex flex-col overflow-hidden top-14 md:top-[122px] md:rounded-tl-2xl md:border-l md:border-t md:border-border/40"
         >
           {/* Mobile handle */}
           <button
