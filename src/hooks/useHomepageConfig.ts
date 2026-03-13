@@ -56,6 +56,14 @@ async function fetchHomepageConfig(): Promise<HomepageConfig | null> {
     card2_description: buildMultilingual(d, 'card2_description'),
     card2_icon: d.card2_icon || null,
     skip_link: buildMultilingual(d, 'skip_link'),
+    detail1_heading: buildMultilingual(d, 'detail1_heading'),
+    detail1_description: buildMultilingual(d, 'detail1_description'),
+    detail1_cta: buildMultilingual(d, 'detail1_cta'),
+    detail1_bg_image: d.detail1_bg_image || null,
+    detail2_heading: buildMultilingual(d, 'detail2_heading'),
+    detail2_description: buildMultilingual(d, 'detail2_description'),
+    detail2_cta: buildMultilingual(d, 'detail2_cta'),
+    detail2_bg_image: d.detail2_bg_image || null,
   };
 }
 
