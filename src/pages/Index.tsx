@@ -6,6 +6,7 @@ import { ModeSelector } from '@/components/ModeSelector';
 import { ExperienceSelector } from '@/components/ExperienceSelector';
 import { useExplorationMode } from '@/hooks/useLanguage';
 import { LCPOptimizer, useLCPOptimization, ResourceOptimizer } from '@/components/LCPOptimizer';
+import { useHomepageConfig } from '@/hooks/useHomepageConfig';
 
 type FlowStep = 'mode' | 'experience';
 
@@ -13,6 +14,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { setMode } = useExplorationMode();
   const [step, setStep] = useState<FlowStep>('mode');
+  const { data: homepageConfig } = useHomepageConfig();
   
   // Optimize LCP
   useLCPOptimization();
@@ -40,7 +42,12 @@ const Index = () => {
       <ResourceOptimizer />
       <div className="min-h-screen bg-background">
         {/* Dynamic blurred background */}
-        <DynamicBackground blur={5} interval={8000} />
+        <DynamicBackground
+          blur={5}
+          interval={homepageConfig?.slideshow_interval || 8000}
+          cmsImages={homepageConfig?.slideshow_images}
+          mode={homepageConfig?.slideshow_mode}
+        />
         
         {/* Header with language selector */}
         <OnboardingHeader />

@@ -1,30 +1,47 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getDirectusAssetUrl } from '@/lib/directus-url';
 
-// Import Asturias images
+// Local fallback images
 import covadongaImg from '@/assets/covadonga.jpg';
 import picosImg from '@/assets/picos.jpg';
 import caresImg from '@/assets/cares.jpg';
 import heroImg from '@/assets/hero-mountains.jpg';
 import llastresImg from '@/assets/llastres.jpg';
 
-const images = [heroImg, covadongaImg, picosImg, caresImg, llastresImg];
+const fallbackImages = [heroImg, covadongaImg, picosImg, caresImg, llastresImg];
 
 interface DynamicBackgroundProps {
   blur?: number;
   interval?: number;
+  /** CMS image UUIDs from slideshow_images */
+  cmsImages?: string[];
+  /** CMS slideshow mode */
+  mode?: string | null;
 }
 
-export function DynamicBackground({ blur = 8, interval = 7000 }: DynamicBackgroundProps) {
+export function DynamicBackground({ blur = 8, interval = 7000, cmsImages, mode }: DynamicBackgroundProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Use CMS images if available, otherwise fallback
+  const images = cmsImages && cmsImages.length > 0
+    ? cmsImages.map(id => getDirectusAssetUrl(id))
+    : fallbackImages;
+
+  const isSingle = mode === 'static' || images.length === 1;
+
   useEffect(() => {
+    if (isSingle) return;
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % images.length);
     }, interval);
-
     return () => clearInterval(timer);
-  }, [interval]);
+  }, [interval, images.length, isSingle]);
+
+  // Reset index when images change
+  useEffect(() => {
+    setCurrentIndex(0);
+  }, [cmsImages]);
 
   return (
     <div className="fixed inset-0 overflow-hidden">
@@ -39,9 +56,7 @@ export function DynamicBackground({ blur = 8, interval = 7000 }: DynamicBackgrou
         >
           <div
             className="absolute inset-0 bg-cover bg-center"
-            style={{ 
-              backgroundImage: `url(${images[currentIndex]})`
-            }}
+            style={{ backgroundImage: `url(${images[currentIndex]})` }}
           />
         </motion.div>
       </AnimatePresence>

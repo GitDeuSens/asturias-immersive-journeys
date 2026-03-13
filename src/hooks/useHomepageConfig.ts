@@ -25,6 +25,9 @@ export interface HomepageConfig {
   detail2_cta: Record<string, string>;
   detail2_bg_image: string | null;
   social_links: SocialLink[];
+  slideshow_mode: string | null;
+  slideshow_images: string[];
+  slideshow_interval: number | null;
 }
 
 export interface SocialLink {
@@ -74,6 +77,9 @@ async function fetchHomepageConfig(): Promise<HomepageConfig | null> {
     detail2_cta: buildMultilingual(d, 'detail2_cta'),
     detail2_bg_image: d.detail2_bg_image || null,
     social_links: Array.isArray(d.social_links) ? d.social_links : [],
+    slideshow_mode: d.slideshow_mode || null,
+    slideshow_images: Array.isArray(d.slideshow_images) ? d.slideshow_images : [],
+    slideshow_interval: d.slideshow_interval ? Number(d.slideshow_interval) : null,
   };
 }
 
