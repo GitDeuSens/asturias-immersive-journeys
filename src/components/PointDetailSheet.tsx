@@ -207,15 +207,15 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
               className="sticky top-0 z-20 relative h-44 sm:h-60 bg-cover bg-center flex-shrink-0 overflow-hidden"
               style={{ backgroundImage: point.coverImage ? `url(${DIRECTUS_URL}/assets/${point.coverImage})` : undefined }}
             >
-              {/* Gradient — appears on scroll */}
-              <div className={`absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity duration-300 ${titlePinned ? 'opacity-100' : 'opacity-0'}`} />
+              {/* Gradient — appears on scroll, blends into sheet background */}
+              <div className={`absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent transition-opacity duration-300 ${titlePinned ? 'opacity-100' : 'opacity-0'}`} />
               {/* Always-visible base gradient for title legibility */}
-              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background/80 to-transparent" />
               {/* Title — always on the photo */}
               <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 pt-12">
                 <h1
                   ref={bodyTitleRef}
-                  className="font-bold text-white leading-tight line-clamp-2 drop-shadow-lg"
+                  className="font-bold text-foreground leading-tight line-clamp-2 drop-shadow-[0_1px_3px_rgba(255,255,255,0.4)]"
                   style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)' }}
                 >{title}</h1>
               </div>
