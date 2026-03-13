@@ -341,5 +341,10 @@ export function toMultilingual(
     }
     result[t.languages_code] = value;
   }
+  // Fallback: fill empty languages with first non-empty value (es → en → fr)
+  const fallback = result.es || result.en || result.fr || '';
+  if (!result.es) result.es = fallback;
+  if (!result.en) result.en = fallback;
+  if (!result.fr) result.fr = fallback;
   return result as Record<Language, string>;
 }
