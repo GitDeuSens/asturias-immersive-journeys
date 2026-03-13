@@ -31,6 +31,8 @@ export interface SocialLink {
   icon: string;
   url: string;
   label?: string;
+  hidden?: boolean;
+  visible?: boolean;
 }
 
 function buildMultilingual(raw: any, prefix: string): Record<string, string> {
