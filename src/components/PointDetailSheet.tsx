@@ -215,8 +215,8 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
               <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 pt-12">
                 <h1
                   ref={bodyTitleRef}
-                  className="font-bold text-foreground leading-tight line-clamp-2 drop-shadow-[0_1px_3px_rgba(255,255,255,0.4)]"
-                  style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)' }}
+                  className="font-bold text-white leading-tight line-clamp-2"
+                  style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', textShadow: '0 1px 4px rgba(0,0,0,0.7), 0 0 12px rgba(0,0,0,0.4)' }}
                 >{title}</h1>
               </div>
               <button
