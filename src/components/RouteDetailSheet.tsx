@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import {
   X,
   MapPin,
@@ -54,6 +54,9 @@ interface RouteDetailSheetProps {
 export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }: RouteDetailSheetProps) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as 'es' | 'en' | 'fr';
+  const [titlePinned, setTitlePinned] = useState(false);
+  const bodyTitleRef = useRef<HTMLHeadingElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { getCategoryById } = useDirectusCategories(lang);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -73,6 +76,25 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
       trackRouteViewed(route.id, routeName, route.points.length);
     }
   }, [route, lang]);
+
+  // Track when body title scrolls behind sticky hero
+  useEffect(() => {
+    setTitlePinned(false);
+  }, [route?.id]);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    const titleEl = bodyTitleRef.current;
+    if (!container || !titleEl) return;
+    const heroHeight = window.innerWidth >= 640 ? 240 : 176;
+    const onScroll = () => {
+      const titleRect = titleEl.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      setTitlePinned(titleRect.top - containerRect.top < heroHeight);
+    };
+    container.addEventListener('scroll', onScroll, { passive: true });
+    return () => container.removeEventListener('scroll', onScroll);
+  }, [route?.id]);
 
   if (!route) return null;
 
@@ -135,14 +157,15 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
         aria-modal="true"
         aria-labelledby="route-detail-title"
       >
-        {/* Hero image with title overlay */}
+        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
+        {/* Hero image — sticky, gradient appears on scroll */}
         <div
-          className="relative h-44 sm:h-60 bg-cover bg-center flex-shrink-0 rounded-t-2xl overflow-hidden"
+          className="sticky top-0 z-20 relative h-44 sm:h-60 bg-cover bg-center flex-shrink-0 rounded-t-2xl overflow-hidden"
           style={{ backgroundImage: `url(${route.coverImage})` }}
           role="img"
           aria-label={route.title[lang]}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" aria-hidden="true" />
+          <div className={`absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent transition-opacity duration-300 ${titlePinned ? 'opacity-100' : 'opacity-0'}`} aria-hidden="true" />
 
           {/* Favorite + Close buttons */}
           <div className="absolute top-4 right-4 flex items-center gap-2">
@@ -162,17 +185,17 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
             </button>
           </div>
 
-          {/* Title + theme + badge overlaid on hero */}
-          <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 pt-12">
+          {/* Pinned title overlay — visible only when scrolled */}
+          <div className={`absolute bottom-0 left-0 right-0 px-5 pb-4 pt-12 transition-opacity duration-300 ${titlePinned ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
             <div className="flex items-end gap-2">
               <div className="flex-1 min-w-0">
-                <h1
-                  id="route-detail-title"
+                <h2
                   className="font-bold text-foreground leading-tight line-clamp-2"
                   style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)' }}
+                  aria-hidden={!titlePinned}
                 >
                   {route.title[lang]}
-                </h1>
+                </h2>
                 {route.theme[lang] && (
                   <p className="text-xs sm:text-sm font-medium text-foreground/70 mt-0.5 truncate">
                     {route.theme[lang]}
@@ -184,8 +207,29 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
           </div>
         </div>
 
+        {/* Body title — visible initially */}
+        <div className="px-6 pt-4 pb-1">
+          <div className="flex items-end gap-2">
+            <div className="flex-1 min-w-0">
+              <h1
+                ref={bodyTitleRef}
+                id="route-detail-title"
+                className="font-bold text-foreground leading-tight"
+                style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)' }}
+              >
+                {route.title[lang]}
+              </h1>
+              {route.theme[lang] && (
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground mt-0.5 truncate">
+                  {route.theme[lang]}
+                </p>
+              )}
+            </div>
+            <PopularityBadge viewCount={route.viewCount} dateCreated={route.createdAt} size="md" className="flex-shrink-0 mb-0.5" />
+          </div>
+        </div>
+
         {/* Scrollable content */}
-        <ScrollArea className="flex-1">
           <div className="p-6 space-y-6">
             {/* Quick info badges */}
             <div className="flex flex-wrap gap-2">
@@ -364,7 +408,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
 
         {/* CTA Footer */}
         <div className="p-4 border-t border-border bg-background flex-shrink-0">
