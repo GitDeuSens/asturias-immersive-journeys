@@ -230,7 +230,6 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
         </div>
 
         {/* Scrollable content */}
-        <ScrollArea className="flex-1">
           <div className="p-6 space-y-6">
             {/* Quick info badges */}
             <div className="flex flex-wrap gap-2">
