@@ -5,12 +5,14 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { GeolocationErrorAlert } from "@/components/GeolocationErrorAlert";
 import { Footer } from "./Footer";
+import { useHomepageConfig } from "@/hooks/useHomepageConfig";
 
 interface ModeSelectorProps {
   onSelect: (mode: "home" | "here") => void;
 }
 
-const texts = {
+// Fallback texts when CMS has no data
+const fallbackTexts = {
   title: {
     es: "Visita Asturias como nunca antes.",
     en: "Visit Asturias like never before.",
@@ -43,11 +45,25 @@ const texts = {
   }
 };
 
+/** Pick CMS value or fallback */
+function pick(cms: Record<string, string> | undefined, fallback: Record<string, string>, lang: string): string {
+  const v = cms?.[lang] || cms?.es;
+  return v || fallback[lang] || fallback.es || '';
+}
+
 export function ModeSelector({ onSelect }: ModeSelectorProps) {
-  const { t } = useLanguage();
+  const { t, language: lang } = useLanguage();
   const { requestLocation, loading, error, clearLocation } = useGeolocation();
   const [selectedMode, setSelectedMode] = useState<"home" | "here" | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
+  const { data: config } = useHomepageConfig();
+
+  const title = pick(config?.main_title, fallbackTexts.title, lang);
+  const subtitle = pick(config?.main_subtitle, fallbackTexts.subtitle, lang);
+  const card1Title = pick(config?.card1_title, fallbackTexts.homeTitle, lang);
+  const card1Desc = pick(config?.card1_description, fallbackTexts.homeDescription, lang);
+  const card2Title = pick(config?.card2_title, fallbackTexts.hereTitle, lang);
+  const card2Desc = pick(config?.card2_description, fallbackTexts.hereDescription, lang);
 
   const handleHomeSelect = () => {
     setSelectedMode("home");
@@ -94,11 +110,11 @@ export function ModeSelector({ onSelect }: ModeSelectorProps) {
           style={{ fontWeight: 'lighter'}}
           className="text-2xl sm:text-3xl md:text-4xl lg:text-7xl text-white text-center mb-3 sm:mb-5 drop-shadow-lg max-w-3xl initial-title"
         >
-          {t(texts.title)}
+          {title}
         </motion.h1>
 
         <div className="mb-3 sm:mb-5 w-16 sm:w-24 h-px bg-white/40" />
-        <span className="text-white mb-4 sm:mb-8 text-sm sm:text-base text-center px-2">{t(texts.subtitle)}</span>
+        <span className="text-white mb-4 sm:mb-8 text-sm sm:text-base text-center px-2">{subtitle}</span>
 
         {/* Mode Cards */}
         <div className="flex flex-col md:flex-row gap-3 md:gap-6 w-full max-w-4xl">
@@ -117,8 +133,8 @@ export function ModeSelector({ onSelect }: ModeSelectorProps) {
               <Home strokeWidth={1} className="icons text-primary" />
             </div>
             {/* Content */}
-            <h2 className="text-lg md:text-3xl font-bold text-white mb-1 md:mb-3 drop-shadow-md">{t(texts.homeTitle)}</h2>
-            <p className="text-white/80 text-sm md:text-lg leading-relaxed line-clamp-2 md:line-clamp-none">{t(texts.homeDescription)}</p>
+            <h2 className="text-lg md:text-3xl font-bold text-white mb-1 md:mb-3 drop-shadow-md">{card1Title}</h2>
+            <p className="text-white/80 text-sm md:text-lg leading-relaxed line-clamp-2 md:line-clamp-none">{card1Desc}</p>
 
             {/* Decorative gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
@@ -140,8 +156,8 @@ export function ModeSelector({ onSelect }: ModeSelectorProps) {
             </div>
 
             {/* Content */}
-            <h2 className="text-lg md:text-3xl font-bold text-white mb-1 md:mb-3 drop-shadow-md">{t(texts.hereTitle)}</h2>
-            <p className="text-white/80 text-sm md:text-lg leading-relaxed mb-2 md:mb-4 line-clamp-2 md:line-clamp-none">{t(texts.hereDescription)}</p>
+            <h2 className="text-lg md:text-3xl font-bold text-white mb-1 md:mb-3 drop-shadow-md">{card2Title}</h2>
+            <p className="text-white/80 text-sm md:text-lg leading-relaxed mb-2 md:mb-4 line-clamp-2 md:line-clamp-none">{card2Desc}</p>
             {/* Decorative gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
           </motion.button>
