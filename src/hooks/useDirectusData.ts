@@ -172,6 +172,7 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
         order: poi.order ?? idx + 1,
         title: toMultilingual(poi.translations, 'title') || { es: '', en: '', fr: '' },
         shortDescription: toMultilingual(poi.translations, 'short_description') || { es: '', en: '', fr: '' },
+        longDescription: toMultilingual(poi.translations, 'description') || undefined,
         location: {
           lat,
           lng,

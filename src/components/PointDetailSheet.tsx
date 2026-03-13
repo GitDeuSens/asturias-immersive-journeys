@@ -163,6 +163,8 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
   const hasPDF = !!content.pdf;
   const title = getText(point.title, language);
   const shortDescription = getText((point as any).shortDescription ?? (point as any).short_description, language);
+  const longDescription = getText((point as any).longDescription ?? (point as any).description ?? (point as any).long_description, language);
+  const detailDescription = longDescription || shortDescription;
 
   const handleNavigateToStart = () => {
     if (point.location !== null) openNavigation(point.location.lat, point.location.lng, title);
@@ -188,7 +190,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
           <div className="flex-1 overflow-y-auto">
             {/* Hero image */}
             <div
-              className="sticky top-0 z-20 relative h-44 sm:h-60 bg-cover bg-center flex-shrink-0 overflow-hidden border-b border-border/40"
+              className="sticky top-0 z-20 relative h-44 sm:h-60 bg-cover bg-center flex-shrink-0 overflow-hidden"
               style={{ backgroundImage: point.coverImage ? `url(${DIRECTUS_URL}/assets/${point.coverImage})` : undefined }}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
@@ -256,7 +258,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
               </div>
             )}
             <div className="p-6 space-y-6">
-              {!hasAR && <p className="text-muted-foreground leading-relaxed text-base">{shortDescription}</p>}
+              {!hasAR && <p className="text-muted-foreground leading-relaxed text-base">{detailDescription}</p>}
               <NavigationSection point={point} />
               {point.location.address && (
                 <div className="cursor-pointer flex items-start gap-3 p-3 rounded-xl bg-muted/30 border border-border/50" onClick={handleNavigateToStart}>
