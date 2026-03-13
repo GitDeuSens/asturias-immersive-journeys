@@ -281,12 +281,8 @@ export function useImmersiveRoutes(language: Language = 'es') {
 
       // Points are now loaded with deep relations, no need for separate requests
       const immersiveRoutes: ImmersiveRoute[] = directusRoutes.map((route: any) => {
-        // Points are already included in the route data
         const points = route.points || [];
-        console.log('[DEBUG Route]', route.slug, 'title:', JSON.stringify(route.title), 'cover:', route.cover_image, 'cover_url:', route.cover_image_url, 'translations:', route.translations?.length);
-        const result = directusRouteToImmersive(route, points);
-        console.log('[DEBUG Immersive]', result.slug, 'title:', JSON.stringify(result.title), 'cover:', result.coverImage);
-        return result;
+        return directusRouteToImmersive(route, points);
       });
 
       setRoutes(immersiveRoutes);
