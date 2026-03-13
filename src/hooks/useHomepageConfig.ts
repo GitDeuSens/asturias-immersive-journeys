@@ -25,6 +25,9 @@ export interface HomepageConfig {
   detail2_cta: Record<string, string>;
   detail2_bg_image: string | null;
   social_links: SocialLink[];
+  slideshow_mode: string | null;
+  slideshow_images: string[];
+  slideshow_interval: number | null;
 }
 
 export interface SocialLink {
