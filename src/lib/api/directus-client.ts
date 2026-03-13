@@ -464,7 +464,7 @@ class DirectusApiClient {
     try {
       const [routes, analyticsCounts] = await Promise.all([
         this.getClient().request(readItems('routes', {
-          filter: { route_code: { _eq: code }, status: { _in: ['published', 'draft'] } },
+          filter: { route_code: { _eq: code }, status: { _in: API_CONFIG.getStatusFilter() } },
           fields: ['*', ...TRANSLATIONS_DEEP, 'categories.categories_id.*', 'categories.categories_id.translations.*', 'points.*', 'points.translations.*', 'points.ar_scene_id.*', 'points.ar_scene_id.translations.*', 'points.tour_360_id.*', 'points.tour_360_id.translations.*', 'points.gallery.*', 'points.audio_es.id', 'points.audio_es.duration', 'points.audio_en.id', 'points.audio_en.duration', 'points.audio_fr.id', 'points.audio_fr.duration'] as any,
           limit: 1,
         })),
