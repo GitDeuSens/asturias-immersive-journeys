@@ -2,13 +2,14 @@ import { motion } from 'framer-motion';
 import { View, Map, ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Footer } from './Footer';
+import { useHomepageConfig } from '@/hooks/useHomepageConfig';
 
 interface ExperienceSelectorProps {
   onSelect: (experience: 'tours' | 'routes') => void;
   onBack?: () => void;
 }
 
-const texts = {
+const fallbackTexts = {
   title: { es: 'Elige tu experiencia', en: 'Choose your experience', fr: 'Choisissez votre expérience' },
   toursTitle: { es: 'Tours Virtuales 360°', en: 'Virtual Tours 360°', fr: 'Visites Virtuelles 360°' },
   toursSubtitle: { es: 'Explora lugares icónicos con vistas panorámicas inmersivas', en: 'Explore iconic places with immersive panoramic views', fr: 'Explorez des lieux emblématiques avec des vues panoramiques immersives' },
@@ -22,8 +23,18 @@ const texts = {
   },
 };
 
+function pick(cms: Record<string, string> | undefined, fallback: Record<string, string>, lang: string): string {
+  const v = cms?.[lang] || cms?.es;
+  return v || fallback[lang] || fallback.es || '';
+}
+
 export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps) {
-  const { t } = useLanguage();
+  const { t, language: lang } = useLanguage();
+  const { data: config } = useHomepageConfig();
+
+  // ExperienceSelector reuses skip_link as its title if available, otherwise fallback
+  const title = pick(config?.skip_link, fallbackTexts.title, lang) || t(fallbackTexts.title);
+  const description = pick(config?.card1_description, fallbackTexts.homeDescription, lang);
 
   return (
     <>
@@ -35,11 +46,11 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
           transition={{ duration: 0.6 }} style={{ fontWeight: 'lighter' }}
           className="text-lg sm:text-xl md:text-4xl lg:text-6xl text-white text-center mb-2 sm:mb-5 drop-shadow-lg max-w-3xl initial-title"
         >
-          {t(texts.title)}
+          {title}
         </motion.h1>
 
         <div className="mb-2 sm:mb-5 w-16 sm:w-24 h-px bg-white/40" />
-        <span style={{ fontWeight: 'bold' }} className="description text-white mb-4 sm:mb-8 text-xs sm:text-base text-center px-2 leading-relaxed max-w-3xl">{t(texts.homeDescription)}</span>
+        <span style={{ fontWeight: 'bold' }} className="description text-white mb-4 sm:mb-8 text-xs sm:text-base text-center px-2 leading-relaxed max-w-3xl">{description}</span>
 
 
         {/* Experience Cards */}
@@ -57,10 +68,10 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
 
             {/* Content */}
             <h2 className="text-lg md:text-3xl font-bold text-white mb-1 md:mb-3 drop-shadow-md leading-tight">
-              {t(texts.toursTitle)}
+              {t(fallbackTexts.toursTitle)}
             </h2>
             <p className="text-white/80 text-sm md:text-lg leading-relaxed line-clamp-2 md:line-clamp-none">
-              {t(texts.toursSubtitle)}
+              {t(fallbackTexts.toursSubtitle)}
             </p>
 
             {/* CTA hint on hover */}
@@ -87,10 +98,10 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
 
             {/* Content */}
             <h2 className="text-lg md:text-3xl font-bold text-white mb-1 md:mb-3 drop-shadow-md leading-tight">
-              {t(texts.routesTitle)}
+              {t(fallbackTexts.routesTitle)}
             </h2>
             <p className="text-white/80 text-sm md:text-lg leading-relaxed line-clamp-2 md:line-clamp-none">
-              {t(texts.routesSubtitle)}
+              {t(fallbackTexts.routesSubtitle)}
             </p>
 
             {/* CTA hint on hover */}
@@ -113,7 +124,7 @@ export function ExperienceSelector({ onSelect, onBack }: ExperienceSelectorProps
           className="mt-4 sm:mt-6 flex items-center text-md gap-2 text-white/70 hover:text-white transition-colors"
         >
           <ArrowLeft className="w-7 h-7" />
-          <span className="font-medium text-xl">{t(texts.back)}</span>
+          <span className="font-medium text-xl">{t(fallbackTexts.back)}</span>
         </motion.button>
         )}
       </div>
