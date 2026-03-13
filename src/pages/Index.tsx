@@ -6,6 +6,7 @@ import { ModeSelector } from '@/components/ModeSelector';
 import { ExperienceSelector } from '@/components/ExperienceSelector';
 import { useExplorationMode } from '@/hooks/useLanguage';
 import { LCPOptimizer, useLCPOptimization, ResourceOptimizer } from '@/components/LCPOptimizer';
+import { useHomepageConfig } from '@/hooks/useHomepageConfig';
 
 type FlowStep = 'mode' | 'experience';
 
