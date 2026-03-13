@@ -239,30 +239,6 @@ export function UnifiedSearchBar({
               <div className="px-3 pb-3 space-y-2">
                 <Separator className="mb-1" />
 
-                {/* View mode toggle */}
-                {onViewModeChange && viewMode && (
-                  <div>
-                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
-                      {t({ es: 'Vista', en: 'View', fr: 'Vue' })}
-                    </p>
-                    <div className="flex items-center gap-1 p-0.5 rounded-lg bg-muted/60 border border-border/40">
-                      {(['routes', 'points'] as ViewMode[]).map((mode) => (
-                        <button
-                          key={mode}
-                          onClick={() => onViewModeChange(mode)}
-                          className={`flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold px-2 py-1.5 rounded-md transition-all ${
-                            viewMode === mode
-                              ? 'bg-primary text-primary-foreground shadow-sm'
-                              : 'text-muted-foreground hover:text-foreground'
-                          }`}
-                        >
-                          {mode === 'routes' ? <Route className="w-3.5 h-3.5" /> : <MapPin className="w-3.5 h-3.5" />}
-                          {viewModeLabels[mode][lang] || viewModeLabels[mode].en}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
 
                 {/* Categories */}
                 {categories && categories.length > 0 && onToggleCategory && (
