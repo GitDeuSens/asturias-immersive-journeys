@@ -161,10 +161,10 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
           role="img"
           aria-label={route.title[lang]}
         >
-          {/* Scroll-triggered gradient */}
-          <div className={`absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity duration-300 ${titlePinned ? 'opacity-100' : 'opacity-0'}`} aria-hidden="true" />
+          {/* Scroll-triggered gradient — blends into sheet background */}
+          <div className={`absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent transition-opacity duration-300 ${titlePinned ? 'opacity-100' : 'opacity-0'}`} aria-hidden="true" />
           {/* Always-visible base gradient for title legibility */}
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent" aria-hidden="true" />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background/80 to-transparent" aria-hidden="true" />
 
           {/* Favorite + Close buttons */}
           <div className="absolute top-4 right-4 flex items-center gap-2">
