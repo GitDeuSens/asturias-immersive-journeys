@@ -188,7 +188,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
           <div className="flex-1 overflow-y-auto">
             {/* Hero image */}
             <div
-              className="sticky top-0 z-20 relative h-44 sm:h-60 bg-cover bg-center flex-shrink-0 overflow-hidden border-b border-border/40"
+              className="sticky top-0 z-20 relative h-44 sm:h-60 bg-cover bg-center flex-shrink-0 overflow-hidden"
               style={{ backgroundImage: point.coverImage ? `url(${DIRECTUS_URL}/assets/${point.coverImage})` : undefined }}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
