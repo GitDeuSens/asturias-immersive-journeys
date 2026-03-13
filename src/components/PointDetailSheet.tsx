@@ -85,8 +85,11 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
   const [arSceneLoading, setArSceneLoading] = useState(false);
   const [show360Modal, setShow360Modal] = useState(false);
   const [show360Inline, setShow360Inline] = useState(false);
+  const [titlePinned, setTitlePinned] = useState(false);
   const poiStartTime = useRef<number>(Date.now());
   const prevUrlRef = useRef<string>(window.location.pathname);
+  const bodyTitleRef = useRef<HTMLHeadingElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setShow360Inline(false); }, [point?.id]);
 
