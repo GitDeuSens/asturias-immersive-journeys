@@ -197,7 +197,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
                   {route.title[lang]}
                 </h1>
                 {route.theme[lang] && (
-                  <p className="text-xs sm:text-sm font-medium text-white/80 mt-0.5 truncate drop-shadow">
+                  <p className="text-xs sm:text-sm font-medium text-foreground/70 mt-0.5 truncate">
                     {route.theme[lang]}
                   </p>
                 )}
