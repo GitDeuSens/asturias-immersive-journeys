@@ -191,13 +191,13 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
                 <h1
                   ref={bodyTitleRef}
                   id="route-detail-title"
-                  className="font-bold text-foreground leading-tight line-clamp-2 drop-shadow-[0_1px_3px_rgba(255,255,255,0.4)]"
-                  style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)' }}
+                  className="font-bold text-white leading-tight line-clamp-2"
+                  style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', textShadow: '0 1px 4px rgba(0,0,0,0.7), 0 0 12px rgba(0,0,0,0.4)' }}
                 >
                   {route.title[lang]}
                 </h1>
                 {route.theme[lang] && (
-                  <p className="text-xs sm:text-sm font-medium text-foreground/70 mt-0.5 truncate">
+                  <p className="text-xs sm:text-sm font-medium text-white/90 mt-0.5 truncate" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.6)' }}>
                     {route.theme[lang]}
                   </p>
                 )}
