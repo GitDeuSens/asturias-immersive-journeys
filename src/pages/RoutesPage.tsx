@@ -529,7 +529,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
         if (point.location.lat === 0 && point.location.lng === 0) return;
         const ptTitle = point.title as any;
         const pointName = typeof ptTitle === 'string' ? ptTitle : (ptTitle?.[lang] || ptTitle?.es || '');
-        const idx = allPoints.indexOf(point);
+        
         const marker = L.marker([point.location.lat, point.location.lng], {
           icon: createPOIMarkerIcon(point, pointName),
         }).on("click", () => handleSelectPoint(point));

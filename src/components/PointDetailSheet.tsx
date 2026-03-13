@@ -258,7 +258,7 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
               </div>
             )}
             <div className="p-6 space-y-6">
-              {!hasAR && <p className="text-muted-foreground leading-relaxed text-base">{shortDescription}</p>}
+              {!hasAR && <p className="text-muted-foreground leading-relaxed text-base">{detailDescription}</p>}
               <NavigationSection point={point} />
               {point.location.address && (
                 <div className="cursor-pointer flex items-start gap-3 p-3 rounded-xl bg-muted/30 border border-border/50" onClick={handleNavigateToStart}>

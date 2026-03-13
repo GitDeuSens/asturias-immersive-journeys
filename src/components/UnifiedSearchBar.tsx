@@ -359,12 +359,6 @@ export function UnifiedSearchBar({
                   </div>
                 )}
 
-                {/* Result count */}
-                {resultCount !== undefined && (
-                  <p className="text-[10px] text-muted-foreground text-right pt-1">
-                    {resultCount} {t({ es: 'resultados', en: 'results', fr: 'résultats' })}
-                  </p>
-                )}
               </div>
             </motion.div>
           )}
