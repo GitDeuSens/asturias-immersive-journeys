@@ -884,6 +884,8 @@ export const RoutesPage = React.memo(function RoutesPage() {
                       const pointTitle = point.title[lang] || point.title.es || '';
                       const pointDesc = point.shortDescription[lang] || point.shortDescription.es || '';
                       const routeName = point.routeTitle[lang] || point.routeTitle.es || '';
+                      const hasAR = !!point.content?.arExperience;
+                      const has360 = !!point.content?.tour360;
                       return (
                         <motion.button
                           key={point.id}
@@ -894,13 +896,30 @@ export const RoutesPage = React.memo(function RoutesPage() {
                           className="w-full text-left rounded-2xl bg-card/50 border border-border/50 hover:border-primary/50 hover:bg-card/80 transition-all duration-200 group overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                         >
                           <div className="flex gap-3 p-3">
-                            <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-muted">
+                            <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-muted">
                               <img src={imgSrc} alt={pointTitle} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                                {pointTitle}
-                              </h3>
+                              <div className="flex items-center gap-2">
+                                <h3 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1 flex-1 min-w-0">
+                                  {pointTitle}
+                                </h3>
+                                {hasAR && (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-warm/15 text-warm text-[10px] font-bold shrink-0">
+                                    <Smartphone className="w-3 h-3" />AR
+                                  </span>
+                                )}
+                                {has360 && (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/15 text-primary text-[10px] font-bold shrink-0">
+                                    <Camera className="w-3 h-3" />360°
+                                  </span>
+                                )}
+                                {!hasAR && !has360 && (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-accent/15 text-accent-foreground text-[10px] font-bold shrink-0">
+                                    <Info className="w-3 h-3" />Info
+                                  </span>
+                                )}
+                              </div>
                               <p className="text-xs text-primary/80 font-medium mt-0.5 line-clamp-1">{routeName}</p>
                               <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{pointDesc}</p>
                             </div>
