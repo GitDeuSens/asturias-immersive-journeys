@@ -79,6 +79,32 @@ const createPointMarkerIcon = (point: RoutePoint, index: number, pointName: stri
   });
 };
 
+// Create POI marker for Ubicaciones mode — no index number, shows type badge
+const createPOIMarkerIcon = (point: RoutePoint, pointName: string) => {
+  const hasAR = !!point.content.arExperience;
+  const has360 = !!point.content.tour360;
+  const borderColor = hasAR ? "hsl(48, 100%, 50%)" : has360 ? "#C2634C" : "hsl(203, 100%, 32%)";
+  const typeLabel = hasAR ? 'AR' : has360 ? '360°' : 'Info';
+  const typeBg = hasAR ? 'hsl(48, 100%, 50%)' : has360 ? '#C2634C' : 'hsl(203, 100%, 32%)';
+  const typeColor = hasAR ? '#1a1a1a' : 'white';
+  return L.divIcon({
+    className: "custom-marker",
+    html: `
+      <div style="display: flex; flex-direction: column; align-items: center; cursor: pointer;" role="button" aria-label="${pointName}">
+        <div style="position: relative; width: 48px; height: 48px;">
+          <div style="width: 48px; height: 48px; border-radius: 50%; border: 4px solid ${borderColor}; overflow: hidden; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            ${point.coverImage ? `<img src="${DIRECTUS_URL}/assets/${point.coverImage}" style="width: 100%; height: 100%; object-fit: cover;" alt="${pointName}"/>` : `<div style="width: 100%; height: 100%; background: ${borderColor}20;"></div>`}
+          </div>
+          <div style="position: absolute; top: -6px; right: -6px; padding: 1px 5px; background: ${typeBg}; border: 2px solid white; border-radius: 8px; font-size: 9px; font-weight: 800; color: ${typeColor}; box-shadow: 0 2px 8px rgba(0,0,0,0.25); font-family: 'Montserrat', sans-serif; white-space: nowrap;">${typeLabel}</div>
+        </div>
+        <div style="margin-top: 6px; background: white; color: hsl(0, 0%, 15%); font-size: 9px; font-weight: 700; padding: 3px 6px; border-radius: 6px; white-space: nowrap; font-family: 'Montserrat', sans-serif; box-shadow: 0 2px 8px rgba(0,0,0,0.2); text-align: center; border: 1px solid ${borderColor};">${pointName}</div>
+      </div>
+    `,
+    iconSize: [100, 80],
+    iconAnchor: [50, 40],
+  });
+};
+
 export const RoutesPage = React.memo(function RoutesPage() {
   const { routeCode, id: pointId } = useParams<{ routeCode?: string; id?: string }>();
   const navigate = useNavigate();
