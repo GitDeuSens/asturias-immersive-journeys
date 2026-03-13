@@ -934,7 +934,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                                 )}
                               </div>
                               <p className="text-xs text-primary/80 font-medium mt-0.5 line-clamp-1">{routeName}</p>
-                              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{pointDesc}</p>
+                              <p className="text-xs text-muted-foreground mt-1">{pointDesc}</p>
                             </div>
                           </div>
                         </motion.button>

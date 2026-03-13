@@ -518,7 +518,7 @@ function PointCard({ point, index, lang, isVisited, isSelected, isLast, isNeares
           <div className="p-3">
             <h4 className="font-semibold text-foreground line-clamp-1">{title}</h4>
             {shortDescription && (
-              <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{shortDescription}</p>
+              <p className="text-xs text-muted-foreground mt-1">{shortDescription}</p>
             )}
 
             <div className="flex items-center justify-between mt-3 pt-2 border-t border-border/50">
