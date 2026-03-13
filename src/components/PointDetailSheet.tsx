@@ -163,6 +163,8 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
   const hasPDF = !!content.pdf;
   const title = getText(point.title, language);
   const shortDescription = getText((point as any).shortDescription ?? (point as any).short_description, language);
+  const longDescription = getText((point as any).longDescription ?? (point as any).description ?? (point as any).long_description, language);
+  const detailDescription = longDescription || shortDescription;
 
   const handleNavigateToStart = () => {
     if (point.location !== null) openNavigation(point.location.lat, point.location.lng, title);
