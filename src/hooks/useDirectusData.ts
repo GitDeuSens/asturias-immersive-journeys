@@ -93,6 +93,16 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
       }
 
       // Map practical info
+      // Debug: log practical info fields for POIs that might have data
+      if (poi.slug?.includes('moa') || poi.slug?.includes('oro')) {
+        console.log(`[PracticalInfo Debug] POI "${poi.slug}":`, {
+          phone: poi.phone,
+          email: poi.email,
+          website: poi.website,
+          opening_hours: poi.opening_hours,
+          prices: poi.prices,
+        });
+      }
       if (poi.phone || poi.email || poi.website || poi.opening_hours || poi.prices) {
         content.practicalInfo = {
           phone: poi.phone,
