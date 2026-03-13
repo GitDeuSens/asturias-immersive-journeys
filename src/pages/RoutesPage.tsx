@@ -658,9 +658,21 @@ export const RoutesPage = React.memo(function RoutesPage() {
         // Points-only mode (Ubicaciones) — use point slug directly
         navigate(`/routes/poi/${pointSlug(point)}`, { replace: false });
       }
-      // Focus map on clicked POI
+      // Focus map on clicked POI and ensure marker is visible (unclustered)
       if (mapRef.current && point.location.lat !== 0 && point.location.lng !== 0) {
-        mapRef.current.setView([point.location.lat, point.location.lng], 15, { animate: true });
+        // Find the marker for this point
+        const targetMarker = markersRef.current.find(m => {
+          const pos = m.getLatLng();
+          return Math.abs(pos.lat - point.location.lat) < 0.0001 && Math.abs(pos.lng - point.location.lng) < 0.0001;
+        });
+        if (targetMarker && clusterGroupRef.current) {
+          // Use zoomToShowLayer to uncluster and reveal the marker
+          clusterGroupRef.current.zoomToShowLayer(targetMarker, () => {
+            mapRef.current?.setView([point.location.lat, point.location.lng], Math.max(mapRef.current.getZoom(), 15), { animate: true });
+          });
+        } else {
+          mapRef.current.setView([point.location.lat, point.location.lng], 15, { animate: true });
+        }
       }
     }, 0);
   };

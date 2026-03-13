@@ -1,16 +1,13 @@
 // API configuration constants
 
 export const API_CONFIG = {
-  // Content status filters
+  // Content status filters — always show only published content
   STATUS_FILTERS: {
-    DEVELOPMENT: ['published', 'draft'] as const,
-    PRODUCTION: ['published'] as const,
+    DEFAULT: ['published'] as const,
   },
   
-  // Get current status filter based on environment
-  getStatusFilter(): ('published' | 'draft')[] {
-    return import.meta.env.DEV 
-      ? this.STATUS_FILTERS.DEVELOPMENT 
-      : this.STATUS_FILTERS.PRODUCTION;
+  // Get current status filter — always published only
+  getStatusFilter(): ('published')[] {
+    return [...this.STATUS_FILTERS.DEFAULT];
   }
 } as const;
