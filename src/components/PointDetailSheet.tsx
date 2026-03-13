@@ -206,18 +206,21 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
           className="fixed inset-x-2 sm:inset-x-auto sm:right-2 top-16 md:top-[126px] bottom-2 sm:w-full sm:max-w-lg bg-background z-[48] shadow-2xl flex flex-col overflow-hidden rounded-2xl border border-border/40"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex-1 overflow-y-auto">
+          <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
             {/* Hero image */}
             <div
               className="sticky top-0 z-20 relative h-44 sm:h-60 bg-cover bg-center flex-shrink-0 overflow-hidden"
               style={{ backgroundImage: point.coverImage ? `url(${DIRECTUS_URL}/assets/${point.coverImage})` : undefined }}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 pt-12">
-                <h1
+              {/* Gradient — only when title is pinned */}
+              <div className={`absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent transition-opacity duration-300 ${titlePinned ? 'opacity-100' : 'opacity-0'}`} />
+              {/* Pinned title overlay */}
+              <div className={`absolute bottom-0 left-0 right-0 px-5 pb-4 pt-12 transition-opacity duration-300 ${titlePinned ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                <h2
                   className="font-bold text-foreground leading-tight line-clamp-2"
                   style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)' }}
-                >{title}</h1>
+                  aria-hidden={!titlePinned}
+                >{title}</h2>
               </div>
               <button
                 onClick={() => {
@@ -233,6 +236,15 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
                   <Smartphone className="w-4 h-4" />AR<Sparkles className="w-3 h-3" />
                 </motion.span>
               )}
+            </div>
+
+            {/* Body title — visible initially, triggers pinned title on scroll */}
+            <div className="px-6 pt-4 pb-1">
+              <h1
+                ref={bodyTitleRef}
+                className="font-bold text-foreground leading-tight"
+                style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)' }}
+              >{title}</h1>
             </div>
 
             {/* Breadcrumb */}
