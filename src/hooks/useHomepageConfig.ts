@@ -16,6 +16,14 @@ export interface HomepageConfig {
   card2_description: Record<string, string>;
   card2_icon: string | null;
   skip_link: Record<string, string>;
+  detail1_heading: Record<string, string>;
+  detail1_description: Record<string, string>;
+  detail1_cta: Record<string, string>;
+  detail1_bg_image: string | null;
+  detail2_heading: Record<string, string>;
+  detail2_description: Record<string, string>;
+  detail2_cta: Record<string, string>;
+  detail2_bg_image: string | null;
 }
 
 function buildMultilingual(raw: any, prefix: string): Record<string, string> {
@@ -48,6 +56,14 @@ async function fetchHomepageConfig(): Promise<HomepageConfig | null> {
     card2_description: buildMultilingual(d, 'card2_description'),
     card2_icon: d.card2_icon || null,
     skip_link: buildMultilingual(d, 'skip_link'),
+    detail1_heading: buildMultilingual(d, 'detail1_heading'),
+    detail1_description: buildMultilingual(d, 'detail1_description'),
+    detail1_cta: buildMultilingual(d, 'detail1_cta'),
+    detail1_bg_image: d.detail1_bg_image || null,
+    detail2_heading: buildMultilingual(d, 'detail2_heading'),
+    detail2_description: buildMultilingual(d, 'detail2_description'),
+    detail2_cta: buildMultilingual(d, 'detail2_cta'),
+    detail2_bg_image: d.detail2_bg_image || null,
   };
 }
 
