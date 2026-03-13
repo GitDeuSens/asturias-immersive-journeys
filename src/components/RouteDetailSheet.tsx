@@ -408,7 +408,7 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
 
         {/* CTA Footer */}
         <div className="p-4 border-t border-border bg-background flex-shrink-0">
