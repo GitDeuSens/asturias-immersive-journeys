@@ -91,7 +91,23 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
   const bodyTitleRef = useRef<HTMLHeadingElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { setShow360Inline(false); }, [point?.id]);
+  useEffect(() => { setShow360Inline(false); setTitlePinned(false); }, [point?.id]);
+
+  // Track when the body title scrolls behind the sticky hero
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    const titleEl = bodyTitleRef.current;
+    if (!container || !titleEl) return;
+    const heroHeight = window.innerWidth >= 640 ? 240 : 176; // sm:h-60 : h-44
+    const onScroll = () => {
+      const titleRect = titleEl.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      const titleTopRelative = titleRect.top - containerRect.top;
+      setTitlePinned(titleTopRelative < heroHeight);
+    };
+    container.addEventListener('scroll', onScroll, { passive: true });
+    return () => container.removeEventListener('scroll', onScroll);
+  }, [point?.id]);
 
   const loadARScene = useCallback(async () => {
     if (!point?.content?.arExperience) return;
