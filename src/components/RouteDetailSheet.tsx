@@ -54,6 +54,9 @@ interface RouteDetailSheetProps {
 export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }: RouteDetailSheetProps) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as 'es' | 'en' | 'fr';
+  const [titlePinned, setTitlePinned] = useState(false);
+  const bodyTitleRef = useRef<HTMLHeadingElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { getCategoryById } = useDirectusCategories(lang);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
