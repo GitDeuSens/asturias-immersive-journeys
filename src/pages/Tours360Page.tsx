@@ -168,7 +168,7 @@ export function Tours360Page() {
 
   // Generate slug for a tour — prefer DB slug, fallback to title
   const getTourSlug = (tour: KuulaTour): string => {
-    if (tour.slug) return tour.slug;
+    if (tour.slug) return tour.slug.replace(/^\/+/, '');
     const title = typeof tour.title === 'string' ? tour.title : tour.title[language] || tour.title.es || '';
     return slugify(title);
   };
