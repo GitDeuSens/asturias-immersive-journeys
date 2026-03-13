@@ -103,13 +103,17 @@ function directusRouteToImmersive(route: any, points: any[]): ImmersiveRoute {
           prices: poi.prices,
         });
       }
-      if (poi.phone || poi.email || poi.website || poi.opening_hours || poi.prices) {
+      // Check multilingual objects for actual content (they're always objects, even when empty)
+      const hasMultilingualContent = (obj: any): boolean =>
+        obj && typeof obj === 'object' && Object.values(obj).some((v: any) => v && typeof v === 'string' && v.trim() !== '');
+      
+      if (poi.phone || poi.email || poi.website || hasMultilingualContent(poi.opening_hours) || hasMultilingualContent(poi.prices)) {
         content.practicalInfo = {
           phone: poi.phone,
           email: poi.email,
           website: poi.website,
-          schedule: poi.opening_hours,
-          prices: poi.prices,
+          schedule: hasMultilingualContent(poi.opening_hours) ? poi.opening_hours : undefined,
+          prices: hasMultilingualContent(poi.prices) ? poi.prices : undefined,
         };
       }
 
