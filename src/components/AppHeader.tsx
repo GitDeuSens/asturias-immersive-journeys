@@ -68,7 +68,9 @@ export function AppHeader({ showRestart = true, variant = "light" }: AppHeaderPr
             <div className="w-[33px] h-[48px] bg-primary absolute top-2" />
             {homepageConfig?.social_links && homepageConfig.social_links.length > 0 && (
               <div className="container mx-auto pl-4 px-2 py-1.5 flex justify-end gap-2">
-                {homepageConfig.social_links.map((link, idx) => {
+                {homepageConfig.social_links
+                  .filter((link) => link.hidden !== true && link.visible !== false)
+                  .map((link, idx) => {
                   const iconName = link.icon.charAt(0).toUpperCase() + link.icon.slice(1);
                   const LucideIcon = (icons as any)[iconName];
                   if (!LucideIcon) return null;
