@@ -27,6 +27,7 @@ const navItems = [
 
 export function AppHeader({ showRestart = true, variant = "light" }: AppHeaderProps) {
   const { t, i18n } = useTranslation();
+  const { data: homepageConfig } = useHomepageConfig();
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
