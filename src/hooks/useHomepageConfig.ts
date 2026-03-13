@@ -24,6 +24,13 @@ export interface HomepageConfig {
   detail2_description: Record<string, string>;
   detail2_cta: Record<string, string>;
   detail2_bg_image: string | null;
+  social_links: SocialLink[];
+}
+
+export interface SocialLink {
+  icon: string;
+  url: string;
+  label?: string;
 }
 
 function buildMultilingual(raw: any, prefix: string): Record<string, string> {
@@ -64,6 +71,7 @@ async function fetchHomepageConfig(): Promise<HomepageConfig | null> {
     detail2_description: buildMultilingual(d, 'detail2_description'),
     detail2_cta: buildMultilingual(d, 'detail2_cta'),
     detail2_bg_image: d.detail2_bg_image || null,
+    social_links: Array.isArray(d.social_links) ? d.social_links : [],
   };
 }
 

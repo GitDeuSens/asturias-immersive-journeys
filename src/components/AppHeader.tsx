@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Facebook, Twitter, Menu, X, View, Map, Sparkles, Home, ArrowLeftRight, HelpCircle, Heart, MapPin } from "lucide-react";
+import { icons, Menu, X, View, Map, Sparkles, Home, ArrowLeftRight, HelpCircle, Heart, MapPin } from "lucide-react";
+import { useHomepageConfig } from "@/hooks/useHomepageConfig";
 import { useTranslation } from "react-i18next";
 import { SettingsDropdown } from "@/components/SettingsDropdown";
 import { GlossaryDialog } from "@/components/GlossaryDialog";
@@ -26,6 +27,7 @@ const navItems = [
 
 export function AppHeader({ showRestart = true, variant = "light" }: AppHeaderProps) {
   const { t, i18n } = useTranslation();
+  const { data: homepageConfig } = useHomepageConfig();
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -64,26 +66,25 @@ export function AppHeader({ showRestart = true, variant = "light" }: AppHeaderPr
         <div className="hidden md:block bg-asturias-dark border-t-[8px] border-primary">
           <div className="container flex mx-auto pl-4 px-2 justify-between min-h-[44px]">
             <div className="w-[33px] h-[48px] bg-primary absolute top-2" />
-            {(
+            {homepageConfig?.social_links && homepageConfig.social_links.length > 0 && (
               <div className="container mx-auto pl-4 px-2 py-1.5 flex justify-end gap-2">
-                <a
-                  href="https://facebook.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-full bg-muted-foreground/60 hover:bg-primary flex items-center justify-center transition-colors"
-                  aria-label="Facebook"
-                >
-                  <Facebook className="w-4 h-4 text-white" />
-                </a>
-                <a
-                  href="https://twitter.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-full bg-muted-foreground/60 hover:bg-primary flex items-center justify-center transition-colors"
-                  aria-label="X (Twitter)"
-                >
-                  <Twitter className="w-4 h-4 text-white" />
-                </a>
+                {homepageConfig.social_links.map((link, idx) => {
+                  const iconName = link.icon.charAt(0).toUpperCase() + link.icon.slice(1);
+                  const LucideIcon = (icons as any)[iconName];
+                  if (!LucideIcon) return null;
+                  return (
+                    <a
+                      key={idx}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-8 h-8 rounded-full bg-muted-foreground/60 hover:bg-primary flex items-center justify-center transition-colors"
+                      aria-label={link.label || link.icon}
+                    >
+                      <LucideIcon className="w-4 h-4 text-white" />
+                    </a>
+                  );
+                })}
               </div>
             )}
           </div>
