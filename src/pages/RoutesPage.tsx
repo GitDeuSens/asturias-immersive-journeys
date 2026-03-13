@@ -531,7 +531,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
         const pointName = typeof ptTitle === 'string' ? ptTitle : (ptTitle?.[lang] || ptTitle?.es || '');
         const idx = allPoints.indexOf(point);
         const marker = L.marker([point.location.lat, point.location.lng], {
-          icon: createPointMarkerIcon(point, idx, pointName),
+          icon: createPOIMarkerIcon(point, pointName),
         }).on("click", () => handleSelectPoint(point));
 
         clusterGroupRef.current?.addLayer(marker);
