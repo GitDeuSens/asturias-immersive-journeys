@@ -168,7 +168,7 @@ export function Tours360Page() {
 
   // Generate slug for a tour — prefer DB slug, fallback to title
   const getTourSlug = (tour: KuulaTour): string => {
-    if (tour.slug) return tour.slug;
+    if (tour.slug) return tour.slug.replace(/^\/+/, '');
     const title = typeof tour.title === 'string' ? tour.title : tour.title[language] || tour.title.es || '';
     return slugify(title);
   };
@@ -178,7 +178,10 @@ export function Tours360Page() {
     if (slug && kuulaTours.length > 0) {
       const found = kuulaTours.find(tour => {
         const tourSlug = getTourSlug(tour);
-        return tourSlug === slug || slugify(tour.id) === slug || slug === tour.slug;
+        const cleanSlug = slug.replace(/^\/+/, '');
+        // Match by custom slug, build_path slug, or ID
+        const buildSlug = tour.build_path?.replace(/^\/+/, '').replace(/\/+$/, '') || '';
+        return tourSlug === cleanSlug || buildSlug === cleanSlug || slugify(tour.id) === cleanSlug || tour.slug?.replace(/^\/+/, '') === cleanSlug;
       });
       if (found) {
         if (!activeTour || activeTour.id !== found.id) {
