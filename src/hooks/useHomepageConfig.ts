@@ -71,6 +71,7 @@ async function fetchHomepageConfig(): Promise<HomepageConfig | null> {
     detail2_description: buildMultilingual(d, 'detail2_description'),
     detail2_cta: buildMultilingual(d, 'detail2_cta'),
     detail2_bg_image: d.detail2_bg_image || null,
+    social_links: Array.isArray(d.social_links) ? d.social_links : [],
   };
 }
 
