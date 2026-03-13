@@ -88,7 +88,6 @@ export function UnifiedSearchBar({
   selectedCustomFilters = [],
   onToggleCustomFilter,
   extraAction,
-  resultCount,
   className = '',
 }: UnifiedSearchBarProps) {
   const { t, language: lang } = useLanguage();

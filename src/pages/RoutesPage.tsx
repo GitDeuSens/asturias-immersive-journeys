@@ -833,7 +833,7 @@ export const RoutesPage = React.memo(function RoutesPage() {
                   customFilters={viewMode === 'points' ? experienceTypeFilters : undefined}
                   selectedCustomFilters={viewMode === 'points' ? selectedExpTypes : undefined}
                   onToggleCustomFilter={viewMode === 'points' ? toggleExpType : undefined}
-                  resultCount={viewMode === 'routes' ? sortedFilteredRoutes.length : allPoints.length}
+                  
                   extraAction={
                     <button
                       onClick={async () => {

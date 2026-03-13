@@ -301,7 +301,7 @@ export function XRExperiencesPage() {
               query={searchQuery}
               onQueryChange={setSearchQuery}
               placeholder={t(texts.searchPlaceholder)}
-              resultCount={filteredItems.length}
+              
             />
           </motion.div>
 

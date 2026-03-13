@@ -214,7 +214,7 @@ export function VRExperiencesPage() {
               customFilters={categoryFilters}
               selectedCustomFilters={selectedCategories}
               onToggleCustomFilter={toggleCategory}
-              resultCount={filteredExperiences.length}
+              
             />
           </motion.div>
 

@@ -174,7 +174,7 @@ export function ARExperiencesPage() {
               customFilters={arTypeFilters}
               selectedCustomFilters={selectedTypes}
               onToggleCustomFilter={toggleType}
-              resultCount={filteredScenes.length}
+              
             />
           </motion.div>
 
