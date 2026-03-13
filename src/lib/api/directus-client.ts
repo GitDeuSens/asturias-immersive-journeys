@@ -85,9 +85,11 @@ function transformTour360(tour: DirectusTour360): KuulaTour {
 }
 
 function transformARScene(scene: DirectusARScene): ARScene {
+  // Strip leading slashes from slug for clean URLs
+  const cleanSlug = (scene.slug || '').replace(/^\/+/, '');
   return {
     id: scene.id,
-    slug: scene.slug,
+    slug: cleanSlug,
     title: toMultilingual(scene.translations, 'title', true),
     description: toMultilingual(scene.translations, 'description'),
     needle_scene_url: getBuildUrl(scene.build_path, scene.slug, 'ar-builds'),
