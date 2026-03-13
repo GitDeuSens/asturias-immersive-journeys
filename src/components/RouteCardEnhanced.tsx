@@ -111,7 +111,7 @@ const RouteCardComponent = forwardRef<HTMLButtonElement, RouteCardProps>(functio
         <p className="text-xs text-primary font-medium mb-2">{route.theme[lang]}</p>
 
         {/* Description */}
-        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{route.shortDescription[lang]}</p>
+        <p className="text-sm text-muted-foreground mb-3">{route.shortDescription[lang]}</p>
 
         {/* Footer metadata */}
         <div className="flex flex-wrap items-center gap-2">
