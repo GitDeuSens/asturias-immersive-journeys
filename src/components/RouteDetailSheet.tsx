@@ -84,13 +84,9 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
 
   useEffect(() => {
     const container = scrollContainerRef.current;
-    const titleEl = bodyTitleRef.current;
-    if (!container || !titleEl) return;
-    const heroHeight = window.innerWidth >= 640 ? 240 : 176;
+    if (!container) return;
     const onScroll = () => {
-      const titleRect = titleEl.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-      setTitlePinned(titleRect.top - containerRect.top < heroHeight);
+      setTitlePinned(container.scrollTop > 20);
     };
     container.addEventListener('scroll', onScroll, { passive: true });
     return () => container.removeEventListener('scroll', onScroll);
@@ -165,7 +161,10 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
           role="img"
           aria-label={route.title[lang]}
         >
-          <div className={`absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent transition-opacity duration-300 ${titlePinned ? 'opacity-100' : 'opacity-0'}`} aria-hidden="true" />
+          {/* Scroll-triggered gradient */}
+          <div className={`absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity duration-300 ${titlePinned ? 'opacity-100' : 'opacity-0'}`} aria-hidden="true" />
+          {/* Always-visible base gradient for title legibility */}
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent" aria-hidden="true" />
 
           {/* Favorite + Close buttons */}
           <div className="absolute top-4 right-4 flex items-center gap-2">
@@ -185,47 +184,26 @@ export function RouteDetailSheet({ route, onClose, onEnterRoute, onSelectPoint }
             </button>
           </div>
 
-          {/* Pinned title overlay — visible only when scrolled */}
-          <div className={`absolute bottom-0 left-0 right-0 px-5 pb-4 pt-12 transition-opacity duration-300 ${titlePinned ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          {/* Title — always on the photo */}
+          <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 pt-12">
             <div className="flex items-end gap-2">
               <div className="flex-1 min-w-0">
-                <h2
-                  className="font-bold text-foreground leading-tight line-clamp-2"
+                <h1
+                  ref={bodyTitleRef}
+                  id="route-detail-title"
+                  className="font-bold text-white leading-tight line-clamp-2 drop-shadow-lg"
                   style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)' }}
-                  aria-hidden={!titlePinned}
                 >
                   {route.title[lang]}
-                </h2>
+                </h1>
                 {route.theme[lang] && (
-                  <p className="text-xs sm:text-sm font-medium text-foreground/70 mt-0.5 truncate">
+                  <p className="text-xs sm:text-sm font-medium text-white/80 mt-0.5 truncate drop-shadow">
                     {route.theme[lang]}
                   </p>
                 )}
               </div>
               <PopularityBadge viewCount={route.viewCount} dateCreated={route.createdAt} size="md" className="flex-shrink-0 mb-0.5" />
             </div>
-          </div>
-        </div>
-
-        {/* Body title — visible initially */}
-        <div className="px-6 pt-4 pb-1">
-          <div className="flex items-end gap-2">
-            <div className="flex-1 min-w-0">
-              <h1
-                ref={bodyTitleRef}
-                id="route-detail-title"
-                className="font-bold text-foreground leading-tight"
-                style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)' }}
-              >
-                {route.title[lang]}
-              </h1>
-              {route.theme[lang] && (
-                <p className="text-xs sm:text-sm font-medium text-muted-foreground mt-0.5 truncate">
-                  {route.theme[lang]}
-                </p>
-              )}
-            </div>
-            <PopularityBadge viewCount={route.viewCount} dateCreated={route.createdAt} size="md" className="flex-shrink-0 mb-0.5" />
           </div>
         </div>
 

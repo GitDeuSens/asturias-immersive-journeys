@@ -93,17 +93,12 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
 
   useEffect(() => { setShow360Inline(false); setTitlePinned(false); }, [point?.id]);
 
-  // Track when the body title scrolls behind the sticky hero
+  // Activate gradient overlay when user starts scrolling
   useEffect(() => {
     const container = scrollContainerRef.current;
-    const titleEl = bodyTitleRef.current;
-    if (!container || !titleEl) return;
-    const heroHeight = window.innerWidth >= 640 ? 240 : 176; // sm:h-60 : h-44
+    if (!container) return;
     const onScroll = () => {
-      const titleRect = titleEl.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-      const titleTopRelative = titleRect.top - containerRect.top;
-      setTitlePinned(titleTopRelative < heroHeight);
+      setTitlePinned(container.scrollTop > 20);
     };
     container.addEventListener('scroll', onScroll, { passive: true });
     return () => container.removeEventListener('scroll', onScroll);
@@ -212,15 +207,17 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
               className="sticky top-0 z-20 relative h-44 sm:h-60 bg-cover bg-center flex-shrink-0 overflow-hidden"
               style={{ backgroundImage: point.coverImage ? `url(${DIRECTUS_URL}/assets/${point.coverImage})` : undefined }}
             >
-              {/* Gradient — only when title is pinned */}
-              <div className={`absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent transition-opacity duration-300 ${titlePinned ? 'opacity-100' : 'opacity-0'}`} />
-              {/* Pinned title overlay */}
-              <div className={`absolute bottom-0 left-0 right-0 px-5 pb-4 pt-12 transition-opacity duration-300 ${titlePinned ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                <h2
-                  className="font-bold text-foreground leading-tight line-clamp-2"
+              {/* Gradient — appears on scroll */}
+              <div className={`absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity duration-300 ${titlePinned ? 'opacity-100' : 'opacity-0'}`} />
+              {/* Always-visible base gradient for title legibility */}
+              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent" />
+              {/* Title — always on the photo */}
+              <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 pt-12">
+                <h1
+                  ref={bodyTitleRef}
+                  className="font-bold text-white leading-tight line-clamp-2 drop-shadow-lg"
                   style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)' }}
-                  aria-hidden={!titlePinned}
-                >{title}</h2>
+                >{title}</h1>
               </div>
               <button
                 onClick={() => {
@@ -236,15 +233,6 @@ export function PointDetailSheet({ point, onClose, routeTitle, onBackToRoute, al
                   <Smartphone className="w-4 h-4" />AR<Sparkles className="w-3 h-3" />
                 </motion.span>
               )}
-            </div>
-
-            {/* Body title — visible initially, triggers pinned title on scroll */}
-            <div className="px-6 pt-4 pb-1">
-              <h1
-                ref={bodyTitleRef}
-                className="font-bold text-foreground leading-tight"
-                style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)' }}
-              >{title}</h1>
             </div>
 
             {/* Breadcrumb */}
